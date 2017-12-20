@@ -7,69 +7,20 @@ December 18, 2017
 library(tidypredict)
 ```
 
-    ## Loading required package: purrr
-
     ## Loading required package: rlang
 
-    ## 
-    ## Attaching package: 'rlang'
+    ## Loading required package: purrr
 
-    ## The following objects are masked from 'package:purrr':
+    ## 
+    ## Attaching package: 'purrr'
+
+    ## The following objects are masked from 'package:rlang':
     ## 
     ##     %@%, %||%, as_function, flatten, flatten_chr, flatten_dbl,
     ##     flatten_int, flatten_lgl, invoke, list_along, modify, prepend,
     ##     rep_along, splice
 
     ## Loading required package: tibble
-
-    ## 
-    ## Attaching package: 'tibble'
-
-    ## The following object is masked from 'package:rlang':
-    ## 
-    ##     has_name
-
-    ## Warning: replacing previous import 'purrr::invoke' by 'rlang::invoke' when
-    ## loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::flatten_int' by
-    ## 'rlang::flatten_int' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::flatten_dbl' by
-    ## 'rlang::flatten_dbl' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::list_along' by
-    ## 'rlang::list_along' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::%||%' by 'rlang::%||%' when
-    ## loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::flatten_chr' by
-    ## 'rlang::flatten_chr' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::prepend' by 'rlang::prepend'
-    ## when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::flatten' by 'rlang::flatten'
-    ## when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::rep_along' by 'rlang::rep_along'
-    ## when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::splice' by 'rlang::splice' when
-    ## loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::modify' by 'rlang::modify' when
-    ## loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::flatten_lgl' by
-    ## 'rlang::flatten_lgl' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::as_function' by
-    ## 'rlang::as_function' when loading 'tidypredict'
-
-    ## Warning: replacing previous import 'purrr::%@%' by 'rlang::%@%' when
-    ## loading 'tidypredict'
 
 ``` r
 df <- mtcars %>%
@@ -89,9 +40,9 @@ a4 <- as.numeric(predict(m4, df))
 a5 <- as.numeric(predict(m5, df))
 a6 <- as.numeric(predict(m6, df))
 
-tidypredict(m4)
+tidypredict(m6)
 ```
 
-    ## (((ifelse((cyl) == ("cyl6"), (-4.2555824019713), 0)) + (ifelse((cyl) == 
-    ##     ("cyl8"), (-6.07085968049089), 0))) + ((wt) * (-3.20561325619286))) + 
-    ##     (33.9907940091325)
+    ## (((ifelse((cyl) == ("cyl6"), (0.0312386570459738), 0)) + (ifelse((cyl) == 
+    ##     ("cyl8"), (-0.0331329111234639), 0))) + ((mpg) * (0.0476738160865827))) + 
+    ##     (-0.543884568926792)

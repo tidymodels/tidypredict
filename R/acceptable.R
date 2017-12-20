@@ -1,3 +1,19 @@
+#' @export
+acceptable_formula <- function(model){
+  UseMethod("acceptable_formula")
+}
+
+#' @export
+acceptable_formula.lm <- function(model){
+  acceptable_lm(model)
+}
+
+
+#' @export
+acceptable_formula.glm <- function(model){
+  acceptable_lm(model)
+}
+
 ## As suggested by @topepo, brought in from the `pryr` package
 ## via the `recepies` package
 fun_calls <- function(f) {
@@ -12,14 +28,8 @@ fun_calls <- function(f) {
   }
 }
 
-#' @export
-acceptable_formula <- function(model){
-  UseMethod("acceptable_formula")
-}
 
-
-#' @export
-acceptable_formula.default <- function(model){
+acceptable_lm <- function(model){
   # Check for invalid contrasts
   if(length(model$contrasts)){
     contr <- model$contrasts
@@ -42,3 +52,4 @@ acceptable_formula.default <- function(model){
       call. = FALSE)
   }
 }
+

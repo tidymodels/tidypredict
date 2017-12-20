@@ -16,7 +16,6 @@ parsemodel.glm <- function(model) parsemodel_lm(model)
 #' @export
 parsemodel_lm <- function(model){
   
-  
   terms <- model$terms
   
   labels <- attr(terms, "term.labels")

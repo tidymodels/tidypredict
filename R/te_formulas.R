@@ -4,7 +4,7 @@
 #' @importFrom purrr reduce
 #' @import dplyr
 #' @export
-te_formula_lm <- function(parsedmodel, offset = NULL){
+te_fit_lm <- function(parsedmodel, offset = NULL){
   
   coefs <- filter(parsedmodel, type == "categorical") 
   part1 <- map2(coefs$sym_labels, coefs$vals, 
@@ -30,3 +30,9 @@ te_formula_lm <- function(parsedmodel, offset = NULL){
   reduce(f, function(l, r) expr((!!l) + (!!r)))
   
 }
+
+
+
+
+
+

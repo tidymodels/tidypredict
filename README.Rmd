@@ -29,7 +29,9 @@ a4 <- as.numeric(predict(m4, df))
 a5 <- as.numeric(predict(m5, df))
 a6 <- as.numeric(predict(m6, df))
 
-tidypredict(m6)
 
+predict_fit(m4)
+
+predict_interval(m4)
 
 ```
