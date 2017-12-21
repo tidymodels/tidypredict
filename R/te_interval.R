@@ -1,8 +1,7 @@
-
-
 xr <- function(parsedmodel, current, res.var){
   
   parsedmodel <- parsedmodel %>% 
+    filter(type != "variable") %>%
     mutate(current = current) %>%
     filter(current != 0)
   
@@ -41,20 +40,32 @@ xr <- function(parsedmodel, current, res.var){
 #' @importFrom purrr reduce
 #' @import dplyr
 #' @export
-te_interval_lm <- function(model, interval = 0.95){
+te_interval_lm <- function(parsedmodel, interval = 0.95){
+
+  res.var <- parsedmodel %>%
+    filter(labels == "sigma2") %>%
+    pull(vals) %>%
+    as.numeric()
   
-  parsedmodel <- parsemodel(model)
+  res <- parsedmodel %>%
+    filter(labels == "residual") %>%
+    pull(vals) %>%
+    as.numeric()
   
-  res.var <- summary(model)$sigma^2
+  qr <- parsedmodel %>%
+    filter(type != "variable") %>%
+    select(starts_with("qr_"))
+
+  rank <- parsedmodel %>%
+    filter(type != "variable") %>%
+    nrow()
   
-  qr <- qr.solve(qr.R(model$qr))
-  
-  xrinv<- 1:model$rank %>%
-    map(~xr(parsedmodel, current = qr[, .x], res.var = res.var))
+  xrinv<- 1:rank %>%
+    map(~xr(parsedmodel, current = pull(qr[, .x]), res.var = res.var))
   
   ip <-  reduce(xrinv, function(l, r) expr((!!l) + (!!r)))
   
-  tfrac <- qt(1-(1 - interval)/2, model$df.residual)
+  tfrac <- qt(1-(1 - interval)/2, res)
   
   expr((!!tfrac ) * sqrt((!!ip) + (!! res.var)))
   

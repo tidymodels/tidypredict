@@ -1,10 +1,9 @@
-
 #' @import rlang
 #' @importFrom purrr map2
 #' @importFrom purrr reduce
 #' @import dplyr
 #' @export
-te_fit_lm <- function(parsedmodel, offset = NULL){
+te_fit_lm <- function(parsedmodel){
   
   coefs <- filter(parsedmodel, type == "categorical") 
   part1 <- map2(coefs$sym_labels, coefs$vals, 
@@ -22,17 +21,12 @@ te_fit_lm <- function(parsedmodel, offset = NULL){
     f <- c(f, intercept$estimate)
   }
   
-  if(!is.null(offset)){
-    f <- c(f, offset)
-  }
   
+  offset <- filter(parsedmodel, labels == "offset")
+  if(nrow(offset) > 0){
+    f <- c(f, sym(offset$vals))
+  }
   
   reduce(f, function(l, r) expr((!!l) + (!!r)))
   
 }
-
-
-
-
-
-
