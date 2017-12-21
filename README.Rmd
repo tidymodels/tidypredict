@@ -1,14 +1,16 @@
 ---
 title: "tidypredict"
 output:
-  github_document:
+  md_document:
     toc: true
-    toc_depth: 3
 ---
+
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)
 ```
+
+## Intro
 
 The mail goal of **tidypredict** is to use [Tidy Evaluation](http://rlang.tidyverse.org/articles/tidy-evaluation.html) to produce a formula that can be executed inside `dplyr` verbs that calculates the prediction based on a model.  In other words, it takes place of the `predict()` function.
 
@@ -16,9 +18,9 @@ The main motivation for `tidypredict` is to open the possibility to score the ne
 
 ## Highlights
 
-- `predict_fit()` /`predict_interval()` - Creates a *tidy eval* formula that `dplyr` can run to calculate the predictions.
-
 - `predict_to_column()` - Helper function, similar to `tibble::rowid_to_column()` that makes it easier to add the fitted and interval calculations to an analysis.
+
+- `predict_fit()` /`predict_interval()` - Creates a *tidy eval* formula that `dplyr` can run to calculate the predictions. (Used by `predict_to_column()`)
 
 - `parsemodel()` - Reads an R model (`lm` and `glm` only at this time) and outputs a tidy `tibble` with the needed information to calculate the predictions.  
 
@@ -78,7 +80,7 @@ predict(model, head(df,10), interval = "prediction")
 ```
 
 
-## Prediction functions
+### Prediction functions
 
 To see the prediction formula, call the `predict_fit()` function.  Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
 
@@ -112,7 +114,7 @@ The confidence interval can also be modified, the default is 0.95
 predict_interval(model, interval = 0.99)
 ```
 
-## Model parser
+### Model parser
 
 The `parsemodel()` function returns a tidy table with the data needed to run the predictions
 
@@ -122,7 +124,7 @@ parsemodel(model)
 
 `predict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
 
-## Save a parsed model
+### Save a parsed model
 
 The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The predition functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
 
