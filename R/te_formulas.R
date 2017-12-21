@@ -5,6 +5,10 @@
 #' @export
 te_fit_lm <- function(parsedmodel){
   
+  parsedmodel <- parsedmodel %>% 
+    filter(type != "variable") %>%
+    mutate(sym_labels = syms(labels)) 
+  
   coefs <- filter(parsedmodel, type == "categorical") 
   part1 <- map2(coefs$sym_labels, coefs$vals, 
                 function(name, val) expr((!!name) == (!!val)))

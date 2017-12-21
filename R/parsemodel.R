@@ -96,8 +96,7 @@ parsemodel_lm <- function(model){
     mutate(coef_labels = paste0(labels, vals)) %>%
     full_join(coef, by = "coef_labels") %>%
     full_join(qr, by = "coef_labels") %>%
-    select(- coef_labels) %>%
-    mutate(sym_labels = syms(labels))
+    select(- coef_labels) 
   
   if(any(is.na(tidy$labels))){
     stop("Error parsing the model")

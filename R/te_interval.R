@@ -2,8 +2,8 @@ xr <- function(parsedmodel, current, res.var){
   
   parsedmodel <- parsedmodel %>% 
     filter(type != "variable") %>%
-    mutate(current = current) %>%
-    filter(current != 0)
+    mutate(current = current,
+           sym_labels = syms(labels)) 
   
   coefs <- filter(parsedmodel, type == "categorical") 
   part1 <- map2(coefs$sym_labels, coefs$vals, 
