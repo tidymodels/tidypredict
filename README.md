@@ -8,7 +8,8 @@ tidypredict
     -   [`prediction_to_column()`](#prediction_to_column)
     -   [Prediction functions](#prediction-functions)
     -   [Model parser](#model-parser)
-    -   [Save a parsed model](#save-a-parsed-model)
+    -   [Save, and reload, a parsed
+        model](#save-and-reload-a-parsed-model)
 
 Intro
 -----
@@ -258,7 +259,7 @@ requires the first four. The `qr_...` fields are use to calculate the
 prediction intervals, the are the result of running `qr.solve()` against
 the model’s `qr` variable.
 
-### Save a parsed model
+### Save, and reload, a parsed model
 
 The output of the model parser can be saved as a `.csv` file and
 reloaded at a later time. The predition functions have an S3 method for
