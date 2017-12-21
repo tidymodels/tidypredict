@@ -1,37 +1,143 @@
 ---
-title: "Untitled"
-author: "Edgar Ruiz"
-date: "December 18, 2017"
-output: github_document
+title: "tidypredict"
+output:
+  github_document:
+    toc: true
+    toc_depth: 3
 ---
-
 ```{r setup, include=FALSE}
 library(dplyr)
+library(tidypredict)
 ```
 
+The mail goal of **tidypredict** is to use [Tidy Evaluation](http://rlang.tidyverse.org/articles/tidy-evaluation.html) to produce a formula that can be executed inside `dplyr` verbs that calculates the prediction based on a model.  In other words, it takes place of the `predict()` function.
+
+The main motivation for `tidypredict` is to open the possibility to score the new results inside a database or Spark.  The premise is that even though the model may be created in-memory inside R, there is still the need to use the results to score at scale.
+
+## Highlights
+
+- `predict_fit()` /`predict_interval()` - Creates a *tidy eval* formula that `dplyr` can run to calculate the predictions.
+
+- `predict_to_column()` - Helper function, similar to `tibble::rowid_to_column()` that makes it easier to add the fitted and interval calculations to an analysis.
+
+- `parsemodel()` - Reads an R model (`lm` and `glm` only at this time) and outputs a tidy `tibble` with the needed information to calculate the predictions.  
+
+- *The parser and the formula creation are separated* - This allows for non-R model objects to use the same `predict_...` functions, just as long as they provide the same data as the output from `parsemodel()` does.
+
+## Advantages
+
+- Using *tidy eval* allows the resulting formula to be translated to SQL-syntax, which allows the predictions to run inside the database
+
+- The output from `parsemodel()` can be saved to a file, and re-loaded from, a *csv* file easily. This means that it is a good alternative to saving the, usually large, model variable as an `.rds` file for later use, such as in a Shiny app.
+
+- Because of the separation of the predict functions from the parsing functions, models created using different languages (as in not R) could still be run at-scale as long as a `data.frame` is produced and passed to the prediction functions.  Some possibilities are PMML, SAS, and other types.
+
+
+## Example
+
 ```{r}
+library(dplyr)
 library(tidypredict)
 
 df <- mtcars %>%
   mutate(cyl = paste0("cyl", cyl))
 
-m1 <- lm(mpg ~ wt + am, weights = cyl, data = mtcars)
-m2 <- lm(mpg ~ wt + am, data = mtcars)
-m3 <- lm(mpg ~ wt + am, offset = cyl, data = mtcars)
-m4 <- lm(mpg ~ wt + cyl, data = df)
-m5 <- glm(am ~ wt + mpg, data = mtcars)
-m6 <- glm(am ~ cyl + mpg, data = df)
+model <- lm(mpg ~ wt + am + cyl, data = df)
 
-a1 <- as.numeric(predict(m1, mtcars))
-a2 <- as.numeric(predict(m2, mtcars))
-a3 <- as.numeric(predict(m3, mtcars))
-a4 <- as.numeric(predict(m4, df))
-a5 <- as.numeric(predict(m5, df))
-a6 <- as.numeric(predict(m6, df))
-
-
-predict_fit(m4)
-
-predict_interval(m4)
-
+model
 ```
+
+### `prediction_to_column()`
+
+```{r}
+df %>%
+  head(10) %>%
+  predict_to_column(model)
+```
+
+
+Compare the results against `predict()`
+
+```{r}
+predict(model, head(df,10))
+```
+
+To include the prediction intervals just use the `add_interval` switch
+```{r}
+df %>%
+  head(10) %>%
+  predict_to_column(model, add_interval = TRUE) %>%
+  select(fit, lower, upper)
+```
+
+
+Compare the results against `predict()`
+
+```{r}
+predict(model, head(df,10), interval = "prediction")
+```
+
+
+## Prediction functions
+
+To see the prediction formula, call the `predict_fit()` function.  Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
+
+```{r}
+predict_fit(model)
+```
+
+If more granular control than what `predict_to_column()` is needed, then the function can be used inside a `dplyr` verb command
+
+```{r}
+df %>%
+  head(10) %>%
+  mutate(fit = !! predict_fit(model))
+```
+
+
+
+To add prediction intervals, an additional calculation is neded against the fitted result
+```{r}
+df %>%
+  head(10) %>%
+  mutate(fit = !! predict_fit(model),
+         lwr = fit + !! predict_interval(model),
+         upr = fit - !! predict_interval(model)) %>%
+  select(fit, lwr, upr)
+```
+
+The confidence interval can also be modified, the default is 0.95
+
+```{r}
+predict_interval(model, interval = 0.99)
+```
+
+## Model parser
+
+The `parsemodel()` function returns a tidy table with the data needed to run the predictions
+
+```{r}
+parsemodel(model)
+```
+
+`predict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
+
+## Save a parsed model
+
+The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The predition functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
+
+```{r}
+write.csv(parsemodel(model), "model.csv")
+
+
+reloaded_model <- read.csv("model.csv")
+
+df %>%
+  head(10) %>%
+  predict_to_column(reloaded_model, add_interval = TRUE, vars = c("ft", "up", "lw")) %>%
+  select(ft, lw, up)
+```
+
+
+
+

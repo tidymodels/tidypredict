@@ -72,11 +72,11 @@ parsemodel_lm <- function(model){
   offset <- model$call$offset
   if(!is.null(offset)){
     tidy <- tidy %>%
-      bind_row(
+      bind_rows(tibble(
         labels = "offset", 
-        vals = offset,
-        type = "variable")
-    }
+        vals = as.character(offset),
+        type = "variable")        
+      )}
   
   coef <- summary(model)$coefficients  %>%
     as.data.frame() %>%
