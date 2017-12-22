@@ -140,6 +140,25 @@ df %>%
   select(ft, lw, up)
 ```
 
+### Binomial `glm` models
+
+`tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
+```{r}
+model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
+
+mtcars %>%
+  head(10) %>%
+  predict_to_column(model)  %>%
+  pull(fit)
+```
+
+Confirm that the predictions match to what the `predict()` function returns
+
+```{r}
+as.numeric(predict(model, head(mtcars, 10), type = "response"))
+```
+
+
 
 
 

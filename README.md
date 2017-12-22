@@ -10,6 +10,7 @@ tidypredict
     -   [Model parser](#model-parser)
     -   [Save, and reload, a parsed
         model](#save-and-reload-a-parsed-model)
+    -   [Binomial `glm` models](#binomial-glm-models)
 
 Intro
 -----
@@ -288,3 +289,26 @@ formula to compile.
     ## 8  23.70638 23.70638 23.70638
     ## 9  23.83236 23.83236 23.83236
     ## 10 18.66166 18.66166 18.66166
+
+### Binomial `glm` models
+
+`tidypredict` supports `glm` models with a *binomial* `family` and
+*logit* `link`
+
+    model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
+
+    mtcars %>%
+      head(10) %>%
+      predict_to_column(model)  %>%
+      pull(fit)
+
+    ##  [1] 0.90625492 0.65308276 0.97366320 0.15728804 0.09561351 0.10149089
+    ##  [7] 0.16047152 0.07651740 0.15247435 0.08248711
+
+Confirm that the predictions match to what the `predict()` function
+returns
+
+    as.numeric(predict(model, head(mtcars, 10), type = "response"))
+
+    ##  [1] 0.90625492 0.65308276 0.97366320 0.15728804 0.09561351 0.10149089
+    ##  [7] 0.16047152 0.07651740 0.15247435 0.08248711
