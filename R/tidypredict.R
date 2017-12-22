@@ -5,15 +5,14 @@ predict_fit <- function(model){
 
 #' @export
 predict_fit.lm <- function(model){
-  
   parsedmodel <- parsemodel(model)
-  
   te_fit_lm(parsedmodel)
 }
 
 #' @export
 predict_fit.glm <- function(model){
-  predict_fit.lm(model)
+  parsedmodel <- parsemodel(model)
+  te_fit_glm(parsedmodel)
 }
 
 #' @export
@@ -27,13 +26,23 @@ predict_fit.glm <- function(model){
     filter(labels == "model") %>%
     pull(vals)
   
-  if(model_type %in% c("lm", "glm")){ 
-    te_fit_lm(model)
-    } else {
-      stop("Model not recognized")
-    }
+  assigned <- 0
   
+  if(model_type == "lm"){
+    assigned <- 1
+    fit <- te_fit_lm(model)
+  }
   
+  if(model_type == "glm"){
+    assigned <- 1
+    fit <- te_fit_glm(model)
+  }
+  
+  if(assigned ==0){
+    stop("Model not recognized")
+  }
+
+  fit
 }
 
 #' @export
@@ -43,15 +52,14 @@ predict_interval <- function(model, interval = 0.95){
 
 #' @export
 predict_interval.lm <- function(model, interval = 0.95){
-
   parsedmodel <- parsemodel(model)
-  
   te_interval_lm (parsedmodel, interval)
 }
 
 #' @export
 predict_interval.glm <- function(model, interval = 0.95){
-  predict_interval.lm(model, interval)
+  parsedmodel <- parsemodel(model)
+  te_interval_glm (parsedmodel, interval)
 }
 
 #' @export
@@ -64,14 +72,22 @@ predict_interval.glm <- function(model, interval = 0.95){
   model_type <- model %>%
     filter(labels == "model") %>%
     pull(vals)
+
+  assigned <- 0
   
-  if(model_type %in% c("lm", "glm")){ 
-    te_interval_lm(model, interval = interval)
-  } else {
-    stop("Model not recognized")
+  if(model_type == "lm"){
+    assigned <- 1
+    te_interval_lm(model)
   }
   
+  if(model_type == "glm"){
+    assigned <- 1
+    te_interval_glm(model)
+  }
   
+  if(assigned ==0){
+    stop("Model not recognized")
+  }
 }
 
 #' @import rlang

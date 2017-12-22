@@ -8,6 +8,16 @@ parsemodel.lm <- function(model) parsemodel_lm(model)
 #' @export
 parsemodel.glm <- function(model) parsemodel_lm(model)
 
+
+add_variable <- function(df, labels, vals){
+  df %>%
+    bind_rows(tibble(
+      labels = !!labels,
+      vals = as.character(!! vals),
+      type = "variable"
+    ))
+}
+
 #' @import rlang
 #' @importFrom purrr map2
 #' @importFrom purrr reduce
@@ -58,16 +68,22 @@ parsemodel_lm <- function(model){
         vals == "" ~ "continuous",
         vals != "" ~ "categorical",
         TRUE ~ "error")
-    ) %>%
-    bind_rows(tibble(
-      labels = c("sigma2", "residual", "model"), 
-      vals = c(
-        summary(model)$sigma^2,
-        model$df.residual,
-        class(model)[[1]]
-      ),
-      type = "variable"
-    ))
+    ) 
+  
+  tidy <- add_variable(tidy, labels = "model", vals = class(model)[[1]])
+  tidy <- add_variable(tidy, labels = "residual", vals = model$df.residual)
+  
+  if(length(summary(model)$sigma^2) > 0){
+    tidy <- add_variable(tidy, labels = "sigma2", vals = summary(model)$sigma^2)
+  } 
+  
+  if(!is.null(model$family$family)){
+    tidy <- add_variable(tidy, labels = "family", vals = model$family$family)
+  }
+
+  if(!is.null(model$family$link)){
+    tidy <- add_variable(tidy, labels = "link", vals = model$family$link)
+  }
   
   offset <- model$call$offset
   if(!is.null(offset)){

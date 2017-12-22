@@ -73,4 +73,26 @@ te_interval_lm <- function(parsedmodel, interval = 0.95){
 
 
 
+#' @import rlang
+#' @import dplyr
+#' @export
+te_interval_glm <- function(parsedmodel, interval = 0.95){
+  
+  intervals <- te_interval_lm(parsedmodel, interval)
+  
+  family <- pull(filter(parsedmodel, labels == "family"), vals)
+  link <- pull(filter(parsedmodel, labels == "link"), vals)
+  
+  assigned <- 0
+  
+  if(family == "gaussian" && link == "identity"){
+    assigned <- 1
+  }
+  
+  if(assigned ==0){
+    stop("Combination of family and link are not supported for prediction intervals")
+  }
+
+  intervals
+}
 

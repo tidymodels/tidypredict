@@ -24,8 +24,7 @@ te_fit_lm <- function(parsedmodel){
   if(nrow(intercept) > 0){
     f <- c(f, intercept$estimate)
   }
-  
-  
+
   offset <- filter(parsedmodel, labels == "offset")
   if(nrow(offset) > 0){
     f <- c(f, sym(offset$vals))
@@ -34,3 +33,33 @@ te_fit_lm <- function(parsedmodel){
   reduce(f, function(l, r) expr((!!l) + (!!r)))
   
 }
+
+#' @import rlang
+#' @import dplyr
+#' @export
+te_fit_glm <- function(parsedmodel){
+  
+  fit <- te_fit_lm(parsedmodel)
+  
+  family <- pull(filter(parsedmodel, labels == "family"), vals)
+  link <- pull(filter(parsedmodel, labels == "link"), vals)
+  
+  
+  assigned <- 0
+  
+  if(family == "gaussian" && link == "identity"){
+    assigned <- 1
+  }
+  
+  if(family == "binomial" && link == "logit"){
+    assigned <- 1
+    fit <- expr(exp(!! fit) / (exp(!! fit) + 1))
+  }
+  
+  if(assigned ==0){
+    stop("Combination of family and link are not supported")
+  }
+  
+  fit
+}
+

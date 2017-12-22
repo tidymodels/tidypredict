@@ -243,21 +243,22 @@ run the predictions
     parsemodel(model)
 
     ## # A tibble: 8 x 9
-    ##   labels  vals   type   estima~    qr_1    qr_2    qr_3      qr_4     qr_5
-    ##   <chr>   <chr>  <chr>    <dbl>   <dbl>   <dbl>   <dbl>     <dbl>    <dbl>
-    ## 1 (Inter~ ""     inter~  33.8   - 0.177 - 0.591   0.770   0.141   - 0.419 
-    ## 2 wt      ""     conti~ - 3.15    0       0.184 - 0.176 - 0.0135    0.238 
-    ## 3 am      ""     conti~   0.150   0       0     - 0.499 - 0.00973   0.0212
-    ## 4 cyl     cyl6   categ~ - 4.26    0       0       0     - 0.428   - 0.332 
-    ## 5 cyl     cyl8   categ~ - 6.08    0       0       0       0       - 0.647 
-    ## 6 sigma2  6.776~ varia~  NA      NA      NA      NA      NA        NA     
-    ## 7 residu~ 27     varia~  NA      NA      NA      NA      NA        NA     
-    ## 8 model   lm     varia~  NA      NA      NA      NA      NA        NA
+    ##        labels            vals        type   estimate       qr_1       qr_2
+    ##         <chr>           <chr>       <chr>      <dbl>      <dbl>      <dbl>
+    ## 1 (Intercept)                   intercept 33.7535920 -0.1767767 -0.5905573
+    ## 2          wt                  continuous -3.1495978  0.0000000  0.1835596
+    ## 3          am                  continuous  0.1501031  0.0000000  0.0000000
+    ## 4         cyl            cyl6 categorical -4.2573185  0.0000000  0.0000000
+    ## 5         cyl            cyl8 categorical -6.0791189  0.0000000  0.0000000
+    ## 6       model              lm    variable         NA         NA         NA
+    ## 7    residual              27    variable         NA         NA         NA
+    ## 8      sigma2 6.7766049449091    variable         NA         NA         NA
+    ## # ... with 3 more variables: qr_3 <dbl>, qr_4 <dbl>, qr_5 <dbl>
 
 `predict_fit()` does not need all of the columns in this table, it only
 requires the first four. The `qr_...` fields are use to calculate the
 prediction intervals, the are the result of running `qr.solve()` against
-the model’s `qr` variable.
+the model's `qr` variable.
 
 ### Save, and reload, a parsed model
 
@@ -277,13 +278,13 @@ formula to compile.
       select(ft, lw, up)
 
     ##          ft       lw       up
-    ## 1  21.39443 15.53968 27.24918
-    ## 2  20.59128 14.72632 26.45624
-    ## 3  26.59663 20.96580 32.22746
-    ## 4  19.37032 13.56317 25.17746
-    ## 5  16.83986 11.16336 22.51635
-    ## 6  18.59867 12.80729 24.39004
-    ## 7  16.43041 10.80210 22.05872
-    ## 8  23.70638 17.85550 29.55725
-    ## 9  23.83236 17.98927 29.67545
-    ## 10 18.66166 12.87034 24.45297
+    ## 1  21.39443 21.39443 21.39443
+    ## 2  20.59128 20.59128 20.59128
+    ## 3  26.59663 26.59663 26.59663
+    ## 4  19.37032 19.37032 19.37032
+    ## 5  16.83986 16.83986 16.83986
+    ## 6  18.59867 18.59867 18.59867
+    ## 7  16.43041 16.43041 16.43041
+    ## 8  23.70638 23.70638 23.70638
+    ## 9  23.83236 23.83236 23.83236
+    ## 10 18.66166 18.66166 18.66166
