@@ -1,9 +1,11 @@
 ---
 title: "tidypredict"
 output:
-  md_document:
+  github_document:
     toc: true
 ---
+
+[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict) 
 
 ```{r setup, include=FALSE}
 library(dplyr)
