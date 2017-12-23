@@ -34,6 +34,12 @@ The main motivation for `tidypredict` is to open the possibility to score the ne
 
 - Because of the separation of the predict functions from the parsing functions, models created using different languages (as in not R) could still be run at-scale as long as a `data.frame` is produced and passed to the prediction functions.  Some possibilities are PMML, SAS, and other types.
 
+## Installation
+
+Install `tidypredict` using `devtools` as follows:
+```{r}
+devtools::install_github("edgararuiz/tidypredict")
+```
 
 ## Example
 

@@ -4,6 +4,7 @@ tidypredict
 -   [Intro](#intro)
 -   [Highlights](#highlights)
 -   [Advantages](#advantages)
+-   [Installation](#installation)
 -   [Example](#example)
     -   [`prediction_to_column()`](#prediction_to_column)
     -   [Prediction functions](#prediction-functions)
@@ -62,6 +63,15 @@ Advantages
     could still be run at-scale as long as a `data.frame` is produced
     and passed to the prediction functions. Some possibilities are PMML,
     SAS, and other types.
+
+Installation
+------------
+
+Install `tidypredict` using `devtools` as follows:
+
+    devtools::install_github("edgararuiz/tidypredict")
+
+    ## Installation failed: Line starting 'can be executed insi ...' is malformed!
 
 Example
 -------
