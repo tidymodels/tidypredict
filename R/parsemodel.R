@@ -1,3 +1,18 @@
+#' Converts an R model object into a table
+#'
+#'It parses a fitted R model's structure to extract all of the necessary
+#'components to pass along to the functions that create the actual 
+#'Tidy Eval formula that dplyr can read.  It is currently able to parse
+#'lm() and glm() models.
+#'
+#' @param model An R model object
+#'
+#' @examples
+#' 
+#' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
+#' model <- lm(x ~ y, df)
+#' parsemodel(model)
+#'
 #' @export
 parsemodel <- function(model){
   UseMethod("parsemodel")
@@ -8,7 +23,8 @@ parsemodel.lm <- function(model) parsemodel_lm(model)
 #' @export
 parsemodel.glm <- function(model) parsemodel_lm(model)
 
-
+#' @import dplyr
+#' @importFrom tibble tibble
 add_variable <- function(df, labels, vals){
   df %>%
     bind_rows(tibble(
@@ -20,9 +36,12 @@ add_variable <- function(df, labels, vals){
 
 #' @import rlang
 #' @importFrom purrr map2
+#' @importFrom purrr map
 #' @importFrom purrr reduce
 #' @import dplyr
-#' @export
+#' @importFrom tibble tibble
+#' @importFrom tibble rowid_to_column
+#' @importFrom tibble rownames_to_column
 parsemodel_lm <- function(model){
   
   acceptable_formula(model)

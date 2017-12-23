@@ -1,3 +1,8 @@
+#' @import rlang
+#' @importFrom purrr map2
+#' @importFrom purrr map
+#' @importFrom purrr reduce
+#' @import dplyr
 xr <- function(parsedmodel, current, res.var){
   
   parsedmodel <- parsedmodel %>% 
@@ -39,7 +44,6 @@ xr <- function(parsedmodel, current, res.var){
 #' @importFrom purrr map2
 #' @importFrom purrr reduce
 #' @import dplyr
-#' @export
 te_interval_lm <- function(parsedmodel, interval = 0.95){
 
   res.var <- parsedmodel %>%
@@ -71,11 +75,8 @@ te_interval_lm <- function(parsedmodel, interval = 0.95){
   
 }
 
-
-
 #' @import rlang
 #' @import dplyr
-#' @export
 te_interval_glm <- function(parsedmodel, interval = 0.95){
   
   intervals <- te_interval_lm(parsedmodel, interval)

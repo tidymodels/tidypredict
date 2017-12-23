@@ -2,7 +2,6 @@
 #' @importFrom purrr map2
 #' @importFrom purrr reduce
 #' @import dplyr
-#' @export
 te_fit_lm <- function(parsedmodel){
   
   parsedmodel <- parsedmodel %>% 
@@ -36,7 +35,6 @@ te_fit_lm <- function(parsedmodel){
 
 #' @import rlang
 #' @import dplyr
-#' @export
 te_fit_glm <- function(parsedmodel){
   
   fit <- te_fit_lm(parsedmodel)
