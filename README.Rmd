@@ -37,7 +37,7 @@ The main motivation for `tidypredict` is to open the possibility to score the ne
 ## Installation
 
 Install `tidypredict` using `devtools` as follows:
-```{r}
+```{r, eval = FALSE}
 devtools::install_github("edgararuiz/tidypredict")
 ```
 

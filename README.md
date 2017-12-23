@@ -71,8 +71,6 @@ Install `tidypredict` using `devtools` as follows:
 
     devtools::install_github("edgararuiz/tidypredict")
 
-    ## Installation failed: Line starting 'can be executed insi ...' is malformed!
-
 Example
 -------
 
