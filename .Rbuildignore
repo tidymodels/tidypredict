@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 README.Rmd
 model.csv
+travis.yml
