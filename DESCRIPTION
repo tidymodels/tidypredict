@@ -1,7 +1,10 @@
 Package: tidypredict
 Version: 0.0.0.9000
-Title: Parses a model to create a predict routine with Tidy eval
-Description: Parses a model to create a predict routine with Tidy eval.
+Title: Parses a model to create a predict routine with Tidy Eval
+Description: The mail goal of 'tidypredict' is to use Tidy Evaluation to produce a formula that 
+can be executed inside 'dplyr' verbs that calculates the prediction based on a model. In other words, 
+it takes place of the predict() function. The main motivation for tidypredict is to open the 
+possibility to score the new results inside a database or Spark.
 Authors@R:
     person("Edgar", "Ruiz", email = "edgar@rstudio.com", role = c("aut", "cre"))
 Depends:
