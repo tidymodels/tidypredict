@@ -1,6 +1,8 @@
 tidypredict
 ===========
 
+[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict) 
+
 -   [Intro](#intro)
 -   [Highlights](#highlights)
 -   [Advantages](#advantages)
