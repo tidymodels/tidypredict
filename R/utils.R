@@ -56,19 +56,41 @@ setOldClass(c("test_predictions", "data.frame"))
 
 print.test_predictions <- function(x, ...) {
   
+  fit <- filter(x, fit_threshold)
+  fit_records <- nrow(fit)
+  cat("\nFitted records over the threshold: ", fit_records)
+  if(fit_records > 0){
+    cat(fit %>%
+          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", fit_diff)) %>%
+          pull() )
+    }
+
+
+  lwr <- filter(x, lwr_threshold)
+  lwr_records <- nrow(lwr)
+  cat("\nLower interval records over the threshold: ", lwr_records)
+  if(lwr_records > 0){
+    cat(lwr %>%
+          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", lwr_diff)) %>%
+          pull() )
+  } 
+
+  upr <- filter(x, upr_threshold)
+  upr_records <- nrow(upr)
+  cat("\nUpper interval records over the threshold: ", upr_records)
+  if(upr_records > 0){
+    cat(upr %>%
+          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", upr_diff)) %>%
+          pull() )
+  }
   
-  
-  cat(x %>%
-        filter(fit_threshold) %>%
-        mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", fit_diff)) %>%
-        pull() )
-  
+    
 }
 
-# 
+
 # m3 <- lm(mpg ~ wt + cyl, data = mtcars)
 # 
-# x <- test_predictions(m3,include_intervals = TRUE, max.rows = 5, threshold =  0.000000000000000000000000000001)
+# x <- test_predictions(m3,include_intervals = TRUE, max.rows = 5, threshold =  0.000000000000000000000001)
 # 
 # x
 
