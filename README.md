@@ -1,9 +1,6 @@
 tidypredict
 ================
 
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
-
-
 -   [Intro](#intro)
 -   [Highlights](#highlights)
 -   [Advantages](#advantages)
@@ -14,7 +11,9 @@ tidypredict
     -   [Model parser](#model-parser)
     -   [Save, and reload, a parsed model](#save-and-reload-a-parsed-model)
     -   [Binomial `glm` models](#binomial-glm-models)
+    -   [Test results](#test-results)
 
+[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 
 Intro
 -----
@@ -31,6 +30,8 @@ Highlights
 -   `predict_fit()` /`predict_interval()` - Creates a *tidy eval* formula that `dplyr` can run to calculate the predictions. (Used by `predict_to_column()`)
 
 -   `parsemodel()` - Reads an R model (`lm` and `glm` only at this time) and outputs a tidy `tibble` with the needed information to calculate the predictions.
+
+-   `tidypredict` includes a helper function to compare the results of the base `predict()` function against the results from the `tidypredict` functions, it is called: `test_predictions()`
 
 -   *The parser and the formula creation are separated* - This allows for non-R model objects to use the same `predict_...` functions, just as long as they provide the same data as the output from `parsemodel()` does.
 
@@ -177,7 +178,7 @@ df %>%
     ## 9  22.8 cyl4 140.8  95 3.92 3.150 22.90  1  0    4    2 23.83236
     ## 10 19.2 cyl6 167.6 123 3.92 3.440 18.30  1  0    4    4 18.66166
 
-To add prediction intervals, an additional calculation is neded against the fitted result
+To add prediction intervals, an additional calculation is needed against the fitted result
 
 ``` r
 df %>%
@@ -264,7 +265,7 @@ parsemodel(model)
 
 ### Save, and reload, a parsed model
 
-The output of the model parser can be saved as a `.csv` file and reloaded at a later time. The predition functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
+The output of the model parser can be saved as a `.csv` file and reloaded at a later time. The prediction functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
 
 ``` r
 write.csv(parsemodel(model), "model.csv")
@@ -314,3 +315,87 @@ as.numeric(predict(model, head(mtcars, 10), type = "response"))
 
     ##  [1] 0.90625492 0.65308276 0.97366320 0.15728804 0.09561351 0.10149089
     ##  [7] 0.16047152 0.07651740 0.15247435 0.08248711
+
+### Test results
+
+For good measure, the `test_predictions()` function will run the `predict()` command and `predict_to_column()` and then compares the results. Because of decimal precision, some results will be different, but by a very, very small amount. That's why the comparison tests that `test_predictions()` run focuses on a difference **threshold**. The default threshold is: 0.000000000001.
+
+It is highly recommended to run this test to confirm that the output of the `tidypredict` functions are within acceptable ranges.
+
+`test_predictions()` has a custom `print` and `knit_print` methods that return a summary of the results:
+
+``` r
+model <- lm(mpg ~ wt + am + cyl, data = df)
+
+test_predictions(model, include_intervals = TRUE)
+```
+
+    ## tidypredict test results
+    ## Difference threshold: 1e-12
+    ## 
+    ##  All results are within the difference threshold
+
+The `threshold` is reduced to 1e-16 to see the response of a "failing" test.
+
+``` r
+test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+```
+
+    ## tidypredict test results
+    ## Difference threshold: 1e-16
+    ## 
+    ## Fitted records above the threshold: 7
+    ## Lower interval records above the threshold: 15
+    ## Upper interval records above the threshold: 13
+    ## 
+    ## Fit max  difference:7.105427357601e-15
+    ## Lower max difference:3.5527136788005e-15
+    ## Upper max difference:3.5527136788005e-15
+
+`test_predictions()` returns a list that contains a `data.frame` with the raw results, the model call and the message. Additionally, an output called `alert` is included in case the test is to be automated and there's a need to easily tell the R script running the test that there is a problem.
+
+``` r
+results <- test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+
+results
+```
+
+    ## tidypredict test results
+    ## Difference threshold: 1e-16
+    ## 
+    ## Fitted records above the threshold: 7
+    ## Lower interval records above the threshold: 15
+    ## Upper interval records above the threshold: 13
+    ## 
+    ## Fit max  difference:7.105427357601e-15
+    ## Lower max difference:3.5527136788005e-15
+    ## Upper max difference:3.5527136788005e-15
+
+This is an sample of the raw results of the test:
+
+``` r
+head(results$raw_results)
+```
+
+    ##   rowid      fit      lwr      upr   fit_te   upr_te   lwr_te     fit_diff
+    ## 1     1 21.39443 15.53968 27.24918 21.39443 27.24918 15.53968 0.000000e+00
+    ## 2     2 20.59128 14.72632 26.45624 20.59128 26.45624 14.72632 0.000000e+00
+    ## 3     3 26.59663 20.96580 32.22746 26.59663 32.22746 20.96580 3.552714e-15
+    ## 4     4 19.37032 13.56317 25.17746 19.37032 25.17746 13.56317 3.552714e-15
+    ## 5     5 16.83986 11.16336 22.51635 16.83986 22.51635 11.16336 0.000000e+00
+    ## 6     6 18.59867 12.80729 24.39004 18.59867 24.39004 12.80729 0.000000e+00
+    ##   fit_threshold     lwr_diff     upr_diff lwr_threshold upr_threshold
+    ## 1         FALSE 0.000000e+00 0.000000e+00         FALSE         FALSE
+    ## 2         FALSE 1.776357e-15 0.000000e+00          TRUE         FALSE
+    ## 3          TRUE 3.552714e-15 0.000000e+00          TRUE         FALSE
+    ## 4          TRUE 1.776357e-15 7.105427e-15          TRUE          TRUE
+    ## 5         FALSE 0.000000e+00 0.000000e+00         FALSE         FALSE
+    ## 6         FALSE 3.552714e-15 3.552714e-15          TRUE          TRUE
+
+The `alert` output is set to TRUE because, because at least one of the `_threshold` fields are TRUE
+
+``` r
+results$alert
+```
+
+    ## [1] TRUE

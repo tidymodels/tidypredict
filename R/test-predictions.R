@@ -1,9 +1,37 @@
-test_predictions <- function(model, ...){
+#' Tests base predict function against tidypredict
+#'
+#'Runs predict() and the predict_to_column() functions and compares
+#'the results.  Because of decimal precision, some results will 
+#'be different, but the difference will be very small.  That's why
+#'a "pass" for a test will be if there is no individual result that 
+#'differs more than the 'threshold' amount set.
+#'
+#'
+#' @param model An R model object
+#' @param df A data frame that contains all of the needed fields to run the prediction.  
+#' It defaults to the "model" data frame object inside the model object.
+#' @param threshold The number that a given result difference, between predict() and
+#' predict_to_column() should not exceed.  The default value is 0.000000000001 (1e-12)
+#' @param include_intervals Switch to indicate if the prediction intervals should be
+#' included in the test.  It defaults to FALSE.
+#' @param max_rows The number of rows in the object passed in the df argument. Highly
+#' recommended for large data sets. 
+#'
+#' @examples
+#' 
+#' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
+#' model <- lm(x ~ y, df)
+#' test_predictions(model, include_intervals = TRUE)
+#'
+#' @export 
+test_predictions <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
    UseMethod("test_predictions")
 }
 
-
-test_predictions.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max.rows = NULL){
+#' @import rlang
+#' @import dplyr
+#' @export 
+test_predictions.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
   
   offset <- model$call$offset
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
@@ -16,9 +44,9 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
   
   interval <- ifelse(include_intervals == TRUE, "prediction", "none")
   
-  if(is.numeric(max.rows)) df <- head(df, max.rows)
+  if(is.numeric(max_rows)) df <- head(df, max_rows)
   
-  base <- predict(model, df, interval = interval)
+  base <- predict(model, df, interval = interval, type = "response")
   
   if(include_intervals == FALSE){
     base <- data.frame(fit = base, row.names =  NULL)
@@ -94,18 +122,21 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
 
 setOldClass(c("test_predictions", "list"))
 
+#' print method for test predictions results
+#'
+#' @keywords internal
+#' @export
 print.test_predictions <- function(x, ...) {
   cat(x$message)
 }
 
-
-#m3 <- glm(mpg ~ wt + cyl, data = mtcars)
-# m3 <- lm(mpg ~ wt + cyl, data = mtcars)
-#  
-# x <- test_predictions(m3,include_intervals = TRUE, max.rows = 5, threshold =  0.000000000000000000000001)
-#  
-# x
-# 
+#' Knit print method for test predictions results
+#'
+#' @keywords internal
+#' @export
+knit_print.test_predictions <- function(x, ...) {
+  x$message
+}
 
 
 

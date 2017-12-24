@@ -42,6 +42,9 @@ add_variable <- function(df, labels, vals){
 #' @importFrom tibble tibble
 #' @importFrom tibble rowid_to_column
 #' @importFrom tibble rownames_to_column
+#' @importFrom utils head
+#' @importFrom stats predict 
+#' @importFrom stats qt
 parsemodel_lm <- function(model){
   
   acceptable_formula(model)

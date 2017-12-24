@@ -26,6 +26,8 @@ The main motivation for `tidypredict` is to open the possibility to score the ne
 
 - `parsemodel()` - Reads an R model (`lm` and `glm` only at this time) and outputs a tidy `tibble` with the needed information to calculate the predictions.  
 
+- `tidypredict` includes a helper function to compare the results of the base `predict()` function against the results from the `tidypredict` functions, it is called: `test_predictions()`
+
 - *The parser and the formula creation are separated* - This allows for non-R model objects to use the same `predict_...` functions, just as long as they provide the same data as the output from `parsemodel()` does.
 
 ## Advantages
@@ -106,7 +108,7 @@ df %>%
 
 
 
-To add prediction intervals, an additional calculation is neded against the fitted result
+To add prediction intervals, an additional calculation is needed against the fitted result
 ```{r}
 df %>%
   head(10) %>%
@@ -134,7 +136,7 @@ parsemodel(model)
 
 ### Save, and reload, a parsed model
 
-The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The predition functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
+The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The prediction functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
 
 ```{r}
 write.csv(parsemodel(model), "model.csv")
@@ -166,7 +168,41 @@ Confirm that the predictions match to what the `predict()` function returns
 as.numeric(predict(model, head(mtcars, 10), type = "response"))
 ```
 
+### Test results
+
+For good measure, the `test_predictions()` function will run the `predict()` command and `predict_to_column()` and then compares the results.  Because of decimal precision, some results will be different, but by a very, very small amount.  That's why the comparison tests that `test_predictions()` run focuses on a difference **threshold**.  The default threshold is: 0.000000000001.
+
+It is highly recommended to run this test to confirm that the output of the `tidypredict` functions are within acceptable ranges.
 
 
+`test_predictions()` has a custom `print` and `knit_print` methods that return a summary of the results:
+```{r}
+model <- lm(mpg ~ wt + am + cyl, data = df)
 
+test_predictions(model, include_intervals = TRUE)
+```
 
+The `threshold` is reduced to 1e-16 to see the response of a "failing" test.
+
+```{r}
+test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+```
+
+`test_predictions()` returns a list that contains a `data.frame` with the raw results, the model call and the message.  Additionally, an output called `alert` is included in case the test is to be automated and there's a need to easily tell the R script running the test that there is a problem.
+
+```{r}
+results <- test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+
+results
+```
+
+This is an sample of the raw results of the test:
+```{r}
+head(results$raw_results)
+```
+
+The `alert` output is set to TRUE because, because at least one of the `_threshold` fields are TRUE
+
+```{r}
+results$alert
+```
