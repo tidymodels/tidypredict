@@ -30,7 +30,7 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
     predict_to_column(model, 
                       add_interval = include_intervals,
                       vars = c("fit_te", "upr_te", "lwr_te")) %>%
-    select(fit_te, lwr_te, upr_te)
+    select(contains("_te"))
   
   raw_results <- bind_cols(base, te) %>%
     mutate(fit_diff = abs(fit - fit_te),
@@ -48,53 +48,64 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
   raw_results <-raw_results %>%
     rowid_to_column()
   
-  #raw_results
-  structure(raw_results, class = c("test_predictions", "data.frame"))
-}  
-
-setOldClass(c("test_predictions", "data.frame"))
-
-print.test_predictions <- function(x, ...) {
+  threshold_df <- raw_results %>%
+    select(contains("_threshold")) %>%
+    summarise_all(sum)
   
-  fit <- filter(x, fit_threshold)
-  fit_records <- nrow(fit)
-  cat("\nFitted records over the threshold: ", fit_records)
-  if(fit_records > 0){
-    cat(fit %>%
-          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", fit_diff)) %>%
-          pull() )
-    }
-
-
-  lwr <- filter(x, lwr_threshold)
-  lwr_records <- nrow(lwr)
-  cat("\nLower interval records over the threshold: ", lwr_records)
-  if(lwr_records > 0){
-    cat(lwr %>%
-          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", lwr_diff)) %>%
-          pull() )
-  } 
-
-  upr <- filter(x, upr_threshold)
-  upr_records <- nrow(upr)
-  cat("\nUpper interval records over the threshold: ", upr_records)
-  if(upr_records > 0){
-    cat(upr %>%
-          mutate(message = paste0("\n  Row:", rowid, " |  Difference: ", upr_diff)) %>%
-          pull() )
+  alert <- any(threshold_df > 0)
+  
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ", threshold,
+    "\n"
+  )
+  
+  if(alert){
+    
+    difference <- raw_results %>%
+      select(contains("_diff")) %>%
+      summarise_all(max)
+    
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ", threshold_df$fit_threshold,
+      if(!is.null(threshold_df$lwr_threshold)) "\nLower interval records above the threshold: ", threshold_df$lwr_threshold,
+      if(!is.null(threshold_df$upr_threshold)) "\nUpper interval records above the threshold: ", threshold_df$upr_threshold,
+      "\n\nFit max  difference:", difference$upr_diff,
+      "\nLower max difference:", difference$lwr_diff,
+      "\nUpper max difference:", difference$fit_diff
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
   }
   
-    
+  results <- list()
+  
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  
+  structure(results, class = c("test_predictions", "list"))
+}  
+
+setOldClass(c("test_predictions", "list"))
+
+print.test_predictions <- function(x, ...) {
+  cat(x$message)
 }
 
 
+#m3 <- glm(mpg ~ wt + cyl, data = mtcars)
 # m3 <- lm(mpg ~ wt + cyl, data = mtcars)
-# 
+#  
 # x <- test_predictions(m3,include_intervals = TRUE, max.rows = 5, threshold =  0.000000000000000000000001)
-# 
+#  
 # x
-
-
+# 
 
 
 
