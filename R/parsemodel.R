@@ -151,69 +151,34 @@ parsemodel_lm <- function(model){
 #' @export
 parsemodel.randomForest <- function(model){
   
-  model_tree <- tree::tree(model)
+  model_frame <- getTree(model, labelVar = TRUE) %>%
+    as.tibble() %>%
+    rowid_to_column() 
   
-  model_frame <- model_tree$frame
+  colnames(model_frame) <- sub(" ", "_", colnames(model_frame))
   
-  model_frame$rowid <- rownames(model_frame)
   
-  rm(model_tree)
+  model_frame
   
-  model_frame <- model_frame %>%
-    select(var, n, dev, rowid)  %>%
-    bind_cols(as.data.frame(model_frame$splits)) %>%
-    bind_cols(as.data.frame(model_frame$yprob)) %>%
-    mutate(rowid = as.numeric(rowid),
-           cutleft = as.character(cutleft),
-           cutright = as.character(cutright),
-           var = as.character(var),
-           parent = floor(rowid / 2),
-           from_left = rowid / 2 == parent)
   
-  result_vars <-model_frame[, model$classes]
-  
-  response <- 1:nrow(result_vars) %>%
-    map(~which.max(result_vars[.x,])) %>%
-    map(~attr(.x, "names")) %>%
-    as.character()
-  
-  percent <- 1:nrow(result_vars) %>%
-    map(~result_vars[.x,response[.x]]) %>%
-    as.numeric()
-  
-  model_frame <- model_frame %>%
-    mutate(response = response,
-           percent = percent)
-  
-  rm(result_vars)
-  rm(response)
-  rm(percent)
   
   all_paths <- model_frame %>%
-    filter(cutleft == "") %>%
+    filter(status == -1) %>% 
     pull(rowid) %>%
     map(~get_path(.x, model_frame)) %>%
     bind_rows()
   
-  parser <- model_frame %>%
-    filter(cutleft == "") %>%
-    rownames_to_column() %>%
-    mutate(labels = paste0("path-", rowname),
-           vals = response, 
-           type = "path", 
-           estimate = percent) %>%
-    select(labels, vals, type, estimate) %>%
-    bind_cols(all_paths)  %>%
-    bind_rows(tibble(
-      labels = "model",
-      vals = "randomForest",
-      type = "variable",
-      estimate = NA,
-      field = NA,
-      operation = NA
-    )) 
+  tidy <- model_frame %>%
+    filter(status == -1) %>% 
+    rowid_to_column("labels") %>%
+    mutate(labels = paste0("path-", labels),
+           type = "path",
+           estimate = 0) %>%
+    select(labels, vals = prediction, type, estimate) %>%
+    bind_cols(all_paths)
   
-  parser
+  tidy
+  
   
 }
 
@@ -222,31 +187,39 @@ get_marker_regx <- function()"\\{\\:\\}"
 
 
 
+
 get_path <- function(row_id, model_frame){
   field <- NULL
   operation <- NULL
+  
   for(get_path in 1:nrow(model_frame)){
-    if(row_id == 0){
+    
+    current <- filter(model_frame, rowid == row_id)
+    if(current$status == 1){
+      field <- c(
+        field, 
+        as.character(current$split_var))
+      
+      operation <- c(
+        operation, 
+        paste0(ifelse(to_left, "<=", ">"), current$split_point))
+      
+    } 
+    
+    left <- which(model_frame$left_daughter == row_id)
+    right <- which(model_frame$right_daughter == row_id)
+    parent <- as.numeric(paste0(left, right, collapse =""))
+    to_left <- length(left) > 0
+    
+    if(is.na(parent)){
       path <- tibble(
         field = paste0(field, collapse = get_marker()),
         operation = paste0(operation, collapse = get_marker())
       )
       break
     } 
-    current <- filter(model_frame, rowid == row_id)
-    if(current$cutleft != ""){
-      field <- c(
-        field, 
-        current$var)
-      
-      operation <- c(
-        operation, 
-        ifelse(current_side, current$cutleft, current$cutright))
-      
-    } 
-    
-    row_id <- current$parent
-    current_side <- current$from_left
+
+    row_id <- parent
   }
   path
   
