@@ -122,6 +122,47 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
 
 setOldClass(c("test_predictions", "list"))
 
+
+#' @import rlang
+#' @import dplyr
+#' @export 
+test_predictions.randomForest <- function(model, df = NULL, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
+  
+  raw_results <- df %>%
+    mutate(predict = as.character(predict(model, iris)),
+           tidypredict = !! predict_fit(model))
+  
+  differences <- raw_results %>%
+    filter(tidypredict != predict | is.na(tidypredict))
+  
+  alert <- nrow(differences) > 0
+  
+  message <- "tidypredict test results\n"
+  
+  if(alert){
+    message <- paste0(
+      message, 
+      "\nPredictions that did not match predict(): ", nrow(differences)
+      )
+  } else {
+    message <- paste0(
+      message, 
+      "\nAll predictions matched"
+    )
+  }
+  
+  results <- list()
+  
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  
+  structure(results, class = c("test_predictions", "list"))
+}
+setOldClass(c("test_predictions", "list"))
+
+
 #' print method for test predictions results
 #'
 #' @keywords internal
@@ -137,6 +178,3 @@ print.test_predictions <- function(x, ...) {
 knit_print.test_predictions <- function(x, ...) {
   x$message
 }
-
-
-

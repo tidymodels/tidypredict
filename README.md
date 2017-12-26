@@ -512,16 +512,21 @@ predict_fit(model)
 Currently, the formula matches 147 out of 150 prediction for Iris
 
 ``` r
-prediction_test <- iris %>%
-  mutate(
-    model = as.character(predict(model, iris)),
-    tidypredict = !! predict_fit(model))
-  
-prediction_test %>%
-  filter(tidypredict != model | is.na(tidypredict))
+test <- test_predictions(model, iris)
+
+test
 ```
 
-    ##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species      model
+    ## tidypredict test results
+    ## 
+    ## Predictions that did not match predict(): 3
+
+``` r
+test$raw_results %>%
+  filter(predict != tidypredict)
+```
+
+    ##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species    predict
     ## 1          4.9         2.4          3.3         1.0 versicolor versicolor
     ## 2          6.0         2.7          5.1         1.6 versicolor versicolor
     ## 3          6.0         2.2          5.0         1.5  virginica  virginica
