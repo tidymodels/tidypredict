@@ -10,6 +10,7 @@ output:
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)
+library(randomForest)
 ```
 
 ## Intro
@@ -206,3 +207,30 @@ The `alert` output is set to TRUE because, because at least one of the `_thresho
 ```{r}
 results$alert
 ```
+
+
+## Random Forest
+
+```{r}
+library(randomForest)
+
+set.seed(100)
+
+model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+
+model
+```
+```{r}
+iris %>%
+  predict_to_column(model)
+```
+
+```{r}
+iris %>%
+  mutate(fit = !! predict_fit(model))
+```
+
+```{r}
+parsemodel(model)
+````
+

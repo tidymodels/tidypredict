@@ -33,6 +33,13 @@ predict_fit.glm <- function(model){
 }
 
 #' @export
+predict_fit.randomForest <- function(model){
+  parsedmodel <- parsemodel(model)
+  te_randomforest_fit(parsedmodel)
+}
+
+
+#' @export
 #' @importFrom tibble as.tibble
 `predict_fit.data.frame` <- function(model){
   
@@ -55,6 +62,12 @@ predict_fit.glm <- function(model){
     assigned <- 1
     fit <- te_fit_glm(model)
   }
+  
+  if(model_type == "randomForest"){
+    assigned <- 1
+    fit <- te_randomforest_fit(model)
+  }
+  
   
   if(assigned ==0){
     stop("Model not recognized")
