@@ -142,3 +142,77 @@ parsemodel_lm <- function(model){
   
   tidy
 }
+
+#' @import rlang
+#' @importFrom purrr map2
+#' @importFrom purrr map
+#' @importFrom purrr reduce
+#' @import dplyr
+#' @export
+parsemodel.randomForest <- function(model){
+  
+  model_frame <- getTree(model, labelVar = TRUE) %>%
+    as.tibble() %>%
+    rowid_to_column() 
+  
+  colnames(model_frame) <- sub(" ", "_", colnames(model_frame))
+  
+  all_paths <- model_frame %>%
+    filter(status == -1) %>% 
+    pull(rowid) %>%
+    map(~get_path(.x, model_frame)) %>%
+    bind_rows()
+  
+  tidy <- model_frame %>%
+    filter(status == -1) %>% 
+    rowid_to_column("labels") %>%
+    mutate(labels = paste0("path-", labels),
+           type = "path",
+           estimate = 0) %>%
+    select(labels, vals = prediction, type, estimate) %>%
+    bind_cols(all_paths) %>%
+    add_row(labels = "model", vals = "randomForest", type = "variable")
+  
+  tidy
+}
+
+get_marker <- function()"{:}"
+
+get_marker_regx <- function()"\\{\\:\\}"
+
+get_path <- function(row_id, model_frame){
+  field <- NULL
+  operation <- NULL
+  
+  for(get_path in 1:nrow(model_frame)){
+    
+    current <- filter(model_frame, rowid == row_id)
+    if(current$status == 1){
+      field <- c(
+        field, 
+        as.character(current$split_var))
+      
+      operation <- c(
+        operation, 
+        paste0(ifelse(to_left, "<=", ">"), current$split_point))
+      
+    } 
+    
+    left <- which(model_frame$left_daughter == row_id)
+    right <- which(model_frame$right_daughter == row_id)
+    parent <- as.numeric(paste0(left, right, collapse =""))
+    to_left <- length(left) > 0
+    
+    if(is.na(parent)){
+      path <- tibble(
+        field = paste0(field, collapse = get_marker()),
+        operation = paste0(operation, collapse = get_marker())
+      )
+      break
+    } 
+
+    row_id <- parent
+  }
+  path
+  
+}

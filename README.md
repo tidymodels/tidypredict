@@ -12,6 +12,7 @@ tidypredict
     -   [Save, and reload, a parsed model](#save-and-reload-a-parsed-model)
     -   [Binomial `glm` models](#binomial-glm-models)
     -   [Test results](#test-results)
+-   [Random Forest](#random-forest)
 
 [![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 
@@ -399,3 +400,137 @@ results$alert
 ```
 
     ## [1] TRUE
+
+Random Forest
+-------------
+
+``` r
+library(randomForest)
+
+set.seed(100)
+
+model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+
+model
+```
+
+    ## 
+    ## Call:
+    ##  randomForest(formula = Species ~ ., data = iris, ntree = 100,      proximity = TRUE) 
+    ##                Type of random forest: classification
+    ##                      Number of trees: 100
+    ## No. of variables tried at each split: 2
+    ## 
+    ##         OOB estimate of  error rate: 4%
+    ## Confusion matrix:
+    ##            setosa versicolor virginica class.error
+    ## setosa         50          0         0        0.00
+    ## versicolor      0         47         3        0.06
+    ## virginica       0          3        47        0.06
+
+``` r
+iris %>%
+  predict_to_column(model) %>%
+  head(10)
+```
+
+    ##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species    fit
+    ## 1           5.1         3.5          1.4         0.2  setosa setosa
+    ## 2           4.9         3.0          1.4         0.2  setosa setosa
+    ## 3           4.7         3.2          1.3         0.2  setosa setosa
+    ## 4           4.6         3.1          1.5         0.2  setosa setosa
+    ## 5           5.0         3.6          1.4         0.2  setosa setosa
+    ## 6           5.4         3.9          1.7         0.4  setosa setosa
+    ## 7           4.6         3.4          1.4         0.3  setosa setosa
+    ## 8           5.0         3.4          1.5         0.2  setosa setosa
+    ## 9           4.4         2.9          1.4         0.2  setosa setosa
+    ## 10          4.9         3.1          1.5         0.1  setosa setosa
+
+`tidypredict` bases the parser on the ouput from the the `tree::getTree()` function
+
+``` r
+getTree(model, labelVar = TRUE) %>% 
+  as.tibble() 
+```
+
+    ## # A tibble: 13 x 6
+    ##    `left daughter` `right daughter`  `split var` `split point` status
+    ##  *           <dbl>            <dbl>       <fctr>         <dbl>  <dbl>
+    ##  1               2                3 Petal.Length          2.50      1
+    ##  2               0                0         <NA>          0.00     -1
+    ##  3               4                5 Petal.Length          5.05      1
+    ##  4               6                7  Petal.Width          1.90      1
+    ##  5               0                0         <NA>          0.00     -1
+    ##  6               8                9 Sepal.Length          4.95      1
+    ##  7               0                0         <NA>          0.00     -1
+    ##  8               0                0         <NA>          0.00     -1
+    ##  9              10               11  Petal.Width          1.75      1
+    ## 10               0                0         <NA>          0.00     -1
+    ## 11              12               13  Sepal.Width          3.00      1
+    ## 12               0                0         <NA>          0.00     -1
+    ## 13               0                0         <NA>          0.00     -1
+    ## # ... with 1 more variables: prediction <chr>
+
+The parsed model has one entry per path
+
+``` r
+parsemodel(model)
+```
+
+    ## # A tibble: 7 x 6
+    ##   labels       vals  type estimate
+    ##    <chr>      <chr> <chr>    <dbl>
+    ## 1 path-1     setosa  path        0
+    ## 2 path-2  virginica  path        0
+    ## 3 path-3  virginica  path        0
+    ## 4 path-4  virginica  path        0
+    ## 5 path-5 versicolor  path        0
+    ## 6 path-6  virginica  path        0
+    ## 7 path-7 versicolor  path        0
+    ## # ... with 2 more variables: field <chr>, operation <chr>
+
+The Tidy Eval formula is one `dplyr::case_when()` statement
+
+``` r
+predict_fit(model)
+```
+
+    ## case_when((Petal.Length <= 2.5) ~ "setosa", ((Petal.Length > 
+    ##     5.05) & (Petal.Length > 2.5)) ~ "virginica", (((Petal.Width > 
+    ##     1.9) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
+    ##     "virginica", ((((Sepal.Length <= 4.95) & (Petal.Width <= 
+    ##     1.9)) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
+    ##     "virginica", (((((Petal.Width <= 1.75) & (Sepal.Length > 
+    ##     4.95)) & (Petal.Width <= 1.9)) & (Petal.Length <= 5.05)) & 
+    ##     (Petal.Length > 2.5)) ~ "versicolor", ((((((Sepal.Width <= 
+    ##     3) & (Petal.Width > 1.75)) & (Sepal.Length > 4.95)) & (Petal.Width <= 
+    ##     1.9)) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
+    ##     "virginica", ((((((Sepal.Width > 3) & (Petal.Width > 1.75)) & 
+    ##     (Sepal.Length > 4.95)) & (Petal.Width <= 1.9)) & (Petal.Length <= 
+    ##     5.05)) & (Petal.Length > 2.5)) ~ "versicolor")
+
+Currently, the formula matches 147 out of 150 prediction for Iris
+
+``` r
+test <- test_predictions(model, iris)
+
+test
+```
+
+    ## tidypredict test results
+    ## 
+    ## Predictions that did not match predict(): 3
+
+``` r
+test$raw_results %>%
+  filter(predict != tidypredict)
+```
+
+    ##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species    predict
+    ## 1          4.9         2.4          3.3         1.0 versicolor versicolor
+    ## 2          6.0         2.7          5.1         1.6 versicolor versicolor
+    ## 3          6.0         2.2          5.0         1.5  virginica  virginica
+    ##   tidypredict
+    ## 1   virginica
+    ## 2   virginica
+    ## 3  versicolor
