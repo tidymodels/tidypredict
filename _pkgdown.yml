@@ -6,10 +6,26 @@ navbar:
       href: articles/lm.html
     - text: "Generalized Linear Model"
       href: articles/glm.html
-    - text: "Random Forest Model"
+    - text: "Random Forest"
       href: articles/randomForest.html
     - text: "Reference"
       href: "reference/index.html"
   right:
     - icon: fa-github
       href: https://github.com/edgararuiz/tidypredict
+reference:
+  - title: Tidy Eval formulas
+    contents:
+    - predict_fit
+    - predict_interval
+  - title: SQL formulas
+    contents:
+    - fit_to_sql
+    - interval_to_sql
+  - title: dplyr
+    contents:
+    - predict_to_column    
+  - title: Utilities
+    contents:
+    - test_predictions
+    - acceptable_formula
