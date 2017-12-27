@@ -6,7 +6,7 @@
 #' corresponding function that is able to create the Tidy Eval formula.  It
 #' currently supports lm() and glm() models.
 #' 
-#' @param model An R model object
+#' @param model An R model or a tibble with a parsed model
 #'
 #' @examples
 #' 

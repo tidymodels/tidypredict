@@ -7,7 +7,7 @@
 predict_interval(model, interval = 0.95)
 }
 \arguments{
-\item{model}{An R model object}
+\item{model}{An R model or a tibble with a parsed model}
 
 \item{interval}{The prediction interval, defaults to 0.95}
 }

@@ -7,7 +7,7 @@
 predict_fit(model)
 }
 \arguments{
-\item{model}{An R model object}
+\item{model}{An R model or a tibble with a parsed model}
 }
 \description{
 It uses parsemodel to create a tabular version of the data needed to create

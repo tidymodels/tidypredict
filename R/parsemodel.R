@@ -157,11 +157,6 @@ parsemodel.randomForest <- function(model){
   
   colnames(model_frame) <- sub(" ", "_", colnames(model_frame))
   
-  
-  model_frame
-  
-  
-  
   all_paths <- model_frame %>%
     filter(status == -1) %>% 
     pull(rowid) %>%
@@ -175,18 +170,15 @@ parsemodel.randomForest <- function(model){
            type = "path",
            estimate = 0) %>%
     select(labels, vals = prediction, type, estimate) %>%
-    bind_cols(all_paths)
+    bind_cols(all_paths) %>%
+    add_row(labels = "model", vals = "randomForest", type = "variable")
   
   tidy
-  
-  
 }
 
 get_marker <- function()"{:}"
+
 get_marker_regx <- function()"\\{\\:\\}"
-
-
-
 
 get_path <- function(row_id, model_frame){
   field <- NULL

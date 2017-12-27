@@ -9,7 +9,7 @@
 #' The result still has to be added to the fit to obtain the upper bound, and
 #' substracted from fit to obtain the lower bound.
 #' 
-#' @param model An R model object
+#' @param model An R model or a tibble with a parsed model
 #' @param interval The prediction interval, defaults to 0.95
 #'
 #' @examples
