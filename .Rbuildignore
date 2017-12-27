@@ -3,3 +3,5 @@
 README.Rmd
 model.csv
 travis.yml
+^docs$
+^_pkgdown\.yml$

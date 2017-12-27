@@ -1,0 +1,15 @@
+navbar:
+  title: "tidypredict"
+  type: inverse
+  left:
+    - text: "Linear Model"
+      href: articles/lm.html
+    - text: "Generalized Linear Model"
+      href: articles/glm.html
+    - text: "Random Forest Model"
+      href: articles/randomForest.html
+    - text: "Reference"
+      href: "reference/index.html"
+  right:
+    - icon: fa-github
+      href: https://github.com/edgararuiz/tidypredict

@@ -1,5 +1,5 @@
 ---
-title: "Predictions with a binomial `glm` model"
+title: "Binomial glm model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{glm}
@@ -10,17 +10,19 @@ vignette: >
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)
-library(randomForest)
 ```
 
 `tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
 ```{r}
+
 model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
 ```
 
 
 
 ```{r}
+library(tidypredict)
+
 mtcars %>%
   head(10) %>%
   predict_to_column(model) %>%

@@ -1,5 +1,5 @@
 ---
-title: "Predictions with a `randomForest` model"
+title: "randomForest model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{randomForest}
