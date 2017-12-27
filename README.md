@@ -1,52 +1,62 @@
 tidypredict
 ================
 
--   [Intro](#intro)
--   [Highlights](#highlights)
--   [Advantages](#advantages)
--   [Installation](#installation)
--   [Example](#example)
-    -   [`prediction_to_column()`](#prediction_to_column)
-    -   [Prediction functions](#prediction-functions)
-    -   [Model parser](#model-parser)
-    -   [Save, and reload, a parsed model](#save-and-reload-a-parsed-model)
-    -   [Binomial `glm` models](#binomial-glm-models)
-    -   [Test results](#test-results)
--   [Random Forest](#random-forest)
+[![Build
+Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+## Intro
 
-Intro
------
+The mail goal of **tidypredict** is to use [Tidy
+Evaluation](http://rlang.tidyverse.org/articles/tidy-evaluation.html) to
+produce a formula that can be executed inside `dplyr` verbs that
+calculates the prediction based on a model. In other words, it takes
+place of the `predict()` function.
 
-The mail goal of **tidypredict** is to use [Tidy Evaluation](http://rlang.tidyverse.org/articles/tidy-evaluation.html) to produce a formula that can be executed inside `dplyr` verbs that calculates the prediction based on a model. In other words, it takes place of the `predict()` function.
+The main motivation for `tidypredict` is to open the possibility to
+score the new results inside a database or Spark. The premise is that
+even though the model may be created in-memory inside R, there is still
+the need to use the results to score at scale.
 
-The main motivation for `tidypredict` is to open the possibility to score the new results inside a database or Spark. The premise is that even though the model may be created in-memory inside R, there is still the need to use the results to score at scale.
+## Highlights
 
-Highlights
-----------
+  - `predict_to_column()` - Helper function, similar to
+    `tibble::rowid_to_column()` that makes it easier to add the fitted
+    and interval calculations to an analysis.
 
--   `predict_to_column()` - Helper function, similar to `tibble::rowid_to_column()` that makes it easier to add the fitted and interval calculations to an analysis.
+  - `predict_fit()` /`predict_interval()` - Creates a *tidy eval*
+    formula that `dplyr` can run to calculate the predictions. (Used by
+    `predict_to_column()`)
 
--   `predict_fit()` /`predict_interval()` - Creates a *tidy eval* formula that `dplyr` can run to calculate the predictions. (Used by `predict_to_column()`)
+  - `parsemodel()` - Reads an R model (`lm` and `glm` only at this time)
+    and outputs a tidy `tibble` with the needed information to calculate
+    the predictions.
 
--   `parsemodel()` - Reads an R model (`lm` and `glm` only at this time) and outputs a tidy `tibble` with the needed information to calculate the predictions.
+  - `tidypredict` includes a helper function to compare the results of
+    the base `predict()` function against the results from the
+    `tidypredict` functions, it is called: `test_predictions()`
 
--   `tidypredict` includes a helper function to compare the results of the base `predict()` function against the results from the `tidypredict` functions, it is called: `test_predictions()`
+  - *The parser and the formula creation are separated* - This allows
+    for non-R model objects to use the same `predict_...` functions,
+    just as long as they provide the same data as the output from
+    `parsemodel()` does.
 
--   *The parser and the formula creation are separated* - This allows for non-R model objects to use the same `predict_...` functions, just as long as they provide the same data as the output from `parsemodel()` does.
+## Advantages
 
-Advantages
-----------
+  - Using *tidy eval* allows the resulting formula to be translated to
+    SQL-syntax, which allows the predictions to run inside the database
 
--   Using *tidy eval* allows the resulting formula to be translated to SQL-syntax, which allows the predictions to run inside the database
+  - The output from `parsemodel()` can be saved to a file, and re-loaded
+    from, a *csv* file easily. This means that it is a good alternative
+    to saving the, usually large, model variable as an `.rds` file for
+    later use, such as in a Shiny app.
 
--   The output from `parsemodel()` can be saved to a file, and re-loaded from, a *csv* file easily. This means that it is a good alternative to saving the, usually large, model variable as an `.rds` file for later use, such as in a Shiny app.
+  - Because of the separation of the predict functions from the parsing
+    functions, models created using different languages (as in not R)
+    could still be run at-scale as long as a `data.frame` is produced
+    and passed to the prediction functions. Some possibilities are PMML,
+    SAS, and other types.
 
--   Because of the separation of the predict functions from the parsing functions, models created using different languages (as in not R) could still be run at-scale as long as a `data.frame` is produced and passed to the prediction functions. Some possibilities are PMML, SAS, and other types.
-
-Installation
-------------
+## Installation
 
 Install `tidypredict` using `devtools` as follows:
 
@@ -54,8 +64,7 @@ Install `tidypredict` using `devtools` as follows:
 devtools::install_github("edgararuiz/tidypredict")
 ```
 
-Example
--------
+## Example
 
 ``` r
 library(dplyr)
@@ -77,7 +86,7 @@ model
     ## (Intercept)           wt           am      cylcyl6      cylcyl8  
     ##     33.7536      -3.1496       0.1501      -4.2573      -6.0791
 
-### `prediction_to_column()`
+### `predict_to_column()`
 
 ``` r
 df %>%
@@ -97,7 +106,8 @@ df %>%
     ## 9  22.8 cyl4 140.8  95 3.92 3.150 22.90  1  0    4    2 23.83236
     ## 10 19.2 cyl6 167.6 123 3.92 3.440 18.30  1  0    4    4 18.66166
 
-Compare the results against `predict()`
+Compare the results against
+    `predict()`
 
 ``` r
 predict(model, head(df,10))
@@ -149,7 +159,10 @@ predict(model, head(df,10), interval = "prediction")
 
 ### Prediction functions
 
-To see the prediction formula, call the `predict_fit()` function. Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
+To see the prediction formula, call the `predict_fit()` function.
+Because it uses S3 methods, it will decide which parser and formula
+generator to use for the model passed in the
+    argument.
 
 ``` r
 predict_fit(model)
@@ -159,7 +172,8 @@ predict_fit(model)
     ##     ("cyl8"), (-6.07911886695386), 0))) + ((wt) * (-3.14959778114425))) + 
     ##     ((am) * (0.150103119934497))) + (33.7535920047122)
 
-If more granular control than what `predict_to_column()` is needed, then the function can be used inside a `dplyr` verb command
+If more granular control than what `predict_to_column()` is needed, then
+the function can be used inside a `dplyr` verb command
 
 ``` r
 df %>%
@@ -179,7 +193,8 @@ df %>%
     ## 9  22.8 cyl4 140.8  95 3.92 3.150 22.90  1  0    4    2 23.83236
     ## 10 19.2 cyl6 167.6 123 3.92 3.440 18.30  1  0    4    4 18.66166
 
-To add prediction intervals, an additional calculation is needed against the fitted result
+To add prediction intervals, an additional calculation is needed against
+the fitted result
 
 ``` r
 df %>%
@@ -243,30 +258,36 @@ predict_interval(model, interval = 0.99)
 
 ### Model parser
 
-The `parsemodel()` function returns a tidy table with the data needed to run the predictions
+The `parsemodel()` function returns a tidy table with the data needed to
+run the predictions
 
 ``` r
 parsemodel(model)
 ```
 
     ## # A tibble: 8 x 9
-    ##        labels            vals        type   estimate       qr_1       qr_2
-    ##         <chr>           <chr>       <chr>      <dbl>      <dbl>      <dbl>
-    ## 1 (Intercept)                   intercept 33.7535920 -0.1767767 -0.5905573
-    ## 2          wt                  continuous -3.1495978  0.0000000  0.1835596
-    ## 3          am                  continuous  0.1501031  0.0000000  0.0000000
-    ## 4         cyl            cyl6 categorical -4.2573185  0.0000000  0.0000000
-    ## 5         cyl            cyl8 categorical -6.0791189  0.0000000  0.0000000
-    ## 6       model              lm    variable         NA         NA         NA
-    ## 7    residual              27    variable         NA         NA         NA
-    ## 8      sigma2 6.7766049449091    variable         NA         NA         NA
-    ## # ... with 3 more variables: qr_3 <dbl>, qr_4 <dbl>, qr_5 <dbl>
+    ##   labels  vals   type   estima~    qr_1    qr_2    qr_3      qr_4     qr_5
+    ##   <chr>   <chr>  <chr>    <dbl>   <dbl>   <dbl>   <dbl>     <dbl>    <dbl>
+    ## 1 (Inter~ ""     inter~  33.8   - 0.177 - 0.591   0.770   0.141   - 0.419 
+    ## 2 wt      ""     conti~ - 3.15    0       0.184 - 0.176 - 0.0135    0.238 
+    ## 3 am      ""     conti~   0.150   0       0     - 0.499 - 0.00973   0.0212
+    ## 4 cyl     cyl6   categ~ - 4.26    0       0       0     - 0.428   - 0.332 
+    ## 5 cyl     cyl8   categ~ - 6.08    0       0       0       0       - 0.647 
+    ## 6 model   lm     varia~  NA      NA      NA      NA      NA        NA     
+    ## 7 residu~ 27     varia~  NA      NA      NA      NA      NA        NA     
+    ## 8 sigma2  6.776~ varia~  NA      NA      NA      NA      NA        NA
 
-`predict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
+`predict_fit()` does not need all of the columns in this table, it only
+requires the first four. The `qr_...` fields are use to calculate the
+prediction intervals, the are the result of running `qr.solve()` against
+the model’s `qr` variable.
 
 ### Save, and reload, a parsed model
 
-The output of the model parser can be saved as a `.csv` file and reloaded at a later time. The prediction functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
+The output of the model parser can be saved as a `.csv` file and
+reloaded at a later time. The prediction functions have an S3 method for
+`data.frame`, so the `model` entry is used to determine which predict
+formula to compile.
 
 ``` r
 write.csv(parsemodel(model), "model.csv")
@@ -292,38 +313,20 @@ df %>%
     ## 9  23.83236 23.83236 23.83236
     ## 10 18.66166 18.66166 18.66166
 
-### Binomial `glm` models
-
-`tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
-
-``` r
-model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
-
-mtcars %>%
-  head(10) %>%
-  predict_to_column(model)  %>%
-  pull(fit)
-```
-
-    ##  [1] 0.90625492 0.65308276 0.97366320 0.15728804 0.09561351 0.10149089
-    ##  [7] 0.16047152 0.07651740 0.15247435 0.08248711
-
-Confirm that the predictions match to what the `predict()` function returns
-
-``` r
-as.numeric(predict(model, head(mtcars, 10), type = "response"))
-```
-
-    ##  [1] 0.90625492 0.65308276 0.97366320 0.15728804 0.09561351 0.10149089
-    ##  [7] 0.16047152 0.07651740 0.15247435 0.08248711
-
 ### Test results
 
-For good measure, the `test_predictions()` function will run the `predict()` command and `predict_to_column()` and then compares the results. Because of decimal precision, some results will be different, but by a very, very small amount. That's why the comparison tests that `test_predictions()` run focuses on a difference **threshold**. The default threshold is: 0.000000000001.
+For good measure, the `test_predictions()` function will run the
+`predict()` command and `predict_to_column()` and then compares the
+results. Because of decimal precision, some results will be different,
+but by a very, very small amount. That’s why the comparison tests that
+`test_predictions()` run focuses on a difference **threshold**. The
+default threshold is: 0.000000000001.
 
-It is highly recommended to run this test to confirm that the output of the `tidypredict` functions are within acceptable ranges.
+It is highly recommended to run this test to confirm that the output of
+the `tidypredict` functions are within acceptable ranges.
 
-`test_predictions()` has a custom `print` and `knit_print` methods that return a summary of the results:
+`test_predictions()` has a custom `print` and `knit_print` methods that
+return a summary of the results:
 
 ``` r
 model <- lm(mpg ~ wt + am + cyl, data = df)
@@ -336,7 +339,8 @@ test_predictions(model, include_intervals = TRUE)
     ## 
     ##  All results are within the difference threshold
 
-The `threshold` is reduced to 1e-16 to see the response of a "failing" test.
+The `threshold` is reduced to 1e-16 to see the response of a “failing”
+test.
 
 ``` r
 test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
@@ -353,7 +357,12 @@ test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001
     ## Lower max difference:3.5527136788005e-15
     ## Upper max difference:3.5527136788005e-15
 
-`test_predictions()` returns a list that contains a `data.frame` with the raw results, the model call and the message. Additionally, an output called `alert` is included in case the test is to be automated and there's a need to easily tell the R script running the test that there is a problem.
+`test_predictions()` returns a list that contains a `data.frame` with
+the raw results, the model call and the message. Additionally, an output
+called `alert` is included in case the test is to be automated and
+there’s a need to easily tell the R script running the test that there
+is a
+problem.
 
 ``` r
 results <- test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
@@ -372,7 +381,8 @@ results
     ## Lower max difference:3.5527136788005e-15
     ## Upper max difference:3.5527136788005e-15
 
-This is an sample of the raw results of the test:
+This is an sample of the raw results of the
+    test:
 
 ``` r
 head(results$raw_results)
@@ -393,144 +403,11 @@ head(results$raw_results)
     ## 5         FALSE 0.000000e+00 0.000000e+00         FALSE         FALSE
     ## 6         FALSE 3.552714e-15 3.552714e-15          TRUE          TRUE
 
-The `alert` output is set to TRUE because, because at least one of the `_threshold` fields are TRUE
+The `alert` output is set to TRUE because, because at least one of the
+`_threshold` fields are TRUE
 
 ``` r
 results$alert
 ```
 
     ## [1] TRUE
-
-Random Forest
--------------
-
-``` r
-library(randomForest)
-
-set.seed(100)
-
-model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
-
-model
-```
-
-    ## 
-    ## Call:
-    ##  randomForest(formula = Species ~ ., data = iris, ntree = 100,      proximity = TRUE) 
-    ##                Type of random forest: classification
-    ##                      Number of trees: 100
-    ## No. of variables tried at each split: 2
-    ## 
-    ##         OOB estimate of  error rate: 4%
-    ## Confusion matrix:
-    ##            setosa versicolor virginica class.error
-    ## setosa         50          0         0        0.00
-    ## versicolor      0         47         3        0.06
-    ## virginica       0          3        47        0.06
-
-``` r
-iris %>%
-  predict_to_column(model) %>%
-  head(10)
-```
-
-    ##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species    fit
-    ## 1           5.1         3.5          1.4         0.2  setosa setosa
-    ## 2           4.9         3.0          1.4         0.2  setosa setosa
-    ## 3           4.7         3.2          1.3         0.2  setosa setosa
-    ## 4           4.6         3.1          1.5         0.2  setosa setosa
-    ## 5           5.0         3.6          1.4         0.2  setosa setosa
-    ## 6           5.4         3.9          1.7         0.4  setosa setosa
-    ## 7           4.6         3.4          1.4         0.3  setosa setosa
-    ## 8           5.0         3.4          1.5         0.2  setosa setosa
-    ## 9           4.4         2.9          1.4         0.2  setosa setosa
-    ## 10          4.9         3.1          1.5         0.1  setosa setosa
-
-`tidypredict` bases the parser on the ouput from the the `tree::getTree()` function
-
-``` r
-getTree(model, labelVar = TRUE) %>% 
-  as.tibble() 
-```
-
-    ## # A tibble: 13 x 6
-    ##    `left daughter` `right daughter`  `split var` `split point` status
-    ##  *           <dbl>            <dbl>       <fctr>         <dbl>  <dbl>
-    ##  1               2                3 Petal.Length          2.50      1
-    ##  2               0                0         <NA>          0.00     -1
-    ##  3               4                5 Petal.Length          5.05      1
-    ##  4               6                7  Petal.Width          1.90      1
-    ##  5               0                0         <NA>          0.00     -1
-    ##  6               8                9 Sepal.Length          4.95      1
-    ##  7               0                0         <NA>          0.00     -1
-    ##  8               0                0         <NA>          0.00     -1
-    ##  9              10               11  Petal.Width          1.75      1
-    ## 10               0                0         <NA>          0.00     -1
-    ## 11              12               13  Sepal.Width          3.00      1
-    ## 12               0                0         <NA>          0.00     -1
-    ## 13               0                0         <NA>          0.00     -1
-    ## # ... with 1 more variables: prediction <chr>
-
-The parsed model has one entry per path
-
-``` r
-parsemodel(model)
-```
-
-    ## # A tibble: 7 x 6
-    ##   labels       vals  type estimate
-    ##    <chr>      <chr> <chr>    <dbl>
-    ## 1 path-1     setosa  path        0
-    ## 2 path-2  virginica  path        0
-    ## 3 path-3  virginica  path        0
-    ## 4 path-4  virginica  path        0
-    ## 5 path-5 versicolor  path        0
-    ## 6 path-6  virginica  path        0
-    ## 7 path-7 versicolor  path        0
-    ## # ... with 2 more variables: field <chr>, operation <chr>
-
-The Tidy Eval formula is one `dplyr::case_when()` statement
-
-``` r
-predict_fit(model)
-```
-
-    ## case_when((Petal.Length <= 2.5) ~ "setosa", ((Petal.Length > 
-    ##     5.05) & (Petal.Length > 2.5)) ~ "virginica", (((Petal.Width > 
-    ##     1.9) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
-    ##     "virginica", ((((Sepal.Length <= 4.95) & (Petal.Width <= 
-    ##     1.9)) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
-    ##     "virginica", (((((Petal.Width <= 1.75) & (Sepal.Length > 
-    ##     4.95)) & (Petal.Width <= 1.9)) & (Petal.Length <= 5.05)) & 
-    ##     (Petal.Length > 2.5)) ~ "versicolor", ((((((Sepal.Width <= 
-    ##     3) & (Petal.Width > 1.75)) & (Sepal.Length > 4.95)) & (Petal.Width <= 
-    ##     1.9)) & (Petal.Length <= 5.05)) & (Petal.Length > 2.5)) ~ 
-    ##     "virginica", ((((((Sepal.Width > 3) & (Petal.Width > 1.75)) & 
-    ##     (Sepal.Length > 4.95)) & (Petal.Width <= 1.9)) & (Petal.Length <= 
-    ##     5.05)) & (Petal.Length > 2.5)) ~ "versicolor")
-
-Currently, the formula matches 147 out of 150 prediction for Iris
-
-``` r
-test <- test_predictions(model, iris)
-
-test
-```
-
-    ## tidypredict test results
-    ## 
-    ## Predictions that did not match predict(): 3
-
-``` r
-test$raw_results %>%
-  filter(predict != tidypredict)
-```
-
-    ##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species    predict
-    ## 1          4.9         2.4          3.3         1.0 versicolor versicolor
-    ## 2          6.0         2.7          5.1         1.6 versicolor versicolor
-    ## 3          6.0         2.2          5.0         1.5  virginica  virginica
-    ##   tidypredict
-    ## 1   virginica
-    ## 2   virginica
-    ## 3  versicolor

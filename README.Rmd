@@ -60,7 +60,7 @@ model <- lm(mpg ~ wt + am + cyl, data = df)
 model
 ```
 
-### `prediction_to_column()`
+### `predict_to_column()`
 
 ```{r}
 df %>%
@@ -151,24 +151,6 @@ df %>%
   select(ft, lw, up)
 ```
 
-### Binomial `glm` models
-
-`tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
-```{r}
-model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
-
-mtcars %>%
-  head(10) %>%
-  predict_to_column(model)  %>%
-  pull(fit)
-```
-
-Confirm that the predictions match to what the `predict()` function returns
-
-```{r}
-as.numeric(predict(model, head(mtcars, 10), type = "response"))
-```
-
 ### Test results
 
 For good measure, the `test_predictions()` function will run the `predict()` command and `predict_to_column()` and then compares the results.  Because of decimal precision, some results will be different, but by a very, very small amount.  That's why the comparison tests that `test_predictions()` run focuses on a difference **threshold**.  The default threshold is: 0.000000000001.
@@ -206,51 +188,4 @@ The `alert` output is set to TRUE because, because at least one of the `_thresho
 
 ```{r}
 results$alert
-```
-
-
-## Random Forest
-
-
-```{r}
-library(randomForest)
-
-set.seed(100)
-
-model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
-
-model
-```
-
-
-```{r}
-iris %>%
-  predict_to_column(model) %>%
-  head(10)
-```
-
-`tidypredict` bases the parser on the ouput from the the `tree::getTree()` function
-```{r}
-getTree(model, labelVar = TRUE) %>% 
-  as.tibble() 
-```
-
-The parsed model has one entry per path 
-```{r}
-parsemodel(model)
-```
-
-The Tidy Eval formula is one `dplyr::case_when()` statement
-```{r}
-predict_fit(model)
-```
-
-Currently, the formula matches 147 out of 150 prediction for Iris
-```{r}
-test <- test_predictions(model, iris)
-
-test
-
-test$raw_results %>%
-  filter(predict != tidypredict)
 ```

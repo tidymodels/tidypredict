@@ -1,0 +1,68 @@
+---
+title: "Predictions with a `randomForest` model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{randomForest}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidypredict)
+library(randomForest)
+```
+
+```{r}
+library(tidypredict)
+library(randomForest)
+
+set.seed(100)
+
+model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+
+model
+```
+
+## `predict_to_column()`
+
+```{r}
+iris %>%
+  predict_to_column(model) %>%
+  head(10)
+```
+
+## How it works
+
+`tidypredict` bases the parser on the ouput from the the `tree::getTree()` function
+```{r}
+getTree(model, labelVar = TRUE) %>% 
+  as.tibble() 
+```
+
+The parsed model has one entry per path 
+```{r}
+parsemodel(model)
+```
+
+The Tidy Eval formula is one `dplyr::case_when()` statement
+```{r}
+predict_fit(model)
+```
+
+Here an example of how the formula will be translated into SQL
+```{r}
+fit_to_sql(model, dbplyr::simulate_dbi())
+```
+
+## How it performs
+
+Currently, the formula matches 147 out of 150 prediction for Iris
+```{r}
+test <- test_predictions(model, iris)
+
+test
+
+test$raw_results %>%
+  filter(predict != tidypredict)
+```

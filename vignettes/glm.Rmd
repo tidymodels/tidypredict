@@ -1,0 +1,56 @@
+---
+title: "Predictions with a binomial `glm` model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{glm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidypredict)
+library(randomForest)
+```
+
+`tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
+```{r}
+model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
+```
+
+
+
+```{r}
+mtcars %>%
+  head(10) %>%
+  predict_to_column(model) %>%
+  select(mpg, wt, am, fit)
+```
+
+## How it works
+
+This is that the Tidy Eval formula will looks like for this model 
+```{r}
+predict_fit(model)
+```
+
+Here an example of how the formula will be translated into SQL
+```{r}
+fit_to_sql(model, dbplyr::simulate_dbi())
+```
+## How it performs
+
+Confirm that the predictions match to what the `predict()` function returns
+
+```{r}
+test <- test_predictions(model)
+
+test
+```
+
+View some actual results
+```{r}
+test$raw_results %>%
+  head(10)
+```
+
