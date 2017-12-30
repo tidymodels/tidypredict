@@ -4,8 +4,6 @@
 #' @importFrom purrr reduce
 #' @import dplyr
 te_randomforest_fit <- function(parsedmodel){
-  
-  
   paths <- parsedmodel %>%
     filter(type == "path")
   

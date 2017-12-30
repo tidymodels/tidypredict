@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>Binomial glm model</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceLine, a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+div.sourceLine, a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource div.sourceLine, .numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource div.sourceLine::before, .numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Binomial glm model</h1>
+
+
+
+<p><code>tidypredict</code> supports <code>glm</code> models with a <em>binomial</em> <code>family</code> and <em>logit</em> <code>link</code></p>
+<pre class="sourceCode r" id="cb1"><code class="sourceCode r"><div class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw">glm</span>(am <span class="op">~</span><span class="st"> </span>mpg <span class="op">+</span><span class="st"> </span>wt, <span class="dt">data =</span> mtcars, <span class="dt">family =</span> <span class="st">&quot;binomial&quot;</span>)</div></code></pre>
+<pre class="sourceCode r" id="cb2"><code class="sourceCode r"><div class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</div>
+<div class="sourceLine" id="cb2-2" data-line-number="2"></div>
+<div class="sourceLine" id="cb2-3" data-line-number="3">mtcars <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">  </span><span class="kw">predict_to_column</span>(model) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb2-6" data-line-number="6"><span class="st">  </span><span class="kw">select</span>(mpg, wt, am, fit)</div></code></pre>
+<pre><code>##     mpg    wt am        fit
+## 1  21.0 2.620  1 0.90625492
+## 2  21.0 2.875  1 0.65308276
+## 3  22.8 2.320  1 0.97366320
+## 4  21.4 3.215  0 0.15728804
+## 5  18.7 3.440  0 0.09561351
+## 6  18.1 3.460  0 0.10149089
+## 7  14.3 3.570  0 0.16047152
+## 8  24.4 3.190  0 0.07651740
+## 9  22.8 3.150  0 0.15247435
+## 10 19.2 3.440  0 0.08248711</code></pre>
+<section id="how-it-works" class="level2">
+<h2>How it works</h2>
+<p>This is that the Tidy Eval formula will looks like for this model</p>
+<pre class="sourceCode r" id="cb4"><code class="sourceCode r"><div class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">predict_fit</span>(model)</div></code></pre>
+<pre><code>## exp((((mpg) * (-0.324163889357643)) + ((wt) * (-6.41617207291539))) + 
+##     (25.8865539927241))/(exp((((mpg) * (-0.324163889357643)) + 
+##     ((wt) * (-6.41617207291539))) + (25.8865539927241)) + 1)</code></pre>
+<p>Here an example of how the formula will be translated into SQL</p>
+<pre class="sourceCode r" id="cb6"><code class="sourceCode r"><div class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">fit_to_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_dbi</span>())</div></code></pre>
+<pre><code>## &lt;SQL&gt; EXP((((&quot;mpg&quot;) * (-0.324163889357643)) + ((&quot;wt&quot;) * (-6.41617207291539))) + (25.8865539927241)) / (EXP((((&quot;mpg&quot;) * (-0.324163889357643)) + ((&quot;wt&quot;) * (-6.41617207291539))) + (25.8865539927241)) + 1.0)</code></pre>
+</section>
+<section id="how-it-performs" class="level2">
+<h2>How it performs</h2>
+<p>Confirm that the predictions match to what the <code>predict()</code> function returns</p>
+<pre class="sourceCode r" id="cb8"><code class="sourceCode r"><div class="sourceLine" id="cb8-1" data-line-number="1">test &lt;-<span class="st"> </span><span class="kw">test_predictions</span>(model)</div>
+<div class="sourceLine" id="cb8-2" data-line-number="2"></div>
+<div class="sourceLine" id="cb8-3" data-line-number="3">test</div></code></pre>
+<pre><code>## tidypredict test results
+## Difference threshold: 1e-12
+## 
+##  All results are within the difference threshold</code></pre>
+<p>View some actual results</p>
+<pre class="sourceCode r" id="cb10"><code class="sourceCode r"><div class="sourceLine" id="cb10-1" data-line-number="1">test<span class="op">$</span>raw_results <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb10-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</div></code></pre>
+<pre><code>##    rowid        fit     fit_te fit_diff fit_threshold
+## 1      1 0.90625492 0.90625492        0         FALSE
+## 2      2 0.65308276 0.65308276        0         FALSE
+## 3      3 0.97366320 0.97366320        0         FALSE
+## 4      4 0.15728804 0.15728804        0         FALSE
+## 5      5 0.09561351 0.09561351        0         FALSE
+## 6      6 0.10149089 0.10149089        0         FALSE
+## 7      7 0.16047152 0.16047152        0         FALSE
+## 8      8 0.07651740 0.07651740        0         FALSE
+## 9      9 0.15247435 0.15247435        0         FALSE
+## 10    10 0.08248711 0.08248711        0         FALSE</code></pre>
+</section>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

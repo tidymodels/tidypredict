@@ -14,7 +14,9 @@ test_predictions(model, df = model$model, threshold = 1e-12,
 It defaults to the "model" data frame object inside the model object.}
 
 \item{threshold}{The number that a given result difference, between predict() and
-predict_to_column() should not exceed.  The default value is 0.000000000001 (1e-12)}
+predict_to_column() should not exceed.  For continuous predictions, the default 
+value is 0.000000000001 (1e-12), for categorical predictions, the default value is
+0.}
 
 \item{include_intervals}{Switch to indicate if the prediction intervals should be
 included in the test.  It defaults to FALSE.}
@@ -23,11 +25,8 @@ included in the test.  It defaults to FALSE.}
 recommended for large data sets.}
 }
 \description{
-Runs predict() and the predict_to_column() functions and compares
-the results.  Because of decimal precision, some results will 
-be different, but the difference will be very small.  That's why
-a "pass" for a test will be if there is no individual result that 
-differs more than the 'threshold' amount set.
+Compares the results of running predict() and the predict_to_column() 
+functions.
 }
 \examples{
 

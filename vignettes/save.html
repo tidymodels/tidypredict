@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>lm model</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+div.sourceLine, a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; }
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+div.sourceLine, a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource div.sourceLine, .numberSource a.sourceLine
+  { position: relative; }
+pre.numberSource div.sourceLine::before, .numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: absolute; left: -5em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em; }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+@media screen {
+a.sourceLine::before { text-decoration: underline; color: initial; }
+}
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.bn { color: #40a070; } /* BaseN */
+code span.fl { color: #40a070; } /* Float */
+code span.ch { color: #4070a0; } /* Char */
+code span.st { color: #4070a0; } /* String */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.ot { color: #007020; } /* Other */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.fu { color: #06287e; } /* Function */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code span.cn { color: #880000; } /* Constant */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.im { } /* Import */
+code span.va { color: #19177c; } /* Variable */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.op { color: #666666; } /* Operator */
+code span.bu { } /* BuiltIn */
+code span.ex { } /* Extension */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.at { color: #7d9029; } /* Attribute */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+</style>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">lm model</h1>
+
+
+
+<section id="example" class="level2">
+<h2>Example</h2>
+<pre class="sourceCode r" id="cb1"><code class="sourceCode r"><div class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(dplyr)</div>
+<div class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw">library</span>(tidypredict)</div>
+<div class="sourceLine" id="cb1-3" data-line-number="3"></div>
+<div class="sourceLine" id="cb1-4" data-line-number="4">df &lt;-<span class="st"> </span>mtcars <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb1-5" data-line-number="5"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">cyl =</span> <span class="kw">paste0</span>(<span class="st">&quot;cyl&quot;</span>, cyl))</div>
+<div class="sourceLine" id="cb1-6" data-line-number="6"></div>
+<div class="sourceLine" id="cb1-7" data-line-number="7">model &lt;-<span class="st"> </span><span class="kw">lm</span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>am <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> df)</div>
+<div class="sourceLine" id="cb1-8" data-line-number="8"></div>
+<div class="sourceLine" id="cb1-9" data-line-number="9">model</div></code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = mpg ~ wt + am + cyl, data = df)
+## 
+## Coefficients:
+## (Intercept)           wt           am      cylcyl6      cylcyl8  
+##     33.7536      -3.1496       0.1501      -4.2573      -6.0791</code></pre>
+<section id="predict_to_column" class="level3">
+<h3><code>predict_to_column()</code></h3>
+<pre class="sourceCode r" id="cb3"><code class="sourceCode r"><div class="sourceLine" id="cb3-1" data-line-number="1">df <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">predict_to_column</span>(model)</div></code></pre>
+<pre><code>##     mpg  cyl  disp  hp drat    wt  qsec vs am gear carb      fit
+## 1  21.0 cyl6 160.0 110 3.90 2.620 16.46  0  1    4    4 21.39443
+## 2  21.0 cyl6 160.0 110 3.90 2.875 17.02  0  1    4    4 20.59128
+## 3  22.8 cyl4 108.0  93 3.85 2.320 18.61  1  1    4    1 26.59663
+## 4  21.4 cyl6 258.0 110 3.08 3.215 19.44  1  0    3    1 19.37032
+## 5  18.7 cyl8 360.0 175 3.15 3.440 17.02  0  0    3    2 16.83986
+## 6  18.1 cyl6 225.0 105 2.76 3.460 20.22  1  0    3    1 18.59867
+## 7  14.3 cyl8 360.0 245 3.21 3.570 15.84  0  0    3    4 16.43041
+## 8  24.4 cyl4 146.7  62 3.69 3.190 20.00  1  0    4    2 23.70638
+## 9  22.8 cyl4 140.8  95 3.92 3.150 22.90  1  0    4    2 23.83236
+## 10 19.2 cyl6 167.6 123 3.92 3.440 18.30  1  0    4    4 18.66166</code></pre>
+<p>Compare the results against <code>predict()</code></p>
+<pre class="sourceCode r" id="cb5"><code class="sourceCode r"><div class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">predict</span>(model, <span class="kw">head</span>(df,<span class="dv">10</span>))</div></code></pre>
+<pre><code>##        1        2        3        4        5        6        7        8 
+## 21.39443 20.59128 26.59663 19.37032 16.83986 18.59867 16.43041 23.70638 
+##        9       10 
+## 23.83236 18.66166</code></pre>
+<p>To include the prediction intervals just use the <code>add_interval</code> switch</p>
+<pre class="sourceCode r" id="cb7"><code class="sourceCode r"><div class="sourceLine" id="cb7-1" data-line-number="1">df <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb7-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb7-3" data-line-number="3"><span class="st">  </span><span class="kw">predict_to_column</span>(model, <span class="dt">add_interval =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb7-4" data-line-number="4"><span class="st">  </span><span class="kw">select</span>(fit, lower, upper)</div></code></pre>
+<pre><code>##         fit    lower    upper
+## 1  21.39443 15.53968 27.24918
+## 2  20.59128 14.72632 26.45624
+## 3  26.59663 20.96580 32.22746
+## 4  19.37032 13.56317 25.17746
+## 5  16.83986 11.16336 22.51635
+## 6  18.59867 12.80729 24.39004
+## 7  16.43041 10.80210 22.05872
+## 8  23.70638 17.85550 29.55725
+## 9  23.83236 17.98927 29.67545
+## 10 18.66166 12.87034 24.45297</code></pre>
+<p>Compare the results against <code>predict()</code></p>
+<pre class="sourceCode r" id="cb9"><code class="sourceCode r"><div class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">predict</span>(model, <span class="kw">head</span>(df,<span class="dv">10</span>), <span class="dt">interval =</span> <span class="st">&quot;prediction&quot;</span>)</div></code></pre>
+<pre><code>##         fit      lwr      upr
+## 1  21.39443 15.53968 27.24918
+## 2  20.59128 14.72632 26.45624
+## 3  26.59663 20.96580 32.22746
+## 4  19.37032 13.56317 25.17746
+## 5  16.83986 11.16336 22.51635
+## 6  18.59867 12.80729 24.39004
+## 7  16.43041 10.80210 22.05872
+## 8  23.70638 17.85550 29.55725
+## 9  23.83236 17.98927 29.67545
+## 10 18.66166 12.87034 24.45297</code></pre>
+</section>
+<section id="prediction-functions" class="level3">
+<h3>Prediction functions</h3>
+<p>To see the prediction formula, call the <code>predict_fit()</code> function. Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.</p>
+<pre class="sourceCode r" id="cb11"><code class="sourceCode r"><div class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">predict_fit</span>(model)</div></code></pre>
+<pre><code>## ((((ifelse((cyl) == (&quot;cyl6&quot;), (-4.2573185440316), 0)) + (ifelse((cyl) == 
+##     (&quot;cyl8&quot;), (-6.07911886695386), 0))) + ((wt) * (-3.14959778114425))) + 
+##     ((am) * (0.150103119934497))) + (33.7535920047122)</code></pre>
+<p>If more granular control than what <code>predict_to_column()</code> is needed, then the function can be used inside a <code>dplyr</code> verb command</p>
+<pre class="sourceCode r" id="cb13"><code class="sourceCode r"><div class="sourceLine" id="cb13-1" data-line-number="1">df <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb13-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb13-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fit =</span> <span class="op">!!</span><span class="st"> </span><span class="kw">predict_fit</span>(model))</div></code></pre>
+<pre><code>##     mpg  cyl  disp  hp drat    wt  qsec vs am gear carb      fit
+## 1  21.0 cyl6 160.0 110 3.90 2.620 16.46  0  1    4    4 21.39443
+## 2  21.0 cyl6 160.0 110 3.90 2.875 17.02  0  1    4    4 20.59128
+## 3  22.8 cyl4 108.0  93 3.85 2.320 18.61  1  1    4    1 26.59663
+## 4  21.4 cyl6 258.0 110 3.08 3.215 19.44  1  0    3    1 19.37032
+## 5  18.7 cyl8 360.0 175 3.15 3.440 17.02  0  0    3    2 16.83986
+## 6  18.1 cyl6 225.0 105 2.76 3.460 20.22  1  0    3    1 18.59867
+## 7  14.3 cyl8 360.0 245 3.21 3.570 15.84  0  0    3    4 16.43041
+## 8  24.4 cyl4 146.7  62 3.69 3.190 20.00  1  0    4    2 23.70638
+## 9  22.8 cyl4 140.8  95 3.92 3.150 22.90  1  0    4    2 23.83236
+## 10 19.2 cyl6 167.6 123 3.92 3.440 18.30  1  0    4    4 18.66166</code></pre>
+<p>To add prediction intervals, an additional calculation is needed against the fitted result</p>
+<pre class="sourceCode r" id="cb15"><code class="sourceCode r"><div class="sourceLine" id="cb15-1" data-line-number="1">df <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb15-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb15-3" data-line-number="3"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">fit =</span> <span class="op">!!</span><span class="st"> </span><span class="kw">predict_fit</span>(model),</div>
+<div class="sourceLine" id="cb15-4" data-line-number="4">         <span class="dt">lwr =</span> fit <span class="op">+</span><span class="st"> </span><span class="op">!!</span><span class="st"> </span><span class="kw">predict_interval</span>(model),</div>
+<div class="sourceLine" id="cb15-5" data-line-number="5">         <span class="dt">upr =</span> fit <span class="op">-</span><span class="st"> </span><span class="op">!!</span><span class="st"> </span><span class="kw">predict_interval</span>(model)) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb15-6" data-line-number="6"><span class="st">  </span><span class="kw">select</span>(fit, lwr, upr)</div></code></pre>
+<pre><code>##         fit      lwr      upr
+## 1  21.39443 27.24918 15.53968
+## 2  20.59128 26.45624 14.72632
+## 3  26.59663 32.22746 20.96580
+## 4  19.37032 25.17746 13.56317
+## 5  16.83986 22.51635 11.16336
+## 6  18.59867 24.39004 12.80729
+## 7  16.43041 22.05872 10.80210
+## 8  23.70638 29.55725 17.85550
+## 9  23.83236 29.67545 17.98927
+## 10 18.66166 24.45297 12.87034</code></pre>
+<p>The confidence interval can also be modified, the default is 0.95</p>
+<pre class="sourceCode r" id="cb17"><code class="sourceCode r"><div class="sourceLine" id="cb17-1" data-line-number="1"><span class="kw">predict_interval</span>(model, <span class="dt">interval =</span> <span class="fl">0.99</span>)</div></code></pre>
+<pre><code>## (2.77068295712221) * sqrt((((((((((((ifelse((cyl) == (&quot;cyl6&quot;), 
+##     (0), 0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), (0), 0)))) + (((wt) * 
+##     (0)))) + (((am) * (0)))) + (((-0.176776695296637)))) * ((((((ifelse((cyl) == 
+##     (&quot;cyl6&quot;), (0), 0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), (0), 0)))) + 
+##     (((wt) * (0)))) + (((am) * (0)))) + (((-0.176776695296637)))) * 
+##     (6.7766049449091)) + (((((((ifelse((cyl) == (&quot;cyl6&quot;), (0), 
+##     0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), (0), 0)))) + (((wt) * 
+##     (0.183559646169165)))) + (((am) * (0)))) + (((-0.590557271637747)))) * 
+##     ((((((ifelse((cyl) == (&quot;cyl6&quot;), (0), 0))) + ((ifelse((cyl) == 
+##         (&quot;cyl8&quot;), (0), 0)))) + (((wt) * (0.183559646169165)))) + 
+##         (((am) * (0)))) + (((-0.590557271637747)))) * (6.7766049449091))) + 
+##     (((((((ifelse((cyl) == (&quot;cyl6&quot;), (0), 0))) + ((ifelse((cyl) == 
+##         (&quot;cyl8&quot;), (0), 0)))) + (((wt) * (-0.176199380745393)))) + 
+##         (((am) * (-0.498926847360626)))) + (((0.769566489443368)))) * 
+##         ((((((ifelse((cyl) == (&quot;cyl6&quot;), (0), 0))) + ((ifelse((cyl) == 
+##             (&quot;cyl8&quot;), (0), 0)))) + (((wt) * (-0.176199380745393)))) + 
+##             (((am) * (-0.498926847360626)))) + (((0.769566489443368)))) * 
+##         (6.7766049449091))) + (((((((ifelse((cyl) == (&quot;cyl6&quot;), 
+##     (-0.428347713758794), 0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), 
+##     (0), 0)))) + (((wt) * (-0.0135489721333101)))) + (((am) * 
+##     (-0.00972707159804957)))) + (((0.141243115817336)))) * ((((((ifelse((cyl) == 
+##     (&quot;cyl6&quot;), (-0.428347713758794), 0))) + ((ifelse((cyl) == 
+##     (&quot;cyl8&quot;), (0), 0)))) + (((wt) * (-0.0135489721333101)))) + 
+##     (((am) * (-0.00972707159804957)))) + (((0.141243115817336)))) * 
+##     (6.7766049449091))) + (((((((ifelse((cyl) == (&quot;cyl6&quot;), (-0.332281834786717), 
+##     0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), (-0.64678807848721), 0)))) + 
+##     (((wt) * (0.238228067530327)))) + (((am) * (0.0212231164458079)))) + 
+##     (((-0.419404705620305)))) * ((((((ifelse((cyl) == (&quot;cyl6&quot;), 
+##     (-0.332281834786717), 0))) + ((ifelse((cyl) == (&quot;cyl8&quot;), 
+##     (-0.64678807848721), 0)))) + (((wt) * (0.238228067530327)))) + 
+##     (((am) * (0.0212231164458079)))) + (((-0.419404705620305)))) * 
+##     (6.7766049449091))) + (6.7766049449091))</code></pre>
+</section>
+<section id="model-parser" class="level3">
+<h3>Model parser</h3>
+<p>The <code>parsemodel()</code> function returns a tidy table with the data needed to run the predictions</p>
+<pre class="sourceCode r" id="cb19"><code class="sourceCode r"><div class="sourceLine" id="cb19-1" data-line-number="1"><span class="kw">parsemodel</span>(model)</div></code></pre>
+<pre><code>## # A tibble: 8 x 9
+##   labels  vals   type   estima~    qr_1    qr_2    qr_3      qr_4     qr_5
+##   &lt;chr&gt;   &lt;chr&gt;  &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+## 1 (Inter~ &quot;&quot;     inter~  33.8   - 0.177 - 0.591   0.770   0.141   - 0.419 
+## 2 wt      &quot;&quot;     conti~ - 3.15    0       0.184 - 0.176 - 0.0135    0.238 
+## 3 am      &quot;&quot;     conti~   0.150   0       0     - 0.499 - 0.00973   0.0212
+## 4 cyl     cyl6   categ~ - 4.26    0       0       0     - 0.428   - 0.332 
+## 5 cyl     cyl8   categ~ - 6.08    0       0       0       0       - 0.647 
+## 6 model   lm     varia~  NA      NA      NA      NA      NA        NA     
+## 7 residu~ 27     varia~  NA      NA      NA      NA      NA        NA     
+## 8 sigma2  6.776~ varia~  NA      NA      NA      NA      NA        NA</code></pre>
+<p><code>predict_fit()</code> does not need all of the columns in this table, it only requires the first four. The <code>qr_...</code> fields are use to calculate the prediction intervals, the are the result of running <code>qr.solve()</code> against the model’s <code>qr</code> variable.</p>
+</section>
+<section id="save-and-reload-a-parsed-model" class="level3">
+<h3>Save, and reload, a parsed model</h3>
+<p>The output of the model parser can be saved as a <code>.csv</code> file and reloaded at a later time. The prediction functions have an S3 method for <code>data.frame</code>, so the <code>model</code> entry is used to determine which predict formula to compile.</p>
+<pre class="sourceCode r" id="cb21"><code class="sourceCode r"><div class="sourceLine" id="cb21-1" data-line-number="1"><span class="kw">write.csv</span>(<span class="kw">parsemodel</span>(model), <span class="st">&quot;model.csv&quot;</span>)</div>
+<div class="sourceLine" id="cb21-2" data-line-number="2"></div>
+<div class="sourceLine" id="cb21-3" data-line-number="3"></div>
+<div class="sourceLine" id="cb21-4" data-line-number="4">reloaded_model &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;model.csv&quot;</span>)</div>
+<div class="sourceLine" id="cb21-5" data-line-number="5"></div>
+<div class="sourceLine" id="cb21-6" data-line-number="6">df <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb21-7" data-line-number="7"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb21-8" data-line-number="8"><span class="st">  </span><span class="kw">predict_to_column</span>(reloaded_model, <span class="dt">add_interval =</span> <span class="ot">TRUE</span>, <span class="dt">vars =</span> <span class="kw">c</span>(<span class="st">&quot;ft&quot;</span>, <span class="st">&quot;up&quot;</span>, <span class="st">&quot;lw&quot;</span>)) <span class="op">%&gt;%</span></div>
+<div class="sourceLine" id="cb21-9" data-line-number="9"><span class="st">  </span><span class="kw">select</span>(ft, lw, up)</div></code></pre>
+<pre><code>##          ft       lw       up
+## 1  21.39443 21.39443 21.39443
+## 2  20.59128 20.59128 20.59128
+## 3  26.59663 26.59663 26.59663
+## 4  19.37032 19.37032 19.37032
+## 5  16.83986 16.83986 16.83986
+## 6  18.59867 18.59867 18.59867
+## 7  16.43041 16.43041 16.43041
+## 8  23.70638 23.70638 23.70638
+## 9  23.83236 23.83236 23.83236
+## 10 18.66166 18.66166 18.66166</code></pre>
+</section>
+</section>
+
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

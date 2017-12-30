@@ -102,3 +102,18 @@ parsemodel(model)
 
 `predict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
 
+### Save, and reload, a parsed model
+
+The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The prediction functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
+
+```{r}
+write.csv(parsemodel(model), "model.csv")
+
+
+reloaded_model <- read.csv("model.csv")
+
+df %>%
+  head(10) %>%
+  predict_to_column(reloaded_model, add_interval = TRUE, vars = c("ft", "up", "lw")) %>%
+  select(ft, lw, up)
+```
