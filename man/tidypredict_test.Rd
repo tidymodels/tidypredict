@@ -14,7 +14,7 @@ tidypredict_test(model, df = model$model, threshold = 1e-12,
 It defaults to the "model" data frame object inside the model object.}
 
 \item{threshold}{The number that a given result difference, between predict() and
-tidypredict_to_column() should not exceed.  For continuous predictions, the default 
+tidypredict_to_column() should not exceed.  For continuous predictions, the default
 value is 0.000000000001 (1e-12), for categorical predictions, the default value is
 0.}
 
@@ -25,7 +25,7 @@ included in the test.  It defaults to FALSE.}
 recommended for large data sets.}
 }
 \description{
-Compares the results of running predict() and the tidypredict_to_column() 
+Compares the results of running predict() and the tidypredict_to_column()
 functions.
 }
 \examples{

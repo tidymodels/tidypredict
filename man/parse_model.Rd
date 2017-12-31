@@ -11,7 +11,7 @@ parse_model(model)
 }
 \description{
 It parses a fitted R model's structure to extract all of the necessary
-components to pass along to the functions that create the actual 
+components to pass along to the functions that create the actual
 Tidy Eval formula that dplyr can read.  It is currently able to parse
 lm() and glm() models.
 }

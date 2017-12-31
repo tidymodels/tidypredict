@@ -13,7 +13,7 @@ acceptable_formula(model)
 Uses an S3 method to check that a given formula can be parsed based on its class.
 Currently it supports lm() and glm() models.  It currently checks for contrasts
 in variables that currently cannot be parsed, and checks to make sure that there
-are no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))). 
+are no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).
 This function is mostly meant for function interaction, not user interaction.
 }
 \examples{

@@ -10,7 +10,7 @@ tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,
 \arguments{
 \item{df}{A data.frame or tibble}
 
-\item{model}{An R object, typically an R model, but it can also bee a regular data frame 
+\item{model}{An R object, typically an R model, but it can also bee a regular data frame
 that has a parsed model already loaded.}
 
 \item{add_interval}{Switch that indicates if the prediction interval columns should be added. Defaults
@@ -23,7 +23,7 @@ FALSE}
 }
 \description{
 Adds a new column with the results form tidypredict_fit() to a piped command set.
-If add_interval is set to TRUE, then it will add two additional columns, one 
+If add_interval is set to TRUE, then it will add two additional columns, one
 for the lower and another for the upper prediction interval bounds.
 }
 \examples{

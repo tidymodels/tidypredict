@@ -5,7 +5,7 @@ df <- mtcars %>%
 
 m1 <- lm(mpg ~ wt + am, data = df)
 m2 <- lm(mpg ~ wt + am + cyl, data = df)
-m3 <- lm(mpg ~ wt + + cyl, offset = am, data = df)
+m3 <- lm(mpg ~ wt + +cyl, offset = am, data = df)
 m4 <- glm(am ~ wt + cyl, data = df, family = "gaussian")
 m5 <- glm(am ~ wt + cyl, data = df, family = "binomial")
 
@@ -47,12 +47,12 @@ test_that("Returns a call", {
 
 
 mfail <- glm(am ~ wt + cyl, data = df, family = "quasibinomial")
-test_that("Fails when model is not guassian or binomial",{
+test_that("Fails when model is not guassian or binomial", {
   expect_error(tidypredict_fit(mfail))
 })
 
 p <- parse_model(m5)
-test_that("Accepts a data frame as the model argument and results are in range",{
+test_that("Accepts a data frame as the model argument and results are in range", {
   expect_is(tidypredict_fit(p), "call")
   any(abs(p5 - pull(mutate(df, x = !! tidypredict_fit(p)))) > 0.000000000001)
 })

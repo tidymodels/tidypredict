@@ -3,57 +3,57 @@
 #' @importFrom purrr map
 #' @importFrom purrr reduce
 #' @import dplyr
-te_randomforest_fit <- function(parsedmodel){
+te_randomforest_fit <- function(parsedmodel) {
   paths <- parsedmodel %>%
     filter(type == "path")
-  
+
   all_paths <- 1:nrow(paths) %>%
     map(~case_formula(
-      paths$vals[.x], 
-      paths$field[.x], 
-      paths$operator[.x], 
+      paths$vals[.x],
+      paths$field[.x],
+      paths$operator[.x],
       paths$split_point[.x]
     ))
-  
+
   expr(case_when(!!! all_paths))
 }
 
 #' @import rlang
-case_formula <- function(vals, field, operator, split_point){
+case_formula <- function(vals, field, operator, split_point) {
   marker <- get_marker_regx()
-  
+
   path <- tibble(
     field = unlist(strsplit(field, marker)),
     operator = unlist(strsplit(operator, marker)),
-    split_point = unlist(strsplit(split_point, marker))) %>% 
+    split_point = unlist(strsplit(split_point, marker))
+  ) %>%
     mutate(split_point = as.numeric(split_point)) %>%
-    rowid_to_column() 
+    rowid_to_column()
 
-  right <- filter(path, operator == "right") 
-  if(nrow(right) > 0 ){
+  right <- filter(path, operator == "right")
+  if (nrow(right) > 0) {
     right <- right %>%
       split(.$rowid) %>%
-      map(~expr((!!sym(.x$field)) > !!.x$split_point))
+      map(~expr((!! sym(.x$field)) > !! .x$split_point))
   } else {
     right <- NULL
   }
-  
-  left <- filter(path, operator == "left") 
-  if(nrow(left) > 0 ){
+
+  left <- filter(path, operator == "left")
+  if (nrow(left) > 0) {
     left <- left %>%
       split(.$rowid) %>%
-      map(~expr((!!sym(.x$field)) <= !!.x$split_point))
+      map(~expr((!! sym(.x$field)) <= !! .x$split_point))
   } else {
     left <- NULL
   }
-  
-  
+
+
   f <- c(right, left) %>%
-    reduce(function(l, r) expr((!!l) & (!!r)))
-  
+    reduce(function(l, r) expr((!! l) & (!! r)))
+
   expr((!!! f) ~ !! vals)
 }
 
 
-get_marker_regx <- function()"\\{\\:\\}"
-
+get_marker_regx <- function() "\\{\\:\\}"

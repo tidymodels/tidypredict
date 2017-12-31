@@ -11,7 +11,7 @@ tidypredict_fit(model)
 }
 \description{
 It uses parse_model to create a tabular version of the data needed to create
-a Tidy Eval formula that can then be used inside a dplyr command.  It uses 
+a Tidy Eval formula that can then be used inside a dplyr command.  It uses
 S3 methods to automatically determine the class of the model and run the
 corresponding function that is able to create the Tidy Eval formula.  It
 currently supports lm() and glm() models.
