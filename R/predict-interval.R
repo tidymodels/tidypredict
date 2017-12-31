@@ -1,6 +1,6 @@
 #' Returns a Tidy Eval formula to calculate prediction interval
 #' 
-#' It uses parsemodel to create a tabular version of the data needed to create
+#' It uses parse_model to create a tabular version of the data needed to create
 #' a Tidy Eval formula that can then be used inside a dplyr command.  It uses 
 #' S3 methods to automatically determine the class of the model and run the
 #' corresponding function that is able to create the Tidy Eval formula.  It
@@ -16,28 +16,28 @@
 #' 
 #' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
 #' model <- lm(x ~ y, df)
-#' predict_interval(model)
+#' tidypredict_interval(model)
 #'
 #' 
 #' @export
-predict_interval <- function(model, interval = 0.95){
-  UseMethod("predict_interval")
+tidypredict_interval <- function(model, interval = 0.95){
+  UseMethod("tidypredict_interval")
 }
 
 #' @export
-predict_interval.lm <- function(model, interval = 0.95){
-  parsedmodel <- parsemodel(model)
+tidypredict_interval.lm <- function(model, interval = 0.95){
+  parsedmodel <- parse_model(model)
   te_interval_lm (parsedmodel, interval)
 }
 
 #' @export
-predict_interval.glm <- function(model, interval = 0.95){
-  parsedmodel <- parsemodel(model)
+tidypredict_interval.glm <- function(model, interval = 0.95){
+  parsedmodel <- parse_model(model)
   te_interval_glm (parsedmodel, interval)
 }
 
 #' @export
-`predict_interval.data.frame` <- function(model, interval = 0.95){
+`tidypredict_interval.data.frame` <- function(model, interval = 0.95){
   
   model <-  model %>% 
     mutate_if(is.factor, as.character) %>% 

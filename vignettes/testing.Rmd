@@ -27,12 +27,12 @@ model <- lm(mpg ~ wt + am + cyl, data = df)
 model
 ```
 
-### `predict_to_column()`
+### `tidypredict_to_column()`
 
 ```{r}
 df %>%
   head(10) %>%
-  predict_to_column(model)
+  tidypredict_to_column(model)
 ```
 
 
@@ -46,7 +46,7 @@ To include the prediction intervals just use the `add_interval` switch
 ```{r}
 df %>%
   head(10) %>%
-  predict_to_column(model, add_interval = TRUE) %>%
+  tidypredict_to_column(model, add_interval = TRUE) %>%
   select(fit, lower, upper)
 ```
 
@@ -60,18 +60,18 @@ predict(model, head(df,10), interval = "prediction")
 
 ### Prediction functions
 
-To see the prediction formula, call the `predict_fit()` function.  Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
+To see the prediction formula, call the `tidypredict_fit()` function.  Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
 
 ```{r}
-predict_fit(model)
+tidypredict_fit(model)
 ```
 
-If more granular control than what `predict_to_column()` is needed, then the function can be used inside a `dplyr` verb command
+If more granular control than what `tidypredict_to_column()` is needed, then the function can be used inside a `dplyr` verb command
 
 ```{r}
 df %>%
   head(10) %>%
-  mutate(fit = !! predict_fit(model))
+  mutate(fit = !! tidypredict_fit(model))
 ```
 
 
@@ -80,68 +80,68 @@ To add prediction intervals, an additional calculation is needed against the fit
 ```{r}
 df %>%
   head(10) %>%
-  mutate(fit = !! predict_fit(model),
-         lwr = fit + !! predict_interval(model),
-         upr = fit - !! predict_interval(model)) %>%
+  mutate(fit = !! tidypredict_fit(model),
+         lwr = fit + !! tidypredict_interval(model),
+         upr = fit - !! tidypredict_interval(model)) %>%
   select(fit, lwr, upr)
 ```
 
 The confidence interval can also be modified, the default is 0.95
 
 ```{r}
-predict_interval(model, interval = 0.99)
+tidypredict_interval(model, interval = 0.99)
 ```
 
 ### Model parser
 
-The `parsemodel()` function returns a tidy table with the data needed to run the predictions
+The `parse_model()` function returns a tidy table with the data needed to run the predictions
 
 ```{r}
-parsemodel(model)
+parse_model(model)
 ```
 
-`predict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
+`tidypredict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
 
 ### Save, and reload, a parsed model
 
 The output of the model parser can be saved as a `.csv` file and reloaded at a later time.  The prediction functions have an S3 method for `data.frame`, so the `model` entry is used to determine which predict formula to compile.
 
 ```{r}
-write.csv(parsemodel(model), "model.csv")
+write.csv(parse_model(model), "model.csv")
 
 
 reloaded_model <- read.csv("model.csv")
 
 df %>%
   head(10) %>%
-  predict_to_column(reloaded_model, add_interval = TRUE, vars = c("ft", "up", "lw")) %>%
+  tidypredict_to_column(reloaded_model, add_interval = TRUE, vars = c("ft", "up", "lw")) %>%
   select(ft, lw, up)
 ```
 
 ### Test results
 
-For good measure, the `test_predictions()` function will run the `predict()` command and `predict_to_column()` and then compares the results.  Because of decimal precision, some results will be different, but by a very, very small amount.  That's why the comparison tests that `test_predictions()` run focuses on a difference **threshold**.  The default threshold is: 0.000000000001.
+For good measure, the `tidypredict_test()` function will run the `predict()` command and `tidypredict_to_column()` and then compares the results.  Because of decimal precision, some results will be different, but by a very, very small amount.  That's why the comparison tests that `tidypredict_test()` run focuses on a difference **threshold**.  The default threshold is: 0.000000000001.
 
 It is highly recommended to run this test to confirm that the output of the `tidypredict` functions are within acceptable ranges.
 
 
-`test_predictions()` has a custom `print` and `knit_print` methods that return a summary of the results:
+`tidypredict_test()` has a custom `print` and `knit_print` methods that return a summary of the results:
 ```{r}
 model <- lm(mpg ~ wt + am + cyl, data = df)
 
-test_predictions(model, include_intervals = TRUE)
+tidypredict_test(model, include_intervals = TRUE)
 ```
 
 The `threshold` is reduced to 1e-16 to see the response of a "failing" test.
 
 ```{r}
-test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+tidypredict_test(model, include_intervals = TRUE, threshold = 0.0000000000000001)
 ```
 
-`test_predictions()` returns a list that contains a `data.frame` with the raw results, the model call and the message.  Additionally, an output called `alert` is included in case the test is to be automated and there's a need to easily tell the R script running the test that there is a problem.
+`tidypredict_test()` returns a list that contains a `data.frame` with the raw results, the model call and the message.  Additionally, an output called `alert` is included in case the test is to be automated and there's a need to easily tell the R script running the test that there is a problem.
 
 ```{r}
-results <- test_predictions(model, include_intervals = TRUE, threshold = 0.0000000000000001)
+results <- tidypredict_test(model, include_intervals = TRUE, threshold = 0.0000000000000001)
 
 results
 ```

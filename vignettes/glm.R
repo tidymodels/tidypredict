@@ -3,7 +3,6 @@ library(dplyr)
 library(tidypredict)
 
 ## ------------------------------------------------------------------------
-
 model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
 
 ## ------------------------------------------------------------------------
@@ -11,17 +10,17 @@ library(tidypredict)
 
 mtcars %>%
   head(10) %>%
-  predict_to_column(model) %>%
+  tidypredict_to_column(model) %>%
   select(mpg, wt, am, fit)
 
 ## ------------------------------------------------------------------------
-predict_fit(model)
+tidypredict_fit(model)
 
 ## ------------------------------------------------------------------------
-fit_to_sql(model, dbplyr::simulate_dbi())
+tidypredict_sql(model, dbplyr::simulate_dbi())
 
 ## ------------------------------------------------------------------------
-test <- test_predictions(model)
+test <- tidypredict_test(model)
 
 test
 

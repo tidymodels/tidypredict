@@ -14,7 +14,6 @@ library(tidypredict)
 
 `tidypredict` supports `glm` models with a *binomial* `family` and *logit* `link`
 ```{r}
-
 model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
 ```
 
@@ -25,7 +24,7 @@ library(tidypredict)
 
 mtcars %>%
   head(10) %>%
-  predict_to_column(model) %>%
+  tidypredict_to_column(model) %>%
   select(mpg, wt, am, fit)
 ```
 
@@ -33,19 +32,19 @@ mtcars %>%
 
 This is that the Tidy Eval formula will looks like for this model 
 ```{r}
-predict_fit(model)
+tidypredict_fit(model)
 ```
 
 Here an example of how the formula will be translated into SQL
 ```{r}
-fit_to_sql(model, dbplyr::simulate_dbi())
+tidypredict_sql(model, dbplyr::simulate_dbi())
 ```
 ## How it performs
 
 Confirm that the predictions match to what the `predict()` function returns
 
 ```{r}
-test <- test_predictions(model)
+test <- tidypredict_test(model)
 
 test
 ```

@@ -15,7 +15,7 @@ model
 
 ## ------------------------------------------------------------------------
 iris %>%
-  predict_to_column(model) %>%
+  tidypredict_to_column(model) %>%
   head(10)
 
 ## ------------------------------------------------------------------------
@@ -23,16 +23,16 @@ getTree(model, labelVar = TRUE) %>%
   as.tibble() 
 
 ## ------------------------------------------------------------------------
-parsemodel(model)
+parse_model(model)
 
 ## ------------------------------------------------------------------------
-predict_fit(model)
+tidypredict_fit(model)
 
 ## ------------------------------------------------------------------------
-fit_to_sql(model, dbplyr::simulate_dbi())
+tidypredict_sql(model, dbplyr::simulate_dbi())
 
 ## ------------------------------------------------------------------------
-test <- test_predictions(model, iris, threshold = 5)
+test <- tidypredict_test(model, iris, threshold = 5)
 
 test
 

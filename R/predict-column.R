@@ -1,6 +1,6 @@
 #' Adds the prediction columns to a piped command set
 #' 
-#' Adds a new column with the results form predict_fit() to a piped command set.
+#' Adds a new column with the results form tidypredict_fit() to a piped command set.
 #' If add_interval is set to TRUE, then it will add two additional columns, one 
 #' for the lower and another for the upper prediction interval bounds.  
 #' 
@@ -21,23 +21,23 @@
 #' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
 #' model <- lm(x ~ y, df)
 #' df %>%
-#'   predict_to_column(model, add_interval = TRUE)
+#'   tidypredict_to_column(model, add_interval = TRUE)
 #'
 #' @import rlang
 #' @importFrom purrr reduce
 #' @import dplyr
 #' @export
-predict_to_column <- function(df, model, add_interval = FALSE, interval = 0.95, vars = c("fit", "upper", "lower")){
+tidypredict_to_column <- function(df, model, add_interval = FALSE, interval = 0.95, vars = c("fit", "upper", "lower")){
   
   fit <- vars[1]
   upper <- vars[2]
   lower <- vars[3]
   
-  df <- mutate(df, !! fit := !! predict_fit(model))
+  df <- mutate(df, !! fit := !! tidypredict_fit(model))
   
   if(add_interval){
     
-    formulas <- c(sym(fit) , predict_interval(model, interval = interval))
+    formulas <- c(sym(fit) , tidypredict_interval(model, interval = interval))
     upper_formula <- reduce(formulas, function(l, r) expr((!!l) + (!!r)))
     lower_formula <- reduce(formulas, function(l, r) expr((!!l) - (!!r)))
     

@@ -8,11 +8,11 @@
 #' @examples
 #' 
 #' model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-#' fit_to_sql(model, dbplyr::simulate_dbi())
+#' tidypredict_sql(model, dbplyr::simulate_dbi())
 #' 
 #' @export
-fit_to_sql <- function(model, con){
-  f <- predict_fit(model)
+tidypredict_sql <- function(model, con){
+  f <- tidypredict_fit(model)
   dbplyr::translate_sql(!!f, con = con)
 }
 
@@ -27,10 +27,10 @@ fit_to_sql <- function(model, con){
 #' @examples
 #' 
 #' model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-#' interval_to_sql(model, dbplyr::simulate_dbi())
+#' tidypredict_sql_interval(model, dbplyr::simulate_dbi())
 #' 
 #' @export
-interval_to_sql <- function(model, con, interval = 0.95){
-  f <- predict_interval(model, interval)
+tidypredict_sql_interval <- function(model, con, interval = 0.95){
+  f <- tidypredict_interval(model, interval)
   dbplyr::translate_sql(!!f, con = con)
 }

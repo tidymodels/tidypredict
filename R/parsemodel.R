@@ -11,17 +11,17 @@
 #' 
 #' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
 #' model <- lm(x ~ y, df)
-#' parsemodel(model)
+#' parse_model(model)
 #'
 #' @export
-parsemodel <- function(model){
-  UseMethod("parsemodel")
+parse_model <- function(model){
+  UseMethod("parse_model")
 }
 #' @export
-parsemodel.lm <- function(model) parsemodel_lm(model)
+parse_model.lm <- function(model) parse_model_lm(model)
 
 #' @export
-parsemodel.glm <- function(model) parsemodel_lm(model)
+parse_model.glm <- function(model) parse_model_lm(model)
 
 #' @import dplyr
 #' @importFrom tibble tibble
@@ -45,7 +45,7 @@ add_variable <- function(df, labels, vals){
 #' @importFrom utils head
 #' @importFrom stats predict 
 #' @importFrom stats qt
-parsemodel_lm <- function(model){
+parse_model_lm <- function(model){
   
   acceptable_formula(model)
   
@@ -149,7 +149,7 @@ parsemodel_lm <- function(model){
 #' @importFrom purrr reduce
 #' @import dplyr
 #' @export
-parsemodel.randomForest <- function(model){
+parse_model.randomForest <- function(model){
   
   model_frame <- getTree(model, labelVar = TRUE) %>%
     as.tibble() %>%

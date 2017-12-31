@@ -1,13 +1,13 @@
 #' Tests base predict function against tidypredict
 #'
-#'Compares the results of running predict() and the predict_to_column() 
+#'Compares the results of running predict() and the tidypredict_to_column() 
 #'functions. 
 #'
 #' @param model An R model object
 #' @param df A data frame that contains all of the needed fields to run the prediction.  
 #' It defaults to the "model" data frame object inside the model object.
 #' @param threshold The number that a given result difference, between predict() and
-#' predict_to_column() should not exceed.  For continuous predictions, the default 
+#' tidypredict_to_column() should not exceed.  For continuous predictions, the default 
 #' value is 0.000000000001 (1e-12), for categorical predictions, the default value is
 #' 0.
 #' @param include_intervals Switch to indicate if the prediction intervals should be
@@ -19,17 +19,17 @@
 #' 
 #' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
 #' model <- lm(x ~ y, df)
-#' test_predictions(model, include_intervals = TRUE)
+#' tidypredict_test(model, include_intervals = TRUE)
 #'
 #' @export 
-test_predictions <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
-   UseMethod("test_predictions")
+tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
+   UseMethod("tidypredict_test")
 }
 
 #' @import rlang
 #' @import dplyr
 #' @export 
-test_predictions.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
+tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL){
   
   offset <- model$call$offset
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
@@ -52,7 +52,7 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
   }
   
   te <- df %>%
-    predict_to_column(model, 
+    tidypredict_to_column(model, 
                       add_interval = include_intervals,
                       vars = c("fit_te", "upr_te", "lwr_te")) %>%
     select(contains("_te"))
@@ -114,20 +114,20 @@ test_predictions.default <- function(model, df = model$model, threshold = 0.0000
   results$message <- message
   results$alert <- alert
   
-  structure(results, class = c("test_predictions", "list"))
+  structure(results, class = c("tidypredict_test", "list"))
 }  
 
-setOldClass(c("test_predictions", "list"))
+setOldClass(c("tidypredict_test", "list"))
 
 
 #' @import rlang
 #' @import dplyr
 #' @export 
-test_predictions.randomForest <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL){
+tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL){
   
   raw_results <- df %>%
     mutate(predict = as.character(predict(model, iris)),
-           tidypredict = !! predict_fit(model))
+           tidypredict = !! tidypredict_fit(model))
   
   differences <- raw_results %>%
     filter(tidypredict != predict | is.na(tidypredict))
@@ -163,16 +163,16 @@ test_predictions.randomForest <- function(model, df = NULL, threshold = 0, inclu
   results$message <- message
   results$alert <- alert
   
-  structure(results, class = c("test_predictions", "list"))
+  structure(results, class = c("tidypredict_test", "list"))
 }
-setOldClass(c("test_predictions", "list"))
+setOldClass(c("tidypredict_test", "list"))
 
 
 #' print method for test predictions results
 #'
 #' @keywords internal
 #' @export
-print.test_predictions <- function(x, ...) {
+print.tidypredict_test <- function(x, ...) {
   cat(x$message)
 }
 
@@ -180,6 +180,6 @@ print.test_predictions <- function(x, ...) {
 #'
 #' @keywords internal
 #' @export
-knit_print.test_predictions <- function(x, ...) {
+knit_print.tidypredict_test <- function(x, ...) {
   x$message
 }

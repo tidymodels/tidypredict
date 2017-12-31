@@ -1,6 +1,6 @@
 #' Returns a Tidy Eval formula to calculate fitted values
 #' 
-#' It uses parsemodel to create a tabular version of the data needed to create
+#' It uses parse_model to create a tabular version of the data needed to create
 #' a Tidy Eval formula that can then be used inside a dplyr command.  It uses 
 #' S3 methods to automatically determine the class of the model and run the
 #' corresponding function that is able to create the Tidy Eval formula.  It
@@ -12,36 +12,36 @@
 #' 
 #' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
 #' model <- lm(x ~ y, df)
-#' predict_fit(model)
+#' tidypredict_fit(model)
 #'
 #' 
 #' @export
-predict_fit <- function(model){
-  UseMethod("predict_fit")
+tidypredict_fit <- function(model){
+  UseMethod("tidypredict_fit")
 }
 
 #' @export
-predict_fit.lm <- function(model){
-  parsedmodel <- parsemodel(model)
+tidypredict_fit.lm <- function(model){
+  parsedmodel <- parse_model(model)
   te_fit_lm(parsedmodel)
 }
 
 #' @export
-predict_fit.glm <- function(model){
-  parsedmodel <- parsemodel(model)
+tidypredict_fit.glm <- function(model){
+  parsedmodel <- parse_model(model)
   te_fit_glm(parsedmodel)
 }
 
 #' @export
-predict_fit.randomForest <- function(model){
-  parsedmodel <- parsemodel(model)
+tidypredict_fit.randomForest <- function(model){
+  parsedmodel <- parse_model(model)
   te_randomforest_fit(parsedmodel)
 }
 
 
 #' @export
 #' @importFrom tibble as.tibble
-`predict_fit.data.frame` <- function(model){
+`tidypredict_fit.data.frame` <- function(model){
   
   model <-  model %>% 
     mutate_if(is.factor, as.character) %>% 

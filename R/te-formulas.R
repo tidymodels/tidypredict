@@ -37,7 +37,6 @@ te_fit_glm <- function(parsedmodel){
   family <- pull(filter(parsedmodel, labels == "family"), vals)
   link <- pull(filter(parsedmodel, labels == "link"), vals)
   
-  
   assigned <- 0
   
   if(family == "gaussian" && link == "identity"){
