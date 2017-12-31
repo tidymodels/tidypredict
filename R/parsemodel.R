@@ -178,11 +178,12 @@ parsemodel.randomForest <- function(model){
 
 get_marker <- function()"{:}"
 
-get_marker_regx <- function()"\\{\\:\\}"
 
 get_path <- function(row_id, model_frame){
+  
   field <- NULL
-  operation <- NULL
+  operator <- NULL
+  split_point <- NULL
   
   for(get_path in 1:nrow(model_frame)){
     
@@ -192,10 +193,14 @@ get_path <- function(row_id, model_frame){
         field, 
         as.character(current$split_var))
       
-      operation <- c(
-        operation, 
-        paste0(ifelse(to_left, "<=", ">"), current$split_point))
+      operator <- c(
+        operator, 
+        paste0(ifelse(to_left, "left", "right")))
       
+      split_point <- c(
+        split_point,
+        as.character(current$split_point)
+      )
     } 
     
     left <- which(model_frame$left_daughter == row_id)
@@ -206,7 +211,8 @@ get_path <- function(row_id, model_frame){
     if(is.na(parent)){
       path <- tibble(
         field = paste0(field, collapse = get_marker()),
-        operation = paste0(operation, collapse = get_marker())
+        operator = paste0(operator, collapse = get_marker()),
+        split_point = paste0(split_point, collapse = get_marker())
       )
       break
     } 
