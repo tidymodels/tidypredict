@@ -5,5 +5,5 @@
 model.csv
 inst/doc
 content
-static
+/static/
 vignettes-backup
