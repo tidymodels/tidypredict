@@ -142,7 +142,7 @@
         </div>
       
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9000</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -404,9 +404,11 @@ test</code></pre>
 				&copy; 2017 Released under the GPL-3 license &ndash;
 				
 				Documentation built with
-				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
-				using the
+				<a href="https://github.com/r-lib/pkgdown/">pkgdown</a>,
+				<a href="https://github.com/rstudio/blogdown">blogdown</a>, and 
+				<a href="https://www.gohugo.io" target="_blank"> Hugo</a> using the
 				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+				
 			</aside>
 
 			<footer class="footer">
@@ -484,20 +486,20 @@ test</code></pre>
 
     <script>
       /* Add headers to scrollspy */
-      var headers   = document.getElementsByTagName("h2");
+      
       var scrollspy = document.getElementById('scrollspy');
-
+      var headers   = document.getElementsByTagName("section");
+      var tbody   = document.getElementsByTagName("tbody");
+      
       if(scrollspy) {
         if(headers.length > 0) {
           for(var i = 0; i < headers.length; i++) {
             var li = document.createElement("li");
             li.setAttribute("class", "anchor");
-
             var a  = document.createElement("a");
             a.setAttribute("href", "#" + headers[i].id);
             a.setAttribute("title", headers[i].innerHTML);
-            a.innerHTML = headers[i].innerHTML;
-
+            a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
             li.appendChild(a)
             scrollspy.appendChild(li);
           }
