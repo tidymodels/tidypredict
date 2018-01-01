@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Vignettes on tidypredict</title>
+    <link>/vignettes/</link>
+    <description>Recent content in Vignettes on tidypredict</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Released under the GPL-3 license</copyright>
+    
+	<atom:link href="/vignettes/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Random Forest model</title>
+      <link>/vignettes/randomforest/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/vignettes/randomforest/</guid>
+      <description>library(tidypredict)library(randomForest)set.seed(100)model &amp;lt;- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)model## ## Call:## randomForest(formula = Species ~ ., data = iris, ntree = 100, proximity = TRUE) ## Type of random forest: classification## Number of trees: 100## No. of variables tried at each split: 2## ## OOB estimate of error rate: 4%## Confusion matrix:## setosa versicolor virginica class.</description>
+    </item>
+    
+  </channel>
+</rss>

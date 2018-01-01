@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>References on tidypredict</title>
+    <link>/reference/</link>
+    <description>Recent content in References on tidypredict</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Released under the GPL-3 license</copyright>
+    
+	<atom:link href="/reference/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Function Reference</title>
+      <link>/reference/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/</guid>
+      <description>Tidy Eval formulasSQL formulasdplyrUtilitiesTidy Eval formulastidypredict_fit Returns a Tidy Eval formula to calculate fitted values
+tidypredict_interval Returns a Tidy Eval formula to calculate prediction interval
+SQL formulastidypredict_sql Returns a SQL query with formula to calculate fitted values
+tidypredict_sql_interval Returns a SQL query with formula to calculate predicted interval</description>
+    </item>
+    
+    <item>
+      <title>acceptable_formula</title>
+      <link>/reference/acceptable_formula/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/acceptable_formula/</guid>
+      <description>ArgumentsExamplesUses an S3 method to check that a given formula can be parsed based on its class.Currently it supports lm() and glm() models. It currently checks for contrastsin variables that currently cannot be parsed, and checks to make sure that thereare no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).This function is mostly meant for function interaction, not user interaction.</description>
+    </item>
+    
+    <item>
+      <title>knit_print.tidypredict_test</title>
+      <link>/reference/knit_print.tidypredict_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/knit_print.tidypredict_test/</guid>
+      <description>Knit print method for test predictions results
+knit_print.tidypredict_test(x, ...)</description>
+    </item>
+    
+    <item>
+      <title>parse_model</title>
+      <link>/reference/parse_model/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/parse_model/</guid>
+      <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure to extract all of the necessarycomponents to pass along to the functions that create the actualTidy Eval formula that dplyr can read. It is currently able to parselm() and glm() models.
+parse_model(model)ArgumentsmodelAn R model object
+Examplesdf &amp;lt;- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))model &amp;lt;- lm(x ~ y, df)parse_model(model)#&amp;gt; # A tibble: 5 x 6#&amp;gt; labels vals type estimate qr_1 qr_2#&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;#&amp;gt; 1 (Intercept) &#34;</description>
+    </item>
+    
+    <item>
+      <title>print.tidypredict_test</title>
+      <link>/reference/print.tidypredict_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/print.tidypredict_test/</guid>
+      <description>print method for test predictions results
+# S3 method for tidypredict_testprint(x, ...)</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_fit</title>
+      <link>/reference/tidypredict_fit/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_fit/</guid>
+      <description>ArgumentsExamplesIt uses parse_model to create a tabular version of the data needed to createa Tidy Eval formula that can then be used inside a dplyr command. It usesS3 methods to automatically determine the class of the model and run thecorresponding function that is able to create the Tidy Eval formula. Itcurrently supports lm() and glm() models.
+tidypredict_fit(model)ArgumentsmodelAn R model or a tibble with a parsed model</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_interval</title>
+      <link>/reference/tidypredict_interval/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_interval/</guid>
+      <description>ArgumentsDetailsExamplesIt uses parse_model to create a tabular version of the data needed to createa Tidy Eval formula that can then be used inside a dplyr command. It usesS3 methods to automatically determine the class of the model and run thecorresponding function that is able to create the Tidy Eval formula. Itcurrently supports lm() models.
+tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_sql</title>
+      <link>/reference/tidypredict_sql/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_sql/</guid>
+      <description>ArgumentsExamplesReturns a SQL query with formula to calculate fitted values
+tidypredict_sql(model, con)ArgumentsmodelAn R model or a tibble with a parsed model
+conDatabase connection object. It is used to selectthe correst SQL translation syntax.
+Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; ((((&#34;wt&#34;) * (-3.12514220026708)) + ((&#34;</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_sql_interval</title>
+      <link>/reference/tidypredict_sql_interval/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_sql_interval/</guid>
+      <description>ArgumentsExamplesReturns a SQL query with formula to calculate predicted interval
+tidypredict_sql_interval(model, con, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model
+conDatabase connection object. It is used to selectthe correst SQL translation syntax.
+intervalThe prediction interval, defaults to 0.95
+Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql_interval(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (2.</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_test</title>
+      <link>/reference/tidypredict_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_test/</guid>
+      <description>ArgumentsExamplesCompares the results of running predict() and the tidypredict_to_column()functions.
+tidypredict_test(model, df = model$model, threshold = 1e-12,include_intervals = FALSE, max_rows = NULL)ArgumentsmodelAn R model object
+dfA data frame that contains all of the needed fields to run the prediction.It defaults to the &#34;model&#34; data frame object inside the model object.
+thresholdThe number that a given result difference, between predict() andtidypredict_to_column() should not exceed.</description>
+    </item>
+    
+    <item>
+      <title>tidypredict_to_column</title>
+      <link>/reference/tidypredict_to_column/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict_to_column/</guid>
+      <description>ArgumentsExamplesAdds a new column with the results form tidypredict_fit() to a piped command set.If add_interval is set to TRUE, then it will add two additional columns, onefor the lower and another for the upper prediction interval bounds.
+tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,vars = c(&#34;fit&#34;, &#34;upper&#34;, &#34;lower&#34;))ArgumentsdfA data.frame or tibble
+modelAn R object, typically an R model, but it can also bee a regular data framethat has a parsed model already loaded.</description>
+    </item>
+    
+  </channel>
+</rss>

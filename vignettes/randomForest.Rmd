@@ -1,10 +1,14 @@
 ---
-title: "randomForest model"
+title: "Random Forest model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{randomForest}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+menu:
+  main:
+    parent: "articles"
+    weight: 1
 ---
 
 ```{r setup, include=FALSE}
