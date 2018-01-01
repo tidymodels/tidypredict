@@ -234,6 +234,19 @@
 
 
       
+        
+        
+
+
+
+<a  title="Linear Regression model" href="/vignettes/lm/">
+	
+	Linear Regression model
+</a>
+
+
+
+      
     </ul>
   
 </li>
@@ -277,29 +290,39 @@
 		<div class="wrapper">
 			<h1>Random Forest model </h1>
 
-			<pre class="r"><code>library(tidypredict)
-library(randomForest)
+			<section id="highlights-limitations" class="level2">
+<h2>Highlights &amp; Limitations</h2>
+<ul>
+<li>Uses the <code>randomForest::getTree()</code> to parse each decision path.</li>
+<li>In-line functions in the fomulas are <strong>not supported</strong>:
+<ul>
+<li>OK - <code>wt ~ mpg + am</code></li>
+<li>OK - <code>mutate(mtcars, newam = paste0(am))</code> and then <code>wt ~ mpg + newam</code></li>
+<li>Not OK - <code>wt ~ mpg + as.factor(am)</code></li>
+<li>Not OK - <code>wt ~ mpg + as.character(am)</code></li>
+</ul></li>
+<li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
+</ul>
+</section>
+<section id="how-it-works" class="level2">
+<h2>How it works</h2>
+<p>Here is a simple <code>randomForest()</code> model using the <code>iris</code> dataset:</p>
+<pre class="r"><code>library(randomForest)
+model &lt;- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)</code></pre>
+<p>The SQL translations returns a single SQL <code>CASE WHEN</code> operation. Each decision path is a <code>WHEN</code> statement.</p>
+<pre class="r"><code>library(tidypredict)
 
-set.seed(100)
-
-model &lt;- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
-
-model</code></pre>
-<pre><code>## 
-## Call:
-##  randomForest(formula = Species ~ ., data = iris, ntree = 100,      proximity = TRUE) 
-##                Type of random forest: classification
-##                      Number of trees: 100
-## No. of variables tried at each split: 2
-## 
-##         OOB estimate of  error rate: 4%
-## Confusion matrix:
-##            setosa versicolor virginica class.error
-## setosa         50          0         0        0.00
-## versicolor      0         47         3        0.06
-## virginica       0          3        47        0.06</code></pre>
-<section id="tidypredict_to_column" class="level2">
-<h2><code>tidypredict_to_column()</code></h2>
+tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
+<pre><code>## &lt;SQL&gt; CASE
+## WHEN (((`Petal.Length`) &lt;= 2.5)) THEN (&#39;setosa&#39;)
+## WHEN ((((`Petal.Length`) &gt; 5.05) AND ((`Petal.Length`) &gt; 2.5))) THEN (&#39;virginica&#39;)
+## WHEN (((((`Petal.Width`) &gt; 1.9) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Length`) &lt;= 5.05))) THEN (&#39;virginica&#39;)
+## WHEN ((((((`Petal.Length`) &gt; 2.5) AND ((`Sepal.Length`) &lt;= 4.95)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN (&#39;virginica&#39;)
+## WHEN (((((((`Sepal.Length`) &gt; 4.95) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Width`) &lt;= 1.75)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN (&#39;versicolor&#39;)
+## WHEN ((((((((`Petal.Width`) &gt; 1.75) AND ((`Sepal.Length`) &gt; 4.95)) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Sepal.Width`) &lt;= 3.0)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN (&#39;virginica&#39;)
+## WHEN ((((((((`Sepal.Width`) &gt; 3.0) AND ((`Petal.Width`) &gt; 1.75)) AND ((`Sepal.Length`) &gt; 4.95)) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN (&#39;versicolor&#39;)
+## END</code></pre>
+<p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
 <pre class="r"><code>iris %&gt;%
   tidypredict_to_column(model) %&gt;%
   head(10)</code></pre>
@@ -315,28 +338,19 @@ model</code></pre>
 ## 9           4.4         2.9          1.4         0.2  setosa setosa
 ## 10          4.9         3.1          1.5         0.1  setosa setosa</code></pre>
 </section>
-<section id="how-it-works" class="level2">
-<h2>How it works</h2>
-<p><code>tidypredict</code> bases the parser on the ouput from the the <code>tree::getTree()</code> function</p>
-<pre class="r"><code>getTree(model, labelVar = TRUE) %&gt;% 
-  as.tibble() </code></pre>
-<pre><code>## # A tibble: 13 x 6
-##    `left daughter` `right daughter` `split var`  `split point` stat~ pred~
-##  *           &lt;dbl&gt;            &lt;dbl&gt; &lt;fctr&gt;               &lt;dbl&gt; &lt;dbl&gt; &lt;chr&gt;
-##  1            2.00             3.00 Petal.Length          2.50  1.00 &lt;NA&gt; 
-##  2            0                0    &lt;NA&gt;                  0    -1.00 seto~
-##  3            4.00             5.00 Petal.Length          5.05  1.00 &lt;NA&gt; 
-##  4            6.00             7.00 Petal.Width           1.90  1.00 &lt;NA&gt; 
-##  5            0                0    &lt;NA&gt;                  0    -1.00 virg~
-##  6            8.00             9.00 Sepal.Length          4.95  1.00 &lt;NA&gt; 
-##  7            0                0    &lt;NA&gt;                  0    -1.00 virg~
-##  8            0                0    &lt;NA&gt;                  0    -1.00 virg~
-##  9           10.0             11.0  Petal.Width           1.75  1.00 &lt;NA&gt; 
-## 10            0                0    &lt;NA&gt;                  0    -1.00 vers~
-## 11           12.0             13.0  Sepal.Width           3.00  1.00 &lt;NA&gt; 
-## 12            0                0    &lt;NA&gt;                  0    -1.00 virg~
-## 13            0                0    &lt;NA&gt;                  0    -1.00 vers~</code></pre>
-<p>The parsed model has one entry per path</p>
+<section id="under-the-hood" class="level2">
+<h2>Under the hood</h2>
+<p>The parser is based on the ouput from the <code>randomForest::getTree()</code> function. It will return as many desicion paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<pre class="r"><code>getTree(model, labelVar = TRUE) %&gt;%
+  head()</code></pre>
+<pre><code>##   left daughter right daughter    split var split point status prediction
+## 1             2              3 Petal.Length        2.50      1       &lt;NA&gt;
+## 2             0              0         &lt;NA&gt;        0.00     -1     setosa
+## 3             4              5 Petal.Length        5.05      1       &lt;NA&gt;
+## 4             6              7  Petal.Width        1.90      1       &lt;NA&gt;
+## 5             0              0         &lt;NA&gt;        0.00     -1  virginica
+## 6             8              9 Sepal.Length        4.95      1       &lt;NA&gt;</code></pre>
+<p>The parsed model contains one row for each path. The <code>field</code>, <code>operator</code> and <code>split_point</code> field list every step in a concatenated character variable.</p>
 <pre class="r"><code>parse_model(model)</code></pre>
 <pre><code>## # A tibble: 8 x 7
 ##   labels vals         type     estimate field           operator  split_p~
@@ -349,7 +363,7 @@ model</code></pre>
 ## 6 path-6 virginica    path            0 Sepal.Width{:}~ left{:}r~ 3{:}1.7~
 ## 7 path-7 versicolor   path            0 Sepal.Width{:}~ right{:}~ 3{:}1.7~
 ## 8 model  randomForest variable       NA &lt;NA&gt;            &lt;NA&gt;      &lt;NA&gt;</code></pre>
-<p>The Tidy Eval formula is one <code>dplyr::case_when()</code> statement</p>
+<p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code>dplyr::case_when()</code> statement</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
 <pre><code>## case_when(((Petal.Length) &lt;= 2.5) ~ &quot;setosa&quot;, (((Petal.Length) &gt; 
 ##     5.05) &amp; ((Petal.Length) &gt; 2.5)) ~ &quot;virginica&quot;, ((((Petal.Width) &gt; 
@@ -364,21 +378,16 @@ model</code></pre>
 ##     5.05)) ~ &quot;virginica&quot;, (((((((Sepal.Width) &gt; 3) &amp; ((Petal.Width) &gt; 
 ##     1.75)) &amp; ((Sepal.Length) &gt; 4.95)) &amp; ((Petal.Length) &gt; 2.5)) &amp; 
 ##     ((Petal.Width) &lt;= 1.9)) &amp; ((Petal.Length) &lt;= 5.05)) ~ &quot;versicolor&quot;)</code></pre>
-<p>Here an example of how the formula will be translated into SQL</p>
-<pre class="r"><code>tidypredict_sql(model, dbplyr::simulate_dbi())</code></pre>
-<pre><code>## &lt;SQL&gt; CASE
-## WHEN (((&quot;Petal.Length&quot;) &lt;= 2.5)) THEN (&#39;setosa&#39;)
-## WHEN ((((&quot;Petal.Length&quot;) &gt; 5.05) AND ((&quot;Petal.Length&quot;) &gt; 2.5))) THEN (&#39;virginica&#39;)
-## WHEN (((((&quot;Petal.Width&quot;) &gt; 1.9) AND ((&quot;Petal.Length&quot;) &gt; 2.5)) AND ((&quot;Petal.Length&quot;) &lt;= 5.05))) THEN (&#39;virginica&#39;)
-## WHEN ((((((&quot;Petal.Length&quot;) &gt; 2.5) AND ((&quot;Sepal.Length&quot;) &lt;= 4.95)) AND ((&quot;Petal.Width&quot;) &lt;= 1.9)) AND ((&quot;Petal.Length&quot;) &lt;= 5.05))) THEN (&#39;virginica&#39;)
-## WHEN (((((((&quot;Sepal.Length&quot;) &gt; 4.95) AND ((&quot;Petal.Length&quot;) &gt; 2.5)) AND ((&quot;Petal.Width&quot;) &lt;= 1.75)) AND ((&quot;Petal.Width&quot;) &lt;= 1.9)) AND ((&quot;Petal.Length&quot;) &lt;= 5.05))) THEN (&#39;versicolor&#39;)
-## WHEN ((((((((&quot;Petal.Width&quot;) &gt; 1.75) AND ((&quot;Sepal.Length&quot;) &gt; 4.95)) AND ((&quot;Petal.Length&quot;) &gt; 2.5)) AND ((&quot;Sepal.Width&quot;) &lt;= 3.0)) AND ((&quot;Petal.Width&quot;) &lt;= 1.9)) AND ((&quot;Petal.Length&quot;) &lt;= 5.05))) THEN (&#39;virginica&#39;)
-## WHEN ((((((((&quot;Sepal.Width&quot;) &gt; 3.0) AND ((&quot;Petal.Width&quot;) &gt; 1.75)) AND ((&quot;Sepal.Length&quot;) &gt; 4.95)) AND ((&quot;Petal.Length&quot;) &gt; 2.5)) AND ((&quot;Petal.Width&quot;) &lt;= 1.9)) AND ((&quot;Petal.Length&quot;) &lt;= 5.05))) THEN (&#39;versicolor&#39;)
-## END</code></pre>
+<p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
+<ul>
+<li>Use directly inside <code>dplyr</code>, <code>mutate(iris, !! tidypredict_fit(model))</code></li>
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
+<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
+</ul>
 </section>
 <section id="how-it-performs" class="level2">
 <h2>How it performs</h2>
-<p>Currently, the formula matches 147 out of 150 prediction for Iris</p>
+<p>Currently, the formula matches 147 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
 <pre class="r"><code>test &lt;- tidypredict_test(model, iris, threshold = 5)
 
 test</code></pre>
@@ -417,7 +426,7 @@ test</code></pre>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/" title="Function Reference">
+      <a href="/vignettes/lm/" title="Linear Regression model">
         <span class="direction">
           Previous
         </span>
@@ -427,7 +436,7 @@ test</code></pre>
           </div>
           <div class="stretch">
             <div class="title">
-              Function Reference
+              Linear Regression model
             </div>
           </div>
         </div>

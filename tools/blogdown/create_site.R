@@ -14,16 +14,21 @@ blogdown_build <- function(skip_theme = TRUE) {
 
   current_theme <- list.files("tools/blogdown/themes/")[1]
   theme_target <- paste0("themes/", current_theme )
-  if (!skip_theme &&  file.exists(theme_target)) {
+  if (!skip_theme) {
     if (file.exists(theme_target)) unlink(theme_target, recursive = TRUE)
-    
     file.copy(
       paste0("tools/blogdown/themes/", current_theme), 
       "themes/", 
       recursive = TRUE
-      )
-    
-  }
+    )}
+  
+  if(!file.exists(theme_target)){
+    file.copy(
+      paste0("tools/blogdown/themes/", current_theme), 
+      "themes/", 
+      recursive = TRUE
+    )}
+  
   pkgdown::build_reference(path = "content/reference")
   blogdown::serve_site()
 }
