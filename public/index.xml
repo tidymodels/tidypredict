@@ -17,10 +17,10 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/</guid>
-      <description>Tidy Eval formulasSQL formulasdplyrUtilitiesTidy Eval formulastidypredict_fit Returns a Tidy Eval formula to calculate fitted values
-tidypredict_interval Returns a Tidy Eval formula to calculate prediction interval
-SQL formulastidypredict_sql Returns a SQL query with formula to calculate fitted values
-tidypredict_sql_interval Returns a SQL query with formula to calculate predicted interval</description>
+      <description>SQL formulasdplyrUtilitiesSQL formulastidypredict_sql Returns a SQL query with formula to calculate fitted values
+tidypredict_sql_interval Returns a SQL query with formula to calculate predicted interval
+dplyrtidypredict_to_column Adds the prediction columns to a piped command set
+tidypredict_fit Returns a Tidy Eval formula to calculate fitted values</description>
     </item>
     
     <item>

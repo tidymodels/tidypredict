@@ -1,10 +1,6 @@
 template:
   path: "tools/blogdown/pkgdown"
 reference:
-  - title: Tidy Eval formulas
-    contents:
-    - tidypredict_fit
-    - tidypredict_interval
   - title: SQL formulas
     contents:
     - tidypredict_sql
@@ -12,6 +8,8 @@ reference:
   - title: dplyr
     contents:
     - tidypredict_to_column    
+    - tidypredict_fit
+    - tidypredict_interval
   - title: Utilities
     contents:
     - tidypredict_test

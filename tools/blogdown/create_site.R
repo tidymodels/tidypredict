@@ -24,8 +24,6 @@ blogdown_build <- function(skip_theme = TRUE) {
       )
     
   }
-  
-  
   pkgdown::build_reference(path = "content/reference")
   blogdown::serve_site()
 }
