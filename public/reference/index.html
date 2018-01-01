@@ -247,6 +247,19 @@
 
 
       
+        
+        
+
+
+
+<a  title="Generalized Linear model" href="/vignettes/glm/">
+	
+	Generalized Linear model
+</a>
+
+
+
+      
     </ul>
   
 </li>
@@ -399,14 +412,14 @@
 
   <div class="next">
   
-      <a href="/vignettes/lm/" title="Linear Regression model">
+      <a href="/vignettes/glm/" title="Generalized Linear model">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Linear Regression model
+              Generalized Linear model
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
@@ -451,7 +464,6 @@
       
       var scrollspy = document.getElementById('scrollspy');
       var headers   = document.getElementsByTagName("section");
-      var tbody   = document.getElementsByTagName("tbody");
       
       if(scrollspy) {
         if(headers.length > 0) {
@@ -461,7 +473,7 @@
             var a  = document.createElement("a");
             a.setAttribute("href", "#" + headers[i].id);
             a.setAttribute("title", headers[i].innerHTML);
-            a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
+            a.innerHTML = headers[i].innerHTML;
             li.appendChild(a)
             scrollspy.appendChild(li);
           }

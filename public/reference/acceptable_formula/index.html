@@ -244,6 +244,19 @@
 
 
       
+        
+        
+
+
+
+<a  title="Generalized Linear model" href="/vignettes/glm/">
+	
+	Generalized Linear model
+</a>
+
+
+
+      
     </ul>
   
 </li>
@@ -423,7 +436,6 @@ This function is mostly meant for function interaction, not user interaction.</p
       
       var scrollspy = document.getElementById('scrollspy');
       var headers   = document.getElementsByTagName("section");
-      var tbody   = document.getElementsByTagName("tbody");
       
       if(scrollspy) {
         if(headers.length > 0) {
@@ -433,7 +445,7 @@ This function is mostly meant for function interaction, not user interaction.</p
             var a  = document.createElement("a");
             a.setAttribute("href", "#" + headers[i].id);
             a.setAttribute("title", headers[i].innerHTML);
-            a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
+            a.innerHTML = headers[i].innerHTML;
             li.appendChild(a)
             scrollspy.appendChild(li);
           }

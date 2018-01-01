@@ -9,18 +9,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>tidypredict_sql_interval - tidypredict</title>
+    <title>Generalized Linear model - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
     <meta name="description" content="Parses a model to create a predict routine with Tidy Eval.">
     
-    <link rel="canonical" href="/reference/tidypredict_sql_interval/">
+    <link rel="canonical" href="/vignettes/glm/">
     
     <meta name="author" content="Edgar Ruiz">
     
 
-    <meta property="og:url" content="/reference/tidypredict_sql_interval/">
+    <meta property="og:url" content="/vignettes/glm/">
     <meta property="og:title" content="tidypredict">
     <meta property="og:image" content="/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="tidypredict">
@@ -97,7 +97,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - tidypredict_sql_interval
+        tidypredict - Generalized Linear model
       </div>
     </div>
 
@@ -249,11 +249,14 @@
 
 
 
-<a  title="Generalized Linear model" href="/vignettes/glm/">
+<a class="current" title="Generalized Linear model" href="/vignettes/glm/">
 	
 	Generalized Linear model
 </a>
 
+
+<ul id="scrollspy">
+</ul>
 
 
       
@@ -298,58 +301,95 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>tidypredict_sql_interval </h1>
+			<h1>Generalized Linear model </h1>
 
-			<div class="doc-page">
+			<div id="highlights-limitations" class="section level2">
+<h2>Highlights &amp; Limitations</h2>
+<ul>
+<li>Defaults to 0-to-1 predictions for <code>binomial</code> family models. That is akin to running <code>predict(model, type = &quot;response&quot;)</code></li>
+<li>Only <em>treatment</em> contrast (<code>contr.treatment</code>) are supported.</li>
+<li><code>offset</code> is supported</li>
+<li>Categorical variables are supported</li>
+<li>In-line functions in the formulas are <strong>not supported</strong>:
+<ul>
+<li>OK - <code>wt ~ mpg + am</code></li>
+<li>OK - <code>mutate(mtcars, newam = paste0(am))</code> and then <code>wt ~ mpg + newam</code></li>
+<li>Not OK - <code>wt ~ mpg + as.factor(am)</code></li>
+<li>Not OK - <code>wt ~ mpg + as.character(am)</code></li>
+</ul></li>
+<li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
+</ul>
+</div>
+<div id="how-it-works" class="section level2">
+<h2>How it works</h2>
+<pre class="r"><code>df &lt;- mtcars %&gt;%
+  mutate(char_cyl = paste0(&quot;cyl&quot;, cyl)) %&gt;%
+  select(wt, char_cyl, am) 
 
-    <div class="doc-page-index">
-    <ul data-gumshoe>
-    <li><a href="#arguments">Arguments</a></li>
-        
-    <li><a href="#examples">Examples</a></li>
-    </ul>
-    </div>
+model &lt;- glm(am ~ wt + char_cyl, data = df, family = &quot;binomial&quot;)</code></pre>
+<p>It returns a SQL query that contains the coefficients (<code>model$coefficients</code>) operated against the correct variable or categorical variable value. In most cases the resulting SQL is one short <code>CASE WHEN</code> statement per coefficient. It appends the <code>offset</code> field or value, if one is provided.</p>
+<p>For <code>binomial</code> models, the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid</a> equation is applied. This means that the target SQL database type will need to support the exponent function.</p>
+<pre class="r"><code>library(tidypredict)
 
-    <div class="doc-page-body">
+tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
+<pre><code>## &lt;SQL&gt; EXP((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((3.10462643177453)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) + (CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((5.37942092366097)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((`wt`) * (-7.85934263583835))) + (20.8527831345691)) / (EXP((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((3.10462643177453)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) + (CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((5.37942092366097)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((`wt`) * (-7.85934263583835))) + (20.8527831345691)) + 1.0)</code></pre>
+<p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
+<pre class="r"><code>df %&gt;%
+  tidypredict_to_column(model) %&gt;%
+  head(10) </code></pre>
+<pre><code>##       wt char_cyl am        fit
+## 1  2.620     cyl6  1 0.96662269
+## 2  2.875     cyl6  1 0.79605201
+## 3  2.320     cyl4  1 0.93208127
+## 4  3.215     cyl6  0 0.21242376
+## 5  3.440     cyl8  0 0.30918450
+## 6  3.460     cyl6  0 0.03783629
+## 7  3.570     cyl8  0 0.13875740
+## 8  3.190     cyl4  0 0.01450687
+## 9  3.150     cyl4  0 0.01975984
+## 10 3.440     cyl6  0 0.04399324</code></pre>
+</div>
+<div id="under-the-hood" class="section level2">
+<h2>Under the hood</h2>
+<p>The parser reads several parts of the <code>glm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
+<pre class="r"><code>parse_model(model)</code></pre>
+<pre><code>## # A tibble: 8 x 8
+##   labels      vals     type        estimate    qr_1   qr_2    qr_3   qr_4
+##   &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+## 1 (Intercept) &quot;&quot;       intercept      20.9  - 0.679 - 5.11 - 1.15    6.05
+## 2 wt          &quot;&quot;       continuous    - 7.86   0       1.62   0.232 - 2.58
+## 3 char_cyl    cyl6     categorical     3.10   0       0      1.56    1.86
+## 4 char_cyl    cyl8     categorical     5.38   0       0      0       3.20
+## 5 model       glm      variable       NA     NA      NA     NA      NA   
+## 6 residual    28       variable       NA     NA      NA     NA      NA   
+## 7 family      binomial variable       NA     NA      NA     NA      NA   
+## 8 link        logit    variable       NA     NA      NA     NA      NA</code></pre>
+<p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
+<pre class="r"><code>tidypredict_fit(model)</code></pre>
+<pre><code>## exp((((ifelse((char_cyl) == (&quot;cyl6&quot;), (3.10462643177453), 0)) + 
+##     (ifelse((char_cyl) == (&quot;cyl8&quot;), (5.37942092366097), 0))) + 
+##     ((wt) * (-7.85934263583835))) + (20.8527831345691))/(exp((((ifelse((char_cyl) == 
+##     (&quot;cyl6&quot;), (3.10462643177453), 0)) + (ifelse((char_cyl) == 
+##     (&quot;cyl8&quot;), (5.37942092366097), 0))) + ((wt) * (-7.85934263583835))) + 
+##     (20.8527831345691)) + 1)</code></pre>
+<p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
+<ul>
+<li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
+<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
+</ul>
+<p>The same applies to the prediction interval functions.</p>
+</div>
+<div id="how-it-performs" class="section level2">
+<h2>How it performs</h2>
+<p>Testing the <code>tidypredict</code> results is easy. The <code>tidypredict_test()</code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code>tidypredict_fit()</code>, and <code>tidypredict_interval()</code> to the results given by <code>predict()</code></p>
+<pre class="r"><code>tidypredict_test(model)</code></pre>
+<pre><code>## tidypredict test results
+## Difference threshold: 1e-12
+## 
+##  All results are within the difference threshold</code></pre>
+</div>
 
-    
-    <p>Returns a SQL query with formula to calculate predicted interval</p>
-    
-
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='no'>con</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</code></pre></div>
-    
-    <h2 id="arguments">Arguments</h2>
-    <table class="ref-arguments">
-
-    <colgroup>
-      <col class="name" />
-      <col class="desc" />
-    </colgroup>
-
-    <tr>
-      <td>model</td>
-      <td><p>An R model or a tibble with a parsed model</p></td>
-    </tr>
-    <tr>
-      <td>con</td>
-      <td><p>Database connection object. It is used to select
-the correst SQL translation syntax.</p></td>
-    </tr>
-    <tr>
-      <td>interval</td>
-      <td><p>The prediction interval, defaults to 0.95</p></td>
-    </tr>
-    </table>
-    
-
-    <h2 id="examples">Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>am</span> + <span class='no'>cyl</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
-<span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (2.04840714179524) * SQRT((((((((((("wt") * (-0.0))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.176776695296637)))) * (((((("wt") * (-0.0))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.176776695296637)))) * (6.8231093058295)) + ((((((("wt") * (0.183559646169165))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.590557271637747)))) * (((((("wt") * (0.183559646169165))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.590557271637747)))) * (6.8231093058295))) + ((((((("wt") * (-0.176199380745393))) + ((("am") * (-0.498926847360626)))) + ((("cyl") * (0.0)))) + (((0.769566489443368)))) * (((((("wt") * (-0.176199380745393))) + ((("am") * (-0.498926847360626)))) + ((("cyl") * (0.0)))) + (((0.769566489443368)))) * (6.8231093058295))) + ((((((("wt") * (-0.23845787029348))) + ((("am") * (-0.0214203331902853)))) + ((("cyl") * (0.161662223806132)))) + (((-0.224404416240186)))) * (((((("wt") * (-0.23845787029348))) + ((("am") * (-0.0214203331902853)))) + ((("cyl") * (0.161662223806132)))) + (((-0.224404416240186)))) * (6.8231093058295))) + (6.8231093058295))</div><div class='input'>
-</div></code></pre></div>
-    </div>
-
-    </div>
 
 			<aside class="copyright" role="note">
 				
@@ -369,7 +409,7 @@ the correst SQL translation syntax.</p></td>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/tidypredict_sql/" title="tidypredict_sql">
+      <a href="/reference/" title="Function Reference">
         <span class="direction">
           Previous
         </span>
@@ -379,7 +419,7 @@ the correst SQL translation syntax.</p></td>
           </div>
           <div class="stretch">
             <div class="title">
-              tidypredict_sql
+              Function Reference
             </div>
           </div>
         </div>
@@ -389,14 +429,14 @@ the correst SQL translation syntax.</p></td>
 
   <div class="next">
   
-      <a href="/reference/tidypredict_test/" title="tidypredict_test">
+      <a href="/vignettes/lm/" title="Linear Regression model">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict_test
+              Linear Regression model
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

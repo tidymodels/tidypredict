@@ -8,7 +8,7 @@ vignette: >
 menu:
   main:
     parent: "articles"
-    weight: 1
+    weight: 3
 ---
 
 ```{r setup, include=FALSE}
@@ -21,11 +21,11 @@ set.seed(100)
 ## Highlights & Limitations
 
 - Uses the `randomForest::getTree()` to parse each decision path.
-- In-line functions in the fomulas are **not supported**:  
-   - OK - `wt ~ mpg + am` 
-   - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
-   - Not OK - `wt ~ mpg + as.factor(am)`
-   - Not OK - `wt ~ mpg + as.character(am)`
+- In-line functions in the formulas are **not supported**:  
+     - OK - `wt ~ mpg + am` 
+     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
+     - Not OK - `wt ~ mpg + as.factor(am)`
+     - Not OK - `wt ~ mpg + as.character(am)`
 - Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
    
 
@@ -54,7 +54,7 @@ iris %>%
 
 ## Under the hood
 
-The parser is based on the ouput from the `randomForest::getTree()` function.  It will return as many desicion paths as there are non-NA rows in the `prediction` field.
+The parser is based on the output from the `randomForest::getTree()` function.  It will return as many decision paths as there are non-NA rows in the `prediction` field.
 ```{r}
 getTree(model, labelVar = TRUE) %>%
   head()

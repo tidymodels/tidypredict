@@ -1,0 +1,113 @@
+---
+title: "Database operations"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{randomForest}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+menu:
+  main:
+    parent: "articles"
+    weight: 4
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidypredict)
+library(randomForest)
+library(dbplyr)
+
+set.seed(100)
+```
+
+Here is a simple example of how to implement a "write-back" 
+
+```{r}
+library(dplyr)
+library(DBI)
+
+flights_table <- nycflights13::flights %>%
+  mutate(current_score = 0) %>%
+  rowid_to_column("flight_id")
+
+con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
+RSQLite::initExtension(con)
+
+db_fligths <- copy_to(con,flights_table )
+
+
+#dbDisconnect(con)
+#dbListTables(con)
+```
+
+```{r}
+db_sample <- db_fligths %>%
+  head(1000) %>%
+  collect() 
+```
+
+```{r}
+df <- db_sample %>%
+  select(dep_delay, hour, distance)
+  
+model <- lm(dep_delay ~ ., data = df)
+
+```
+
+```{r}
+tidypredict_test(model)
+```
+
+```{r, eval = FALSE}
+if(tidypredict_test(model)$alert) stop("Threshold exceeded!")
+```
+
+```{r}
+library(dbplyr)
+
+dbSendQuery(con, build_sql("UPDATE flights_table SET current_score  = ", translate_sql(!!tidypredict_sql(model, con), con = con)))
+```
+
+```{r}
+db_fligths %>%
+  select(current_score) %>%
+  head(10) %>%
+  pull()
+  
+```
+
+```{r}
+  
+dbWriteTable(con, "daily_scores", 
+             tibble(
+               flight_id = 0,
+               score = 0,
+               date = ""
+             ))
+
+new_predictions <- db_fligths %>%
+  filter(month == 12) %>% 
+  tidypredict_to_column(model) %>%
+  select(
+    flight_id,
+    score = current_score) %>%
+  mutate(date = "01/01/2018")
+
+
+
+dbSendQuery(con,  build_sql("INSERT INTO daily_scores ", sql_render(new_predictions, con = con), con = con))
+
+head(tbl(con, "daily_scores"))
+
+```
+
+
+```{r}
+tbl(con, "daily_scores") %>%
+  inner_join(tbl(con, "flights_table"), by = "flight_id") %>%
+  filter(date == "01/01/2018") %>%
+  select(dep_delay, hour, distance, score)
+```
+```{r, include = FALSE}
+dbDisconnect(con)
+```

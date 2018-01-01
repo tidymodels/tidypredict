@@ -247,6 +247,19 @@
 
 
       
+        
+        
+
+
+
+<a  title="Generalized Linear model" href="/vignettes/glm/">
+	
+	Generalized Linear model
+</a>
+
+
+
+      
     </ul>
   
 </li>
@@ -290,11 +303,11 @@
 		<div class="wrapper">
 			<h1>Random Forest model </h1>
 
-			<section id="highlights-limitations" class="level2">
+			<div id="highlights-limitations" class="section level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li>Uses the <code>randomForest::getTree()</code> to parse each decision path.</li>
-<li>In-line functions in the fomulas are <strong>not supported</strong>:
+<li>In-line functions in the formulas are <strong>not supported</strong>:
 <ul>
 <li>OK - <code>wt ~ mpg + am</code></li>
 <li>OK - <code>mutate(mtcars, newam = paste0(am))</code> and then <code>wt ~ mpg + newam</code></li>
@@ -303,8 +316,8 @@
 </ul></li>
 <li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
 </ul>
-</section>
-<section id="how-it-works" class="level2">
+</div>
+<div id="how-it-works" class="section level2">
 <h2>How it works</h2>
 <p>Here is a simple <code>randomForest()</code> model using the <code>iris</code> dataset:</p>
 <pre class="r"><code>library(randomForest)
@@ -337,10 +350,10 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## 8           5.0         3.4          1.5         0.2  setosa setosa
 ## 9           4.4         2.9          1.4         0.2  setosa setosa
 ## 10          4.9         3.1          1.5         0.1  setosa setosa</code></pre>
-</section>
-<section id="under-the-hood" class="level2">
+</div>
+<div id="under-the-hood" class="section level2">
 <h2>Under the hood</h2>
-<p>The parser is based on the ouput from the <code>randomForest::getTree()</code> function. It will return as many desicion paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<p>The parser is based on the output from the <code>randomForest::getTree()</code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
 <pre class="r"><code>getTree(model, labelVar = TRUE) %&gt;%
   head()</code></pre>
 <pre><code>##   left daughter right daughter    split var split point status prediction
@@ -384,8 +397,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
-</section>
-<section id="how-it-performs" class="level2">
+</div>
+<div id="how-it-performs" class="section level2">
 <h2>How it performs</h2>
 <p>Currently, the formula matches 147 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
 <pre class="r"><code>test &lt;- tidypredict_test(model, iris, threshold = 5)
@@ -405,7 +418,7 @@ test</code></pre>
 ## 1   virginica
 ## 2   virginica
 ## 3  versicolor</code></pre>
-</section>
+</div>
 
 
 			<aside class="copyright" role="note">
@@ -498,7 +511,6 @@ test</code></pre>
       
       var scrollspy = document.getElementById('scrollspy');
       var headers   = document.getElementsByTagName("section");
-      var tbody   = document.getElementsByTagName("tbody");
       
       if(scrollspy) {
         if(headers.length > 0) {
@@ -508,7 +520,7 @@ test</code></pre>
             var a  = document.createElement("a");
             a.setAttribute("href", "#" + headers[i].id);
             a.setAttribute("title", headers[i].innerHTML);
-            a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
+            a.innerHTML = headers[i].innerHTML;
             li.appendChild(a)
             scrollspy.appendChild(li);
           }

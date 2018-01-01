@@ -1,7 +1,7 @@
+theme = "hugo-material-docs"
 baseurl = "/"
 languageCode = "en-us"
 title = "tidypredict"
-theme = "hugo-material-docs"
 metadataformat = "yaml"
 ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
 canonifyurls = true
@@ -32,6 +32,12 @@ googleAnalytics = ""
 	# Syntax highlighting theme
 	highlight_css  = ""
 
+  # options for highlight.js (version, additional languages, and theme)
+  highlightjsVersion = "9.11.0"
+  highlightjsCDN = "//cdn.bootcss.com"
+  highlightjsLang = ["r", "yaml"]
+  highlightjsTheme = "github"
+
 	[params.palette]
     	primary = "teal"
     	accent  = "blue"
@@ -39,6 +45,7 @@ googleAnalytics = ""
     [params.font]
     	text = "Ubuntu"
     	code = "Ubuntu Mono"
+    	
 
 
 [social]

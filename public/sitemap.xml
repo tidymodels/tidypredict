@@ -12,6 +12,10 @@
   </url>
   
   <url>
+    <loc>/vignettes/glm/</loc>
+  </url>
+  
+  <url>
     <loc>/vignettes/lm/</loc>
   </url>
   

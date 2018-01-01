@@ -9,7 +9,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>tidypredict - tidypredict</title>
+    <title>tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
@@ -68,6 +68,9 @@
     
     <script src="/javascripts/modernizr.js"></script>
 
+    
+    <link href="/index.xml" rel="alternate" type="application/rss+xml" title="tidypredict" />
+    <link href="/index.xml" rel="feed" type="application/rss+xml" title="tidypredict" />
     
 
   </head>
@@ -247,6 +250,19 @@
 
 
       
+        
+        
+
+
+
+<a  title="Generalized Linear model" href="/vignettes/glm/">
+	
+	Generalized Linear model
+</a>
+
+
+
+      
     </ul>
   
 </li>
@@ -288,70 +304,38 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>tidypredict </h1>
-
-			<p><a href="https://travis-ci.org/edgararuiz/tidypredict"><img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" /></a></p>
-<section id="intro" class="level2">
-<h2>Intro</h2>
-<p>Run the predictions of an R model inside the database. <code>tidypredict</code> parses a model fitted in R, such as:</p>
-<pre class="r"><code>model &lt;- lm(mpg ~ wt + cyl, data = mtcars)</code></pre>
-<p>And creates the SQL statement needed to calculate the fitted prediction:</p>
-<pre class="r"><code>tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)</code></pre>
-</section>
-<section id="installation" class="level2">
-<h2>Installation</h2>
-<p>Install <code>tidypredict</code> using <code>devtools</code> as follows:</p>
-<pre class="r"><code>devtools::install_github(&quot;edgararuiz/tidypredict&quot;)</code></pre>
-</section>
-
+			
 
 			<aside class="copyright" role="note">
 				
 				&copy; 2018 Released under the GPL-3 license &ndash;
 				
 				Documentation built with
-				<a href="https://github.com/r-lib/pkgdown/">pkgdown</a>,
-				<a href="https://github.com/rstudio/blogdown">blogdown</a>, and 
-				<a href="https://www.gohugo.io" target="_blank"> Hugo</a> using the
+				<a href="https://www.gohugo.io" target="_blank">Hugo</a>
+				using the
 				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
-				
 			</aside>
 
 			<footer class="footer">
 				
 
+
+
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
-  
-      <a href="/reference/print.tidypredict_test/" title="print.tidypredict_test">
-        <span class="direction">
-          Previous
-        </span>
-        <div class="page">
-          <div class="button button-previous" role="button" aria-label="Previous">
-            <i class="icon icon-back"></i>
-          </div>
-          <div class="stretch">
-            <div class="title">
-              print.tidypredict_test
-            </div>
-          </div>
-        </div>
-      </a>
-  
   </div>
 
-  <div class="next">
   
-      <a href="/reference/tidypredict_fit/" title="tidypredict_fit">
+  
+  <div class="next">
+      <a href="/reference/" title="Function Reference">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict_fit
+              Function Reference
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
@@ -359,11 +343,8 @@
           </div>
         </div>
       </a>
-  
   </div>
 </nav>
-
-
 
 
 
@@ -396,7 +377,6 @@
       
       var scrollspy = document.getElementById('scrollspy');
       var headers   = document.getElementsByTagName("section");
-      var tbody   = document.getElementsByTagName("tbody");
       
       if(scrollspy) {
         if(headers.length > 0) {
@@ -406,7 +386,7 @@
             var a  = document.createElement("a");
             a.setAttribute("href", "#" + headers[i].id);
             a.setAttribute("title", headers[i].innerHTML);
-            a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
+            a.innerHTML = headers[i].innerHTML;
             li.appendChild(a)
             scrollspy.appendChild(li);
           }

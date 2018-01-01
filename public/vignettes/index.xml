@@ -12,12 +12,21 @@
     
     
     <item>
+      <title>Generalized Linear model</title>
+      <link>/vignettes/glm/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/vignettes/glm/</guid>
+      <description>Highlights &amp;amp; LimitationsDefaults to 0-to-1 predictions for binomial family models. That is akin to running predict(model, type = &amp;quot;response&amp;quot;)Only treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.</description>
+    </item>
+    
+    <item>
       <title>Linear Regression model</title>
       <link>/vignettes/lm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/vignettes/lm/</guid>
-      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Only treatment contrast (contr.treatment) are supported.offset is supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.</description>
+      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Only treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.</description>
     </item>
     
     <item>
@@ -26,7 +35,7 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/vignettes/randomforest/</guid>
-      <description>Highlights &amp;amp; LimitationsUses the randomForest::getTree() to parse each decision path.In-line functions in the fomulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple randomForest() model using the iris dataset:</description>
+      <description>Highlights &amp;amp; LimitationsUses the randomForest::getTree() to parse each decision path.In-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple randomForest() model using the iris dataset:</description>
     </item>
     
   </channel>
