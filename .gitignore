@@ -4,3 +4,7 @@
 .Ruserdata
 model.csv
 inst/doc
+content
+/static/
+vignettes-backup
+/themes/

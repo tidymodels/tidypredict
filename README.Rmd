@@ -1,11 +1,7 @@
 ---
 title: "tidypredict"
-output:
-  github_document:
-    toc: true
+output: github_document
 ---
-
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict) 
 
 ```{r setup, include=FALSE}
 library(dplyr)
@@ -13,18 +9,7 @@ library(tidypredict)
 library(randomForest)
 ```
 
-## Intro
-
-Run the predictions of an R model inside the database.  `tidypredict` parses a model fitted in R, such as:
-```{r}
-model <- lm(mpg ~ wt + cyl, data = mtcars)
-```
-
-And creates the SQL statement needed to calculate the fitted prediction:
-
-```{r}
-tidypredict_sql(model, dbplyr::simulate_mssql())
-```
+Run predictions inside the database. It works with several databases back-ends because it uses `dbplyr` for the final SQL translation of the algorithm.
 
 ## Installation
 
@@ -34,6 +19,25 @@ devtools::install_github("edgararuiz/tidypredict")
 ```
 
 
+## Intro
 
+`tidypredict` is able to parse an R model object, such as:
+```{r}
+model <- lm(mpg ~ wt + cyl, data = mtcars)
+```
+
+And then creates the SQL statement needed to calculate the fitted prediction:
+
+```{r}
+tidypredict_sql(model, dbplyr::simulate_mssql())
+```
+
+## Supported models
+
+The following R models are currently supported. For more info please review the corresponding vignette:
+
+- [Linear Regression](http://tidypredict.netlify.com/articles/lm/) - `lm()`
+- [Generalized Linear model](http://tidypredict.netlify.com/articles/glm/) - `glm()`
+- [Random Forest](http://tidypredict.netlify.com/articles/randomforest/) - `randomForest()`
 
 

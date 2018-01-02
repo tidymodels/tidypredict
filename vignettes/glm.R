@@ -3,28 +3,28 @@ library(dplyr)
 library(tidypredict)
 
 ## ------------------------------------------------------------------------
-model <- glm(am ~ mpg + wt, data = mtcars, family = "binomial")
+df <- mtcars %>%
+  mutate(char_cyl = paste0("cyl", cyl)) %>%
+  select(wt, char_cyl, am) 
+
+model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 
 ## ------------------------------------------------------------------------
 library(tidypredict)
 
-mtcars %>%
-  head(10) %>%
+tidypredict_sql(model, dbplyr::simulate_mssql())
+
+## ------------------------------------------------------------------------
+df %>%
   tidypredict_to_column(model) %>%
-  select(mpg, wt, am, fit)
+  head(10) 
+
+## ------------------------------------------------------------------------
+parse_model(model)
 
 ## ------------------------------------------------------------------------
 tidypredict_fit(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_sql(model, dbplyr::simulate_dbi())
-
-## ------------------------------------------------------------------------
-test <- tidypredict_test(model)
-
-test
-
-## ------------------------------------------------------------------------
-test$raw_results %>%
-  head(10)
+tidypredict_test(model)
 

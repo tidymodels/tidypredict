@@ -1,0 +1,67 @@
+baseurl = "/"
+languageCode = "en-us"
+title = "tidypredict"
+metadataformat = "yaml"
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.R$"]
+canonifyurls = true
+# Enable Google Analytics by entering your tracking id
+googleAnalytics = "UA-111788788-1"
+
+[params]
+	# General information
+	author = "Edgar Ruiz"
+	description = "Parses a model to create a predict routine with Tidy Eval."
+	copyright = "Released under the GPL-3 license"
+
+	# Repository
+	provider = "GitHub"
+	repo_url = "https://github.com/edgararuiz/tidypredict"
+	repo_name = "edgararuiz/tidypredict"
+
+	version = "0.0.0.9001"
+	logo = "images/logo.png"
+	favicon = ""
+
+	permalink = "#"
+
+	# Custom assets
+	custom_css = []
+	custom_js  = []
+
+	# Syntax highlighting theme
+	highlight_css  = ""
+
+  # options for highlight.js (version, additional languages, and theme)
+  highlightjsVersion = "9.11.0"
+  highlightjsCDN = "//cdn.bootcss.com"
+  highlightjsLang = ["r", "yaml"]
+  highlightjsTheme = "github"
+
+	[params.palette]
+    	primary = "teal"
+    	accent  = "blue"
+
+    [params.font]
+    	text = "Ubuntu"
+    	code = "Ubuntu Mono"
+    	
+
+
+[social]
+	twitter = "theotheredgar"
+	github  = "edgararuiz"
+	linkedin = "edgararuiz"
+
+
+
+[[menu.main]]
+	name   = "Home"
+	url    = "/"
+	weight = 0
+
+
+[blackfriday]
+	smartypants	= true
+	fractions = true
+	smartDashes = true
+	plainIDAnchors = true

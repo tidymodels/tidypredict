@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+  
+  
+  
+  
+   <html class="no-js"> 
+
+  <head lang="en-us">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+    <meta http-equiv="X-UA-Compatible" content="IE=10" />
+    <title>tidypredict_to_column - tidypredict</title>
+    <meta name="generator" content="Hugo 0.29" />
+
+    
+    <meta name="description" content="Parses a model to create a predict routine with Tidy Eval.">
+    
+    <link rel="canonical" href="/reference/tidypredict_to_column/">
+    
+    <meta name="author" content="Edgar Ruiz">
+    
+
+    <meta property="og:url" content="/reference/tidypredict_to_column/">
+    <meta property="og:title" content="tidypredict">
+    <meta property="og:image" content="/images/logo.png">
+    <meta name="apple-mobile-web-app-title" content="tidypredict">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+
+    <style>
+      @font-face {
+        font-family: 'Icon';
+        src: url('/fonts/icon.eot');
+        src: url('/fonts/icon.eot')
+               format('embedded-opentype'),
+             url('/fonts/icon.woff')
+               format('woff'),
+             url('/fonts/icon.ttf')
+               format('truetype'),
+             url('/fonts/icon.svg')
+               format('svg');
+        font-weight: normal;
+        font-style: normal;
+      }
+    </style>
+
+    <link rel="stylesheet" href="/stylesheets/application.css">
+    <link rel="stylesheet" href="/stylesheets/temporary.css">
+    <link rel="stylesheet" href="/stylesheets/palettes.css">
+    <link rel="stylesheet" href="/stylesheets/highlight/highlight.css">
+
+    
+    
+    
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Ubuntu:400,700|Ubuntu&#43;Mono">
+    <style>
+      body, input {
+        font-family: 'Ubuntu', Helvetica, Arial, sans-serif;
+      }
+      pre, code {
+        font-family: 'Ubuntu Mono', 'Courier New', 'Courier', monospace;
+      }
+    </style>
+
+    
+    <script src="/javascripts/modernizr.js"></script>
+
+    
+
+  </head>
+  <body class="palette-primary-teal palette-accent-blue">
+
+
+
+	
+	
+
+
+<div class="backdrop">
+	<div class="backdrop-paper"></div>
+</div>
+
+<input class="toggle" type="checkbox" id="toggle-drawer">
+<input class="toggle" type="checkbox" id="toggle-search">
+<label class="toggle-button overlay" for="toggle-drawer"></label>
+
+<header class="header">
+	<nav aria-label="Header">
+  <div class="bar default">
+    <div class="button button-menu" role="button" aria-label="Menu">
+      <label class="toggle-button icon icon-menu" for="toggle-drawer">
+        <span></span>
+      </label>
+    </div>
+    <div class="stretch">
+      <div class="title">
+        tidypredict - tidypredict_to_column
+      </div>
+    </div>
+
+    
+    <div class="button button-twitter" role="button" aria-label="Twitter">
+       <a href="https://twitter.com/theotheredgar" title="@theotheredgar on Twitter" target="_blank" class="toggle-button icon icon-twitter"></a>
+    </div>
+    
+
+    
+    <div class="button button-github" role="button" aria-label="GitHub">
+      <a href="https://github.com/edgararuiz" title="@edgararuiz on GitHub" target="_blank" class="toggle-button icon icon-github"></a>
+    </div>
+    
+    
+        
+  </div>
+  <div class="bar search">
+    <div class="button button-close" role="button" aria-label="Close">
+      <label class="toggle-button icon icon-back" for="toggle-search"></label>
+    </div>
+    <div class="stretch">
+      <div class="field">
+        <input class="query" type="text" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck>
+      </div>
+    </div>
+    <div class="button button-reset" role="button" aria-label="Search">
+      <button class="toggle-button icon icon-close" id="reset-search"></button>
+    </div>
+  </div>
+</nav>
+</header>
+
+<main class="main">
+	<div class="drawer">
+		<nav aria-label="Navigation">
+  <a href="https://github.com/edgararuiz/tidypredict" class="project">
+    <div class="banner">
+      <div class="name">
+        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        
+          <br>
+          edgararuiz/tidypredict
+        
+      </div>
+    </div>
+  </a>
+
+  <div class="scrollable">
+    <div class="wrapper">
+      
+        <ul>
+          <li>
+            <p>
+              
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
+              </a>
+              
+            </p>
+
+          </li>
+        </ul>
+        <hr>
+      
+
+      <div class="toc">
+        
+        <ul>
+          
+
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Home" href="/">
+	
+	Home
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    
+
+
+
+<a  title="Reference" href="/reference/">
+	
+	Reference
+</a>
+
+
+
+  
+</li>
+
+
+
+<li>
+  
+    <span class="section">Articles</span>
+    <ul>
+      
+        
+        
+
+
+
+<a  title="Linear Regression model" href="/articles/lm/">
+	
+	Linear Regression model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="Generalized Linear model" href="/articles/glm/">
+	
+	Generalized Linear model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="Random Forest model" href="/articles/randomforest/">
+	
+	Random Forest model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="Database write-back" href="/articles/sql/">
+	
+	Database write-back
+</a>
+
+
+
+      
+    </ul>
+  
+</li>
+
+
+        </ul>
+        
+
+        
+        <hr>
+        <span class="section">The author</span>
+        
+        <ul>
+          
+          <li>
+            <a href="https://twitter.com/theotheredgar" target="_blank" title="@theotheredgar on Twitter">
+              @theotheredgar on Twitter
+            </a>
+          </li>
+          
+
+          
+          <li>
+            <a href="https://github.com/edgararuiz" target="_blank" title="@edgararuiz on GitHub">
+              @edgararuiz on GitHub
+            </a>
+          </li>
+          
+
+          
+        </ul>
+        
+      </div>
+    </div>
+  </div>
+</nav>
+
+	</div>
+
+	<article class="article">
+		<div class="wrapper">
+			<h1>tidypredict_to_column </h1>
+
+			<div class="doc-page">
+
+    <div class="doc-page-index">
+    <ul data-gumshoe>
+    <li><a href="#arguments">Arguments</a></li>
+        
+    <li><a href="#examples">Examples</a></li>
+    </ul>
+    </div>
+
+    <div class="doc-page-body">
+
+    
+    <p>Adds a new column with the results form tidypredict_fit() to a piped command set.
+If add_interval is set to TRUE, then it will add two additional columns, one
+for the lower and another for the upper prediction interval bounds.</p>
+    
+
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>tidypredict_to_column</span>(<span class='no'>df</span>, <span class='no'>model</span>, <span class='kw'>add_interval</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
+  <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='st'>"fit"</span>, <span class='st'>"upper"</span>, <span class='st'>"lower"</span>))</code></pre></div>
+    
+    <h2 id="arguments">Arguments</h2>
+    <table class="ref-arguments">
+
+    <colgroup>
+      <col class="name" />
+      <col class="desc" />
+    </colgroup>
+
+    <tr>
+      <td>df</td>
+      <td><p>A data.frame or tibble</p></td>
+    </tr>
+    <tr>
+      <td>model</td>
+      <td><p>An R object, typically an R model, but it can also bee a regular data frame
+that has a parsed model already loaded.</p></td>
+    </tr>
+    <tr>
+      <td>add_interval</td>
+      <td><p>Switch that indicates if the prediction interval columns should be added. Defaults
+to FALSE</p></td>
+    </tr>
+    <tr>
+      <td>interval</td>
+      <td><p>The prediction interval, defaults to 0.95. It is ignored if add_interval is set to
+FALSE</p></td>
+    </tr>
+    <tr>
+      <td>vars</td>
+      <td><p>The name of the variables that this function will produce. It defaults to "fit", "upper", and "lower".</p></td>
+    </tr>
+    </table>
+    
+
+    <h2 id="examples">Examples</h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
+<span class='no'>df</span> <span class='kw'>%&gt;%</span>
+  <span class='fu'>tidypredict_to_column</span>(<span class='no'>model</span>, <span class='kw'>add_interval</span> <span class='kw'>=</span> <span class='fl'>TRUE</span>)</div><div class='output co'>#&gt;   x y fit     upper        lower
+#&gt; 1 1 2 1.6  8.007185 -4.807184721
+#&gt; 2 2 3 2.8  8.575358 -2.975358261
+#&gt; 3 5 6 6.4 12.807185 -0.007184721
+#&gt; 4 6 5 5.2 10.975358 -0.575358261
+#&gt; 5 6 4 4.0  9.548785 -1.548784735</div><div class='input'>
+</div></code></pre></div>
+    </div>
+
+    </div>
+
+			<aside class="copyright" role="note">
+				
+				&copy; 2018 Released under the GPL-3 license &ndash;
+				
+				Documentation built with
+				<a href="https://github.com/r-lib/pkgdown/">pkgdown</a>,
+				<a href="https://github.com/rstudio/blogdown">blogdown</a>, and 
+				<a href="https://www.gohugo.io" target="_blank"> Hugo</a> using the
+				<a href="http://github.com/digitalcraftsman/hugo-material-docs" target="_blank">Material</a> theme.
+				
+			</aside>
+
+			<footer class="footer">
+				
+
+<nav class="pagination" aria-label="Footer">
+  <div class="previous">
+  
+      <a href="/reference/tidypredict_test/" title="tidypredict_test">
+        <span class="direction">
+          Previous
+        </span>
+        <div class="page">
+          <div class="button button-previous" role="button" aria-label="Previous">
+            <i class="icon icon-back"></i>
+          </div>
+          <div class="stretch">
+            <div class="title">
+              tidypredict_test
+            </div>
+          </div>
+        </div>
+      </a>
+  
+  </div>
+
+  <div class="next">
+  
+  </div>
+</nav>
+
+
+
+
+
+			</footer>
+		</div>
+	</article>
+
+	<div class="results" role="status" aria-live="polite">
+		<div class="scrollable">
+			<div class="wrapper">
+				<div class="meta"></div>
+				<div class="list"></div>
+			</div>
+		</div>
+	</div>
+</main>
+
+Skip to content
+This repository
+Search
+Pull requests
+Issues
+Marketplace
+Explore
+ @edgararuiz
+ Sign out
+ Unwatch 9
+  Star 5  Fork 5 rstudio/db.rstudio.com
+ Code  Issues 6  Pull requests 0  Projects 0  Wiki  Insights  Settings
+Tree: 7a7548589f Find file Copy pathdb.rstudio.com/themes/hugo-material-docs/layouts/partials/footer_js.html
+7a75485  on Apr 22, 2017
+@edgararuiz edgararuiz Fix to theme's scrollspy
+1 contributor
+RawBlameHistory      
+84 lines (73 sloc)  2.83 KB
+    <script>
+    
+      var base_url = '\/';
+      var repo_id  = 'edgararuiz\/tidypredict';
+    
+    </script>
+
+    <script src="/javascripts/application.js"></script>
+    
+
+    <script>
+      /* Add headers to scrollspy */
+      var headers   = document.getElementsByTagName("div");
+      var scrollspy = document.getElementById('scrollspy');
+      if(scrollspy) {
+        if(headers.length > 0) {
+          for(var i = 0; i < headers.length; i++) {
+            if(headers[i].id.length > 0){
+              var li = document.createElement("li");
+              li.setAttribute("class", "anchor");
+  
+              var a  = document.createElement("a");
+              a.setAttribute("href", "#" + headers[i].id);
+              a.setAttribute("title", headers[i].innerHTML);
+              a.innerHTML = headers[i].getElementsByTagName("h2")[0].innerHTML;
+  
+              li.appendChild(a)
+              scrollspy.appendChild(li);
+            }            
+            
+          }
+        } else {
+          scrollspy.parentElement.removeChild(scrollspy)
+        }
+      }
+    </script>
+
+    
+      <script>
+        (function(i,s,o,g,r,a,m){
+          i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){(i[r].q=i[r].q||
+          []).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;
+          m.parentNode.insertBefore(a,m)
+        })(window, document,
+          'script', '//www.google-analytics.com/analytics.js', 'ga');
+         
+        ga('create', 'UA-111788788-1', 'auto');
+        ga('set', 'anonymizeIp', true);
+        ga('send', 'pageview');
+         
+        var buttons = document.querySelectorAll('a');
+        Array.prototype.map.call(buttons, function(item) {
+          if (item.host != document.location.host) {
+            item.addEventListener('click', function() {
+              var action = item.getAttribute('data-action') || 'follow';
+              ga('send', 'event', 'outbound', action, item.href);
+            });
+          }
+        });
+         
+        var query = document.querySelector('.query');
+        query.addEventListener('blur', function() {
+          if (this.value) {
+            var path = document.location.pathname;
+            ga('send', 'pageview', path + '?q=' + this.value);
+          }
+        });
+      </script>
+    
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.8.0/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+© 2018 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+API
+Training
+Shop
+Blog
+About

@@ -1,10 +1,14 @@
 ---
-title: "lm model"
+title: "Linear Regression model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{lm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+menu:
+  main:
+    parent: "articles"
+    weight: 1 
 ---
 
 ```{r setup, include=FALSE}
@@ -12,93 +16,97 @@ library(dplyr)
 library(tidypredict)
 ```
 
+## Highlights & Limitations
 
-## Example
+- **Supports prediction intervals**, it uses the `qr.solve()` function to parse the interval coefficient of each term.
+- Only *treatment* contrast (`contr.treatment`) are supported.
+- `offset` is supported
+- Categorical variables are supported
+- In-line functions in the formulas are **not supported**:  
+     - OK - `wt ~ mpg + am` 
+     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
+     - Not OK - `wt ~ mpg + as.factor(am)`
+     - Not OK - `wt ~ mpg + as.character(am)`
+
+## How it works
 
 ```{r}
-library(dplyr)
+df <- mtcars %>%
+  mutate(char_cyl = paste0("cyl", cyl)) %>%
+  select(mpg, wt, char_cyl, am) 
+
+model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
+```
+
+It returns a SQL query that contains the coefficients (`model$coefficients`) operated against the correct variable or categorical variable value.  In most cases the resulting SQL is one short `CASE WHEN` statement per coefficient.  It appends the `offset` field or value, if one is provided.
+```{r}
 library(tidypredict)
 
-df <- mtcars %>%
-  mutate(cyl = paste0("cyl", cyl))
-
-model <- lm(mpg ~ wt + am + cyl, data = df)
-
-model
+tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-### `tidypredict_to_column()`
+Alternatively, use `tidypredict_to_column()` if the results are the be used or previewed in `dplyr`.
 
 ```{r}
 df %>%
-  head(10) %>%
-  tidypredict_to_column(model)
+  tidypredict_to_column(model) %>%
+  head(10) 
 ```
 
+## Prediction intervals
 
-Compare the results against `predict()`
-
+Use `tidypredict_sql_interval()` to get the SQL query that operates the prediction interval.  The `interval` defaults to 0.95
 ```{r}
-predict(model, head(df,10))
+tidypredict_sql_interval(model, dbplyr::simulate_mssql())
 ```
 
-To include the prediction intervals just use the `add_interval` switch
+Prediction intervals also works in the `tidypredict_to_column()`, just set the `add_interval` argument to `TRUE`.
 ```{r}
 df %>%
-  head(10) %>%
   tidypredict_to_column(model, add_interval = TRUE) %>%
-  select(fit, lower, upper)
+  head(10)
 ```
 
+## Under the hood
 
-Compare the results against `predict()`
+The parser reads several parts of the `lm` object to tabulate all of the needed variables.  One entry per coefficient is added to the final table, those entries will have the results of `qr.solve()` already operated and placed in the correct column, they will have a `qr_` prefix.  There will be one `qr_` column per coefficient.  
 
-```{r}
-predict(model, head(df,10), interval = "prediction")
-```
-
-
-### Prediction functions
-
-To see the prediction formula, call the `tidypredict_fit()` function.  Because it uses S3 methods, it will decide which parser and formula generator to use for the model passed in the argument.
-
-```{r}
-tidypredict_fit(model)
-```
-
-If more granular control than what `tidypredict_to_column()` is needed, then the function can be used inside a `dplyr` verb command
-
-```{r}
-df %>%
-  head(10) %>%
-  mutate(fit = !! tidypredict_fit(model))
-```
-
-
-
-To add prediction intervals, an additional calculation is needed against the fitted result
-```{r}
-df %>%
-  head(10) %>%
-  mutate(fit = !! tidypredict_fit(model),
-         lwr = fit + !! tidypredict_interval(model),
-         upr = fit - !! tidypredict_interval(model)) %>%
-  select(fit, lwr, upr)
-```
-
-The confidence interval can also be modified, the default is 0.95
-
-```{r}
-tidypredict_interval(model, interval = 0.99)
-```
-
-### Model parser
-
-The `parse_model()` function returns a tidy table with the data needed to run the predictions
+Other variables are added at the end. Some variables are not required for every parsed model.  For example, `offset` is listed because it's part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.
 
 ```{r}
 parse_model(model)
 ```
 
-`tidypredict_fit()` does not need all of the columns in this table, it only requires the first four. The `qr_...` fields are use to calculate the prediction intervals, the are the result of running `qr.solve()` against the model's `qr` variable.
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.
+```{r}
+tidypredict_fit(model)
+```
 
+A function to put together the Tidy Eval interval formula is also supported
+```{r}
+tidypredict_interval(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+  - Use directly inside `dplyr`,  `mutate(df, !! tidypredict_fit(model))`
+  - Use `tidypredict_to_column(model)` to a piped command set
+  - Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+
+The same applies to the prediction interval functions.
+
+
+## How it performs
+
+
+Testing the `tidypredict` results is easy.  The `tidypredict_test()` function automatically uses the `lm` model object's data frame, to compare `tidypredict_fit()`, and `tidypredict_interval()` to the results given by `predict()`
+
+```{r}
+tidypredict_test(model)
+```
+
+To run with prediction intervals set the `include_intervals` argument to `TRUE`
+
+```{r}
+tidypredict_test(model, include_intervals = TRUE)
+```

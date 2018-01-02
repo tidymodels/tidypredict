@@ -1,31 +1,16 @@
-navbar:
-  title: "tidypredict"
-  type: inverse
-  left:
-    - text: "Linear Model"
-      href: articles/lm.html
-    - text: "Generalized Linear Model"
-      href: articles/glm.html
-    - text: "Random Forest"
-      href: articles/randomForest.html
-    - text: "Reference"
-      href: "reference/index.html"
-  right:
-    - icon: fa-github
-      href: https://github.com/edgararuiz/tidypredict
+template:
+  path: "tools/blogdown/pkgdown"
 reference:
-  - title: Tidy Eval formulas
-    contents:
-    - predict_fit
-    - predict_interval
   - title: SQL formulas
     contents:
-    - fit_to_sql
-    - interval_to_sql
+    - tidypredict_sql
+    - tidypredict_sql_interval
   - title: dplyr
     contents:
-    - predict_to_column    
+    - tidypredict_to_column    
+    - tidypredict_fit
+    - tidypredict_interval
   - title: Utilities
     contents:
-    - test_predictions
-    - acceptable_formula
+    - tidypredict_test
+    - parse_model

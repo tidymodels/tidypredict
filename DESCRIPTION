@@ -15,7 +15,9 @@ Suggests:
     testthat,
     randomForest,
     knitr,
-    rmarkdown
+    rmarkdown,
+    nycflights13,
+    RSQLite
 License: GPL-3
 URL: https://github.com/edgararuiz/tidypredict
 BugReports: https://github.com/edgararuiz/tidypredict/issues
