@@ -12,6 +12,18 @@
     
     
     <item>
+      <title>Database write-back</title>
+      <link>/vignettes/sql/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/vignettes/sql/</guid>
+      <description>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.
+Example setupTo keep the example reproducible, a SQLite database will be used to simulate a larger scale deployment.
+First the data is prepared in memory. The article will use the nycflights13::flights data, with a couple of modifications
+library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(current_score = 0) %&amp;gt;%rowid_to_column(&amp;quot;flight_id&amp;quot;)A new database is created using RSQLite.</description>
+    </item>
+    
+    <item>
       <title>Function Reference</title>
       <link>/reference/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -96,11 +108,10 @@ parse_model(model)ArgumentsmodelAn R model object
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/</guid>
-      <description>
-IntroRun the predictions of an R model inside the database. tidypredict parses a model fitted in R, such as:
+      <description>InstallationInstall tidypredict using devtools as follows:
+devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)IntroRun the predictions of an R model inside the database. tidypredict parses a model fitted in R, such as:
 model &amp;lt;- lm(mpg ~ wt + cyl, data = mtcars)And creates the SQL statement needed to calculate the fitted prediction:
-tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)InstallationInstall tidypredict using devtools as follows:
-devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)</description>
+tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)Supported modelsThe following models are supported:</description>
     </item>
     
     <item>

@@ -1,10 +1,14 @@
 tidypredict
 ================
 
--   [Intro](#intro)
--   [Installation](#installation)
+Installation
+------------
 
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+Install `tidypredict` using `devtools` as follows:
+
+``` r
+devtools::install_github("edgararuiz/tidypredict")
+```
 
 Intro
 -----
@@ -23,11 +27,11 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
     ## <SQL> (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)
 
-Installation
-------------
+Supported models
+----------------
 
-Install `tidypredict` using `devtools` as follows:
+The following models are supported:
 
-``` r
-devtools::install_github("edgararuiz/tidypredict")
-```
+-   Linear Regression - `lm()`
+-   Generalized Linear model - `glm()`
+-   Random Forest - `randomForest()`

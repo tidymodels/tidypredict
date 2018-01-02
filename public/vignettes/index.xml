@@ -12,6 +12,18 @@
     
     
     <item>
+      <title>Database write-back</title>
+      <link>/vignettes/sql/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/vignettes/sql/</guid>
+      <description>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.
+Example setupTo keep the example reproducible, a SQLite database will be used to simulate a larger scale deployment.
+First the data is prepared in memory. The article will use the nycflights13::flights data, with a couple of modifications
+library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(current_score = 0) %&amp;gt;%rowid_to_column(&amp;quot;flight_id&amp;quot;)A new database is created using RSQLite.</description>
+    </item>
+    
+    <item>
       <title>Generalized Linear model</title>
       <link>/vignettes/glm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>

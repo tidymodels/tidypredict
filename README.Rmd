@@ -1,17 +1,21 @@
 ---
 title: "tidypredict"
-output:
-  github_document:
-    toc: true
+output: github_document
 ---
-
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict) 
 
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)
 library(randomForest)
 ```
+
+## Installation
+
+Install `tidypredict` using `devtools` as follows:
+```{r, eval = FALSE}
+devtools::install_github("edgararuiz/tidypredict")
+```
+
 
 ## Intro
 
@@ -26,14 +30,12 @@ And creates the SQL statement needed to calculate the fitted prediction:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-## Installation
+## Supported models
 
-Install `tidypredict` using `devtools` as follows:
-```{r, eval = FALSE}
-devtools::install_github("edgararuiz/tidypredict")
-```
+The following models are supported:
 
-
-
+- Linear Regression - `lm()`
+- Generalized Linear model - `glm()`
+- Random Forest - `randomForest()`
 
 
