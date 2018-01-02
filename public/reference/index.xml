@@ -33,16 +33,6 @@
     </item>
     
     <item>
-      <title>knit_print.tidypredict_test</title>
-      <link>/reference/knit_print.tidypredict_test/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/knit_print.tidypredict_test/</guid>
-      <description>Knit print method for test predictions results
-knit_print.tidypredict_test(x, ...)</description>
-    </item>
-    
-    <item>
       <title>parse_model</title>
       <link>/reference/parse_model/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -51,16 +41,6 @@ knit_print.tidypredict_test(x, ...)</description>
       <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure to extract all of the necessarycomponents to pass along to the functions that create the actualTidy Eval formula that dplyr can read. It is currently able to parselm() and glm() models.
 parse_model(model)ArgumentsmodelAn R model object
 Examplesdf &amp;lt;- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))model &amp;lt;- lm(x ~ y, df)parse_model(model)#&amp;gt; # A tibble: 5 x 6#&amp;gt; labels vals type estimate qr_1 qr_2#&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;#&amp;gt; 1 (Intercept) &#34;</description>
-    </item>
-    
-    <item>
-      <title>print.tidypredict_test</title>
-      <link>/reference/print.tidypredict_test/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/print.tidypredict_test/</guid>
-      <description>print method for test predictions results
-# S3 method for tidypredict_testprint(x, ...)</description>
     </item>
     
     <item>

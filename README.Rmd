@@ -36,8 +36,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 The following R models are currently supported. For more info please review the corresponding vignette:
 
-- [Linear Regression](http://tidypredict.netlify.com/vignettes/lm/) - `lm()`
-- [Generalized Linear model](http://tidypredict.netlify.com/vignettes/glm/) - `glm()`
-- [Random Forest](http://tidypredict.netlify.com/vignettes/randomforest/) - `randomForest()`
+- [Linear Regression](http://tidypredict.netlify.com/articles/lm/) - `lm()`
+- [Generalized Linear model](http://tidypredict.netlify.com/articles/glm/) - `glm()`
+- [Random Forest](http://tidypredict.netlify.com/articles/randomforest/) - `randomForest()`
 
 

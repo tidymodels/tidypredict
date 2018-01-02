@@ -1,0 +1,89 @@
+---
+title: "Generalized Linear model"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lm}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+menu:
+  main:
+    parent: "articles"
+    weight: 2
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(tidypredict)
+```
+
+## Highlights & Limitations
+
+- Defaults to 0-to-1 predictions for `binomial` family models. That is akin to running `predict(model, type = "response")`
+- Only *treatment* contrast (`contr.treatment`) are supported.
+- `offset` is supported
+- Categorical variables are supported
+- In-line functions in the formulas are **not supported**:  
+     - OK - `wt ~ mpg + am` 
+     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
+     - Not OK - `wt ~ mpg + as.factor(am)`
+     - Not OK - `wt ~ mpg + as.character(am)`
+- Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
+
+## How it works
+
+```{r}
+df <- mtcars %>%
+  mutate(char_cyl = paste0("cyl", cyl)) %>%
+  select(wt, char_cyl, am) 
+
+model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
+```
+
+It returns a SQL query that contains the coefficients (`model$coefficients`) operated against the correct variable or categorical variable value.  In most cases the resulting SQL is one short `CASE WHEN` statement per coefficient.  It appends the `offset` field or value, if one is provided.
+
+For `binomial` models, the [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_function) equation is applied. This means that the target SQL database type will need to support the exponent function. 
+
+```{r}
+library(tidypredict)
+
+tidypredict_sql(model, dbplyr::simulate_mssql())
+```
+
+Alternatively, use `tidypredict_to_column()` if the results are the be used or previewed in `dplyr`.
+
+```{r}
+df %>%
+  tidypredict_to_column(model) %>%
+  head(10) 
+```
+
+## Under the hood
+
+The parser reads several parts of the `glm` object to tabulate all of the needed variables.  One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model.  For example, `offset` is listed because it's part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.
+
+```{r}
+parse_model(model)
+```
+
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+  - Use directly inside `dplyr`,  `mutate(df, !! tidypredict_fit(model))`
+  - Use `tidypredict_to_column(model)` to a piped command set
+  - Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+
+The same applies to the prediction interval functions.
+
+
+## How it performs
+
+
+Testing the `tidypredict` results is easy.  The `tidypredict_test()` function automatically uses the `lm` model object's data frame, to compare `tidypredict_fit()`, and `tidypredict_interval()` to the results given by `predict()`
+
+```{r}
+tidypredict_test(model)
+```

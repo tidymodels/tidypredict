@@ -2,7 +2,7 @@ baseurl = "/"
 languageCode = "en-us"
 title = "tidypredict"
 metadataformat = "yaml"
-ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$"]
+ignoreFiles = ["\\.Rmd$", "\\.Rmarkdown$", "_files$", "_cache$", "\\.R$"]
 canonifyurls = true
 # Enable Google Analytics by entering your tracking id
 googleAnalytics = ""

@@ -3,12 +3,17 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/articles/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>/vignettes/sql/</loc>
+    <loc>/articles/sql/</loc>
   </url>
   
   <url>
@@ -16,15 +21,15 @@
   </url>
   
   <url>
-    <loc>/vignettes/glm/</loc>
+    <loc>/articles/glm/</loc>
   </url>
   
   <url>
-    <loc>/vignettes/lm/</loc>
+    <loc>/articles/lm/</loc>
   </url>
   
   <url>
-    <loc>/vignettes/randomforest/</loc>
+    <loc>/articles/randomforest/</loc>
   </url>
   
   <url>
@@ -38,24 +43,11 @@
   </url>
   
   <url>
-    <loc>/vignettes/</loc>
-    <priority>0</priority>
-  </url>
-  
-  <url>
     <loc>/reference/acceptable_formula/</loc>
   </url>
   
   <url>
-    <loc>/reference/knit_print.tidypredict_test/</loc>
-  </url>
-  
-  <url>
     <loc>/reference/parse_model/</loc>
-  </url>
-  
-  <url>
-    <loc>/reference/print.tidypredict_test/</loc>
   </url>
   
   <url>
