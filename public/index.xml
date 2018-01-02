@@ -108,10 +108,11 @@ parse_model(model)ArgumentsmodelAn R model object
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/</guid>
-      <description>InstallationInstall tidypredict using devtools as follows:
-devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)IntroRun the predictions of an R model inside the database. tidypredict parses a model fitted in R, such as:
-model &amp;lt;- lm(mpg ~ wt + cyl, data = mtcars)And creates the SQL statement needed to calculate the fitted prediction:
-tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)Supported modelsThe following models are supported:</description>
+      <description>Run predictions inside the database. It works with several databases back-ends because it uses dbplyr for the final SQL translation of the algorithm.
+InstallationInstall tidypredict using devtools as follows:
+devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)Introtidypredict is able to parse an R model object, such as:
+model &amp;lt;- lm(mpg ~ wt + cyl, data = mtcars)And then creates the SQL statement needed to calculate the fitted prediction:
+tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; (((`wt`) * (-3.</description>
     </item>
     
     <item>

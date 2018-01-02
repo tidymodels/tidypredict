@@ -311,26 +311,27 @@
 		<div class="wrapper">
 			<h1>tidypredict </h1>
 
-			<div id="installation" class="section level2">
+			<p>Run predictions inside the database. It works with several databases back-ends because it uses <code>dbplyr</code> for the final SQL translation of the algorithm.</p>
+<div id="installation" class="section level2">
 <h2>Installation</h2>
 <p>Install <code>tidypredict</code> using <code>devtools</code> as follows:</p>
 <pre class="r"><code>devtools::install_github(&quot;edgararuiz/tidypredict&quot;)</code></pre>
 </div>
 <div id="intro" class="section level2">
 <h2>Intro</h2>
-<p>Run the predictions of an R model inside the database. <code>tidypredict</code> parses a model fitted in R, such as:</p>
+<p><code>tidypredict</code> is able to parse an R model object, such as:</p>
 <pre class="r"><code>model &lt;- lm(mpg ~ wt + cyl, data = mtcars)</code></pre>
-<p>And creates the SQL statement needed to calculate the fitted prediction:</p>
+<p>And then creates the SQL statement needed to calculate the fitted prediction:</p>
 <pre class="r"><code>tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <pre><code>## &lt;SQL&gt; (((`wt`) * (-3.19097213898374)) + ((`cyl`) * (-1.5077949682598))) + (39.6862614802529)</code></pre>
 </div>
 <div id="supported-models" class="section level2">
 <h2>Supported models</h2>
-<p>The following models are supported:</p>
+<p>The following R models are currently supported. For more info please review the corresponding vignette:</p>
 <ul>
-<li>Linear Regression - <code>lm()</code></li>
-<li>Generalized Linear model - <code>glm()</code></li>
-<li>Random Forest - <code>randomForest()</code></li>
+<li><a href="http://tidypredict.netlify.com/vignettes/lm/">Linear Regression</a> - <code>lm()</code></li>
+<li><a href="http://tidypredict.netlify.com/vignettes/glm/">Generalized Linear model</a> - <code>glm()</code></li>
+<li><a href="http://tidypredict.netlify.com/vignettes/randomforest/">Random Forest</a> - <code>randomForest()</code></li>
 </ul>
 </div>
 

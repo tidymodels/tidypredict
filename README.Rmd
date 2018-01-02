@@ -9,6 +9,8 @@ library(tidypredict)
 library(randomForest)
 ```
 
+Run predictions inside the database. It works with several databases back-ends because it uses `dbplyr` for the final SQL translation of the algorithm.
+
 ## Installation
 
 Install `tidypredict` using `devtools` as follows:
@@ -19,12 +21,12 @@ devtools::install_github("edgararuiz/tidypredict")
 
 ## Intro
 
-Run the predictions of an R model inside the database.  `tidypredict` parses a model fitted in R, such as:
+`tidypredict` is able to parse an R model object, such as:
 ```{r}
 model <- lm(mpg ~ wt + cyl, data = mtcars)
 ```
 
-And creates the SQL statement needed to calculate the fitted prediction:
+And then creates the SQL statement needed to calculate the fitted prediction:
 
 ```{r}
 tidypredict_sql(model, dbplyr::simulate_mssql())
@@ -32,10 +34,10 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 ## Supported models
 
-The following models are supported:
+The following R models are currently supported. For more info please review the corresponding vignette:
 
-- Linear Regression - `lm()`
-- Generalized Linear model - `glm()`
-- Random Forest - `randomForest()`
+- [Linear Regression](http://tidypredict.netlify.com/vignettes/lm/) - `lm()`
+- [Generalized Linear model](http://tidypredict.netlify.com/vignettes/glm/) - `glm()`
+- [Random Forest](http://tidypredict.netlify.com/vignettes/randomforest/) - `randomForest()`
 
 
