@@ -1,4 +1,5 @@
 library(purrr)
+library(dplyr)
 blogdown_build <- function() {
   
   if (file.exists("content")) unlink("content", recursive = TRUE)
