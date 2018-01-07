@@ -17,13 +17,7 @@ te_fit_lm <- function(parsedmodel) {
   selection <- which(labels != "NA")
   all_terms <- all_terms[, which(labels != "NA")]
   colnames(all_terms) <- labels[which(labels != "NA")]
-  
-  t <- seq_len(nrow(all_terms)) %>%
-    map(~all_terms[.x, ] %>%
-          gather() %>%
-          filter(!is.na(value) )
-    )
-  
+
   
   f <- seq_len(nrow(all_terms)) %>%
     map(~{

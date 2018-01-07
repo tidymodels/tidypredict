@@ -46,12 +46,22 @@ test_that("Individual prediction difference is never above 1e-12", {
   expect_false(any(abs(d7) > 0.000000000001))
 })
 
+test_that("Predictions with interval return no error", {
+  expect_false(tidypredict_test(m1, include_intervals = TRUE)$alert)
+  expect_false(tidypredict_test(m2, include_intervals = TRUE)$alert)
+  expect_false(tidypredict_test(m3, include_intervals = TRUE)$alert)
+  expect_false(tidypredict_test(m6, include_intervals = TRUE)$alert)
+  expect_false(tidypredict_test(m7, include_intervals = TRUE)$alert)
+})
+
 test_that("Returns a call", {
   expect_is(tidypredict_fit(m1), "call")
   expect_is(tidypredict_fit(m2), "call")
   expect_is(tidypredict_fit(m3), "call")
   expect_is(tidypredict_fit(m4), "call")
   expect_is(tidypredict_fit(m5), "call")
+  expect_is(tidypredict_fit(m6), "call")
+  expect_is(tidypredict_fit(m7), "call")
 })
 
 
