@@ -50,7 +50,7 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/articles/lm/</guid>
-      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Only treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.</description>
+      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Supports categorical variables and interactionsOnly treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.</description>
     </item>
     
     <item>
@@ -72,6 +72,16 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
     </item>
     
     <item>
+      <title>knit_print.tidypredict_test</title>
+      <link>/reference/knit_print.tidypredict_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/knit_print.tidypredict_test/</guid>
+      <description>Knit print method for test predictions results
+knit_print.tidypredict_test(x, ...)</description>
+    </item>
+    
+    <item>
       <title>parse_model</title>
       <link>/reference/parse_model/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
@@ -79,7 +89,17 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
       <guid>/reference/parse_model/</guid>
       <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure to extract all of the necessarycomponents to pass along to the functions that create the actualTidy Eval formula that dplyr can read. It is currently able to parselm() and glm() models.
 parse_model(model)ArgumentsmodelAn R model object
-Examplesdf &amp;lt;- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))model &amp;lt;- lm(x ~ y, df)parse_model(model)#&amp;gt; # A tibble: 5 x 6#&amp;gt; labels vals type estimate qr_1 qr_2#&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt;#&amp;gt; 1 (Intercept) &#34;</description>
+Examplesdf &amp;lt;- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))model &amp;lt;- lm(x ~ y, df)parse_model(model)#&amp;gt; # A tibble: 7 x 7#&amp;gt; labels estimate type field_1 qr_1 qr_2 vals #&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt; #&amp;gt; 1 (Intercept) - 0.</description>
+    </item>
+    
+    <item>
+      <title>print.tidypredict_test</title>
+      <link>/reference/print.tidypredict_test/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/print.tidypredict_test/</guid>
+      <description>print method for test predictions results
+# S3 method for tidypredict_testprint(x, ...)</description>
     </item>
     
     <item>
@@ -92,7 +112,7 @@ parse_model(model)ArgumentsmodelAn R model object
 InstallationInstall tidypredict using devtools as follows:
 devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)Introtidypredict is able to parse an R model object, such as:
 model &amp;lt;- lm(mpg ~ wt + cyl, data = mtcars)And then creates the SQL statement needed to calculate the fitted prediction:
-tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; (((`wt`) * (-3.</description>
+tidypredict_sql(model, dbplyr::simulate_mssql())## &amp;lt;SQL&amp;gt; ((39.</description>
     </item>
     
     <item>
@@ -124,7 +144,7 @@ tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a 
       <description>ArgumentsExamplesReturns a SQL query with formula to calculate fitted values
 tidypredict_sql(model, con)ArgumentsmodelAn R model or a tibble with a parsed model
 conDatabase connection object. It is used to selectthe correst SQL translation syntax.
-Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; ((((&#34;wt&#34;) * (-3.12514220026708)) + ((&#34;</description>
+Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (((39.4179334351865) + ((&#34;wt&#34;) * (-3.</description>
     </item>
     
     <item>

@@ -47,7 +47,15 @@
   </url>
   
   <url>
+    <loc>/reference/knit_print.tidypredict_test/</loc>
+  </url>
+  
+  <url>
     <loc>/reference/parse_model/</loc>
+  </url>
+  
+  <url>
+    <loc>/reference/print.tidypredict_test/</loc>
   </url>
   
   <url>

@@ -19,6 +19,7 @@ library(tidypredict)
 ## Highlights & Limitations
 
 - **Supports prediction intervals**, it uses the `qr.solve()` function to parse the interval coefficient of each term.
+- Supports categorical variables and interactions
 - Only *treatment* contrast (`contr.treatment`) are supported.
 - `offset` is supported
 - Categorical variables are supported

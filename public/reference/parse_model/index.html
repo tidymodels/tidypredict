@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -348,14 +348,16 @@ lm() and glm() models.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>parse_model</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; # A tibble: 5 x 6
-#&gt;   labels      vals             type       estimate    qr_1    qr_2
-#&gt;   &lt;chr&gt;       &lt;chr&gt;            &lt;chr&gt;         &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
-#&gt; 1 (Intercept) ""               intercept   - 0.800 - 0.447 - 1.26 
-#&gt; 2 y           ""               continuous    1.20    0       0.316
-#&gt; 3 model       lm               variable     NA      NA      NA    
-#&gt; 4 residual    3                variable     NA      NA      NA    
-#&gt; 5 sigma2      2.53333333333333 variable     NA      NA      NA    </div><div class='input'>
+<span class='fu'>parse_model</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; # A tibble: 7 x 7
+#&gt;   labels      estimate type     field_1    qr_1    qr_2 vals            
+#&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
+#&gt; 1 (Intercept)  - 0.800 term     &lt;NA&gt;    - 0.447 - 1.26  &lt;NA&gt;            
+#&gt; 2 y              1.20  term     {{:}}     0       0.316 &lt;NA&gt;            
+#&gt; 3 labels         0     variable y        NA      NA     &lt;NA&gt;            
+#&gt; 4 model         NA     variable &lt;NA&gt;     NA      NA     lm              
+#&gt; 5 version       NA     variable &lt;NA&gt;     NA      NA     1.0             
+#&gt; 6 residual      NA     variable &lt;NA&gt;     NA      NA     3               
+#&gt; 7 sigma2        NA     variable &lt;NA&gt;     NA      NA     2.53333333333333</div><div class='input'>
 </div></code></pre></div>
     </div>
 
@@ -379,7 +381,7 @@ lm() and glm() models.</p>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/acceptable_formula/" title="acceptable_formula">
+      <a href="/reference/knit_print.tidypredict_test/" title="knit_print.tidypredict_test">
         <span class="direction">
           Previous
         </span>
@@ -389,7 +391,7 @@ lm() and glm() models.</p>
           </div>
           <div class="stretch">
             <div class="title">
-              acceptable_formula
+              knit_print.tidypredict_test
             </div>
           </div>
         </div>
@@ -399,14 +401,14 @@ lm() and glm() models.</p>
 
   <div class="next">
   
-      <a href="/" title="tidypredict">
+      <a href="/reference/print.tidypredict_test/" title="print.tidypredict_test">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict
+              print.tidypredict_test
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

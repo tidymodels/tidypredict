@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -311,7 +311,7 @@
 		<div class="wrapper">
 			<h1>Generalized Linear model </h1>
 
-			<div id="highlights-limitations" class="section level2">
+			<section id="highlights-limitations" class="level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li>Defaults to 0-to-1 predictions for <code>binomial</code> family models. That is akin to running <code>predict(model, type = &quot;response&quot;)</code></li>
@@ -327,8 +327,8 @@
 </ul></li>
 <li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
 </ul>
-</div>
-<div id="how-it-works" class="section level2">
+</section>
+<section id="how-it-works" class="level2">
 <h2>How it works</h2>
 <pre class="r"><code>df &lt;- mtcars %&gt;%
   mutate(char_cyl = paste0(&quot;cyl&quot;, cyl)) %&gt;%
@@ -340,7 +340,7 @@ model &lt;- glm(am ~ wt + char_cyl, data = df, family = &quot;binomial&quot;)</c
 <pre class="r"><code>library(tidypredict)
 
 tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; EXP((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((3.10462643177453)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) + (CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((5.37942092366097)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((`wt`) * (-7.85934263583835))) + (20.8527831345691)) / (EXP((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((3.10462643177453)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) + (CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((5.37942092366097)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((`wt`) * (-7.85934263583835))) + (20.8527831345691)) + 1.0)</code></pre>
+<pre><code>## &lt;SQL&gt; EXP((((20.8527831345691) + ((`wt`) * (-7.85934263583835))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (3.10462643177453))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (5.37942092366097))) / (EXP((((20.8527831345691) + ((`wt`) * (-7.85934263583835))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (3.10462643177453))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (5.37942092366097))) + 1.0)</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
 <pre class="r"><code>df %&gt;%
   tidypredict_to_column(model) %&gt;%
@@ -356,30 +356,32 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## 8  3.190     cyl4  0 0.01450687
 ## 9  3.150     cyl4  0 0.01975984
 ## 10 3.440     cyl6  0 0.04399324</code></pre>
-</div>
-<div id="under-the-hood" class="section level2">
+</section>
+<section id="under-the-hood" class="level2">
 <h2>Under the hood</h2>
 <p>The parser reads several parts of the <code>glm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
 <pre class="r"><code>parse_model(model)</code></pre>
-<pre><code>## # A tibble: 8 x 8
-##   labels      vals     type        estimate    qr_1   qr_2    qr_3   qr_4
-##   &lt;chr&gt;       &lt;chr&gt;    &lt;chr&gt;          &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-## 1 (Intercept) &quot;&quot;       intercept      20.9  - 0.679 - 5.11 - 1.15    6.05
-## 2 wt          &quot;&quot;       continuous    - 7.86   0       1.62   0.232 - 2.58
-## 3 char_cyl    cyl6     categorical     3.10   0       0      1.56    1.86
-## 4 char_cyl    cyl8     categorical     5.38   0       0      0       3.20
-## 5 model       glm      variable       NA     NA      NA     NA      NA   
-## 6 residual    28       variable       NA     NA      NA     NA      NA   
-## 7 family      binomial variable       NA     NA      NA     NA      NA   
-## 8 link        logit    variable       NA     NA      NA     NA      NA</code></pre>
+<pre><code>## # A tibble: 10 x 10
+##    labels  estima~ type   field~ fiel~    qr_1   qr_2    qr_3   qr_4 vals 
+##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;
+##  1 (Inter~   20.9  term   &lt;NA&gt;   &lt;NA&gt;  - 0.679 - 5.11 - 1.15    6.05 &lt;NA&gt; 
+##  2 wt       - 7.86 term   &lt;NA&gt;   {{:}}   0       1.62   0.232 - 2.58 &lt;NA&gt; 
+##  3 char_c~    3.10 term   cyl6   &lt;NA&gt;    0       0      1.56    1.86 &lt;NA&gt; 
+##  4 char_c~    5.38 term   cyl8   &lt;NA&gt;    0       0      0       3.20 &lt;NA&gt; 
+##  5 labels     0    varia~ char_~ wt     NA      NA     NA      NA    &lt;NA&gt; 
+##  6 model     NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    glm  
+##  7 version   NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    1.0  
+##  8 residu~   NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    28   
+##  9 family    NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    bino~
+## 10 link      NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    logit</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
-<pre><code>## exp((((ifelse((char_cyl) == (&quot;cyl6&quot;), (3.10462643177453), 0)) + 
-##     (ifelse((char_cyl) == (&quot;cyl8&quot;), (5.37942092366097), 0))) + 
-##     ((wt) * (-7.85934263583835))) + (20.8527831345691))/(exp((((ifelse((char_cyl) == 
-##     (&quot;cyl6&quot;), (3.10462643177453), 0)) + (ifelse((char_cyl) == 
-##     (&quot;cyl8&quot;), (5.37942092366097), 0))) + ((wt) * (-7.85934263583835))) + 
-##     (20.8527831345691)) + 1)</code></pre>
+<pre><code>## exp((((20.8527831345691) + ((wt) * (-7.85934263583835))) + ((ifelse((char_cyl) == 
+##     (&quot;cyl6&quot;), 1, 0)) * (3.10462643177453))) + ((ifelse((char_cyl) == 
+##     (&quot;cyl8&quot;), 1, 0)) * (5.37942092366097)))/(exp((((20.8527831345691) + 
+##     ((wt) * (-7.85934263583835))) + ((ifelse((char_cyl) == (&quot;cyl6&quot;), 
+##     1, 0)) * (3.10462643177453))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
+##     1, 0)) * (5.37942092366097))) + 1)</code></pre>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -387,8 +389,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
 <p>The same applies to the prediction interval functions.</p>
-</div>
-<div id="how-it-performs" class="section level2">
+</section>
+<section id="how-it-performs" class="level2">
 <h2>How it performs</h2>
 <p>Testing the <code>tidypredict</code> results is easy. The <code>tidypredict_test()</code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code>tidypredict_fit()</code>, and <code>tidypredict_interval()</code> to the results given by <code>predict()</code></p>
 <pre class="r"><code>tidypredict_test(model)</code></pre>
@@ -396,7 +398,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## Difference threshold: 1e-12
 ## 
 ##  All results are within the difference threshold</code></pre>
-</div>
+</section>
 
 
 			<aside class="copyright" role="note">

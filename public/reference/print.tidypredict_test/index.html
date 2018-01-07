@@ -9,18 +9,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>Function Reference - tidypredict</title>
+    <title>print.tidypredict_test - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
     <meta name="description" content="Parses a model to create a predict routine with Tidy Eval.">
     
-    <link rel="canonical" href="/reference/">
+    <link rel="canonical" href="/reference/print.tidypredict_test/">
     
     <meta name="author" content="Edgar Ruiz">
     
 
-    <meta property="og:url" content="/reference/">
+    <meta property="og:url" content="/reference/print.tidypredict_test/">
     <meta property="og:title" content="tidypredict">
     <meta property="og:image" content="/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="tidypredict">
@@ -97,7 +97,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - Function Reference
+        tidypredict - print.tidypredict_test
       </div>
     </div>
 
@@ -196,14 +196,11 @@
 
 
 
-<a class="current" title="Reference" href="/reference/">
+<a  title="Reference" href="/reference/">
 	
 	Reference
 </a>
 
-
-<ul id="scrollspy">
-</ul>
 
 
   
@@ -309,94 +306,28 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Function Reference </h1>
+			<h1>print.tidypredict_test </h1>
 
-			<div class="doc-page-index">
+			<div class="doc-page">
+
+    <div class="doc-page-index">
     <ul data-gumshoe>
-      <li><a href="#section-sql-formulas">SQL formulas</a></li>
-      <li><a href="#section-dplyr">dplyr</a></li>
-      <li><a href="#section-utilities">Utilities</a></li>
-    </ul>
+            </ul>
     </div>
-
-    <div class="doc-page">
 
     <div class="doc-page-body">
 
-      <table class="ref-index">
+    
+    <p>print method for test predictions results</p>
+    
 
-      <colgroup>
-        <col class="alias" />
-        <col class="title" />
-      </colgroup>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for tidypredict_test</span>
+<span class='fu'>print</span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
+        
 
-      <tbody>
-        <tr>
-          <th colspan="2">
-            <h3 id="section-sql-formulas" ><a href="#section-sql-formulas" class="anchor"></a>SQL formulas</h3>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <p><code><a href="tidypredict_sql">tidypredict_sql</a></code> </p>
-          </td>
-          <td><p>Returns a SQL query with formula to calculate fitted values</p></td>
-        </tr><tr>
-          <td>
-            <p><code><a href="tidypredict_sql_interval">tidypredict_sql_interval</a></code> </p>
-          </td>
-          <td><p>Returns a SQL query with formula to calculate predicted interval</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h3 id="section-dplyr" ><a href="#section-dplyr" class="anchor"></a>dplyr</h3>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <p><code><a href="tidypredict_to_column">tidypredict_to_column</a></code> </p>
-          </td>
-          <td><p>Adds the prediction columns to a piped command set</p></td>
-        </tr><tr>
-          <td>
-            <p><code><a href="tidypredict_fit">tidypredict_fit</a></code> </p>
-          </td>
-          <td><p>Returns a Tidy Eval formula to calculate fitted values</p></td>
-        </tr><tr>
-          <td>
-            <p><code><a href="tidypredict_interval">tidypredict_interval</a></code> </p>
-          </td>
-          <td><p>Returns a Tidy Eval formula to calculate prediction interval</p></td>
-        </tr>
-      </tbody><tbody>
-        <tr>
-          <th colspan="2">
-            <h3 id="section-utilities" ><a href="#section-utilities" class="anchor"></a>Utilities</h3>
-            <p class="section-desc"></p>
-          </th>
-        </tr>
-        <tr>
-          <td>
-            <p><code><a href="tidypredict_test">tidypredict_test</a></code> </p>
-          </td>
-          <td><p>Tests base predict function against tidypredict</p></td>
-        </tr><tr>
-          <td>
-            <p><code><a href="parse_model">parse_model</a></code> </p>
-          </td>
-          <td><p>Converts an R model object into a table</p></td>
-        </tr>
-      </tbody>
-      </table>
+    </div>
 
-  </div>
-
-  </div>
-
-
+    </div>
 
 			<aside class="copyright" role="note">
 				
@@ -416,7 +347,7 @@
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/articles/sql/" title="Database write-back">
+      <a href="/reference/parse_model/" title="parse_model">
         <span class="direction">
           Previous
         </span>
@@ -426,7 +357,7 @@
           </div>
           <div class="stretch">
             <div class="title">
-              Database write-back
+              parse_model
             </div>
           </div>
         </div>
@@ -436,14 +367,14 @@
 
   <div class="next">
   
-      <a href="/articles/glm/" title="Generalized Linear model">
+      <a href="/" title="tidypredict">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Generalized Linear model
+              tidypredict
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

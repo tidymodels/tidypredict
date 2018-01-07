@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -349,7 +349,7 @@ currently supports lm() and glm() models.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>tidypredict_fit</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; ((y) * (1.2)) + (-0.799999999999997)</div><div class='input'>
+<span class='fu'>tidypredict_fit</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (-0.799999999999997) + ((y) * (1.2))</div><div class='input'>
 
 </div></code></pre></div>
     </div>

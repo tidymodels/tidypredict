@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -312,7 +312,7 @@
 			<h1>Database write-back </h1>
 
 			<p>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.</p>
-<div id="example-setup" class="section level2">
+<section id="example-setup" class="level2">
 <h2>Example setup</h2>
 <p>To keep the example reproducible, a SQLite database will be used to simulate a larger scale deployment.</p>
 <p>First the data is prepared in memory. The article will use the <code>nycflights13::flights</code> data, with a couple of modifications</p>
@@ -326,8 +326,8 @@ flights_table &lt;- nycflights13::flights %&gt;%
 
 con &lt;- dbConnect(RSQLite::SQLite(), path = &quot;:memory:&quot;)
 db_fligths &lt;- copy_to(con,flights_table )</code></pre>
-</div>
-<div id="model-preparation" class="section level2">
+</section>
+<section id="model-preparation" class="level2">
 <h2>Model preparation</h2>
 <p>A sample is downloaded from the database for modeling. This example already selects the needed variables.</p>
 <pre class="r"><code>df &lt;- db_fligths %&gt;%
@@ -345,8 +345,8 @@ db_fligths &lt;- copy_to(con,flights_table )</code></pre>
 ##  All results are within the difference threshold</code></pre>
 <p>In cases where the model re-fitting is automated, the <code>tidypredict_test()</code> function returns an <code>alert</code> in case the threshold is exceeded, which can be used to fail the automated script.</p>
 <pre class="r"><code>if(tidypredict_test(model)$alert) stop(&quot;Threshold exceeded!&quot;)</code></pre>
-</div>
-<div id="scenario-1---update-scores" class="section level2">
+</section>
+<section id="scenario-1---update-scores" class="level2">
 <h2>Scenario 1 - Update scores</h2>
 <p>In this scenario, The table that supplies the term values is also the recipient of the new score. This is done by updating a specific field in the table. For this example, the field is called <code>current_score</code>. The following SQL UPDATE statement should work in most databases:</p>
 <pre class="r"><code>library(dbplyr)
@@ -354,11 +354,11 @@ db_fligths &lt;- copy_to(con,flights_table )</code></pre>
 update_statement &lt;- build_sql(&quot;UPDATE flights_table SET current_score  = &quot;, tidypredict_sql(model, con = con), con = con)
 
 update_statement</code></pre>
-<pre><code>## &lt;SQL&gt; UPDATE flights_table SET current_score  = (((`hour`) * (1.38710560882252)) + ((`distance`) * (-0.00307606912118567))) + (-3.5984422918702)</code></pre>
+<pre><code>## &lt;SQL&gt; UPDATE flights_table SET current_score  = ((-3.5984422918702) + ((`hour`) * (1.38710560882252))) + ((`distance`) * (-0.00307606912118567))</code></pre>
 <p>This statement can be then passed on to the database team, via documentation or an automated process. In cases where the analyst has the responsibility to run the new SQL statement, or if R is being used to automate the scoring, the next line can be used:</p>
 <pre class="r"><code>dbSendQuery(con, update_statement)</code></pre>
 <pre><code>## &lt;SQLiteResult&gt;
-##   SQL  UPDATE flights_table SET current_score  = (((`hour`) * (1.38710560882252)) + ((`distance`) * (-0.00307606912118567))) + (-3.5984422918702)
+##   SQL  UPDATE flights_table SET current_score  = ((-3.5984422918702) + ((`hour`) * (1.38710560882252))) + ((`distance`) * (-0.00307606912118567))
 ##   ROWS Fetched: 0 [complete]
 ##        Changed: 336776</code></pre>
 <p>Here is a sample of the newly populated field:</p>
@@ -381,8 +381,8 @@ update_statement</code></pre>
 ##  9        1.82  
 ## 10        2.47  
 ## # ... with more rows</code></pre>
-</div>
-<div id="scenario-2--append-new-scores" class="section level2">
+</section>
+<section id="scenario-2--append-new-scores" class="level2">
 <h2>Scenario 2- Append new scores</h2>
 <p>There may be the need to retain not only the new score, but when it was determined and its history. This is usually possible because the source of record possesses a unique key identifier per entity, such as transaction ID or customer ID. In the example, <code>flights_id</code> is the unique identifier.</p>
 <p>In this example, the new scores will be stored in a new table called <code>daily_scores</code>. The following code is part of the example preparation, it creates the table and seeds it with a single row. This is not the best way to create an empty table, but it’ll do for the purposes of this example.</p>
@@ -405,7 +405,7 @@ update_statement</code></pre>
 insert_scores</code></pre>
 <pre><code>## &lt;SQL&gt; INSERT INTO daily_scores SELECT `flight_id`, `score`, &#39;01/01/2018&#39; AS `date`
 ## FROM (SELECT `flight_id`, `score`
-## FROM (SELECT `flight_id`, `year`, `month`, `day`, `dep_time`, `sched_dep_time`, `dep_delay`, `arr_time`, `sched_arr_time`, `arr_delay`, `carrier`, `flight`, `tailnum`, `origin`, `dest`, `air_time`, `distance`, `hour`, `minute`, `time_hour`, `current_score`, (((`hour`) * (1.38710560882252)) + ((`distance`) * (-0.00307606912118567))) + (-3.5984422918702) AS `score`
+## FROM (SELECT `flight_id`, `year`, `month`, `day`, `dep_time`, `sched_dep_time`, `dep_delay`, `arr_time`, `sched_arr_time`, `arr_delay`, `carrier`, `flight`, `tailnum`, `origin`, `dest`, `air_time`, `distance`, `hour`, `minute`, `time_hour`, `current_score`, ((-3.5984422918702) + ((`hour`) * (1.38710560882252))) + ((`distance`) * (-0.00307606912118567)) AS `score`
 ## FROM (SELECT *
 ## FROM `flights_table`
 ## WHERE (`month` = 12.0))))</code></pre>
@@ -414,7 +414,7 @@ insert_scores</code></pre>
 <pre><code>## &lt;SQLiteResult&gt;
 ##   SQL  INSERT INTO daily_scores SELECT `flight_id`, `score`, &#39;01/01/2018&#39; AS `date`
 ## FROM (SELECT `flight_id`, `score`
-## FROM (SELECT `flight_id`, `year`, `month`, `day`, `dep_time`, `sched_dep_time`, `dep_delay`, `arr_time`, `sched_arr_time`, `arr_delay`, `carrier`, `flight`, `tailnum`, `origin`, `dest`, `air_time`, `distance`, `hour`, `minute`, `time_hour`, `current_score`, (((`hour`) * (1.38710560882252)) + ((`distance`) * (-0.00307606912118567))) + (-3.5984422918702) AS `score`
+## FROM (SELECT `flight_id`, `year`, `month`, `day`, `dep_time`, `sched_dep_time`, `dep_delay`, `arr_time`, `sched_arr_time`, `arr_delay`, `carrier`, `flight`, `tailnum`, `origin`, `dest`, `air_time`, `distance`, `hour`, `minute`, `time_hour`, `current_score`, ((-3.5984422918702) + ((`hour`) * (1.38710560882252))) + ((`distance`) * (-0.00307606912118567)) AS `score`
 ## FROM (SELECT *
 ## FROM `flights_table`
 ## WHERE (`month` = 12.0))))
@@ -441,7 +441,7 @@ insert_scores</code></pre>
 ##  9    -11.0   6.00      214   4.07   01/01/2018
 ## 10    -10.0   6.00     1065   1.45   01/01/2018
 ## # ... with more rows</code></pre>
-</div>
+</section>
 
 
 			<aside class="copyright" role="note">

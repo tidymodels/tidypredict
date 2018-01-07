@@ -38,7 +38,7 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/articles/lm/</guid>
-      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Only treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.</description>
+      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Supports categorical variables and interactionsOnly treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.</description>
     </item>
     
     <item>

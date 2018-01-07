@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -353,7 +353,7 @@ the correst SQL translation syntax.</p></td>
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>am</span> + <span class='no'>cyl</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
-<span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (2.04840714179524) * SQRT((((((((((("wt") * (-0.0))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.176776695296637)))) * (((((("wt") * (-0.0))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.176776695296637)))) * (6.8231093058295)) + ((((((("wt") * (0.183559646169165))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.590557271637747)))) * (((((("wt") * (0.183559646169165))) + ((("am") * (0.0)))) + ((("cyl") * (0.0)))) + (((-0.590557271637747)))) * (6.8231093058295))) + ((((((("wt") * (-0.176199380745393))) + ((("am") * (-0.498926847360626)))) + ((("cyl") * (0.0)))) + (((0.769566489443368)))) * (((((("wt") * (-0.176199380745393))) + ((("am") * (-0.498926847360626)))) + ((("cyl") * (0.0)))) + (((0.769566489443368)))) * (6.8231093058295))) + ((((((("wt") * (-0.23845787029348))) + ((("am") * (-0.0214203331902853)))) + ((("cyl") * (0.161662223806132)))) + (((-0.224404416240186)))) * (((((("wt") * (-0.23845787029348))) + ((("am") * (-0.0214203331902853)))) + ((("cyl") * (0.161662223806132)))) + (((-0.224404416240186)))) * (6.8231093058295))) + (6.8231093058295))</div><div class='input'>
+<span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (2.04840714179524) * SQRT((((((((-0.176776695296637))) * (((-0.176776695296637))) * (6.8231093058295)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * (6.8231093058295))) + ((((0.769566489443368))) * (((0.769566489443368))) * (6.8231093058295))) + ((((-0.224404416240186))) * (((-0.224404416240186))) * (6.8231093058295))) + (6.8231093058295))</div><div class='input'>
 </div></code></pre></div>
     </div>
 

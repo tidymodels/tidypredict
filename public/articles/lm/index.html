@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -311,10 +311,11 @@
 		<div class="wrapper">
 			<h1>Linear Regression model </h1>
 
-			<div id="highlights-limitations" class="section level2">
+			<section id="highlights-limitations" class="level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li><strong>Supports prediction intervals</strong>, it uses the <code>qr.solve()</code> function to parse the interval coefficient of each term.</li>
+<li>Supports categorical variables and interactions</li>
 <li>Only <em>treatment</em> contrast (<code>contr.treatment</code>) are supported.</li>
 <li><code>offset</code> is supported</li>
 <li>Categorical variables are supported</li>
@@ -326,8 +327,8 @@
 <li>Not OK - <code>wt ~ mpg + as.character(am)</code></li>
 </ul></li>
 </ul>
-</div>
-<div id="how-it-works" class="section level2">
+</section>
+<section id="how-it-works" class="level2">
 <h2>How it works</h2>
 <pre class="r"><code>df &lt;- mtcars %&gt;%
   mutate(char_cyl = paste0(&quot;cyl&quot;, cyl)) %&gt;%
@@ -338,7 +339,7 @@ model &lt;- lm(mpg ~ wt + char_cyl, offset = am, data = df)</code></pre>
 <pre class="r"><code>library(tidypredict)
 
 tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; ((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((-4.26714873091281)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) + (CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((-6.12588309683682)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((`wt`) * (-2.83243330448326))) + (32.4105336886021)) + (`am`)</code></pre>
+<pre><code>## &lt;SQL&gt; ((((32.4105336886021) + ((`wt`) * (-2.83243330448326))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (-4.26714873091281))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (-6.12588309683682))) + (`am`)</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
 <pre class="r"><code>df %&gt;%
   tidypredict_to_column(model) %&gt;%
@@ -354,74 +355,58 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## 8  24.4 3.190     cyl4  0 23.37507
 ## 9  22.8 3.150     cyl4  0 23.48837
 ## 10 19.2 3.440     cyl6  0 18.39981</code></pre>
-</div>
-<div id="prediction-intervals" class="section level2">
+</section>
+<section id="prediction-intervals" class="level2">
 <h2>Prediction intervals</h2>
 <p>Use <code>tidypredict_sql_interval()</code> to get the SQL query that operates the prediction interval. The <code>interval</code> defaults to 0.95</p>
 <pre class="r"><code>tidypredict_sql_interval(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; (2.04840714179524) * SQRT((((((((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((-0.0)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (-0.0)))) + (((-0.176776695296637)))) * (((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((-0.0)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (-0.0)))) + (((-0.176776695296637)))) * (6.63799055122669)) + ((((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((-0.0)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (0.183559646169165)))) + (((-0.590557271637747)))) * (((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((-0.0)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (0.183559646169165)))) + (((-0.590557271637747)))) * (6.63799055122669))) + ((((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((0.428266330860589)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (0.0101118696567173)))) + (((-0.126215672528828)))) * (((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((0.428266330860589)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.0)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (0.0101118696567173)))) + (((-0.126215672528828)))) * (6.63799055122669))) + ((((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((0.332336511639638)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.646203930513815)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (-0.230516217152034)))) + (((0.386215468111418)))) * (((((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN ((0.332336511639638)) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END)) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN ((0.646203930513815)) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END))) + (((`wt`) * (-0.230516217152034)))) + (((0.386215468111418)))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
+<pre><code>## &lt;SQL&gt; (2.04840714179524) * SQRT((((((((-0.176776695296637))) * (((-0.176776695296637))) * (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
 <p>Prediction intervals also works in the <code>tidypredict_to_column()</code>, just set the <code>add_interval</code> argument to <code>TRUE</code>.</p>
 <pre class="r"><code>df %&gt;%
   tidypredict_to_column(model, add_interval = TRUE) %&gt;%
   head(10)</code></pre>
-<pre><code>##     mpg    wt char_cyl am      fit    upper    lower
-## 1  21.0 2.620     cyl6  1 21.72241 27.41716 16.02765
-## 2  21.0 2.875     cyl6  1 21.00014 26.65467 15.34560
-## 3  22.8 2.320     cyl4  1 26.83929 32.35180 21.32678
-## 4  21.4 3.215     cyl6  0 19.03711 24.68113 13.39309
-## 5  18.7 3.440     cyl8  0 16.54108 22.07276 11.00940
-## 6  18.1 3.460     cyl6  0 18.34317 24.01030 12.67603
-## 7  14.3 3.570     cyl8  0 16.17286 21.67635 10.66938
-## 8  24.4 3.190     cyl4  0 23.37507 29.06408 17.68606
-## 9  22.8 3.150     cyl4  0 23.48837 29.16231 17.81443
-## 10 19.2 3.440     cyl6  0 18.39981 24.06411 12.73552</code></pre>
-</div>
-<div id="under-the-hood" class="section level2">
+<pre><code>##     mpg    wt char_cyl am      fit    upper     lower
+## 1  21.0 2.620     cyl6  1 21.72241 28.28255 15.162272
+## 2  21.0 2.875     cyl6  1 21.00014 27.56028 14.440001
+## 3  22.8 2.320     cyl4  1 26.83929 33.39943 20.279150
+## 4  21.4 3.215     cyl6  0 19.03711 25.59725 12.476974
+## 5  18.7 3.440     cyl8  0 16.54108 23.10122  9.980942
+## 6  18.1 3.460     cyl6  0 18.34317 24.90330 11.783028
+## 7  14.3 3.570     cyl8  0 16.17286 22.73300  9.612726
+## 8  24.4 3.190     cyl4  0 23.37507 29.93521 16.814933
+## 9  22.8 3.150     cyl4  0 23.48837 30.04851 16.928231
+## 10 19.2 3.440     cyl6  0 18.39981 24.95995 11.839676</code></pre>
+</section>
+<section id="under-the-hood" class="level2">
 <h2>Under the hood</h2>
 <p>The parser reads several parts of the <code>lm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table, those entries will have the results of <code>qr.solve()</code> already operated and placed in the correct column, they will have a <code>qr_</code> prefix. There will be one <code>qr_</code> column per coefficient.</p>
 <p>Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
 <pre class="r"><code>parse_model(model)</code></pre>
-<pre><code>## # A tibble: 8 x 8
-##   labels      vals        type     estim~    qr_1    qr_2     qr_3    qr_4
-##   &lt;chr&gt;       &lt;chr&gt;       &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
-## 1 (Intercept) &quot;&quot;          interce~  32.4  - 0.177 - 0.591 - 0.126    0.386
-## 2 wt          &quot;&quot;          continu~ - 2.83   0       0.184   0.0101 - 0.231
-## 3 char_cyl    cyl6        categor~ - 4.27   0       0       0.428    0.332
-## 4 char_cyl    cyl8        categor~ - 6.13   0       0       0        0.646
-## 5 model       lm          variable  NA     NA      NA      NA       NA    
-## 6 residual    28          variable  NA     NA      NA      NA       NA    
-## 7 sigma2      6.63799055~ variable  NA     NA      NA      NA       NA    
-## 8 offset      am          variable  NA     NA      NA      NA       NA</code></pre>
+<pre><code>## # A tibble: 10 x 10
+##    labels estima~ type  fiel~ fiel~    qr_1    qr_2     qr_3    qr_4 vals 
+##    &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;
+##  1 (Inte~   32.4  term  &lt;NA&gt;  &lt;NA&gt;  - 0.177 - 0.591 - 0.126    0.386 &lt;NA&gt; 
+##  2 wt      - 2.83 term  &lt;NA&gt;  {{:}}   0       0.184   0.0101 - 0.231 &lt;NA&gt; 
+##  3 char_~  - 4.27 term  cyl6  &lt;NA&gt;    0       0       0.428    0.332 &lt;NA&gt; 
+##  4 char_~  - 6.13 term  cyl8  &lt;NA&gt;    0       0       0        0.646 &lt;NA&gt; 
+##  5 labels    0    vari~ char~ wt     NA      NA      NA       NA     &lt;NA&gt; 
+##  6 model    NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     lm   
+##  7 versi~   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     1.0  
+##  8 resid~   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     28   
+##  9 sigma2   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     6.63~
+## 10 offset   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     am</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
-<pre><code>## ((((ifelse((char_cyl) == (&quot;cyl6&quot;), (-4.26714873091281), 0)) + 
-##     (ifelse((char_cyl) == (&quot;cyl8&quot;), (-6.12588309683682), 0))) + 
-##     ((wt) * (-2.83243330448326))) + (32.4105336886021)) + (am)</code></pre>
+<pre><code>## ((((32.4105336886021) + ((wt) * (-2.83243330448326))) + ((ifelse((char_cyl) == 
+##     (&quot;cyl6&quot;), 1, 0)) * (-4.26714873091281))) + ((ifelse((char_cyl) == 
+##     (&quot;cyl8&quot;), 1, 0)) * (-6.12588309683682))) + (am)</code></pre>
 <p>A function to put together the Tidy Eval interval formula is also supported</p>
 <pre class="r"><code>tidypredict_interval(model)</code></pre>
-<pre><code>## (2.04840714179524) * sqrt((((((((((ifelse((char_cyl) == (&quot;cyl6&quot;), 
-##     (0), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), (0), 0)))) + 
-##     (((wt) * (0)))) + (((-0.176776695296637)))) * (((((ifelse((char_cyl) == 
-##     (&quot;cyl6&quot;), (0), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), (0), 
-##     0)))) + (((wt) * (0)))) + (((-0.176776695296637)))) * (6.63799055122669)) + 
-##     ((((((ifelse((char_cyl) == (&quot;cyl6&quot;), (0), 0))) + ((ifelse((char_cyl) == 
-##         (&quot;cyl8&quot;), (0), 0)))) + (((wt) * (0.183559646169165)))) + 
-##         (((-0.590557271637747)))) * (((((ifelse((char_cyl) == 
-##         (&quot;cyl6&quot;), (0), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
-##         (0), 0)))) + (((wt) * (0.183559646169165)))) + (((-0.590557271637747)))) * 
-##         (6.63799055122669))) + ((((((ifelse((char_cyl) == (&quot;cyl6&quot;), 
-##     (0.428266330860589), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
-##     (0), 0)))) + (((wt) * (0.0101118696567173)))) + (((-0.126215672528828)))) * 
-##     (((((ifelse((char_cyl) == (&quot;cyl6&quot;), (0.428266330860589), 
-##         0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), (0), 0)))) + 
-##         (((wt) * (0.0101118696567173)))) + (((-0.126215672528828)))) * 
-##     (6.63799055122669))) + ((((((ifelse((char_cyl) == (&quot;cyl6&quot;), 
-##     (0.332336511639638), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
-##     (0.646203930513815), 0)))) + (((wt) * (-0.230516217152034)))) + 
-##     (((0.386215468111418)))) * (((((ifelse((char_cyl) == (&quot;cyl6&quot;), 
-##     (0.332336511639638), 0))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
-##     (0.646203930513815), 0)))) + (((wt) * (-0.230516217152034)))) + 
-##     (((0.386215468111418)))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
+<pre><code>## (2.04840714179524) * sqrt((((((((-0.176776695296637))) * (((-0.176776695296637))) * 
+##     (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * 
+##     (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * 
+##     (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * 
+##     (6.63799055122669))) + (6.63799055122669))</code></pre>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -429,8 +414,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
 <p>The same applies to the prediction interval functions.</p>
-</div>
-<div id="how-it-performs" class="section level2">
+</section>
+<section id="how-it-performs" class="level2">
 <h2>How it performs</h2>
 <p>Testing the <code>tidypredict</code> results is easy. The <code>tidypredict_test()</code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code>tidypredict_fit()</code>, and <code>tidypredict_interval()</code> to the results given by <code>predict()</code></p>
 <pre class="r"><code>tidypredict_test(model)</code></pre>
@@ -443,8 +428,14 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <pre><code>## tidypredict test results
 ## Difference threshold: 1e-12
 ## 
-##  All results are within the difference threshold</code></pre>
-</div>
+## Fitted records above the threshold: 0
+## Lower interval records above the threshold: 32
+## Upper interval records above the threshold: 32
+## 
+## Fit max  difference:1.09621641898533
+## Lower max difference:1.09621641898523
+## Upper max difference:5.32907051820075e-14</code></pre>
+</section>
 
 
 			<aside class="copyright" role="note">
