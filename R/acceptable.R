@@ -62,7 +62,7 @@ acceptable_lm <- function(model) {
 
   # Check for in-line formulas
   funs <- fun_calls(model$call)
-  funs <- funs[!(funs %in% c("~", "+", "-", "lm", "glm"))]
+  funs <- funs[!(funs %in% c("~", "+", "-", "*", "lm", "glm"))]
   if (length(funs) > 0) {
     stop(
       "Functions inside the formula are not supported. Functions detected: ",

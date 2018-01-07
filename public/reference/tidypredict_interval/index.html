@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -360,11 +360,10 @@ substracted from fit to obtain the lower bound.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (3.18244630528371) * sqrt(((((((y) * (0))) + (((-0.447213595499958)))) * 
-#&gt;     ((((y) * (0))) + (((-0.447213595499958)))) * (2.53333333333333)) + 
-#&gt;     (((((y) * (0.316227766016838))) + (((-1.26491106406735)))) * 
-#&gt;         ((((y) * (0.316227766016838))) + (((-1.26491106406735)))) * 
-#&gt;         (2.53333333333333))) + (2.53333333333333))</div><div class='input'>
+<span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (3.18244630528371) * sqrt((((-0.447213595499958) * (-0.447213595499958) * 
+#&gt;     (2.53333333333333)) + (((-1.26491106406735) + ((y) * (0.316227766016838))) * 
+#&gt;     ((-1.26491106406735) + ((y) * (0.316227766016838))) * (2.53333333333333))) + 
+#&gt;     (2.53333333333333))</div><div class='input'>
 
 </div></code></pre></div>
     </div>

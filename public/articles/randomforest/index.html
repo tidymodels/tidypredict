@@ -137,7 +137,7 @@
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9001</span></strong>
+        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
         
           <br>
           edgararuiz/tidypredict
@@ -311,7 +311,7 @@
 		<div class="wrapper">
 			<h1>Random Forest model </h1>
 
-			<div id="highlights-limitations" class="section level2">
+			<section id="highlights-limitations" class="level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li>Uses the <code>randomForest::getTree()</code> to parse each decision path.</li>
@@ -324,8 +324,8 @@
 </ul></li>
 <li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
 </ul>
-</div>
-<div id="how-it-works" class="section level2">
+</section>
+<section id="how-it-works" class="level2">
 <h2>How it works</h2>
 <p>Here is a simple <code>randomForest()</code> model using the <code>iris</code> dataset:</p>
 <pre class="r"><code>library(randomForest)
@@ -358,8 +358,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## 8           5.0         3.4          1.5         0.2  setosa setosa
 ## 9           4.4         2.9          1.4         0.2  setosa setosa
 ## 10          4.9         3.1          1.5         0.1  setosa setosa</code></pre>
-</div>
-<div id="under-the-hood" class="section level2">
+</section>
+<section id="under-the-hood" class="level2">
 <h2>Under the hood</h2>
 <p>The parser is based on the output from the <code>randomForest::getTree()</code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
 <pre class="r"><code>getTree(model, labelVar = TRUE) %&gt;%
@@ -405,8 +405,8 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
-</div>
-<div id="how-it-performs" class="section level2">
+</section>
+<section id="how-it-performs" class="level2">
 <h2>How it performs</h2>
 <p>Currently, the formula matches 147 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
 <pre class="r"><code>test &lt;- tidypredict_test(model, iris, threshold = 5)
@@ -426,7 +426,7 @@ test</code></pre>
 ## 1   virginica
 ## 2   virginica
 ## 3  versicolor</code></pre>
-</div>
+</section>
 
 
 			<aside class="copyright" role="note">

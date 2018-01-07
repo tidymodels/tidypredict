@@ -45,70 +45,120 @@ add_variable <- function(df, labels, vals) {
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
+#' @import tidyr
 parse_model_lm <- function(model) {
   acceptable_formula(model)
 
-  terms <- model$terms
-
-  labels <- attr(terms, "term.labels")
-
-  tidy <- tibble(labels)
-
+  
+  var_labels <- names(attr(model$terms, "dataClasses"))
+  if(attr(model$terms, "response") == 1) var_labels <- var_labels[2:length(var_labels)]
+  
+  vars <-tibble(var = var_labels)
+  
   xl <- model$xlevels
-
-  if (length(xl) > 0) {
-    xlevels <- names(xl) %>%
-      map({
-        ~tibble(
-          labels = .x,
-          vals = as.character(xl[[.x]])
-        ) %>%
-          rowid_to_column("row")
-      }) %>%
-      bind_rows() %>%
-      filter(row > 1) %>%
-      select(-row)
-
-    tidy <- tidy %>%
-      left_join(xlevels, by = "labels")
+  if(length(xl) > 0){
+    xl_df <- 1:length(xl) %>%
+      map_df(~tibble(
+        var = names(xl[.x]),
+        vals = xl[[.x]]
+      ))
+    vars <- vars %>%
+      left_join(xl_df, by = "var") %>%
+      mutate(fullname = paste0(var, ifelse(is.na(vals), "", vals)))
+  } else {
+    vars <- vars %>%
+      mutate(fullname = var)
   }
-
-  i <- attr(terms, "intercept")
-  if (!is.null(i)) {
-    tidy <-
-      tibble(
-        labels = "(Intercept)",
-        vals = ""
-      ) %>%
-      bind_rows(tidy)
-  }
-
+  
+  co <- model$coefficients 
+  
+  est <- names(co) %>%
+    map(~strsplit(.x, ":")) 
+  
+  est_df <- seq_len(length(est)) %>%
+    map_df(~tibble(
+      coefno = .x,
+      fullname = est[[.x]][[1]] 
+    ))
+  
+  
+  
+  all_vals <- est_df %>%
+    left_join(vars, by = "fullname") %>%
+    mutate(vals = ifelse(fullname == var, "{{:}}", vals)) %>%
+    filter(!is.na(var)) %>%
+    filter(!is.na(vals)) %>%
+    select(-fullname) %>%
+    group_by(coefno) %>%
+    spread(var, vals) 
+  
+  new_vals <- as_list(colnames(all_vals))
+  names(new_vals) <- colnames(all_vals)
+  
+  all_vals <- as_tibble(new_vals) %>%
+    mutate(coefno = 0L) %>%
+    bind_rows(all_vals) 
+  
+  colnames(all_vals) <- c("coefno", paste0("field_", (2:length(all_vals))-1))
+  
+  tidy <- as_tibble(model$coefficients) %>%
+    rownames_to_column("labels") %>%
+    rowid_to_column("coefno")  %>%
+    rename(estimate = value) %>%
+    mutate(type = "term") %>%
+    bind_rows(tibble(
+      coefno = 0,
+      labels = "labels",
+      estimate = 0,
+      type = "variable"
+    )) %>%
+    left_join(all_vals, by = "coefno")
+  
+  
+  qr <- qr.solve(qr.R(model$qr)) %>%
+    as.data.frame() %>%
+    rownames_to_column() 
+  
+  colnames(qr) <- c("coef_labels", paste0("qr_", 1:nrow(qr)))
+  
+  cf <- as_list(c("labels", rep(NA, length(qr) -1)))
+  names(cf) <- names(qr)
+  
+  qr <- qr %>%
+    bind_rows(as_tibble(cf))
+  
+  
   tidy <- tidy %>%
-    mutate(
-      vals = ifelse(is.na(vals), "", vals),
-      type = case_when(
-        labels == "(Intercept)" ~ "intercept",
-        vals == "" ~ "continuous",
-        vals != "" ~ "categorical",
-        TRUE ~ "error"
+    bind_cols(qr) %>%
+    mutate(label_match = coef_labels != labels)
+  
+  if(sum(tidy$label_match) == 0){
+    tidy <- tidy %>%
+      select(
+        - coefno,
+        - coef_labels,
+        - label_match
       )
-    )
-
+  } else {
+    stop("There was a parsing error")
+  }
+  
   tidy <- add_variable(tidy, labels = "model", vals = class(model)[[1]])
+  tidy <- add_variable(tidy, labels = "version", vals = "1.0")
   tidy <- add_variable(tidy, labels = "residual", vals = model$df.residual)
-
+  
   if (length(summary(model)$sigma ^ 2) > 0) {
     tidy <- add_variable(tidy, labels = "sigma2", vals = summary(model)$sigma ^ 2)
   }
-
+  
   if (!is.null(model$family$family)) {
     tidy <- add_variable(tidy, labels = "family", vals = model$family$family)
   }
-
+  
   if (!is.null(model$family$link)) {
     tidy <- add_variable(tidy, labels = "link", vals = model$family$link)
   }
-
+  
   offset <- model$call$offset
   if (!is.null(offset)) {
     tidy <- tidy %>%
@@ -117,32 +167,6 @@ parse_model_lm <- function(model) {
         vals = as.character(offset),
         type = "variable"
       ))
-  }
-
-  coef <- summary(model)$coefficients %>%
-    as.data.frame() %>%
-    rownames_to_column("coef_labels") %>%
-    select(
-      coef_labels,
-      estimate = Estimate
-    )
-
-  res.var <- summary(model)$sigma ^ 2
-
-  qr <- qr.solve(qr.R(model$qr)) %>%
-    as.data.frame() %>%
-    rownames_to_column()
-
-  colnames(qr) <- c("coef_labels", paste0("qr_", 1:nrow(qr)))
-
-  tidy <- tidy %>%
-    mutate(coef_labels = paste0(labels, vals)) %>%
-    full_join(coef, by = "coef_labels") %>%
-    full_join(qr, by = "coef_labels") %>%
-    select(-coef_labels)
-
-  if (any(is.na(tidy$labels))) {
-    stop("Error parsing the model")
   }
 
   tidy

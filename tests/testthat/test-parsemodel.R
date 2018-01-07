@@ -16,12 +16,8 @@ pgm <- parse_model(gm)
 
 test_that("It has the minium set of columns", {
   expect_equal(colnames(pm)[1], "labels")
-  expect_equal(colnames(pm)[2], "vals")
   expect_equal(colnames(pm)[3], "type")
-  expect_equal(colnames(pm)[4], "estimate")
 
   expect_equal(colnames(pgm)[1], "labels")
-  expect_equal(colnames(pgm)[2], "vals")
   expect_equal(colnames(pgm)[3], "type")
-  expect_equal(colnames(pgm)[4], "estimate")
 })
