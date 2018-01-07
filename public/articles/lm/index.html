@@ -360,22 +360,22 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <h2>Prediction intervals</h2>
 <p>Use <code>tidypredict_sql_interval()</code> to get the SQL query that operates the prediction interval. The <code>interval</code> defaults to 0.95</p>
 <pre class="r"><code>tidypredict_sql_interval(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; (2.04840714179524) * SQRT((((((((-0.176776695296637))) * (((-0.176776695296637))) * (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
+<pre><code>## &lt;SQL&gt; (2.04840714179524) * SQRT((((((-0.176776695296637) * (-0.176776695296637) * (6.63799055122669)) + (((-0.590557271637747) + ((`wt`) * (0.183559646169165))) * ((-0.590557271637747) + ((`wt`) * (0.183559646169165))) * (6.63799055122669))) + ((((-0.126215672528828) + ((`wt`) * (0.0101118696567173))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.428266330860589))) * (((-0.126215672528828) + ((`wt`) * (0.0101118696567173))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.428266330860589))) * (6.63799055122669))) + (((((0.386215468111418) + ((`wt`) * (-0.230516217152034))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.332336511639638))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.646203930513815))) * ((((0.386215468111418) + ((`wt`) * (-0.230516217152034))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.332336511639638))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (0.646203930513815))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
 <p>Prediction intervals also works in the <code>tidypredict_to_column()</code>, just set the <code>add_interval</code> argument to <code>TRUE</code>.</p>
 <pre class="r"><code>df %&gt;%
   tidypredict_to_column(model, add_interval = TRUE) %&gt;%
   head(10)</code></pre>
-<pre><code>##     mpg    wt char_cyl am      fit    upper     lower
-## 1  21.0 2.620     cyl6  1 21.72241 28.28255 15.162272
-## 2  21.0 2.875     cyl6  1 21.00014 27.56028 14.440001
-## 3  22.8 2.320     cyl4  1 26.83929 33.39943 20.279150
-## 4  21.4 3.215     cyl6  0 19.03711 25.59725 12.476974
-## 5  18.7 3.440     cyl8  0 16.54108 23.10122  9.980942
-## 6  18.1 3.460     cyl6  0 18.34317 24.90330 11.783028
-## 7  14.3 3.570     cyl8  0 16.17286 22.73300  9.612726
-## 8  24.4 3.190     cyl4  0 23.37507 29.93521 16.814933
-## 9  22.8 3.150     cyl4  0 23.48837 30.04851 16.928231
-## 10 19.2 3.440     cyl6  0 18.39981 24.95995 11.839676</code></pre>
+<pre><code>##     mpg    wt char_cyl am      fit    upper    lower
+## 1  21.0 2.620     cyl6  1 21.72241 27.41716 16.02765
+## 2  21.0 2.875     cyl6  1 21.00014 26.65467 15.34560
+## 3  22.8 2.320     cyl4  1 26.83929 32.35180 21.32678
+## 4  21.4 3.215     cyl6  0 19.03711 24.68113 13.39309
+## 5  18.7 3.440     cyl8  0 16.54108 22.07276 11.00940
+## 6  18.1 3.460     cyl6  0 18.34317 24.01030 12.67603
+## 7  14.3 3.570     cyl8  0 16.17286 21.67635 10.66938
+## 8  24.4 3.190     cyl4  0 23.37507 29.06408 17.68606
+## 9  22.8 3.150     cyl4  0 23.48837 29.16231 17.81443
+## 10 19.2 3.440     cyl6  0 18.39981 24.06411 12.73552</code></pre>
 </section>
 <section id="under-the-hood" class="level2">
 <h2>Under the hood</h2>
@@ -402,11 +402,20 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ##     (&quot;cyl8&quot;), 1, 0)) * (-6.12588309683682))) + (am)</code></pre>
 <p>A function to put together the Tidy Eval interval formula is also supported</p>
 <pre class="r"><code>tidypredict_interval(model)</code></pre>
-<pre><code>## (2.04840714179524) * sqrt((((((((-0.176776695296637))) * (((-0.176776695296637))) * 
-##     (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * 
-##     (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * 
-##     (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * 
-##     (6.63799055122669))) + (6.63799055122669))</code></pre>
+<pre><code>## (2.04840714179524) * sqrt((((((-0.176776695296637) * (-0.176776695296637) * 
+##     (6.63799055122669)) + (((-0.590557271637747) + ((wt) * (0.183559646169165))) * 
+##     ((-0.590557271637747) + ((wt) * (0.183559646169165))) * (6.63799055122669))) + 
+##     ((((-0.126215672528828) + ((wt) * (0.0101118696567173))) + 
+##         ((ifelse((char_cyl) == (&quot;cyl6&quot;), 1, 0)) * (0.428266330860589))) * 
+##         (((-0.126215672528828) + ((wt) * (0.0101118696567173))) + 
+##             ((ifelse((char_cyl) == (&quot;cyl6&quot;), 1, 0)) * (0.428266330860589))) * 
+##         (6.63799055122669))) + (((((0.386215468111418) + ((wt) * 
+##     (-0.230516217152034))) + ((ifelse((char_cyl) == (&quot;cyl6&quot;), 
+##     1, 0)) * (0.332336511639638))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
+##     1, 0)) * (0.646203930513815))) * ((((0.386215468111418) + 
+##     ((wt) * (-0.230516217152034))) + ((ifelse((char_cyl) == (&quot;cyl6&quot;), 
+##     1, 0)) * (0.332336511639638))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
+##     1, 0)) * (0.646203930513815))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -428,13 +437,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <pre><code>## tidypredict test results
 ## Difference threshold: 1e-12
 ## 
-## Fitted records above the threshold: 0
-## Lower interval records above the threshold: 32
-## Upper interval records above the threshold: 32
-## 
-## Fit max  difference:1.09621641898533
-## Lower max difference:1.09621641898523
-## Upper max difference:5.32907051820075e-14</code></pre>
+##  All results are within the difference threshold</code></pre>
 </section>
 
 
