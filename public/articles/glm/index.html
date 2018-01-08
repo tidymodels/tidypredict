@@ -340,7 +340,7 @@ model &lt;- glm(am ~ wt + char_cyl, data = df, family = &quot;binomial&quot;)</c
 <pre class="r"><code>library(tidypredict)
 
 tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
-<pre><code>## &lt;SQL&gt; EXP((((20.8527831345691) + ((`wt`) * (-7.85934263583835))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (3.10462643177453))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (5.37942092366097))) / (EXP((((20.8527831345691) + ((`wt`) * (-7.85934263583835))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (3.10462643177453))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (5.37942092366097))) + 1.0)</code></pre>
+<pre><code>## &lt;SQL&gt; 1.0 - 1.0 / (1.0 + EXP((((20.8527831345691) + ((`wt`) * (-7.85934263583835))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl6&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (3.10462643177453))) + ((CASE WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;TRUE&#39;) THEN (1.0) WHEN (((`char_cyl`) = (&#39;cyl8&#39;)) =  &#39;FALSE&#39;) THEN (0.0) END) * (5.37942092366097))))</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
 <pre class="r"><code>df %&gt;%
   tidypredict_to_column(model) %&gt;%
@@ -376,12 +376,9 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 ## 10 link      NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    logit</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
-<pre><code>## exp((((20.8527831345691) + ((wt) * (-7.85934263583835))) + ((ifelse((char_cyl) == 
-##     (&quot;cyl6&quot;), 1, 0)) * (3.10462643177453))) + ((ifelse((char_cyl) == 
-##     (&quot;cyl8&quot;), 1, 0)) * (5.37942092366097)))/(exp((((20.8527831345691) + 
-##     ((wt) * (-7.85934263583835))) + ((ifelse((char_cyl) == (&quot;cyl6&quot;), 
-##     1, 0)) * (3.10462643177453))) + ((ifelse((char_cyl) == (&quot;cyl8&quot;), 
-##     1, 0)) * (5.37942092366097))) + 1)</code></pre>
+<pre><code>## 1 - 1/(1 + exp((((20.8527831345691) + ((wt) * (-7.85934263583835))) + 
+##     ((ifelse((char_cyl) == (&quot;cyl6&quot;), 1, 0)) * (3.10462643177453))) + 
+##     ((ifelse((char_cyl) == (&quot;cyl8&quot;), 1, 0)) * (5.37942092366097))))</code></pre>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -506,7 +503,7 @@ RawBlameHistory
 
     <script>
       /* Add headers to scrollspy */
-      var headers   = document.getElementsByTagName("div");
+      var headers   = document.getElementsByTagName("section");
       var scrollspy = document.getElementById('scrollspy');
       if(scrollspy) {
         if(headers.length > 0) {
