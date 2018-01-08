@@ -62,7 +62,7 @@ te_fit_glm <- function(parsedmodel) {
 
   if (family == "binomial" && link == "logit") {
     assigned <- 1
-    fit <- expr(exp(!! fit) / (exp(!! fit) + 1))
+    fit <- expr(1 - 1 / (1 + exp(!! fit)))
   }
 
   if (assigned == 0) {
