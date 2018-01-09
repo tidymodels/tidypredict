@@ -18,8 +18,10 @@ the correst SQL translation syntax.}
 Returns a SQL query with formula to calculate predicted interval
 }
 \examples{
+library(dbplyr)
 
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql_interval(model, dbplyr::simulate_dbi())
+tidypredict_sql_interval(model, simulate_dbi())
 
 }
+\keyword{internal}

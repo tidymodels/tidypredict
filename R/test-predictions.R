@@ -26,8 +26,6 @@ tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001
   UseMethod("tidypredict_test")
 }
 
-#' @import rlang
-#' @import dplyr
 #' @export
 tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL) {
   offset <- model$call$offset
@@ -60,17 +58,17 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 
   raw_results <- bind_cols(base, te) %>%
     mutate(
-      fit_diff = abs(fit - fit_te),
-      fit_threshold = fit_diff > threshold
+      fit_diff = abs(.data$fit - .data$fit_te),
+      fit_threshold = .data$fit_diff > threshold
     )
 
   if (include_intervals == TRUE) {
     raw_results <- raw_results %>%
       mutate(
-        lwr_diff = abs(lwr - lwr_te),
-        upr_diff = abs(upr - upr_te),
-        lwr_threshold = lwr_diff > threshold,
-        upr_threshold = upr_diff > threshold
+        lwr_diff = abs(.data$lwr - .data$lwr_te),
+        upr_diff = abs(.data$upr - .data$upr_te),
+        lwr_threshold = .data$lwr_diff > threshold,
+        upr_threshold = .data$upr_diff > threshold
       )
   }
 
@@ -122,19 +120,16 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 
 setOldClass(c("tidypredict_test", "list"))
 
-
-#' @import rlang
-#' @import dplyr
 #' @export
 tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL) {
   raw_results <- df %>%
     mutate(
-      predict = as.character(predict(model, iris)),
+      predict = as.character(predict(model, df)),
       tidypredict = !! tidypredict_fit(model)
     )
 
   differences <- raw_results %>%
-    filter(tidypredict != predict | is.na(tidypredict))
+    filter(.data$tidypredict != predict | is.na(.data$tidypredict))
 
   alert <- nrow(differences) > threshold
 
@@ -173,7 +168,6 @@ setOldClass(c("tidypredict_test", "list"))
 
 
 #' print method for test predictions results
-#'
 #' @keywords internal
 #' @export
 print.tidypredict_test <- function(x, ...) {
@@ -181,9 +175,9 @@ print.tidypredict_test <- function(x, ...) {
 }
 
 #' Knit print method for test predictions results
-#'
 #' @keywords internal
 #' @export
+#' 
 knit_print.tidypredict_test <- function(x, ...) {
   x$message
 }

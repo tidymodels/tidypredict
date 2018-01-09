@@ -1,13 +1,8 @@
-#' @import rlang
-#' @importFrom purrr map2
-#' @importFrom purrr map
-#' @importFrom purrr reduce
-#' @import dplyr
-xr <- function(parsedmodel, qr_field, res.var) {
+xr <- function(parsedmodel = NULL, qr_field = NULL, res.var = NULL) {
   qr_field <- parse_expr(qr_field)
   
   labels <- parsedmodel %>%
-    filter(labels == "labels") %>%
+    filter(.data$labels == "labels") %>%
     as.character()
   
   labels <- labels[4:length(labels)]
@@ -16,9 +11,9 @@ xr <- function(parsedmodel, qr_field, res.var) {
   
   all_terms <- parsedmodel %>%
     mutate(estimate = !! qr_field) %>%
-    filter(type == "term",
-           estimate != 0) %>%
-    select(- type, -labels) 
+    filter(.data$type == "term",
+           .data$estimate != 0) %>%
+    select(- .data$type, -.data$labels) 
   
   selection <- which(labels != "NA")
   all_terms <- all_terms[, which(labels != "NA")]
@@ -51,23 +46,19 @@ xr <- function(parsedmodel, qr_field, res.var) {
   f
 }
 
-#' @import rlang
-#' @importFrom purrr map2
-#' @importFrom purrr reduce
-#' @import dplyr
 te_interval_lm <- function(parsedmodel, interval = 0.95) {
   res.var <- parsedmodel %>%
     filter(labels == "sigma2") %>%
-    pull(vals) %>%
+    pull(.data$vals) %>%
     as.numeric()
 
   res <- parsedmodel %>%
-    filter(labels == "residual") %>%
-    pull(vals) %>%
+    filter(.data$labels == "residual") %>%
+    pull(.data$vals) %>%
     as.numeric()
 
   qr <- parsedmodel %>%
-    filter(type != "variable") %>%
+    filter(.data$type != "variable") %>%
     select(starts_with("qr_"))
 
   xrinv <- colnames(qr) %>% 
@@ -81,13 +72,11 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
   expr((!! tfrac) * sqrt((!! ip) + (!! res.var)))
 }
 
-#' @import rlang
-#' @import dplyr
 te_interval_glm <- function(parsedmodel, interval = 0.95) {
   intervals <- te_interval_lm(parsedmodel, interval)
 
-  family <- pull(filter(parsedmodel, labels == "family"), vals)
-  link <- pull(filter(parsedmodel, labels == "link"), vals)
+  family <- pull(filter(parsedmodel, .data$labels == "family"), .data$vals)
+  link <- pull(filter(parsedmodel, .data$labels == "link"), .data$vals)
 
   assigned <- 0
 

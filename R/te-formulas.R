@@ -11,8 +11,8 @@ te_fit_lm <- function(parsedmodel) {
   labels <- labels[4:length(labels)]
   labels <- c("estimate", labels)
   all_terms <- parsedmodel %>%
-    filter(type == "term") %>%
-    select(- type, -labels)
+    filter(.data$type == "term") %>%
+    select(- .data$type, -.data$labels)
   
   selection <- which(labels != "NA")
   all_terms <- all_terms[, which(labels != "NA")]
@@ -51,8 +51,8 @@ te_fit_lm <- function(parsedmodel) {
 te_fit_glm <- function(parsedmodel) {
   fit <- te_fit_lm(parsedmodel)
 
-  family <- pull(filter(parsedmodel, labels == "family"), vals)
-  link <- pull(filter(parsedmodel, labels == "link"), vals)
+  family <- pull(filter(parsedmodel, labels == "family"), .data$vals)
+  link <- pull(filter(parsedmodel, labels == "link"), .data$vals)
 
   assigned <- 0
 

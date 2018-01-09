@@ -49,14 +49,13 @@ add_variable <- function(df, labels, vals) {
 parse_model_lm <- function(model) {
   acceptable_formula(model)
 
-  
   var_labels <- names(attr(model$terms, "dataClasses"))
-  if(attr(model$terms, "response") == 1) var_labels <- var_labels[2:length(var_labels)]
-  
-  vars <-tibble(var = var_labels)
-  
+  if (attr(model$terms, "response") == 1) var_labels <- var_labels[2:length(var_labels)]
+
+  vars <- tibble(var = var_labels)
+
   xl <- model$xlevels
-  if(length(xl) > 0){
+  if (length(xl) > 0) {
     xl_df <- 1:length(xl) %>%
       map_df(~tibble(
         var = names(xl[.x]),
@@ -64,47 +63,45 @@ parse_model_lm <- function(model) {
       ))
     vars <- vars %>%
       left_join(xl_df, by = "var") %>%
-      mutate(fullname = paste0(var, ifelse(is.na(vals), "", vals)))
+      mutate(fullname = paste0(.data$var, ifelse(is.na(.data$vals), "", .data$vals)))
   } else {
     vars <- vars %>%
-      mutate(fullname = var)
+      mutate(fullname = .data$var)
   }
-  
-  co <- model$coefficients 
-  
+
+  co <- model$coefficients
+
   est <- names(co) %>%
-    map(~strsplit(.x, ":")) 
-  
+    map(~strsplit(.x, ":"))
+
   est_df <- seq_len(length(est)) %>%
     map_df(~tibble(
       coefno = .x,
-      fullname = est[[.x]][[1]] 
+      fullname = est[[.x]][[1]]
     ))
-  
-  
-  
+
   all_vals <- est_df %>%
     left_join(vars, by = "fullname") %>%
-    mutate(vals = ifelse(fullname == var, "{{:}}", vals)) %>%
-    filter(!is.na(var)) %>%
-    filter(!is.na(vals)) %>%
-    select(-fullname) %>%
-    group_by(coefno) %>%
-    spread(var, vals) 
-  
+    mutate(vals = ifelse(.data$fullname == .data$var, "{{:}}", .data$vals)) %>%
+    filter(!is.na(.data$var)) %>%
+    filter(!is.na(.data$vals)) %>%
+    select(-.data$fullname) %>%
+    group_by(.data$coefno) %>%
+    spread(.data$var, .data$vals)
+
   new_vals <- as_list(colnames(all_vals))
   names(new_vals) <- colnames(all_vals)
-  
+
   all_vals <- as_tibble(new_vals) %>%
     mutate(coefno = 0L) %>%
-    bind_rows(all_vals) 
-  
-  colnames(all_vals) <- c("coefno", paste0("field_", (2:length(all_vals))-1))
-  
+    bind_rows(all_vals)
+
+  colnames(all_vals) <- c("coefno", paste0("field_", (2:length(all_vals)) - 1))
+
   tidy <- as_tibble(model$coefficients) %>%
     rownames_to_column("labels") %>%
-    rowid_to_column("coefno")  %>%
-    rename(estimate = value) %>%
+    rowid_to_column("coefno") %>%
+    rename(estimate = .data$value) %>%
     mutate(type = "term") %>%
     bind_rows(tibble(
       coefno = 0,
@@ -113,52 +110,50 @@ parse_model_lm <- function(model) {
       type = "variable"
     )) %>%
     left_join(all_vals, by = "coefno")
-  
-  
+
   qr <- qr.solve(qr.R(model$qr)) %>%
     as.data.frame() %>%
-    rownames_to_column() 
-  
+    rownames_to_column()
+
   colnames(qr) <- c("coef_labels", paste0("qr_", 1:nrow(qr)))
-  
-  cf <- as_list(c("labels", rep(NA, length(qr) -1)))
+
+  cf <- as_list(c("labels", rep(NA, length(qr) - 1)))
   names(cf) <- names(qr)
-  
+
   qr <- qr %>%
     bind_rows(as_tibble(cf))
-  
-  
+
   tidy <- tidy %>%
     bind_cols(qr) %>%
-    mutate(label_match = coef_labels != labels)
-  
-  if(sum(tidy$label_match) == 0){
+    mutate(label_match = .data$coef_labels != .data$labels)
+
+  if (sum(tidy$label_match) == 0) {
     tidy <- tidy %>%
       select(
-        - coefno,
-        - coef_labels,
-        - label_match
+        -.data$coefno,
+        -.data$coef_labels,
+        -.data$label_match
       )
   } else {
     stop("There was a parsing error")
   }
-  
+
   tidy <- add_variable(tidy, labels = "model", vals = class(model)[[1]])
   tidy <- add_variable(tidy, labels = "version", vals = "1.0")
   tidy <- add_variable(tidy, labels = "residual", vals = model$df.residual)
-  
+
   if (length(summary(model)$sigma ^ 2) > 0) {
     tidy <- add_variable(tidy, labels = "sigma2", vals = summary(model)$sigma ^ 2)
   }
-  
+
   if (!is.null(model$family$family)) {
     tidy <- add_variable(tidy, labels = "family", vals = model$family$family)
   }
-  
+
   if (!is.null(model$family$link)) {
     tidy <- add_variable(tidy, labels = "link", vals = model$family$link)
   }
-  
+
   offset <- model$call$offset
   if (!is.null(offset)) {
     tidy <- tidy %>%
@@ -179,27 +174,33 @@ parse_model_lm <- function(model) {
 #' @import dplyr
 #' @export
 parse_model.randomForest <- function(model) {
-  model_frame <- getTree(model, labelVar = TRUE) %>%
+  model_frame <- randomForest::getTree(model, labelVar = TRUE) %>%
     as.tibble() %>%
     rowid_to_column()
 
   colnames(model_frame) <- sub(" ", "_", colnames(model_frame))
 
   all_paths <- model_frame %>%
-    filter(status == -1) %>%
-    pull(rowid) %>%
+    filter(.data$status == -1) %>%
+    pull(.data$rowid) %>%
     map(~get_path(.x, model_frame)) %>%
     bind_rows()
 
   tidy <- model_frame %>%
-    filter(status == -1) %>%
+    filter(.data$status == -1) %>%
     rowid_to_column("labels") %>%
     mutate(
       labels = paste0("path-", labels),
       type = "path",
       estimate = 0
     ) %>%
-    select(labels, vals = prediction, type, estimate) %>%
+    mutate(vals = .data$prediction) %>%
+    select(
+      .data$labels,
+      .data$vals,
+      .data$type,
+      .data$estimate
+    ) %>%
     bind_cols(all_paths) %>%
     add_row(labels = "model", vals = "randomForest", type = "variable")
 
@@ -215,7 +216,7 @@ get_path <- function(row_id, model_frame) {
   split_point <- NULL
 
   for (get_path in 1:nrow(model_frame)) {
-    current <- filter(model_frame, rowid == row_id)
+    current <- filter(model_frame, .data$rowid == row_id)
     if (current$status == 1) {
       field <- c(
         field,

@@ -43,8 +43,8 @@ tidypredict_interval.glm <- function(model, interval = 0.95) {
     as.tibble()
 
   model_type <- model %>%
-    filter(labels == "model") %>%
-    pull(vals)
+    filter(.data$labels == "model") %>%
+    pull(.data$vals)
 
   assigned <- 0
 
