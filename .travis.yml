@@ -6,7 +6,6 @@ cache: packages
 warnings_are_errors: false
 
 include:
-include:
   - r: release
   - r: oldrel
   - r: devel
