@@ -42,13 +42,14 @@ tidypredict_fit.randomForest <- function(model) {
 #' @export
 #' @importFrom tibble as.tibble
 `tidypredict_fit.data.frame` <- function(model) {
+  
   model <- model %>%
     mutate_if(is.factor, as.character) %>%
     as.tibble()
 
   model_type <- model %>%
-    filter(labels == "model") %>%
-    pull(vals)
+    filter(.data$labels == "model") %>%
+    pull(.data$vals)
 
   assigned <- 0
 

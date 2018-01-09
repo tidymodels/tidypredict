@@ -18,9 +18,11 @@ Suggests:
     knitr,
     rmarkdown,
     nycflights13,
-    RSQLite
+    RSQLite, 
+    methods,
+    DBI
 License: GPL-3
-URL: https://github.com/edgararuiz/tidypredict
+URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

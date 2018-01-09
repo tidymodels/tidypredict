@@ -16,8 +16,10 @@ the correst SQL translation syntax.}
 Returns a SQL query with formula to calculate fitted values
 }
 \examples{
+library(dbplyr)
 
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql(model, dbplyr::simulate_dbi())
+tidypredict_sql(model, simulate_dbi())
 
 }
+\keyword{internal}

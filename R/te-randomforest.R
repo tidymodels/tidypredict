@@ -1,11 +1,6 @@
-#' @import rlang
-#' @importFrom purrr map2
-#' @importFrom purrr map
-#' @importFrom purrr reduce
-#' @import dplyr
 te_randomforest_fit <- function(parsedmodel) {
   paths <- parsedmodel %>%
-    filter(type == "path")
+    filter(.data$type == "path")
 
   all_paths <- 1:nrow(paths) %>%
     map(~case_formula(
@@ -18,7 +13,6 @@ te_randomforest_fit <- function(parsedmodel) {
   expr(case_when(!!! all_paths))
 }
 
-#' @import rlang
 case_formula <- function(vals, field, operator, split_point) {
   marker <- get_marker_regx()
 
@@ -27,7 +21,7 @@ case_formula <- function(vals, field, operator, split_point) {
     operator = unlist(strsplit(operator, marker)),
     split_point = unlist(strsplit(split_point, marker))
   ) %>%
-    mutate(split_point = as.numeric(split_point)) %>%
+    mutate(split_point = as.numeric(.data$split_point)) %>%
     rowid_to_column()
 
   right <- filter(path, operator == "right")
