@@ -62,11 +62,15 @@ acceptable_lm <- function(model) {
 
   # Check for in-line formulas
   funs <- fun_calls(model$call)
-  funs <- funs[!(funs %in% c("~", "+", "-", "*", "lm", "glm"))]
+  funs <- funs[!(funs %in% c("~", "+", "-", "*", "(", ")", "::", "lm", "glm"))]
   if (length(funs) > 0) {
-    stop(
-      "Functions inside the formula are not supported. Functions detected: ",
-      paste0("`", funs, "`", collapse = ","), ". Use `dplyr` transformations to prepare the data.",
+    contains_offset <- any(funs == "offset")
+    contains_other <- funs[funs != "offset"]  
+    stop(paste0(
+      "Functions inside the formula are not supported." ,
+      if(contains_offset) "\n- Offset detected.  Try using offset as an argument instead.",
+      if(length(contains_other) > 0) paste0("\n- Functions detected: ", paste0("`", contains_other, "`", collapse = ","), ". Use `dplyr` transformations to prepare the data.")
+    ),
       call. = FALSE
     )
   }
