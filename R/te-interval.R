@@ -1,48 +1,50 @@
 xr <- function(parsedmodel = NULL, qr_field = NULL, res.var = NULL) {
   qr_field <- parse_expr(qr_field)
-  
+
   labels <- parsedmodel %>%
     filter(.data$labels == "labels") %>%
     as.character()
-  
+
   labels <- labels[4:length(labels)]
   labels <- c("estimate", labels)
-  
-  
+
+
   all_terms <- parsedmodel %>%
     mutate(estimate = !! qr_field) %>%
-    filter(.data$type == "term",
-           .data$estimate != 0) %>%
-    select(- .data$type, -.data$labels) 
-  
+    filter(
+      .data$type == "term",
+      .data$estimate != 0
+    ) %>%
+    select(-.data$type, -.data$labels)
+
   selection <- which(labels != "NA")
   all_terms <- all_terms[, which(labels != "NA")]
   colnames(all_terms) <- labels[which(labels != "NA")]
-  
-  
+
+
   f <- seq_len(nrow(all_terms)) %>%
     map(~{
       vars <- colnames(all_terms)
       vals <- as.character(all_terms[.x, ])
-      
+
       estimate <- vals[vars == "estimate"]
       estimate <- expr(!! as.numeric(estimate))
-      
+
       reg <- vars[vals == "{{:}}" & !is.na(vals) & vars != "estimate"]
       reg <- expr(!! syms(reg))
-      
+
       field <- vars[vals != "{{:}}" & !is.na(vals) & vars != "estimate"]
-      val <-  vals[vals != "{{:}}" & !is.na(vals) & vars != "estimate"]
-      ie <- map2(syms(field), val, function(x, y) expr((!!x) == (!!y)))
-      ie <- map(ie, function(x) expr(ifelse(!!x, 1, 0)))
+      val <- vals[vals != "{{:}}" & !is.na(vals) & vars != "estimate"]
+      ie <- map2(syms(field), val, function(x, y) expr((!! x) == (!! y)))
+      ie <- map(ie, function(x) expr(ifelse(!! x, 1, 0)))
       set <- c(reg, ie, estimate)
       reduce(set, function(l, r) expr((!!! l) * (!!! r)))
-    } )
-  
+    })
+
   f <- reduce(f, function(l, r) expr((!! l) + (!! r)))
-  
+
   f <- expr((!! f) * (!! f) * (!! res.var))
-  
+
   f
 }
 
@@ -61,7 +63,7 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
     filter(.data$type != "variable") %>%
     select(starts_with("qr_"))
 
-  xrinv <- colnames(qr) %>% 
+  xrinv <- colnames(qr) %>%
     map(~xr(parsedmodel, .x, res.var)) %>%
     flatten()
 
