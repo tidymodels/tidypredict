@@ -60,12 +60,14 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
     as.numeric()
 
   qr <- parsedmodel %>%
-    filter(.data$type != "variable") %>%
+    filter(.data$type == "term") %>%
     select(starts_with("qr_"))
 
   xrinv <- colnames(qr) %>%
-    map(~xr(parsedmodel, .x, res.var)) %>%
-    flatten()
+    map(~xr(
+      parsedmodel = parsedmodel, 
+      qr_field = .x, 
+      res.var = res.var)) 
 
   ip <- reduce(xrinv, function(l, r) expr((!! l) + (!! r)))
 
