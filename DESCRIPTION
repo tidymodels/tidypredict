@@ -1,6 +1,6 @@
 Package: tidypredict
 Version: 0.1.0
-Title: Run predictions inside the database
+Title: Run Predictions Inside the Database
 Description: It works with several databases back-ends because it leverages 'dplyr'  and 'dbplyr' for the final SQL translation of the algorithm.
 Authors@R:
     person("Edgar", "Ruiz", email = "edgar@rstudio.com", role = c("aut", "cre"))

@@ -4,7 +4,7 @@
 \name{tidypredict-package}
 \alias{tidypredict}
 \alias{tidypredict-package}
-\title{tidypredict: Run predictions inside the database}
+\title{tidypredict: Run Predictions Inside the Database}
 \description{
 It works with several databases back-ends because it leverages 'dplyr'  and 'dbplyr' for the final SQL translation of the algorithm.
 }
