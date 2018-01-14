@@ -14,3 +14,4 @@ travis.yml
 ^layouts$
 config.toml
 ^revdep$
+^cran-comments\.md$

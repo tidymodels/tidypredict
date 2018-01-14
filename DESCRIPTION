@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.0.0.9002
+Version: 0.1.0
 Title: Run predictions inside the database
 Description: It works with several databases back-ends because it leverages 'dplyr'  and 'dbplyr' for the final SQL translation of the algorithm.
 Authors@R:
