@@ -1,7 +1,3 @@
-#' @import rlang
-#' @importFrom purrr map2
-#' @importFrom purrr reduce
-#' @import dplyr
 te_fit_lm <- function(parsedmodel) {
   labels <- parsedmodel %>%
     filter(labels == "labels") %>%
@@ -45,8 +41,6 @@ te_fit_lm <- function(parsedmodel) {
   reduce(f, function(l, r) expr((!! l) + (!! r)))
 }
 
-#' @import rlang
-#' @import dplyr
 te_fit_glm <- function(parsedmodel) {
   fit <- te_fit_lm(parsedmodel)
 

@@ -1,17 +1,15 @@
 #' Checks that the formula can be parsed
 #'
 #' Uses an S3 method to check that a given formula can be parsed based on its class.
-#' Currently it supports lm() and glm() models.  It currently checks for contrasts
-#' in variables that currently cannot be parsed, and checks to make sure that there
-#' are no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).
-#' This function is mostly meant for function interaction, not user interaction.
+#' It currently scans for contrasts that are not supported and in-line functions.
+#' (e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,
+#' as opposed to human interaction, a successful check is silent.
 #'
 #' @param model An R model object
 #'
 #' @examples
 #'
-#' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-#' model <- lm(x ~ y, df)
+#' model <- lm(mpg ~ wt, mtcars)
 #' acceptable_formula(model)
 #'
 #' @export

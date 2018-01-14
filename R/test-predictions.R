@@ -1,9 +1,10 @@
 #' Tests base predict function against tidypredict
 #'
-#' Compares the results of running predict() and the tidypredict_to_column()
+#' Compares the results of predict() and tidypredict_to_column()
 #' functions.
 #'
-#' @param model An R model object
+#' @param model An R model or a tibble with a parsed model. It currently supports
+#' lm(), glm() and randomForest() models.
 #' @param df A data frame that contains all of the needed fields to run the prediction.
 #' It defaults to the "model" data frame object inside the model object.
 #' @param threshold The number that a given result difference, between predict() and
@@ -17,9 +18,10 @@
 #'
 #' @examples
 #'
-#' df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-#' model <- lm(x ~ y, df)
-#' tidypredict_test(model, include_intervals = TRUE)
+#'library(dplyr)
+#'df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+#'model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#'tidypredict_test(model)
 #'
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL) {
@@ -165,7 +167,6 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, inclu
   structure(results, class = c("tidypredict_test", "list"))
 }
 setOldClass(c("tidypredict_test", "list"))
-
 
 #' print method for test predictions results
 #' @keywords internal

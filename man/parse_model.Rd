@@ -7,18 +7,20 @@
 parse_model(model)
 }
 \arguments{
-\item{model}{An R model object}
+\item{model}{An R model object. It currently supports lm(), 
+glm() and randomForest() models.}
 }
 \description{
-It parses a fitted R model's structure to extract all of the necessary
-components to pass along to the functions that create the actual
-Tidy Eval formula that dplyr can read.  It is currently able to parse
-lm() and glm() models.
+It parses a fitted R model's structure and extracts the components
+needed to create a dplyr formula for prediction.  The function also
+creates a data frame using an specific format so that other
+functions in the future can also pass parsed tables to a given
+formula creating function.
 }
 \examples{
-
-df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-model <- lm(x ~ y, df)
+library(dplyr)
+df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
 parse_model(model)
 
 }

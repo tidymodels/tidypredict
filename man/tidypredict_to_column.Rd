@@ -10,8 +10,7 @@ tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,
 \arguments{
 \item{df}{A data.frame or tibble}
 
-\item{model}{An R object, typically an R model, but it can also bee a regular data frame
-that has a parsed model already loaded.}
+\item{model}{An R model or a parsed model inside a data frame}
 
 \item{add_interval}{Switch that indicates if the prediction interval columns should be added. Defaults
 to FALSE}
@@ -27,12 +26,10 @@ If add_interval is set to TRUE, then it will add two additional columns, one
 for the lower and another for the upper prediction interval bounds.
 }
 \examples{
-
 library(dplyr)
+df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
 
-df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-model <- lm(x ~ y, df)
 df \%>\%
   tidypredict_to_column(model, add_interval = TRUE)
-
 }

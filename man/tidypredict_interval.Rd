@@ -7,26 +7,24 @@
 tidypredict_interval(model, interval = 0.95)
 }
 \arguments{
-\item{model}{An R model or a tibble with a parsed model}
+\item{model}{An R model or a tibble with a parsed model. It currently supports
+lm() models only.}
 
 \item{interval}{The prediction interval, defaults to 0.95}
 }
 \description{
-It uses parse_model to create a tabular version of the data needed to create
-a Tidy Eval formula that can then be used inside a dplyr command.  It uses
-S3 methods to automatically determine the class of the model and run the
-corresponding function that is able to create the Tidy Eval formula.  It
-currently supports lm() models.
+It parses a model or uses an already parsed model to return a
+Tidy Eval formula that can then be used inside a dplyr command.
 }
 \details{
 The result still has to be added to the fit to obtain the upper bound, and
-substracted from fit to obtain the lower bound.
+subtracted from fit to obtain the lower bound.
 }
 \examples{
 
-df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-model <- lm(x ~ y, df)
+library(dplyr)
+df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
 tidypredict_interval(model)
-
 
 }

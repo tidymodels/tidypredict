@@ -1,9 +1,8 @@
 #' Returns a SQL query with formula to calculate fitted values
 #'
-#'
 #' @param model An R model or a tibble with a parsed model
 #' @param con Database connection object. It is used to select
-#' the correst SQL translation syntax.
+#' the correct SQL translation syntax.
 #'
 #' @examples
 #' library(dbplyr)
@@ -23,7 +22,7 @@ tidypredict_sql <- function(model, con) {
 #'
 #' @param model An R model or a tibble with a parsed model
 #' @param con  Database connection object. It is used to select
-#' the correst SQL translation syntax.
+#' the correct SQL translation syntax.
 #' @param interval The prediction interval, defaults to 0.95
 #'
 #' @examples

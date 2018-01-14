@@ -8,7 +8,8 @@ tidypredict_test(model, df = model$model, threshold = 1e-12,
   include_intervals = FALSE, max_rows = NULL)
 }
 \arguments{
-\item{model}{An R model object}
+\item{model}{An R model or a tibble with a parsed model. It currently supports
+lm(), glm() and randomForest() models.}
 
 \item{df}{A data frame that contains all of the needed fields to run the prediction.
 It defaults to the "model" data frame object inside the model object.}
@@ -25,13 +26,14 @@ included in the test.  It defaults to FALSE.}
 recommended for large data sets.}
 }
 \description{
-Compares the results of running predict() and the tidypredict_to_column()
+Compares the results of predict() and tidypredict_to_column()
 functions.
 }
 \examples{
 
-df <- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))
-model <- lm(x ~ y, df)
-tidypredict_test(model, include_intervals = TRUE)
+library(dplyr)
+df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+tidypredict_test(model)
 
 }

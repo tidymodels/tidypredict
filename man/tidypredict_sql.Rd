@@ -10,7 +10,7 @@ tidypredict_sql(model, con)
 \item{model}{An R model or a tibble with a parsed model}
 
 \item{con}{Database connection object. It is used to select
-the correst SQL translation syntax.}
+the correct SQL translation syntax.}
 }
 \description{
 Returns a SQL query with formula to calculate fitted values
