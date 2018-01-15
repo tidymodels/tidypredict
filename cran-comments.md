@@ -6,4 +6,8 @@
 ## R CMD check results
 * 0 errors | 0 warnings | 0 notes
 
-## This is the package's first submission
+## Resubmission
+
+This is a resubmission. In this version I have:
+
+- Quoted software names in the DESCRIPTION file  
