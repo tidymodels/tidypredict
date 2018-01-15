@@ -49,22 +49,24 @@ te_fit_glm <- function(parsedmodel) {
 
   assigned <- 0
 
-  if (family == "gaussian" && link == "identity") {
+  if (link == "identity") {
     assigned <- 1
   }
 
-  if (family == "binomial" && link == "logit") {
+  if (link == "logit") {
     assigned <- 1
     fit <- expr(1 - 1 / (1 + exp(!! fit)))
   }
-
-  if (assigned == 0) {
-    stop("Combination of family and link are not supported")
-  }
-
+  
+  
   if (link == "log") {
     assigned <- 1
     fit <- expr(exp(!! fit))
+  }
+
+
+  if (assigned == 0) {
+    stop("Combination of family and link are not supported")
   }
 
   fit
