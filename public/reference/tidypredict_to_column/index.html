@@ -5,6 +5,7 @@
   
    <html class="no-js"> 
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
   <head lang="en-us">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
@@ -27,8 +28,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/logo.png">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
 
     <style>
       @font-face {
@@ -71,7 +72,7 @@
     
 
   </head>
-  <body class="palette-primary-teal palette-accent-blue">
+  <body class="palette-primary-grey palette-accent-light-green">
 
 
 
@@ -136,12 +137,14 @@
 		<nav aria-label="Navigation">
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
+      
+        <div>
+          <img src="/images/logo.png" , width="120", height="125">
+        </div>
+      
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
-        
-          <br>
-          edgararuiz/tidypredict
-        
+        <strong>tidypredict <span class="version">v.0.1.0</span></strong>
+
       </div>
     </div>
   </a>
@@ -156,6 +159,12 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               
             </p>
 
@@ -470,7 +479,7 @@ RawBlameHistory
 
     <script>
       /* Add headers to scrollspy */
-      var headers   = document.getElementsByTagName("div");
+      var headers   = document.getElementsByTagName("section");
       var scrollspy = document.getElementById('scrollspy');
       if(scrollspy) {
         if(headers.length > 0) {
