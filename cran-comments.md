@@ -10,4 +10,5 @@
 
 This is a resubmission. In this version I have:
 
-- Quoted software names in the DESCRIPTION file  
+- Quoted software names in the DESCRIPTION file
+- Removed quotes from functions
