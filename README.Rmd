@@ -9,11 +9,18 @@ library(tidypredict)
 library(randomForest)
 ```
 
-Run predictions inside the database. It works with several databases back-ends because it uses `dbplyr` for the final SQL translation of the algorithm.
+Run predictions inside the database. `tidypredict` parses a fitted R model object, and returns a formula in 'Tidy Eval' code that calculates the predictions.
+
+**It works with several databases back-ends** because it leverages `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It currently supports `lm()`, `glm()` and `randomForest()` models.
 
 ## Installation
 
-Install `tidypredict` using `devtools` as follows:
+Install `tidypredict` from CRAN using:
+```{r, eval = FALSE}
+install.packages("tidypredict")
+```
+
+Or install the development version using `devtools` as follows:
 ```{r, eval = FALSE}
 devtools::install_github("edgararuiz/tidypredict")
 ```
