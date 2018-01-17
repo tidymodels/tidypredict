@@ -29,7 +29,9 @@
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/acceptable_formula/</guid>
-      <description>ArgumentsExamplesUses an S3 method to check that a given formula can be parsed based on its class.Currently it supports lm() and glm() models. It currently checks for contrastsin variables that currently cannot be parsed, and checks to make sure that thereare no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).This function is mostly meant for function interaction, not user interaction.</description>
+      <description>ArgumentsExamplesUses an S3 method to check that a given formula can be parsed based on its class.It currently scans for contrasts that are not supported and in-line functions.(e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,as opposed to human interaction, a successful check is silent.
+acceptable_formula(model)ArgumentsmodelAn R model object
+Examplesmodel &amp;lt;- lm(mpg ~ wt, mtcars)acceptable_formula(model)</description>
     </item>
     
     <item>
@@ -48,9 +50,8 @@ knit_print.tidypredict_test(x, ...)</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/parse_model/</guid>
-      <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure to extract all of the necessarycomponents to pass along to the functions that create the actualTidy Eval formula that dplyr can read. It is currently able to parselm() and glm() models.
-parse_model(model)ArgumentsmodelAn R model object
-Examplesdf &amp;lt;- data.frame(x = c(1, 2, 5, 6 ,6), y = c(2, 3, 6, 5, 4))model &amp;lt;- lm(x ~ y, df)parse_model(model)#&amp;gt; # A tibble: 7 x 7#&amp;gt; labels estimate type field_1 qr_1 qr_2 vals #&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;chr&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;dbl&amp;gt; &amp;lt;chr&amp;gt; #&amp;gt; 1 (Intercept) - 0.</description>
+      <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure and extracts the componentsneeded to create a dplyr formula for prediction. The function alsocreates a data frame using an specific format so that otherfunctions in the future can also pass parsed tables to a givenformula creating function.
+parse_model(model)ArgumentsmodelAn R model object. It currently supports lm(), glm() and randomForest() models.</description>
     </item>
     
     <item>
@@ -64,13 +65,27 @@ parse_model(model)ArgumentsmodelAn R model object
     </item>
     
     <item>
+      <title>tidypredict,tidypredict-package</title>
+      <link>/reference/tidypredict-package/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/reference/tidypredict-package/</guid>
+      <description>See alsoIt parses a fitted &#39;R&#39; model object, and returns a formulain &#39;Tidy Eval&#39; code that calculates the predictions.It works with several databases back-ends because it leverages &#39;dplyr&#39;and &#39;dbplyr&#39; for the final &#39;SQL&#39; translation of the algorithm. It currentlysupports lm(), glm() and randomForest() models.
+See alsoUseful links:
+http://tidypredict.netlify.com/
+Report bugs at https://github.com/edgararuiz/tidypredict/issues
+</description>
+    </item>
+    
+    <item>
       <title>tidypredict_fit</title>
       <link>/reference/tidypredict_fit/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/tidypredict_fit/</guid>
-      <description>ArgumentsExamplesIt uses parse_model to create a tabular version of the data needed to createa Tidy Eval formula that can then be used inside a dplyr command. It usesS3 methods to automatically determine the class of the model and run thecorresponding function that is able to create the Tidy Eval formula. Itcurrently supports lm() and glm() models.
-tidypredict_fit(model)ArgumentsmodelAn R model or a tibble with a parsed model</description>
+      <description>ArgumentsExamplesIt parses a model or uses an already parsed model to return aTidy Eval formula that can then be used inside a dplyr command.
+tidypredict_fit(model)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm(), glm() and randomForest() models.
+Exampleslibrary(dplyr)df &amp;lt;- mutate(mtcars, cyl = paste0(&#34;cyl&#34;, cyl))model &amp;lt;- lm(mpg ~ wt + cyl * disp, offset = am, data = df)tidypredict_fit(model)#&amp;gt; (((((((39.</description>
     </item>
     
     <item>
@@ -79,8 +94,10 @@ tidypredict_fit(model)ArgumentsmodelAn R model or a tibble with a parsed m
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/tidypredict_interval/</guid>
-      <description>ArgumentsDetailsExamplesIt uses parse_model to create a tabular version of the data needed to createa Tidy Eval formula that can then be used inside a dplyr command. It usesS3 methods to automatically determine the class of the model and run thecorresponding function that is able to create the Tidy Eval formula. Itcurrently supports lm() models.
-tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model</description>
+      <description>ArgumentsDetailsExamplesIt parses a model or uses an already parsed model to return aTidy Eval formula that can then be used inside a dplyr command.
+tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm() models only.
+intervalThe prediction interval, defaults to 0.95
+DetailsThe result still has to be added to the fit to obtain the upper bound, andsubtracted from fit to obtain the lower bound.</description>
     </item>
     
     <item>
@@ -91,8 +108,8 @@ tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a 
       <guid>/reference/tidypredict_sql/</guid>
       <description>ArgumentsExamplesReturns a SQL query with formula to calculate fitted values
 tidypredict_sql(model, con)ArgumentsmodelAn R model or a tibble with a parsed model
-conDatabase connection object. It is used to selectthe correst SQL translation syntax.
-Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (((39.4179334351865) + ((&#34;wt&#34;) * (-3.</description>
+conDatabase connection object. It is used to selectthe correct SQL translation syntax.
+Exampleslibrary(dbplyr)#&amp;gt; #&amp;gt; Attaching package: �dbplyr�#&amp;gt; The following objects are masked from �package:tidypredict�:#&amp;gt; #&amp;gt; ident, sql#&amp;gt; The following objects are masked from �package:dplyr�:#&amp;gt; #&amp;gt; ident, sqlmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (((39.</description>
     </item>
     
     <item>
@@ -103,9 +120,9 @@ tidypredict_sql(model, con)ArgumentsmodelAn R model or a tibble with a par
       <guid>/reference/tidypredict_sql_interval/</guid>
       <description>ArgumentsExamplesReturns a SQL query with formula to calculate predicted interval
 tidypredict_sql_interval(model, con, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model
-conDatabase connection object. It is used to selectthe correst SQL translation syntax.
+conDatabase connection object. It is used to selectthe correct SQL translation syntax.
 intervalThe prediction interval, defaults to 0.95
-Examplesmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql_interval(model, dbplyr::simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (2.</description>
+Exampleslibrary(dbplyr)model &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql_interval(model, simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (2.</description>
     </item>
     
     <item>
@@ -114,10 +131,9 @@ tidypredict_sql_interval(model, con, interval = 0.95)ArgumentsmodelAn R mo
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/tidypredict_test/</guid>
-      <description>ArgumentsExamplesCompares the results of running predict() and the tidypredict_to_column()functions.
-tidypredict_test(model, df = model$model, threshold = 1e-12,include_intervals = FALSE, max_rows = NULL)ArgumentsmodelAn R model object
-dfA data frame that contains all of the needed fields to run the prediction.It defaults to the &#34;model&#34; data frame object inside the model object.
-thresholdThe number that a given result difference, between predict() andtidypredict_to_column() should not exceed.</description>
+      <description>ArgumentsExamplesCompares the results of predict() and tidypredict_to_column()functions.
+tidypredict_test(model, df = model$model, threshold = 1e-12,include_intervals = FALSE, max_rows = NULL)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm(), glm() and randomForest() models.
+dfA data frame that contains all of the needed fields to run the prediction.It defaults to the &#34;</description>
     </item>
     
     <item>
@@ -128,7 +144,7 @@ tidypredict_test(model, df = model$model, threshold = 1e-12,include_intervals =
       <guid>/reference/tidypredict_to_column/</guid>
       <description>ArgumentsExamplesAdds a new column with the results form tidypredict_fit() to a piped command set.If add_interval is set to TRUE, then it will add two additional columns, onefor the lower and another for the upper prediction interval bounds.
 tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,vars = c(&#34;fit&#34;, &#34;upper&#34;, &#34;lower&#34;))ArgumentsdfA data.frame or tibble
-modelAn R object, typically an R model, but it can also bee a regular data framethat has a parsed model already loaded.</description>
+modelAn R model or a parsed model inside a data frame</description>
     </item>
     
   </channel>

@@ -331,10 +331,9 @@
 
     
     <p>Uses an S3 method to check that a given formula can be parsed based on its class.
-Currently it supports lm() and glm() models.  It currently checks for contrasts
-in variables that currently cannot be parsed, and checks to make sure that there
-are no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).
-This function is mostly meant for function interaction, not user interaction.</p>
+It currently scans for contrasts that are not supported and in-line functions.
+(e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,
+as opposed to human interaction, a successful check is silent.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>acceptable_formula</span>(<span class='no'>model</span>)</code></pre></div>
@@ -356,8 +355,7 @@ This function is mostly meant for function interaction, not user interaction.</p
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span>, <span class='no'>mtcars</span>)
 <span class='fu'>acceptable_formula</span>(<span class='no'>model</span>)</div></code></pre></div>
     </div>
 

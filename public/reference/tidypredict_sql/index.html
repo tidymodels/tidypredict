@@ -350,15 +350,20 @@
     <tr>
       <td>con</td>
       <td><p>Database connection object. It is used to select
-the correst SQL translation syntax.</p></td>
+the correct SQL translation syntax.</p></td>
     </tr>
     </table>
     
 
     <h2 id="examples">Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='fu'>library</span>(<span class='no'>dbplyr</span>)</div><div class='output co'>#&gt; <span class='message'></span>
+#&gt; <span class='message'>Attaching package: ‘dbplyr’</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:tidypredict’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    ident, sql</span></div><div class='output co'>#&gt; <span class='message'>The following objects are masked from ‘package:dplyr’:</span>
+#&gt; <span class='message'></span>
+#&gt; <span class='message'>    ident, sql</span></div><div class='input'>
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>am</span> + <span class='no'>cyl</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
-<span class='fu'>tidypredict_sql</span>(<span class='no'>model</span>, <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (((39.4179334351865) + (("wt") * (-3.12514220026708))) + (("am") * (0.176493157719668))) + (("cyl") * (-1.5102456624971))</div><div class='input'>
+<span class='fu'>tidypredict_sql</span>(<span class='no'>model</span>, <span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (((39.4179334351865) + (("wt") * (-3.12514220026708))) + (("am") * (0.176493157719668))) + (("cyl") * (-1.5102456624971))</div><div class='input'>
 </div></code></pre></div>
     </div>
 

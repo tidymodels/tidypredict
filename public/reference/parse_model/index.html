@@ -330,10 +330,11 @@
     <div class="doc-page-body">
 
     
-    <p>It parses a fitted R model's structure to extract all of the necessary
-components to pass along to the functions that create the actual
-Tidy Eval formula that dplyr can read.  It is currently able to parse
-lm() and glm() models.</p>
+    <p>It parses a fitted R model's structure and extracts the components
+needed to create a dplyr formula for prediction.  The function also
+creates a data frame using an specific format so that other
+functions in the future can also pass parsed tables to a given
+formula creating function.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>parse_model</span>(<span class='no'>model</span>)</code></pre></div>
@@ -348,25 +349,33 @@ lm() and glm() models.</p>
 
     <tr>
       <td>model</td>
-      <td><p>An R model object</p></td>
+      <td><p>An R model object. It currently supports lm(), 
+glm() and randomForest() models.</p></td>
     </tr>
     </table>
     
 
     <h2 id="examples">Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>parse_model</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; # A tibble: 7 x 7
-#&gt;   labels      estimate type     field_1    qr_1    qr_2 vals            
-#&gt;   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;           
-#&gt; 1 (Intercept)  - 0.800 term     &lt;NA&gt;    - 0.447 - 1.26  &lt;NA&gt;            
-#&gt; 2 y              1.20  term     {{:}}     0       0.316 &lt;NA&gt;            
-#&gt; 3 labels         0     variable y        NA      NA     &lt;NA&gt;            
-#&gt; 4 model         NA     variable &lt;NA&gt;     NA      NA     lm              
-#&gt; 5 version       NA     variable &lt;NA&gt;     NA      NA     1.0             
-#&gt; 6 residual      NA     variable &lt;NA&gt;     NA      NA     3               
-#&gt; 7 sigma2        NA     variable &lt;NA&gt;     NA      NA     2.53333333333333</div><div class='input'>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='no'>mtcars</span>, <span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"cyl"</span>, <span class='no'>cyl</span>))
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
+<span class='fu'>parse_model</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; # A tibble: 13 x 14
+#&gt;    labels   estimate type   field~ fiel~ fiel~    qr_1    qr_2     qr_3    qr_4
+#&gt;    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+#&gt;  1 (Interc~  39.4    term   &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;  - 0.177 - 0.591 - 0.126    0.386
+#&gt;  2 wt       - 1.62   term   &lt;NA&gt;   &lt;NA&gt;  {{:}}   0       0.184   0.0101 - 0.231
+#&gt;  3 cylcyl6  -18.4    term   cyl6   &lt;NA&gt;  &lt;NA&gt;    0       0       0.428    0.332
+#&gt;  4 cylcyl8  -16.2    term   cyl8   &lt;NA&gt;  &lt;NA&gt;    0       0       0        0.646
+#&gt;  5 disp     - 0.0930 term   &lt;NA&gt;   {{:}} &lt;NA&gt;    0       0       0        0    
+#&gt;  6 cylcyl6~   0.111  term   cyl6   {{:}} &lt;NA&gt;    0       0       0        0    
+#&gt;  7 cylcyl8~   0.0880 term   cyl8   {{:}} &lt;NA&gt;    0       0       0        0    
+#&gt;  8 labels     0      varia~ cyl    disp  wt     NA      NA      NA       NA    
+#&gt;  9 model     NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
+#&gt; 10 version   NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
+#&gt; 11 residual  NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
+#&gt; 12 sigma2    NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
+#&gt; 13 offset    NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
+#&gt; # ... with 4 more variables: qr_5 &lt;dbl&gt;, qr_6 &lt;dbl&gt;, qr_7 &lt;dbl&gt;, vals &lt;chr&gt;</div><div class='input'>
 </div></code></pre></div>
     </div>
 

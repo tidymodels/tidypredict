@@ -320,10 +320,13 @@
 		<div class="wrapper">
 			<h1>tidypredict </h1>
 
-			<p>Run predictions inside the database. It works with several databases back-ends because it uses <code>dbplyr</code> for the final SQL translation of the algorithm.</p>
+			<p>Run predictions inside the database. <code>tidypredict</code> parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.</p>
+<p><strong>It works with several databases back-ends</strong> because it leverages <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm. It currently supports <code>lm()</code>, <code>glm()</code> and <code>randomForest()</code> models.</p>
 <section id="installation" class="level2">
 <h2>Installation</h2>
-<p>Install <code>tidypredict</code> using <code>devtools</code> as follows:</p>
+<p>Install <code>tidypredict</code> from CRAN using:</p>
+<pre class="r"><code>install.packages(&quot;tidypredict&quot;)</code></pre>
+<p>Or install the development version using <code>devtools</code> as follows:</p>
 <pre class="r"><code>devtools::install_github(&quot;edgararuiz/tidypredict&quot;)</code></pre>
 </section>
 <section id="intro" class="level2">
@@ -383,14 +386,14 @@
 
   <div class="next">
   
-      <a href="/reference/tidypredict_fit/" title="tidypredict_fit">
+      <a href="/reference/tidypredict-package/" title="tidypredict,tidypredict-package">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict_fit
+              tidypredict,tidypredict-package
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

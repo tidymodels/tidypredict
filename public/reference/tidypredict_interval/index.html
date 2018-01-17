@@ -332,11 +332,8 @@
     <div class="doc-page-body">
 
     
-    <p>It uses parse_model to create a tabular version of the data needed to create
-a Tidy Eval formula that can then be used inside a dplyr command.  It uses
-S3 methods to automatically determine the class of the model and run the
-corresponding function that is able to create the Tidy Eval formula.  It
-currently supports lm() models.</p>
+    <p>It parses a model or uses an already parsed model to return a
+Tidy Eval formula that can then be used inside a dplyr command.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</code></pre></div>
@@ -351,7 +348,8 @@ currently supports lm() models.</p>
 
     <tr>
       <td>model</td>
-      <td><p>An R model or a tibble with a parsed model</p></td>
+      <td><p>An R model or a tibble with a parsed model. It currently supports
+lm() models only.</p></td>
     </tr>
     <tr>
       <td>interval</td>
@@ -362,18 +360,57 @@ currently supports lm() models.</p>
     <h2 id="details">Details</h2>
 
     <p>The result still has to be added to the fit to obtain the upper bound, and
-substracted from fit to obtain the lower bound.</p>
+subtracted from fit to obtain the lower bound.</p>
     
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (3.18244630528371) * sqrt((((-0.447213595499958) * (-0.447213595499958) * 
-#&gt;     (2.53333333333333)) + (((-1.26491106406735) + ((y) * (0.316227766016838))) * 
-#&gt;     ((-1.26491106406735) + ((y) * (0.316227766016838))) * (2.53333333333333))) + 
-#&gt;     (2.53333333333333))</div><div class='input'>
-
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='no'>mtcars</span>, <span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"cyl"</span>, <span class='no'>cyl</span>))
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
+<span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (2.0595385527533) * sqrt(((((((((-0.176776695296637) * (-0.176776695296637) * 
+#&gt;     (5.4148660732425)) + (((-0.590557271637747) + ((wt) * (0.183559646169165))) * 
+#&gt;     ((-0.590557271637747) + ((wt) * (0.183559646169165))) * (5.4148660732425))) + 
+#&gt;     ((((-0.126215672528828) + ((wt) * (0.0101118696567173))) + 
+#&gt;         ((ifelse((cyl) == ("cyl6"), 1, 0)) * (0.428266330860589))) * 
+#&gt;         (((-0.126215672528828) + ((wt) * (0.0101118696567173))) + 
+#&gt;             ((ifelse((cyl) == ("cyl6"), 1, 0)) * (0.428266330860589))) * 
+#&gt;         (5.4148660732425))) + (((((0.386215468111418) + ((wt) * 
+#&gt;     (-0.230516217152034))) + ((ifelse((cyl) == ("cyl6"), 1, 0)) * 
+#&gt;     (0.332336511639638))) + ((ifelse((cyl) == ("cyl8"), 1, 0)) * 
+#&gt;     (0.646203930513815))) * ((((0.386215468111418) + ((wt) * 
+#&gt;     (-0.230516217152034))) + ((ifelse((cyl) == ("cyl6"), 1, 0)) * 
+#&gt;     (0.332336511639638))) + ((ifelse((cyl) == ("cyl8"), 1, 0)) * 
+#&gt;     (0.646203930513815))) * (5.4148660732425))) + ((((((-0.153656347809448) + 
+#&gt;     ((wt) * (0.30544122969658))) + ((ifelse((cyl) == ("cyl6"), 
+#&gt;     1, 0)) * (0.1509332046154))) + ((ifelse((cyl) == ("cyl8"), 
+#&gt;     1, 0)) * (0.76082884204827))) + ((disp) * (-0.00517897882607625))) * 
+#&gt;     (((((-0.153656347809448) + ((wt) * (0.30544122969658))) + 
+#&gt;         ((ifelse((cyl) == ("cyl6"), 1, 0)) * (0.1509332046154))) + 
+#&gt;         ((ifelse((cyl) == ("cyl8"), 1, 0)) * (0.76082884204827))) + 
+#&gt;         ((disp) * (-0.00517897882607625))) * (5.4148660732425))) + 
+#&gt;     (((((((-0.0223589233233276) + ((wt) * (-0.0955117420011905))) + 
+#&gt;         ((ifelse((cyl) == ("cyl6"), 1, 0)) * (1.88382983909738))) + 
+#&gt;         ((ifelse((cyl) == ("cyl8"), 1, 0)) * (-0.403967380709359))) + 
+#&gt;         ((disp) * (0.00228914819342199))) + (((disp) * (ifelse((cyl) == 
+#&gt;         ("cyl6"), 1, 0))) * (-0.0108195644963774))) * ((((((-0.0223589233233276) + 
+#&gt;         ((wt) * (-0.0955117420011905))) + ((ifelse((cyl) == ("cyl6"), 
+#&gt;         1, 0)) * (1.88382983909738))) + ((ifelse((cyl) == ("cyl8"), 
+#&gt;         1, 0)) * (-0.403967380709359))) + ((disp) * (0.00228914819342199))) + 
+#&gt;         (((disp) * (ifelse((cyl) == ("cyl6"), 1, 0))) * (-0.0108195644963774))) * 
+#&gt;         (5.4148660732425))) + ((((((((1.04062152259755) + ((wt) * 
+#&gt;     (0.156526972089146))) + ((ifelse((cyl) == ("cyl6"), 1, 0)) * 
+#&gt;     (-1.41229176936981))) + ((ifelse((cyl) == ("cyl8"), 1, 0)) * 
+#&gt;     (-1.64546937617655))) + ((disp) * (-0.0133008166085693))) + 
+#&gt;     (((disp) * (ifelse((cyl) == ("cyl6"), 1, 0))) * (0.0126666778900692))) + 
+#&gt;     (((disp) * (ifelse((cyl) == ("cyl8"), 1, 0))) * (0.0132409552398366))) * 
+#&gt;     (((((((1.04062152259755) + ((wt) * (0.156526972089146))) + 
+#&gt;         ((ifelse((cyl) == ("cyl6"), 1, 0)) * (-1.41229176936981))) + 
+#&gt;         ((ifelse((cyl) == ("cyl8"), 1, 0)) * (-1.64546937617655))) + 
+#&gt;         ((disp) * (-0.0133008166085693))) + (((disp) * (ifelse((cyl) == 
+#&gt;         ("cyl6"), 1, 0))) * (0.0126666778900692))) + (((disp) * 
+#&gt;         (ifelse((cyl) == ("cyl8"), 1, 0))) * (0.0132409552398366))) * 
+#&gt;     (5.4148660732425))) + (5.4148660732425))</div><div class='input'>
 </div></code></pre></div>
     </div>
 
