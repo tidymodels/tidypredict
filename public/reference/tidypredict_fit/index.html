@@ -5,6 +5,7 @@
   
    <html class="no-js"> 
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
   <head lang="en-us">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
@@ -27,8 +28,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/logo.png">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
 
     <style>
       @font-face {
@@ -71,7 +72,7 @@
     
 
   </head>
-  <body class="palette-primary-teal palette-accent-blue">
+  <body class="palette-primary-grey palette-accent-light-green">
 
 
 
@@ -136,12 +137,14 @@
 		<nav aria-label="Navigation">
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
+      
+        <div>
+          <img src="/images/logo.png" , width="120", height="125">
+        </div>
+      
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
-        
-          <br>
-          edgararuiz/tidypredict
-        
+        <strong>tidypredict <span class="version">v.0.1.0</span></strong>
+
       </div>
     </div>
   </a>
@@ -156,6 +159,12 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               
             </p>
 
@@ -321,11 +330,8 @@
     <div class="doc-page-body">
 
     
-    <p>It uses parse_model to create a tabular version of the data needed to create
-a Tidy Eval formula that can then be used inside a dplyr command.  It uses
-S3 methods to automatically determine the class of the model and run the
-corresponding function that is able to create the Tidy Eval formula.  It
-currently supports lm() and glm() models.</p>
+    <p>It parses a model or uses an already parsed model to return a
+Tidy Eval formula that can then be used inside a dplyr command.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>tidypredict_fit</span>(<span class='no'>model</span>)</code></pre></div>
@@ -340,17 +346,23 @@ currently supports lm() and glm() models.</p>
 
     <tr>
       <td>model</td>
-      <td><p>An R model or a tibble with a parsed model</p></td>
+      <td><p>An R model or a tibble with a parsed model. It currently supports
+lm(), glm() and randomForest() models.</p></td>
     </tr>
     </table>
     
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
-<span class='fu'>tidypredict_fit</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (-0.799999999999997) + ((y) * (1.2))</div><div class='input'>
-
+<span class='fu'>library</span>(<span class='no'>dplyr</span>)
+<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='no'>mtcars</span>, <span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"cyl"</span>, <span class='no'>cyl</span>))
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
+<span class='fu'>tidypredict_fit</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; (((((((39.4127792009634) + ((wt) * (-1.61917264901457))) + ((ifelse((cyl) == 
+#&gt;     ("cyl6"), 1, 0)) * (-18.4170134479827))) + ((ifelse((cyl) == 
+#&gt;     ("cyl8"), 1, 0)) * (-16.2066476965851))) + ((disp) * (-0.0929785674850189))) + 
+#&gt;     (((disp) * (ifelse((cyl) == ("cyl6"), 1, 0))) * (0.11133890642722))) + 
+#&gt;     (((disp) * (ifelse((cyl) == ("cyl8"), 1, 0))) * (0.0879557120382374))) + 
+#&gt;     (am)</div><div class='input'>
 </div></code></pre></div>
     </div>
 
@@ -374,7 +386,7 @@ currently supports lm() and glm() models.</p>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/" title="tidypredict">
+      <a href="/reference/tidypredict-package/" title="tidypredict,tidypredict-package">
         <span class="direction">
           Previous
         </span>
@@ -384,7 +396,7 @@ currently supports lm() and glm() models.</p>
           </div>
           <div class="stretch">
             <div class="title">
-              tidypredict
+              tidypredict,tidypredict-package
             </div>
           </div>
         </div>

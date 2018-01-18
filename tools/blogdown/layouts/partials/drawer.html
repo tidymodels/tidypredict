@@ -1,12 +1,14 @@
 <nav aria-label="Navigation">
   <a href="{{ with .Site.Params.repo_url }}{{ . }}{{ else }}{{ .Site.BaseURL }}{{ end }}" class="project">
     <div class="banner">
+      {{ with .Site.Params.logo }}
+        <div>
+          <img src="{{ $.Site.BaseURL }}{{ . }}" , width="120", height="125">
+        </div>
+      {{ end }}
       <div class="name">
         <strong>{{ .Site.Title }} {{ with .Site.Params.version }}<span class="version">{{ . }}</span>{{ end }}</strong>
-        {{ with .Scratch.Get "repo_id" }}
-          <br>
-          {{ . }}
-        {{ end }}
+
       </div>
     </div>
   </a>
@@ -21,6 +23,12 @@
               <a href="https://travis-ci.org/{{ . }}">
                 <img src="https://travis-ci.org/{{ . }}.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/{{ . }}">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/{{ . }}">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               {{end}}
             </p>
 

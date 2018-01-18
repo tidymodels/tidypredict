@@ -5,6 +5,7 @@
   
    <html class="no-js"> 
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
   <head lang="en-us">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
@@ -27,8 +28,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/logo.png">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
 
     <style>
       @font-face {
@@ -71,7 +72,7 @@
     
 
   </head>
-  <body class="palette-primary-teal palette-accent-blue">
+  <body class="palette-primary-grey palette-accent-light-green">
 
 
 
@@ -136,12 +137,14 @@
 		<nav aria-label="Navigation">
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
+      
+        <div>
+          <img src="/images/logo.png" , width="120", height="125">
+        </div>
+      
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
-        
-          <br>
-          edgararuiz/tidypredict
-        
+        <strong>tidypredict <span class="version">v.0.1.0</span></strong>
+
       </div>
     </div>
   </a>
@@ -156,6 +159,12 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               
             </p>
 
@@ -322,10 +331,9 @@
 
     
     <p>Uses an S3 method to check that a given formula can be parsed based on its class.
-Currently it supports lm() and glm() models.  It currently checks for contrasts
-in variables that currently cannot be parsed, and checks to make sure that there
-are no in-line R functions in the call of the formula (e.g: lm(wt ~ as.factor(am))).
-This function is mostly meant for function interaction, not user interaction.</p>
+It currently scans for contrasts that are not supported and in-line functions.
+(e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,
+as opposed to human interaction, a successful check is silent.</p>
     
 
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>acceptable_formula</span>(<span class='no'>model</span>)</code></pre></div>
@@ -347,8 +355,7 @@ This function is mostly meant for function interaction, not user interaction.</p
 
     <h2 id="examples">Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
-<span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'>data.frame</span>(<span class='kw'>x</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>1</span>, <span class='fl'>2</span>, <span class='fl'>5</span>, <span class='fl'>6</span> ,<span class='fl'>6</span>), <span class='kw'>y</span> <span class='kw'>=</span> <span class='fu'>c</span>(<span class='fl'>2</span>, <span class='fl'>3</span>, <span class='fl'>6</span>, <span class='fl'>5</span>, <span class='fl'>4</span>))
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>x</span> ~ <span class='no'>y</span>, <span class='no'>df</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span>, <span class='no'>mtcars</span>)
 <span class='fu'>acceptable_formula</span>(<span class='no'>model</span>)</div></code></pre></div>
     </div>
 

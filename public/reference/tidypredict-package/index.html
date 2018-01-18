@@ -10,18 +10,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>print.tidypredict_test - tidypredict</title>
+    <title>tidypredict,tidypredict-package - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
     <meta name="description" content="Parses a model to create a predict routine with Tidy Eval.">
     
-    <link rel="canonical" href="/reference/print.tidypredict_test/">
+    <link rel="canonical" href="/reference/tidypredict-package/">
     
     <meta name="author" content="Edgar Ruiz">
     
 
-    <meta property="og:url" content="/reference/print.tidypredict_test/">
+    <meta property="og:url" content="/reference/tidypredict-package/">
     <meta property="og:title" content="tidypredict">
     <meta property="og:image" content="/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="tidypredict">
@@ -98,7 +98,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - print.tidypredict_test
+        tidypredict - tidypredict,tidypredict-package
       </div>
     </div>
 
@@ -315,24 +315,35 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>print.tidypredict_test </h1>
+			<h1>tidypredict,tidypredict-package </h1>
 
 			<div class="doc-page">
 
     <div class="doc-page-index">
     <ul data-gumshoe>
-            </ul>
+    
+    <li><a href="#see-also">See also</a></li>
+        </ul>
     </div>
 
     <div class="doc-page-body">
 
     
-    <p>print method for test predictions results</p>
+    <p>It parses a fitted 'R' model object, and returns a formula
+in 'Tidy Eval' code that calculates the predictions.
+It works with several databases back-ends because it leverages 'dplyr'
+and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
+supports lm(), glm() and randomForest() models.</p>
     
 
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='co'># S3 method for tidypredict_test</span>
-<span class='fu'>print</span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
         
+    <h2 id="see-also">See also</h2>
+
+    <p>Useful links:</p><ul>
+<li><p><a href='http://tidypredict.netlify.com/'>http://tidypredict.netlify.com/</a></p></li>
+<li><p>Report bugs at <a href='https://github.com/edgararuiz/tidypredict/issues'>https://github.com/edgararuiz/tidypredict/issues</a></p></li>
+</ul>
+    
 
     </div>
 
@@ -356,7 +367,7 @@
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/parse_model/" title="parse_model">
+      <a href="/" title="tidypredict">
         <span class="direction">
           Previous
         </span>
@@ -366,7 +377,7 @@
           </div>
           <div class="stretch">
             <div class="title">
-              parse_model
+              tidypredict
             </div>
           </div>
         </div>
@@ -376,14 +387,14 @@
 
   <div class="next">
   
-      <a href="/" title="tidypredict">
+      <a href="/reference/tidypredict_fit/" title="tidypredict_fit">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict
+              tidypredict_fit
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

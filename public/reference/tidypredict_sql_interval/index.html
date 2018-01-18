@@ -5,6 +5,7 @@
   
    <html class="no-js"> 
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
   <head lang="en-us">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
@@ -27,8 +28,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/logo.png">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
 
     <style>
       @font-face {
@@ -71,7 +72,7 @@
     
 
   </head>
-  <body class="palette-primary-teal palette-accent-blue">
+  <body class="palette-primary-grey palette-accent-light-green">
 
 
 
@@ -136,12 +137,14 @@
 		<nav aria-label="Navigation">
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
+      
+        <div>
+          <img src="/images/logo.png" , width="120", height="125">
+        </div>
+      
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
-        
-          <br>
-          edgararuiz/tidypredict
-        
+        <strong>tidypredict <span class="version">v.0.1.0</span></strong>
+
       </div>
     </div>
   </a>
@@ -156,6 +159,12 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               
             </p>
 
@@ -341,7 +350,7 @@
     <tr>
       <td>con</td>
       <td><p>Database connection object. It is used to select
-the correst SQL translation syntax.</p></td>
+the correct SQL translation syntax.</p></td>
     </tr>
     <tr>
       <td>interval</td>
@@ -351,9 +360,10 @@ the correst SQL translation syntax.</p></td>
     
 
     <h2 id="examples">Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'>
+    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><div class='input'><span class='fu'>library</span>(<span class='no'>dbplyr</span>)
+
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>am</span> + <span class='no'>cyl</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
-<span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='kw pkg'>dbplyr</span><span class='kw ns'>::</span><span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (2.04840714179524) * SQRT((((((-0.176776695296637) * (-0.176776695296637) * (6.8231093058295)) + (((-0.590557271637747) + (("wt") * (0.183559646169165))) * ((-0.590557271637747) + (("wt") * (0.183559646169165))) * (6.8231093058295))) + ((((0.769566489443368) + (("wt") * (-0.176199380745393))) + (("am") * (-0.498926847360626))) * (((0.769566489443368) + (("wt") * (-0.176199380745393))) + (("am") * (-0.498926847360626))) * (6.8231093058295))) + (((((-0.224404416240186) + (("wt") * (-0.23845787029348))) + (("am") * (-0.0214203331902853))) + (("cyl") * (0.161662223806132))) * ((((-0.224404416240186) + (("wt") * (-0.23845787029348))) + (("am") * (-0.0214203331902853))) + (("cyl") * (0.161662223806132))) * (6.8231093058295))) + (6.8231093058295))</div><div class='input'>
+<span class='fu'>tidypredict_sql_interval</span>(<span class='no'>model</span>, <span class='fu'><a href='http://www.rdocumentation.org/packages/dbplyr/topics/tbl_lazy'>simulate_dbi</a></span>())</div><div class='output co'>#&gt; &lt;SQL&gt; (2.04840714179524) * SQRT((((((-0.176776695296637) * (-0.176776695296637) * (6.8231093058295)) + (((-0.590557271637747) + (("wt") * (0.183559646169165))) * ((-0.590557271637747) + (("wt") * (0.183559646169165))) * (6.8231093058295))) + ((((0.769566489443368) + (("wt") * (-0.176199380745393))) + (("am") * (-0.498926847360626))) * (((0.769566489443368) + (("wt") * (-0.176199380745393))) + (("am") * (-0.498926847360626))) * (6.8231093058295))) + (((((-0.224404416240186) + (("wt") * (-0.23845787029348))) + (("am") * (-0.0214203331902853))) + (("cyl") * (0.161662223806132))) * ((((-0.224404416240186) + (("wt") * (-0.23845787029348))) + (("am") * (-0.0214203331902853))) + (("cyl") * (0.161662223806132))) * (6.8231093058295))) + (6.8231093058295))</div><div class='input'>
 </div></code></pre></div>
     </div>
 

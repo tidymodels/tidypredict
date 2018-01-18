@@ -5,6 +5,7 @@
   
    <html class="no-js"> 
 
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
   <head lang="en-us">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
@@ -27,8 +28,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="shortcut icon" type="image/x-icon" href="/images/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="shortcut icon" type="image/x-icon" href="/logo.png">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
 
     <style>
       @font-face {
@@ -71,7 +72,7 @@
     
 
   </head>
-  <body class="palette-primary-teal palette-accent-blue">
+  <body class="palette-primary-grey palette-accent-light-green">
 
 
 
@@ -136,12 +137,14 @@
 		<nav aria-label="Navigation">
   <a href="https://github.com/edgararuiz/tidypredict" class="project">
     <div class="banner">
+      
+        <div>
+          <img src="/images/logo.png" , width="120", height="125">
+        </div>
+      
       <div class="name">
-        <strong>tidypredict <span class="version">0.0.0.9002</span></strong>
-        
-          <br>
-          edgararuiz/tidypredict
-        
+        <strong>tidypredict <span class="version">v.0.1.0</span></strong>
+
       </div>
     </div>
   </a>
@@ -156,6 +159,12 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
+              </a>
+              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              </a>              
               
             </p>
 
@@ -311,10 +320,13 @@
 		<div class="wrapper">
 			<h1>tidypredict </h1>
 
-			<p>Run predictions inside the database. It works with several databases back-ends because it uses <code>dbplyr</code> for the final SQL translation of the algorithm.</p>
+			<p>Run predictions inside the database. <code>tidypredict</code> parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.</p>
+<p><strong>It works with several databases back-ends</strong> because it leverages <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm. It currently supports <code>lm()</code>, <code>glm()</code> and <code>randomForest()</code> models.</p>
 <section id="installation" class="level2">
 <h2>Installation</h2>
-<p>Install <code>tidypredict</code> using <code>devtools</code> as follows:</p>
+<p>Install <code>tidypredict</code> from CRAN using:</p>
+<pre class="r"><code>install.packages(&quot;tidypredict&quot;)</code></pre>
+<p>Or install the development version using <code>devtools</code> as follows:</p>
 <pre class="r"><code>devtools::install_github(&quot;edgararuiz/tidypredict&quot;)</code></pre>
 </section>
 <section id="intro" class="level2">
@@ -374,14 +386,14 @@
 
   <div class="next">
   
-      <a href="/reference/tidypredict_fit/" title="tidypredict_fit">
+      <a href="/reference/tidypredict-package/" title="tidypredict,tidypredict-package">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              tidypredict_fit
+              tidypredict,tidypredict-package
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
