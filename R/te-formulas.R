@@ -1,3 +1,5 @@
+strip_factor<-function(x) gsub("factor\\((.+)\\)","\\1",x)
+
 te_fit_lm <- function(parsedmodel) {
   labels <- parsedmodel %>%
     filter(labels == "labels") %>%
@@ -16,7 +18,7 @@ te_fit_lm <- function(parsedmodel) {
 
   f <- seq_len(nrow(all_terms)) %>%
     map(~{
-      vars <- colnames(all_terms)
+      vars <- strip_factor(colnames(all_terms))
       vals <- as.character(all_terms[.x, ])
 
       estimate <- vals[vars == "estimate"]
