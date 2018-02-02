@@ -166,13 +166,13 @@ parse_model.randomForest <- function(model) {
   colnames(model_frame) <- sub(" ", "_", colnames(model_frame))
 
   all_paths <- model_frame %>%
-    filter(.data$status == -1) %>%
+    filter(.data$left_daughter == 0, .data$right_daughter == 0) %>%
     pull(.data$rowid) %>%
     map(~get_path(.x, model_frame)) %>%
     bind_rows()
 
   tidy <- model_frame %>%
-    filter(.data$status == -1) %>%
+    filter(.data$left_daughter == 0, .data$right_daughter == 0) %>%
     rowid_to_column("labels") %>%
     mutate(
       labels = paste0("path-", labels),
@@ -201,7 +201,7 @@ get_path <- function(row_id, model_frame) {
 
   for (get_path in 1:nrow(model_frame)) {
     current <- filter(model_frame, .data$rowid == row_id)
-    if (current$status == 1) {
+    if (current$left_daughter != 0 && current$right_daughter != 0) {
       field <- c(
         field,
         as.character(current$split_var)
