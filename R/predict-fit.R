@@ -36,6 +36,11 @@ tidypredict_fit.randomForest <- function(model) {
   te_randomforest_fit(parsedmodel)
 }
 
+#' @export
+tidypredict_fit.ranger <- function(model) {
+  parsedmodel <- parse_model(model)
+  te_ranger_fit(parsedmodel)
+}
 
 #' @export
 #' @importFrom tibble as.tibble
