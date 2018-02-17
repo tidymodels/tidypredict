@@ -3,11 +3,13 @@ library(dplyr)
 library(tidypredict)
 library(randomForest)
 library(dbplyr)
+library(tibble)
 
 set.seed(100)
 
 ## ------------------------------------------------------------------------
 library(dplyr)
+library(tibble)
 
 flights_table <- nycflights13::flights %>%
   mutate(current_score = 0) %>%

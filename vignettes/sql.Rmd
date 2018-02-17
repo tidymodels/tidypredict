@@ -17,6 +17,7 @@ library(dplyr)
 library(tidypredict)
 library(randomForest)
 library(dbplyr)
+library(tibble)
 
 set.seed(100)
 ```
@@ -30,6 +31,7 @@ To keep the example reproducible, a SQLite database will be used to simulate a l
 First the data is prepared in memory.  The article will use the `nycflights13::flights` data, with a couple of modifications
 ```{r}
 library(dplyr)
+library(tibble)
 
 flights_table <- nycflights13::flights %>%
   mutate(current_score = 0) %>%
