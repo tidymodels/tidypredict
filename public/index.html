@@ -159,11 +159,11 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+              <a href="http://cran.r-project.org/package=tidypredict">
                 <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
-                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              <a href="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict">
+                <img src="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict" alt="Downloads" />
               </a>              
               
             </p>
@@ -230,9 +230,9 @@
 
 
 
-<a  title="Linear Regression model" href="/articles/lm/">
+<a  title="lm() model" href="/articles/lm/">
 	
-	Linear Regression model
+	lm() model
 </a>
 
 
@@ -243,9 +243,9 @@
 
 
 
-<a  title="Generalized Linear model" href="/articles/glm/">
+<a  title="glm() model" href="/articles/glm/">
 	
-	Generalized Linear model
+	glm() model
 </a>
 
 
@@ -256,9 +256,22 @@
 
 
 
-<a  title="Random Forest model" href="/articles/randomforest/">
+<a  title="randomForest() model" href="/articles/randomforest/">
 	
-	Random Forest model
+	randomForest() model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="ranger() model" href="/articles/ranger/">
+	
+	ranger() model
 </a>
 
 
@@ -321,7 +334,7 @@
 			<h1>tidypredict </h1>
 
 			<p>Run predictions inside the database. <code>tidypredict</code> parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.</p>
-<p><strong>It works with several databases back-ends</strong> because it leverages <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm. It currently supports <code>lm()</code>, <code>glm()</code> and <code>randomForest()</code> models.</p>
+<p><strong>It works with several databases back-ends</strong> because it leverages <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm. It currently supports <code>lm()</code>, <code>glm()</code> and <code>randomForest()</code> models. Models from the <code>ranger()</code> package are now supported in the development version of the <code>tidypredict</code></p>
 <section id="installation" class="level2">
 <h2>Installation</h2>
 <p>Install <code>tidypredict</code> from CRAN using:</p>
@@ -344,6 +357,7 @@
 <li><a href="http://tidypredict.netlify.com/articles/lm/">Linear Regression</a> - <code>lm()</code></li>
 <li><a href="http://tidypredict.netlify.com/articles/glm/">Generalized Linear model</a> - <code>glm()</code></li>
 <li><a href="http://tidypredict.netlify.com/articles/randomforest/">Random Forest</a> - <code>randomForest()</code></li>
+<li><a href="http://tidypredict.netlify.com/articles/ranger/">ranger</a> - <code>ranger()</code> <em>In development</em></li>
 </ul>
 </section>
 
@@ -366,7 +380,7 @@
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/print.tidypredict_test/" title="print.tidypredict_test">
+      <a href="/articles/ranger/" title="ranger() model">
         <span class="direction">
           Previous
         </span>
@@ -376,7 +390,7 @@
           </div>
           <div class="stretch">
             <div class="title">
-              print.tidypredict_test
+              ranger() model
             </div>
           </div>
         </div>

@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>Random Forest model - tidypredict</title>
+    <title>randomForest() model - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
@@ -98,7 +98,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - Random Forest model
+        tidypredict - randomForest() model
       </div>
     </div>
 
@@ -159,11 +159,11 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+              <a href="http://cran.r-project.org/package=tidypredict">
                 <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
-                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              <a href="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict">
+                <img src="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict" alt="Downloads" />
               </a>              
               
             </p>
@@ -227,9 +227,9 @@
 
 
 
-<a  title="Linear Regression model" href="/articles/lm/">
+<a  title="lm() model" href="/articles/lm/">
 	
-	Linear Regression model
+	lm() model
 </a>
 
 
@@ -240,9 +240,9 @@
 
 
 
-<a  title="Generalized Linear model" href="/articles/glm/">
+<a  title="glm() model" href="/articles/glm/">
 	
-	Generalized Linear model
+	glm() model
 </a>
 
 
@@ -253,14 +253,27 @@
 
 
 
-<a class="current" title="Random Forest model" href="/articles/randomforest/">
+<a class="current" title="randomForest() model" href="/articles/randomforest/">
 	
-	Random Forest model
+	randomForest() model
 </a>
 
 
 <ul id="scrollspy">
 </ul>
+
+
+      
+        
+        
+
+
+
+<a  title="ranger() model" href="/articles/ranger/">
+	
+	ranger() model
+</a>
+
 
 
       
@@ -318,7 +331,7 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Random Forest model </h1>
+			<h1>randomForest() model </h1>
 
 			<section id="highlights-limitations" class="level2">
 <h2>Highlights &amp; Limitations</h2>
@@ -383,16 +396,16 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <p>The parsed model contains one row for each path. The <code>field</code>, <code>operator</code> and <code>split_point</code> field list every step in a concatenated character variable.</p>
 <pre class="r"><code>parse_model(model)</code></pre>
 <pre><code>## # A tibble: 8 x 7
-##   labels vals         type     estimate field           operator  split_p~
-##   &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;           &lt;chr&gt;     &lt;chr&gt;   
-## 1 path-1 setosa       path            0 Petal.Length    left      2.5     
-## 2 path-2 virginica    path            0 Petal.Length{:~ right{:}~ 5.05{:}~
-## 3 path-3 virginica    path            0 Petal.Width{:}~ right{:}~ 1.9{:}5~
-## 4 path-4 virginica    path            0 Sepal.Length{:~ left{:}l~ 4.95{:}~
-## 5 path-5 versicolor   path            0 Petal.Width{:}~ left{:}r~ 1.75{:}~
-## 6 path-6 virginica    path            0 Sepal.Width{:}~ left{:}r~ 3{:}1.7~
-## 7 path-7 versicolor   path            0 Sepal.Width{:}~ right{:}~ 3{:}1.7~
-## 8 model  randomForest variable       NA &lt;NA&gt;            &lt;NA&gt;      &lt;NA&gt;</code></pre>
+##   labels vals         type     estimate field      operator   split_point 
+##   &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;       
+## 1 path-1 setosa       path            0 Petal.Len~ left       2.5         
+## 2 path-2 virginica    path            0 Petal.Len~ right{:}r~ 5.05{:}2.5  
+## 3 path-3 virginica    path            0 Petal.Wid~ right{:}l~ 1.9{:}5.05{~
+## 4 path-4 virginica    path            0 Sepal.Len~ left{:}le~ 4.95{:}1.9{~
+## 5 path-5 versicolor   path            0 Petal.Wid~ left{:}ri~ 1.75{:}4.95~
+## 6 path-6 virginica    path            0 Sepal.Wid~ left{:}ri~ 3{:}1.75{:}~
+## 7 path-7 versicolor   path            0 Sepal.Wid~ right{:}r~ 3{:}1.75{:}~
+## 8 model  randomForest variable       NA &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code>dplyr::case_when()</code> statement</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
 <pre><code>## case_when(((Petal.Length) &lt;= 2.5) ~ &quot;setosa&quot;, (((Petal.Length) &gt; 
@@ -456,7 +469,7 @@ test</code></pre>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/articles/lm/" title="Linear Regression model">
+      <a href="/reference/print.tidypredict_test/" title="print.tidypredict_test">
         <span class="direction">
           Previous
         </span>
@@ -466,7 +479,7 @@ test</code></pre>
           </div>
           <div class="stretch">
             <div class="title">
-              Linear Regression model
+              print.tidypredict_test
             </div>
           </div>
         </div>
@@ -476,14 +489,14 @@ test</code></pre>
 
   <div class="next">
   
-      <a href="/reference/acceptable_formula/" title="acceptable_formula">
+      <a href="/articles/ranger/" title="ranger() model">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              acceptable_formula
+              ranger() model
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

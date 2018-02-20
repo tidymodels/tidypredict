@@ -10,7 +10,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>Generalized Linear model - tidypredict</title>
+    <title>glm() model - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
@@ -98,7 +98,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - Generalized Linear model
+        tidypredict - glm() model
       </div>
     </div>
 
@@ -159,11 +159,11 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+              <a href="http://cran.r-project.org/package=tidypredict">
                 <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
-                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              <a href="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict">
+                <img src="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict" alt="Downloads" />
               </a>              
               
             </p>
@@ -227,9 +227,9 @@
 
 
 
-<a  title="Linear Regression model" href="/articles/lm/">
+<a  title="lm() model" href="/articles/lm/">
 	
-	Linear Regression model
+	lm() model
 </a>
 
 
@@ -240,9 +240,9 @@
 
 
 
-<a class="current" title="Generalized Linear model" href="/articles/glm/">
+<a class="current" title="glm() model" href="/articles/glm/">
 	
-	Generalized Linear model
+	glm() model
 </a>
 
 
@@ -256,9 +256,22 @@
 
 
 
-<a  title="Random Forest model" href="/articles/randomforest/">
+<a  title="randomForest() model" href="/articles/randomforest/">
 	
-	Random Forest model
+	randomForest() model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="ranger() model" href="/articles/ranger/">
+	
+	ranger() model
 </a>
 
 
@@ -318,7 +331,7 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>Generalized Linear model </h1>
+			<h1>glm() model </h1>
 
 			<section id="highlights-limitations" class="level2">
 <h2>Highlights &amp; Limitations</h2>
@@ -371,18 +384,19 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <p>The parser reads several parts of the <code>glm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
 <pre class="r"><code>parse_model(model)</code></pre>
 <pre><code>## # A tibble: 10 x 10
-##    labels  estima~ type   field~ fiel~    qr_1   qr_2    qr_3   qr_4 vals 
-##    &lt;chr&gt;     &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt;   &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;
-##  1 (Inter~   20.9  term   &lt;NA&gt;   &lt;NA&gt;  - 0.679 - 5.11 - 1.15    6.05 &lt;NA&gt; 
-##  2 wt       - 7.86 term   &lt;NA&gt;   {{:}}   0       1.62   0.232 - 2.58 &lt;NA&gt; 
-##  3 char_c~    3.10 term   cyl6   &lt;NA&gt;    0       0      1.56    1.86 &lt;NA&gt; 
-##  4 char_c~    5.38 term   cyl8   &lt;NA&gt;    0       0      0       3.20 &lt;NA&gt; 
-##  5 labels     0    varia~ char_~ wt     NA      NA     NA      NA    &lt;NA&gt; 
-##  6 model     NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    glm  
-##  7 version   NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    1.0  
-##  8 residu~   NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    28   
-##  9 family    NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    bino~
-## 10 link      NA    varia~ &lt;NA&gt;   &lt;NA&gt;   NA      NA     NA      NA    logit</code></pre>
+##    labels    estimate type   field_1 field_2    qr_1   qr_2    qr_3   qr_4
+##    &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
+##  1 (Interce~    20.9  term   &lt;NA&gt;    &lt;NA&gt;    - 0.679 - 5.11 - 1.15    6.05
+##  2 wt          - 7.86 term   &lt;NA&gt;    {{:}}     0       1.62   0.232 - 2.58
+##  3 char_cyl~     3.10 term   cyl6    &lt;NA&gt;      0       0      1.56    1.86
+##  4 char_cyl~     5.38 term   cyl8    &lt;NA&gt;      0       0      0       3.20
+##  5 labels        0    varia~ char_c~ wt       NA      NA     NA      NA   
+##  6 model        NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
+##  7 version      NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
+##  8 residual     NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
+##  9 family       NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
+## 10 link         NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
+## # ... with 1 more variable: vals &lt;chr&gt;</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
 <pre class="r"><code>tidypredict_fit(model)</code></pre>
 <pre><code>## 1 - 1/(1 + exp((((20.8527831345691) + ((wt) * (-7.85934263583835))) + 
@@ -425,7 +439,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/" title="Function Reference">
+      <a href="/reference/acceptable_formula/" title="acceptable_formula">
         <span class="direction">
           Previous
         </span>
@@ -435,7 +449,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
           </div>
           <div class="stretch">
             <div class="title">
-              Function Reference
+              acceptable_formula
             </div>
           </div>
         </div>
@@ -445,14 +459,14 @@ tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
 
   <div class="next">
   
-      <a href="/articles/lm/" title="Linear Regression model">
+      <a href="/reference/knit_print.tidypredict_test/" title="knit_print.tidypredict_test">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              Linear Regression model
+              knit_print.tidypredict_test
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">

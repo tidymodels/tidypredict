@@ -20,6 +20,7 @@ Suggests:
     dbplyr,
     testthat,
     randomForest,
+    ranger,
     knitr,
     rmarkdown,
     nycflights13,

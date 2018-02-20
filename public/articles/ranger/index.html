@@ -10,18 +10,18 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=10" />
-    <title>knit_print.tidypredict_test - tidypredict</title>
+    <title>ranger() model - tidypredict</title>
     <meta name="generator" content="Hugo 0.29" />
 
     
     <meta name="description" content="Parses a model to create a predict routine with Tidy Eval.">
     
-    <link rel="canonical" href="/reference/knit_print.tidypredict_test/">
+    <link rel="canonical" href="/articles/ranger/">
     
     <meta name="author" content="Edgar Ruiz">
     
 
-    <meta property="og:url" content="/reference/knit_print.tidypredict_test/">
+    <meta property="og:url" content="/articles/ranger/">
     <meta property="og:title" content="tidypredict">
     <meta property="og:image" content="/images/logo.png">
     <meta name="apple-mobile-web-app-title" content="tidypredict">
@@ -98,7 +98,7 @@
     </div>
     <div class="stretch">
       <div class="title">
-        tidypredict - knit_print.tidypredict_test
+        tidypredict - ranger() model
       </div>
     </div>
 
@@ -266,11 +266,14 @@
 
 
 
-<a  title="ranger() model" href="/articles/ranger/">
+<a class="current" title="ranger() model" href="/articles/ranger/">
 	
 	ranger() model
 </a>
 
+
+<ul id="scrollspy">
+</ul>
 
 
       
@@ -328,27 +331,127 @@
 
 	<article class="article">
 		<div class="wrapper">
-			<h1>knit_print.tidypredict_test </h1>
+			<h1>ranger() model </h1>
 
-			<div class="doc-page">
+			<section id="highlights-limitations" class="level2">
+<h2>Highlights &amp; Limitations</h2>
+<ul>
+<li>Uses the <code>ranger::treeInfo()</code> to parse each decision path.</li>
+<li>In-line functions in the formulas are <strong>not supported</strong>:
+<ul>
+<li>OK - <code>wt ~ mpg + am</code></li>
+<li>OK - <code>mutate(mtcars, newam = paste0(am))</code> and then <code>wt ~ mpg + newam</code></li>
+<li>Not OK - <code>wt ~ mpg + as.factor(am)</code></li>
+<li>Not OK - <code>wt ~ mpg + as.character(am)</code></li>
+</ul></li>
+<li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
+</ul>
+</section>
+<section id="how-it-works" class="level2">
+<h2>How it works</h2>
+<p>Here is a simple <code>ranger()</code> model using the <code>iris</code> dataset:</p>
+<pre class="r"><code>library(ranger)
+model &lt;- ranger::ranger(Species ~ .,data = iris ,num.trees = 100)</code></pre>
+<p>The SQL translations returns a single SQL <code>CASE WHEN</code> operation. Each decision path is a <code>WHEN</code> statement.</p>
+<pre class="r"><code>library(tidypredict)
 
-    <div class="doc-page-index">
-    <ul data-gumshoe>
-            </ul>
-    </div>
+tidypredict_sql(model, dbplyr::simulate_mssql())</code></pre>
+<pre><code>## &lt;SQL&gt; CASE
+## WHEN ((((`Petal.Length`) &lt; 2.45) AND ((`Petal.Width`) &lt; 1.75))) THEN (&#39;setosa&#39;)
+## WHEN ((((`Petal.Width`) &gt;= 1.75) AND ((`Petal.Length`) &lt; 4.85))) THEN (&#39;virginica&#39;)
+## WHEN ((((`Petal.Length`) &gt;= 4.85) AND ((`Petal.Width`) &gt;= 1.75))) THEN (&#39;virginica&#39;)
+## WHEN (((((`Petal.Length`) &gt;= 2.45) AND ((`Petal.Length`) &lt; 5.4)) AND ((`Petal.Width`) &lt; 1.75))) THEN (&#39;versicolor&#39;)
+## WHEN (((((`Petal.Length`) &gt;= 5.4) AND ((`Petal.Length`) &gt;= 2.45)) AND ((`Petal.Width`) &lt; 1.75))) THEN (&#39;virginica&#39;)
+## END</code></pre>
+<p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
+<pre class="r"><code>iris %&gt;%
+  tidypredict_to_column(model) %&gt;%
+  head(10)</code></pre>
+<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species    fit
+## 1           5.1         3.5          1.4         0.2  setosa setosa
+## 2           4.9         3.0          1.4         0.2  setosa setosa
+## 3           4.7         3.2          1.3         0.2  setosa setosa
+## 4           4.6         3.1          1.5         0.2  setosa setosa
+## 5           5.0         3.6          1.4         0.2  setosa setosa
+## 6           5.4         3.9          1.7         0.4  setosa setosa
+## 7           4.6         3.4          1.4         0.3  setosa setosa
+## 8           5.0         3.4          1.5         0.2  setosa setosa
+## 9           4.4         2.9          1.4         0.2  setosa setosa
+## 10          4.9         3.1          1.5         0.1  setosa setosa</code></pre>
+</section>
+<section id="under-the-hood" class="level2">
+<h2>Under the hood</h2>
+<p>The parser is based on the output from the <code>ranger::treeInfo()</code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<pre class="r"><code>treeInfo(model)</code></pre>
+<pre><code>##   nodeID leftChild rightChild splitvarID splitvarName splitval terminal
+## 1      0         1          2          4  Petal.Width     1.75    FALSE
+## 2      1         3          4          3 Petal.Length     2.45    FALSE
+## 3      2         5          6          3 Petal.Length     4.85    FALSE
+## 4      3        NA         NA         NA         &lt;NA&gt;       NA     TRUE
+## 5      4         7          8          3 Petal.Length     5.40    FALSE
+## 6      5        NA         NA         NA         &lt;NA&gt;       NA     TRUE
+## 7      6        NA         NA         NA         &lt;NA&gt;       NA     TRUE
+## 8      7        NA         NA         NA         &lt;NA&gt;       NA     TRUE
+## 9      8        NA         NA         NA         &lt;NA&gt;       NA     TRUE
+##   prediction
+## 1       &lt;NA&gt;
+## 2       &lt;NA&gt;
+## 3       &lt;NA&gt;
+## 4     setosa
+## 5       &lt;NA&gt;
+## 6  virginica
+## 7  virginica
+## 8 versicolor
+## 9  virginica</code></pre>
+<p>The parsed model contains one row for each path. The <code>field</code>, <code>operator</code> and <code>split_point</code> field list every step in a concatenated character variable.</p>
+<pre class="r"><code>parse_model(model)</code></pre>
+<pre><code>## # A tibble: 6 x 7
+##   labels vals       type     estimate field        operator   split_point 
+##   &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;       
+## 1 path-1 setosa     path            0 Petal.Lengt~ left{:}le~ 2.45{:}1.75 
+## 2 path-2 virginica  path            0 Petal.Lengt~ left{:}ri~ 4.85{:}1.75 
+## 3 path-3 virginica  path            0 Petal.Lengt~ right{:}r~ 4.85{:}1.75 
+## 4 path-4 versicolor path            0 Petal.Lengt~ left{:}ri~ 5.4{:}2.45{~
+## 5 path-5 virginica  path            0 Petal.Lengt~ right{:}r~ 5.4{:}2.45{~
+## 6 model  ranger     variable       NA &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</code></pre>
+<p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code>dplyr::case_when()</code> statement</p>
+<pre class="r"><code>tidypredict_fit(model)</code></pre>
+<pre><code>## case_when((((Petal.Length) &lt; 2.45) &amp; ((Petal.Width) &lt; 1.75)) ~ 
+##     &quot;setosa&quot;, (((Petal.Width) &gt;= 1.75) &amp; ((Petal.Length) &lt; 4.85)) ~ 
+##     &quot;virginica&quot;, (((Petal.Length) &gt;= 4.85) &amp; ((Petal.Width) &gt;= 
+##     1.75)) ~ &quot;virginica&quot;, ((((Petal.Length) &gt;= 2.45) &amp; ((Petal.Length) &lt; 
+##     5.4)) &amp; ((Petal.Width) &lt; 1.75)) ~ &quot;versicolor&quot;, ((((Petal.Length) &gt;= 
+##     5.4) &amp; ((Petal.Length) &gt;= 2.45)) &amp; ((Petal.Width) &lt; 1.75)) ~ 
+##     &quot;virginica&quot;)</code></pre>
+<p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
+<ul>
+<li>Use directly inside <code>dplyr</code>, <code>mutate(iris, !! tidypredict_fit(model))</code></li>
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
+<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
+</ul>
+</section>
+<section id="how-it-performs" class="level2">
+<h2>How it performs</h2>
+<p>Currently, the formula matches 146 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
+<pre class="r"><code>test &lt;- tidypredict_test(model, iris, threshold = 4)
 
-    <div class="doc-page-body">
+test</code></pre>
+<pre><code>## tidypredict test results
+## 
+## Success, test is under the set threshold of: 4
+## Predictions that did not match predict(): 4</code></pre>
+<pre class="r"><code>test$raw_results %&gt;%
+  filter(predict != tidypredict)</code></pre>
+<pre><code>## # A tibble: 4 x 7
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species    predict   
+##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;      &lt;chr&gt;     
+## 1         5.90        3.20         4.80        1.80 versicolor versicolor
+## 2         4.90        2.50         4.50        1.70 virginica  virginica 
+## 3         6.00        2.20         5.00        1.50 virginica  virginica 
+## 4         6.30        2.80         5.10        1.50 virginica  virginica 
+## # ... with 1 more variable: tidypredict &lt;chr&gt;</code></pre>
+</section>
 
-    
-    <p>Knit print method for test predictions results</p>
-    
-
-    <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class='fu'>knit_print.tidypredict_test</span>(<span class='no'>x</span>, <span class='no'>...</span>)</code></pre></div>
-        
-
-    </div>
-
-    </div>
 
 			<aside class="copyright" role="note">
 				
@@ -368,7 +471,7 @@
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/articles/glm/" title="glm() model">
+      <a href="/articles/randomforest/" title="randomForest() model">
         <span class="direction">
           Previous
         </span>
@@ -378,7 +481,7 @@
           </div>
           <div class="stretch">
             <div class="title">
-              glm() model
+              randomForest() model
             </div>
           </div>
         </div>
@@ -388,14 +491,14 @@
 
   <div class="next">
   
-      <a href="/articles/lm/" title="lm() model">
+      <a href="/" title="tidypredict">
         <span class="direction">
           Next
         </span>
         <div class="page">
           <div class="stretch">
             <div class="title">
-              lm() model
+              tidypredict
             </div>
           </div>
           <div class="button button-next" role="button" aria-label="Next">
