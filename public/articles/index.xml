@@ -20,11 +20,11 @@
       <description>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.
 Example setupTo keep the example reproducible, a SQLite database will be used to simulate a larger scale deployment.
 First the data is prepared in memory. The article will use the nycflights13::flights data, with a couple of modifications
-library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(current_score = 0) %&amp;gt;%rowid_to_column(&amp;quot;flight_id&amp;quot;)A new database is created using RSQLite.</description>
+library(dplyr)library(tibble)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(current_score = 0) %&amp;gt;%rowid_to_column(&amp;quot;flight_id&amp;quot;)A new database is created using RSQLite.</description>
     </item>
     
     <item>
-      <title>Generalized Linear model</title>
+      <title>glm() model</title>
       <link>/articles/glm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -33,7 +33,7 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
     </item>
     
     <item>
-      <title>Linear Regression model</title>
+      <title>lm() model</title>
       <link>/articles/lm/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
@@ -42,12 +42,21 @@ library(dplyr)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(c
     </item>
     
     <item>
-      <title>Random Forest model</title>
+      <title>randomForest() model</title>
       <link>/articles/randomforest/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/articles/randomforest/</guid>
       <description>Highlights &amp;amp; LimitationsUses the randomForest::getTree() to parse each decision path.In-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple randomForest() model using the iris dataset:</description>
+    </item>
+    
+    <item>
+      <title>ranger() model</title>
+      <link>/articles/ranger/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/articles/ranger/</guid>
+      <description>Highlights &amp;amp; LimitationsUses the ranger::treeInfo() to parse each decision path.In-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple ranger() model using the iris dataset:</description>
     </item>
     
   </channel>

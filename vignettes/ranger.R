@@ -5,7 +5,7 @@ library(ranger)
 set.seed(100)
 
 ## ------------------------------------------------------------------------
-library(randomForest)
+library(ranger)
 model <- ranger::ranger(Species ~ .,data = iris ,num.trees = 100)
 
 ## ------------------------------------------------------------------------

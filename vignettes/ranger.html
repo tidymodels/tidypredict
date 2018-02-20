@@ -12,63 +12,75 @@
 
 
 
-<title>ranger model</title>
+<title>ranger() model</title>
 
 
 
 <style type="text/css">code{white-space: pre;}</style>
 <style type="text/css">
-div.sourceLine, a.sourceLine { display: inline-block; min-height: 1.25em; }
+a.sourceLine { display: inline-block; line-height: 1.25; }
 a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; position: absolute; }
 .sourceCode { overflow: visible; }
-code.sourceCode { white-space: pre; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
 @media print {
 code.sourceCode { white-space: pre-wrap; }
-div.sourceLine, a.sourceLine { text-indent: -1em; padding-left: 1em; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
 }
-pre.numberSource div.sourceLine, .numberSource a.sourceLine
+pre.numberSource a.sourceLine
   { position: relative; }
-pre.numberSource div.sourceLine::before, .numberSource a.sourceLine::before
+pre.numberSource a.sourceLine:empty
+  { position: absolute; }
+pre.numberSource a.sourceLine::before
   { content: attr(data-line-number);
     position: absolute; left: -5em; text-align: right; vertical-align: baseline;
     border: none; pointer-events: all;
     -webkit-touch-callout: none; -webkit-user-select: none;
     -khtml-user-select: none; -moz-user-select: none;
     -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em; }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; color: #aaaaaa;  padding-left: 4px; }
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
 @media screen {
-a.sourceLine::before { text-decoration: underline; color: initial; }
+a.sourceLine::before { text-decoration: underline; }
 }
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
 code span.dt { color: #902000; } /* DataType */
 code span.dv { color: #40a070; } /* DecVal */
-code span.bn { color: #40a070; } /* BaseN */
-code span.fl { color: #40a070; } /* Float */
-code span.ch { color: #4070a0; } /* Char */
-code span.st { color: #4070a0; } /* String */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.ot { color: #007020; } /* Other */
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.fu { color: #06287e; } /* Function */
 code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code span.cn { color: #880000; } /* Constant */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.im { } /* Import */
-code span.va { color: #19177c; } /* Variable */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.op { color: #666666; } /* Operator */
-code span.bu { } /* BuiltIn */
 code span.ex { } /* Extension */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.at { color: #7d9029; } /* Attribute */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
 </style>
 
 
@@ -264,7 +276,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<h1 class="title toc-ignore">ranger model</h1>
+<h1 class="title toc-ignore">ranger() model</h1>
 
 
 
@@ -285,22 +297,12 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="how-it-works" class="level2">
 <h2>How it works</h2>
 <p>Here is a simple <code>ranger()</code> model using the <code>iris</code> dataset:</p>
-<pre class="sourceCode r" id="cb1"><code class="sourceCode r"><div class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(randomForest)</div></code></pre>
-<pre><code>## randomForest 4.6-12</code></pre>
-<pre><code>## Type rfNews() to see new features/changes/bug fixes.</code></pre>
-<pre><code>## 
-## Attaching package: 'randomForest'</code></pre>
-<pre><code>## The following object is masked from 'package:ranger':
-## 
-##     importance</code></pre>
-<pre><code>## The following object is masked from 'package:dplyr':
-## 
-##     combine</code></pre>
-<pre class="sourceCode r" id="cb7"><code class="sourceCode r"><div class="sourceLine" id="cb7-1" data-line-number="1">model &lt;-<span class="st"> </span>ranger<span class="op">::</span><span class="kw">ranger</span>(Species <span class="op">~</span><span class="st"> </span>.,<span class="dt">data =</span> iris ,<span class="dt">num.trees =</span> <span class="dv">100</span>)</div></code></pre>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(ranger)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">model &lt;-<span class="st"> </span>ranger<span class="op">::</span><span class="kw">ranger</span>(Species <span class="op">~</span><span class="st"> </span>.,<span class="dt">data =</span> iris ,<span class="dt">num.trees =</span> <span class="dv">100</span>)</a></code></pre></div>
 <p>The SQL translations returns a single SQL <code>CASE WHEN</code> operation. Each decision path is a <code>WHEN</code> statement.</p>
-<pre class="sourceCode r" id="cb8"><code class="sourceCode r"><div class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</div>
-<div class="sourceLine" id="cb8-2" data-line-number="2"></div>
-<div class="sourceLine" id="cb8-3" data-line-number="3"><span class="kw">tidypredict_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</div></code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">tidypredict_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
 <pre><code>## &lt;SQL&gt; CASE
 ## WHEN ((((`Petal.Length`) &lt; 2.45) AND ((`Petal.Width`) &lt; 1.75))) THEN ('setosa')
 ## WHEN ((((`Petal.Width`) &gt;= 1.75) AND ((`Petal.Length`) &lt; 4.85))) THEN ('virginica')
@@ -309,9 +311,9 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## WHEN (((((`Petal.Length`) &gt;= 5.4) AND ((`Petal.Length`) &gt;= 2.45)) AND ((`Petal.Width`) &lt; 1.75))) THEN ('virginica')
 ## END</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
-<pre class="sourceCode r" id="cb10"><code class="sourceCode r"><div class="sourceLine" id="cb10-1" data-line-number="1">iris <span class="op">%&gt;%</span></div>
-<div class="sourceLine" id="cb10-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></div>
-<div class="sourceLine" id="cb10-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</div></code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">iris <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</a></code></pre></div>
 <pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species    fit
 ## 1           5.1         3.5          1.4         0.2  setosa setosa
 ## 2           4.9         3.0          1.4         0.2  setosa setosa
@@ -327,7 +329,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="under-the-hood" class="level2">
 <h2>Under the hood</h2>
 <p>The parser is based on the output from the <code>ranger::treeInfo()</code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
-<pre class="sourceCode r" id="cb12"><code class="sourceCode r"><div class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">treeInfo</span>(model)</div></code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">treeInfo</span>(model)</a></code></pre></div>
 <pre><code>##   nodeID leftChild rightChild splitvarID splitvarName splitval terminal
 ## 1      0         1          2          4  Petal.Width     1.75    FALSE
 ## 2      1         3          4          3 Petal.Length     2.45    FALSE
@@ -349,18 +351,18 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 ## 8 versicolor
 ## 9  virginica</code></pre>
 <p>The parsed model contains one row for each path. The <code>field</code>, <code>operator</code> and <code>split_point</code> field list every step in a concatenated character variable.</p>
-<pre class="sourceCode r" id="cb14"><code class="sourceCode r"><div class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">parse_model</span>(model)</div></code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
 <pre><code>## # A tibble: 6 x 7
-##   labels vals       type     estimate field            operator   split_p~
-##   &lt;chr&gt;  &lt;fctr&gt;     &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;            &lt;chr&gt;      &lt;chr&gt;   
-## 1 path-1 setosa     path            0 Petal.Length{:}~ left{:}le~ 2.45{:}~
-## 2 path-2 virginica  path            0 Petal.Length{:}~ left{:}ri~ 4.85{:}~
-## 3 path-3 virginica  path            0 Petal.Length{:}~ right{:}r~ 4.85{:}~
-## 4 path-4 versicolor path            0 Petal.Length{:}~ left{:}ri~ 5.4{:}2~
-## 5 path-5 virginica  path            0 Petal.Length{:}~ right{:}r~ 5.4{:}2~
-## 6 model  ranger     variable       NA &lt;NA&gt;             &lt;NA&gt;       &lt;NA&gt;</code></pre>
+##   labels vals       type     estimate field        operator   split_point 
+##   &lt;chr&gt;  &lt;fct&gt;      &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;chr&gt;       
+## 1 path-1 setosa     path            0 Petal.Lengt~ left{:}le~ 2.45{:}1.75 
+## 2 path-2 virginica  path            0 Petal.Lengt~ left{:}ri~ 4.85{:}1.75 
+## 3 path-3 virginica  path            0 Petal.Lengt~ right{:}r~ 4.85{:}1.75 
+## 4 path-4 versicolor path            0 Petal.Lengt~ left{:}ri~ 5.4{:}2.45{~
+## 5 path-5 virginica  path            0 Petal.Lengt~ right{:}r~ 5.4{:}2.45{~
+## 6 model  ranger     variable       NA &lt;NA&gt;         &lt;NA&gt;       &lt;NA&gt;</code></pre>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code>dplyr::case_when()</code> statement</p>
-<pre class="sourceCode r" id="cb16"><code class="sourceCode r"><div class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</div></code></pre>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
 <pre><code>## case_when((((Petal.Length) &lt; 2.45) &amp; ((Petal.Width) &lt; 1.75)) ~ 
 ##     &quot;setosa&quot;, (((Petal.Width) &gt;= 1.75) &amp; ((Petal.Length) &lt; 4.85)) ~ 
 ##     &quot;virginica&quot;, (((Petal.Length) &gt;= 4.85) &amp; ((Petal.Width) &gt;= 
@@ -378,22 +380,23 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <section id="how-it-performs" class="level2">
 <h2>How it performs</h2>
 <p>Currently, the formula matches 146 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
-<pre class="sourceCode r" id="cb18"><code class="sourceCode r"><div class="sourceLine" id="cb18-1" data-line-number="1">test &lt;-<span class="st"> </span><span class="kw">tidypredict_test</span>(model, iris, <span class="dt">threshold =</span> <span class="dv">4</span>)</div>
-<div class="sourceLine" id="cb18-2" data-line-number="2"></div>
-<div class="sourceLine" id="cb18-3" data-line-number="3">test</div></code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">test &lt;-<span class="st"> </span><span class="kw">tidypredict_test</span>(model, iris, <span class="dt">threshold =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb12-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb12-3" data-line-number="3">test</a></code></pre></div>
 <pre><code>## tidypredict test results
 ## 
 ## Success, test is under the set threshold of: 4
 ## Predictions that did not match predict(): 4</code></pre>
-<pre class="sourceCode r" id="cb20"><code class="sourceCode r"><div class="sourceLine" id="cb20-1" data-line-number="1">test<span class="op">$</span>raw_results <span class="op">%&gt;%</span></div>
-<div class="sourceLine" id="cb20-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(predict <span class="op">!=</span><span class="st"> </span>tidypredict)</div></code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">test<span class="op">$</span>raw_results <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(predict <span class="op">!=</span><span class="st"> </span>tidypredict)</a></code></pre></div>
 <pre><code>## # A tibble: 4 x 7
-##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species    pred~ tidy~
-##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fctr&gt;     &lt;chr&gt; &lt;chr&gt;
-## 1         5.90        3.20         4.80        1.80 versicolor vers~ virg~
-## 2         4.90        2.50         4.50        1.70 virginica  virg~ vers~
-## 3         6.00        2.20         5.00        1.50 virginica  virg~ vers~
-## 4         6.30        2.80         5.10        1.50 virginica  virg~ vers~</code></pre>
+##   Sepal.Length Sepal.Width Petal.Length Petal.Width Species    predict   
+##          &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt; &lt;fct&gt;      &lt;chr&gt;     
+## 1         5.90        3.20         4.80        1.80 versicolor versicolor
+## 2         4.90        2.50         4.50        1.70 virginica  virginica 
+## 3         6.00        2.20         5.00        1.50 virginica  virginica 
+## 4         6.30        2.80         5.10        1.50 virginica  virginica 
+## # ... with 1 more variable: tidypredict &lt;chr&gt;</code></pre>
 </section>
 
 

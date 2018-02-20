@@ -159,11 +159,11 @@
               <a href="https://travis-ci.org/edgararuiz/tidypredict">
                 <img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
+              <a href="http://cran.r-project.org/package=tidypredict">
                 <img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN Status" />
               </a>
-              <a href="https://travis-ci.org/edgararuiz/tidypredict">
-                <img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads" />
+              <a href="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict">
+                <img src="https://cranlogs.r-pkg.org/badges/grand-total/tidypredict" alt="Downloads" />
               </a>              
               
             </p>
@@ -227,9 +227,9 @@
 
 
 
-<a  title="Linear Regression model" href="/articles/lm/">
+<a  title="lm() model" href="/articles/lm/">
 	
-	Linear Regression model
+	lm() model
 </a>
 
 
@@ -240,9 +240,9 @@
 
 
 
-<a  title="Generalized Linear model" href="/articles/glm/">
+<a  title="glm() model" href="/articles/glm/">
 	
-	Generalized Linear model
+	glm() model
 </a>
 
 
@@ -253,9 +253,22 @@
 
 
 
-<a  title="Random Forest model" href="/articles/randomforest/">
+<a  title="randomForest() model" href="/articles/randomforest/">
 	
-	Random Forest model
+	randomForest() model
+</a>
+
+
+
+      
+        
+        
+
+
+
+<a  title="ranger() model" href="/articles/ranger/">
+	
+	ranger() model
 </a>
 
 
@@ -360,22 +373,23 @@ glm() and randomForest() models.</p></td>
 <span class='no'>df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='http://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span>(<span class='no'>mtcars</span>, <span class='kw'>cyl</span> <span class='kw'>=</span> <span class='fu'>paste0</span>(<span class='st'>"cyl"</span>, <span class='no'>cyl</span>))
 <span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'>lm</span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>df</span>)
 <span class='fu'>parse_model</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; # A tibble: 13 x 14
-#&gt;    labels   estimate type   field~ fiel~ fiel~    qr_1    qr_2     qr_3    qr_4
-#&gt;    &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt;
-#&gt;  1 (Interc~  39.4    term   &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;  - 0.177 - 0.591 - 0.126    0.386
-#&gt;  2 wt       - 1.62   term   &lt;NA&gt;   &lt;NA&gt;  {{:}}   0       0.184   0.0101 - 0.231
-#&gt;  3 cylcyl6  -18.4    term   cyl6   &lt;NA&gt;  &lt;NA&gt;    0       0       0.428    0.332
-#&gt;  4 cylcyl8  -16.2    term   cyl8   &lt;NA&gt;  &lt;NA&gt;    0       0       0        0.646
-#&gt;  5 disp     - 0.0930 term   &lt;NA&gt;   {{:}} &lt;NA&gt;    0       0       0        0    
-#&gt;  6 cylcyl6~   0.111  term   cyl6   {{:}} &lt;NA&gt;    0       0       0        0    
-#&gt;  7 cylcyl8~   0.0880 term   cyl8   {{:}} &lt;NA&gt;    0       0       0        0    
-#&gt;  8 labels     0      varia~ cyl    disp  wt     NA      NA      NA       NA    
-#&gt;  9 model     NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
-#&gt; 10 version   NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
-#&gt; 11 residual  NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
-#&gt; 12 sigma2    NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
-#&gt; 13 offset    NA      varia~ &lt;NA&gt;   &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA    
-#&gt; # ... with 4 more variables: qr_5 &lt;dbl&gt;, qr_6 &lt;dbl&gt;, qr_7 &lt;dbl&gt;, vals &lt;chr&gt;</div><div class='input'>
+#&gt;    labels     estimate type    field_1 field_2 field_3    qr_1    qr_2     qr_3
+#&gt;    &lt;chr&gt;         &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;
+#&gt;  1 (Intercep~  39.4    term    &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;    - 0.177 - 0.591 - 0.126 
+#&gt;  2 wt         - 1.62   term    &lt;NA&gt;    &lt;NA&gt;    {{:}}     0       0.184   0.0101
+#&gt;  3 cylcyl6    -18.4    term    cyl6    &lt;NA&gt;    &lt;NA&gt;      0       0       0.428 
+#&gt;  4 cylcyl8    -16.2    term    cyl8    &lt;NA&gt;    &lt;NA&gt;      0       0       0     
+#&gt;  5 disp       - 0.0930 term    &lt;NA&gt;    {{:}}   &lt;NA&gt;      0       0       0     
+#&gt;  6 cylcyl6:d~   0.111  term    cyl6    {{:}}   &lt;NA&gt;      0       0       0     
+#&gt;  7 cylcyl8:d~   0.0880 term    cyl8    {{:}}   &lt;NA&gt;      0       0       0     
+#&gt;  8 labels       0      variab~ cyl     disp    wt       NA      NA      NA     
+#&gt;  9 model       NA      variab~ &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;     NA      NA      NA     
+#&gt; 10 version     NA      variab~ &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;     NA      NA      NA     
+#&gt; 11 residual    NA      variab~ &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;     NA      NA      NA     
+#&gt; 12 sigma2      NA      variab~ &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;     NA      NA      NA     
+#&gt; 13 offset      NA      variab~ &lt;NA&gt;    &lt;NA&gt;    &lt;NA&gt;     NA      NA      NA     
+#&gt; # ... with 5 more variables: qr_4 &lt;dbl&gt;, qr_5 &lt;dbl&gt;, qr_6 &lt;dbl&gt;, qr_7 &lt;dbl&gt;,
+#&gt; #   vals &lt;chr&gt;</div><div class='input'>
 </div></code></pre></div>
     </div>
 
@@ -399,7 +413,7 @@ glm() and randomForest() models.</p></td>
 <nav class="pagination" aria-label="Footer">
   <div class="previous">
   
-      <a href="/reference/knit_print.tidypredict_test/" title="knit_print.tidypredict_test">
+      <a href="/articles/lm/" title="lm() model">
         <span class="direction">
           Previous
         </span>
@@ -409,7 +423,7 @@ glm() and randomForest() models.</p></td>
           </div>
           <div class="stretch">
             <div class="title">
-              knit_print.tidypredict_test
+              lm() model
             </div>
           </div>
         </div>

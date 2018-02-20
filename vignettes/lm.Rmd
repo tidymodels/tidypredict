@@ -1,5 +1,5 @@
 ---
-title: "Linear Regression model"
+title: "lm() model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{lm}

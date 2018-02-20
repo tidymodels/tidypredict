@@ -1,5 +1,5 @@
 ---
-title: "ranger model"
+title: "ranger() model"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{randomForest}
@@ -33,7 +33,7 @@ set.seed(100)
 
 Here is a simple `ranger()` model using the `iris` dataset:
 ```{r}
-library(randomForest)
+library(ranger)
 model <- ranger::ranger(Species ~ .,data = iris ,num.trees = 100)
 ```
 

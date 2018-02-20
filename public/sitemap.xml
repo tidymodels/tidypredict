@@ -21,18 +21,6 @@
   </url>
   
   <url>
-    <loc>/articles/glm/</loc>
-  </url>
-  
-  <url>
-    <loc>/articles/lm/</loc>
-  </url>
-  
-  <url>
-    <loc>/articles/randomforest/</loc>
-  </url>
-  
-  <url>
     <loc>/reference/</loc>
     <priority>0</priority>
   </url>
@@ -47,7 +35,15 @@
   </url>
   
   <url>
+    <loc>/articles/glm/</loc>
+  </url>
+  
+  <url>
     <loc>/reference/knit_print.tidypredict_test/</loc>
+  </url>
+  
+  <url>
+    <loc>/articles/lm/</loc>
   </url>
   
   <url>
@@ -56,6 +52,14 @@
   
   <url>
     <loc>/reference/print.tidypredict_test/</loc>
+  </url>
+  
+  <url>
+    <loc>/articles/randomforest/</loc>
+  </url>
+  
+  <url>
+    <loc>/articles/ranger/</loc>
   </url>
   
   <url>
