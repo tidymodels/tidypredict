@@ -166,6 +166,52 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, inclu
 
   structure(results, class = c("tidypredict_test", "list"))
 }
+
+#' @export
+tidypredict_test.ranger <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL) {
+  raw_results <- df %>%
+    as_tibble() %>%
+    mutate(
+      predict = as.character(predict(model, df)$predictions),
+      tidypredict = !! tidypredict_fit(model)
+    )
+  
+  differences <- raw_results %>%
+    filter(.data$tidypredict != predict | is.na(.data$tidypredict))
+  
+  alert <- nrow(differences) > threshold
+  
+  message <- "tidypredict test results\n"
+  
+  if (!alert) {
+    message <- paste0(
+      message,
+      "\nSuccess, test is under the set threshold of: ",
+      threshold
+    )
+  }
+  
+  if (nrow(differences) > 0) {
+    message <- paste0(
+      message,
+      "\nPredictions that did not match predict(): ", nrow(differences)
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\nAll predictions matched"
+    )
+  }
+  
+  results <- list()
+  
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  
+  structure(results, class = c("tidypredict_test", "list"))
+}
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results

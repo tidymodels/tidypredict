@@ -28,7 +28,7 @@ case_formula_ranger <- function(vals, field, operator, split_point) {
   if (nrow(right) > 0) {
     right <- right %>%
       split(.$rowid) %>%
-      map(~expr((!! sym(.x$field)) > !! .x$split_point))
+      map(~expr((!! sym(.x$field)) >= !! .x$split_point))
   } else {
     right <- NULL
   }
@@ -37,7 +37,7 @@ case_formula_ranger <- function(vals, field, operator, split_point) {
   if (nrow(left) > 0) {
     left <- left %>%
       split(.$rowid) %>%
-      map(~expr((!! sym(.x$field)) <= !! .x$split_point))
+      map(~expr((!! sym(.x$field)) < !! .x$split_point))
   } else {
     left <- NULL
   }
@@ -96,7 +96,6 @@ get_path_ranger <- function(row_id, model_frame) {
     current <- model_frame[get_path,]
     if(!is.na(current$leftchild)){
       if(current$leftchild == current_val | current$rightchild == current_val){
-        current_val <- current$rowid
         field <- c(
           field,
           as.character(current$splitvarname)
@@ -109,6 +108,7 @@ get_path_ranger <- function(row_id, model_frame) {
           split_point,
           as.character(current$splitval)
         )
+        current_val <- current$rowid
       }
     }
   }

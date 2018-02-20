@@ -69,6 +69,11 @@ tidypredict_fit.ranger <- function(model) {
     assigned <- 1
     fit <- te_randomforest_fit(model)
   }
+  
+  if (model_type == "ranger") {
+    assigned <- 1
+    fit <- te_ranger_fit(model)
+  }
 
 
   if (assigned == 0) {
