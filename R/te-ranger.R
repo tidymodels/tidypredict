@@ -2,9 +2,9 @@ te_ranger_fit <- function(parsedmodel) {
   paths <- parsedmodel %>%
     filter(.data$type == "path") 
 
-  all_paths <- 1:nrow(paths) %>%
+  all_paths <- seq_len(nrow(paths)) %>%
     map(~case_formula_ranger(
-      ifelse(is.factor(paths$vals[.x]), as.character(paths$vals[.x]), paths$vals[.x]) ,
+      if (is.factor(paths$vals[.x])) as.character(paths$vals[.x]) else paths$vals[.x],
       paths$field[.x],
       paths$operator[.x],
       paths$split_point[.x]
@@ -95,14 +95,14 @@ get_path_ranger <- function(row_id, model_frame) {
   for (get_path in row_id:1) {
     current <- model_frame[get_path,]
     if(!is.na(current$leftchild)){
-      if(current$leftchild == current_val | current$rightchild == current_val){
+      if(current$leftchild == current_val || current$rightchild == current_val){
         field <- c(
           field,
           as.character(current$splitvarname)
         )
         operator <- c(
           operator,
-          paste0(ifelse(current$leftchild == current_val, "left", "right"))
+          if (current$leftchild == current_val) "left" else "right"
         )
         split_point <- c(
           split_point,

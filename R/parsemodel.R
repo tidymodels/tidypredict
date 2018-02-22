@@ -46,7 +46,7 @@ parse_model_lm <- function(model) {
 
   xl <- model$xlevels
   if (length(xl) > 0) {
-    xl_df <- 1:length(xl) %>%
+    xl_df <- seq_along(xl) %>%
       map_df(~tibble(
         var = names(xl[.x]),
         vals = xl[[.x]]
@@ -64,7 +64,7 @@ parse_model_lm <- function(model) {
   est <- names(co) %>%
     map(~strsplit(.x, ":"))
 
-  est_df <- seq_len(length(est)) %>%
+  est_df <- seq_along(est) %>%
     map_df(~tibble(
       coefno = .x,
       fullname = est[[.x]][[1]]
@@ -105,7 +105,7 @@ parse_model_lm <- function(model) {
     as.data.frame() %>%
     rownames_to_column()
 
-  colnames(qr) <- c("coef_labels", paste0("qr_", 1:nrow(qr)))
+  colnames(qr) <- c("coef_labels", paste0("qr_", seq_len(nrow(qr))))
 
   cf <- as_list(c("labels", rep(NA, length(qr) - 1)))
   names(cf) <- names(qr)
@@ -117,7 +117,7 @@ parse_model_lm <- function(model) {
     bind_cols(qr) %>%
     mutate(label_match = .data$coef_labels != .data$labels)
 
-  if (sum(tidy$label_match) == 0) {
+  if (! any(tidy$label_match)) {
     tidy <- tidy %>%
       select(
         -.data$coefno,
@@ -199,7 +199,7 @@ get_path <- function(row_id, model_frame) {
   operator <- NULL
   split_point <- NULL
 
-  for (get_path in 1:nrow(model_frame)) {
+  for (get_path in seq_len(nrow(model_frame))) {
     current <- filter(model_frame, .data$rowid == row_id)
     if (current$left_daughter != 0 && current$right_daughter != 0) {
       field <- c(
