@@ -2,7 +2,7 @@ te_randomforest_fit <- function(parsedmodel) {
   paths <- parsedmodel %>%
     filter(.data$type == "path")
 
-  all_paths <- 1:nrow(paths) %>%
+  all_paths <- seq_len(nrow(paths)) %>%
     map(~case_formula(
       paths$vals[.x],
       paths$field[.x],

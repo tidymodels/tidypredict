@@ -34,17 +34,17 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
 
   if (!is.null(offset) && ismodels) {
-    index <- which(colnames(df) == "(offset)")
+    index <- colnames(df) == "(offset)"
     colnames(df) <- replace(colnames(df), index, as.character(offset))
   }
 
-  interval <- ifelse(include_intervals == TRUE, "prediction", "none")
+  interval <- if (include_intervals) "prediction" else "none"
 
   if (is.numeric(max_rows)) df <- head(df, max_rows)
 
   base <- predict(model, df, interval = interval, type = "response")
 
-  if (include_intervals == FALSE) {
+  if (! include_intervals) {
     base <- data.frame(fit = base, row.names = NULL)
   } else {
     base <- as.data.frame(base)
@@ -64,7 +64,7 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
       fit_threshold = .data$fit_diff > threshold
     )
 
-  if (include_intervals == TRUE) {
+  if (include_intervals) {
     raw_results <- raw_results %>%
       mutate(
         lwr_diff = abs(.data$lwr - .data$lwr_te),

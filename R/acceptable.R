@@ -48,8 +48,8 @@ acceptable_lm <- function(model) {
   # Check for invalid contrasts
   if (length(model$contrasts)) {
     contr <- model$contrasts
-    contr <- contr[!("contr.treatment" %in% model$contrasts)]
-    if (length(contr > 0)) {
+    contr <- contr[!("contr.treatment" %in% contr)]
+    if (length(contr) > 0) {
       stop(
         "The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: ",
         paste0("`", names(contr), "`", collapse = ","),
