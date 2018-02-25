@@ -10,7 +10,7 @@ It parses a fitted 'R' model object, and returns a formula
 in 'Tidy Eval' code that calculates the predictions.
 It works with several databases back-ends because it leverages 'dplyr'
 and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-supports lm(), glm() and randomForest() models.
+supports lm(), glm(), randomForest() and ranger() models.
 }
 \seealso{
 Useful links:

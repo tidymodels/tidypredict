@@ -225,7 +225,7 @@ get_path <- function(row_id, model_frame) {
 parse_model.ranger <- function(model) {
   model_frame <- ranger::treeInfo(model) %>%
     as.tibble() %>%
-    mutate(rowid = nodeID) %>%
+    mutate(rowid = .data$nodeID) %>%
     rename_all(tolower)
 
   all_paths <- model_frame %>%

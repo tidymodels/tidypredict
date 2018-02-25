@@ -5,31 +5,32 @@
 |setting  |value                        |
 |:--------|:----------------------------|
 |version  |R version 3.4.3 (2017-11-30) |
-|system   |x86_64, mingw32              |
+|system   |x86_64, linux-gnu            |
 |ui       |RStudio (1.1.383)            |
 |language |(EN)                         |
-|collate  |English_United States.1252   |
-|tz       |America/Chicago              |
-|date     |2018-01-14                   |
+|collate  |en_US.UTF-8                  |
+|tz       |US/Central                   |
+|date     |2018-02-25                   |
 
 ## Packages
 
 |package      |*  |version |date       |source                            |
 |:------------|:--|:-------|:----------|:---------------------------------|
-|DBI          |   |0.7     |2017-06-18 |CRAN (R 3.4.3)                    |
-|dbplyr       |   |1.2.0   |2018-01-03 |CRAN (R 3.4.3)                    |
-|dplyr        |   |0.7.4   |2017-09-28 |CRAN (R 3.4.3)                    |
-|knitr        |   |1.18    |2017-12-27 |CRAN (R 3.4.3)                    |
-|nycflights13 |   |0.2.2   |2017-01-27 |CRAN (R 3.4.3)                    |
-|purrr        |   |0.2.4   |2017-10-18 |CRAN (R 3.4.3)                    |
-|randomForest |   |4.6-12  |2015-10-07 |CRAN (R 3.4.3)                    |
-|rlang        |   |0.1.6   |2017-12-21 |CRAN (R 3.4.3)                    |
-|rmarkdown    |   |1.8     |2017-11-17 |CRAN (R 3.4.3)                    |
-|RSQLite      |   |2.0     |2017-06-19 |CRAN (R 3.4.3)                    |
-|testthat     |   |2.0.0   |2017-12-13 |CRAN (R 3.4.3)                    |
-|tibble       |   |1.4.1   |2017-12-25 |CRAN (R 3.4.3)                    |
-|tidypredict  |   |0.1.0   |2018-01-14 |local (edgararuiz/tidypredict@NA) |
-|tidyr        |   |0.7.2   |2017-10-16 |CRAN (R 3.4.3)                    |
+|DBI          |   |0.7     |2017-06-18 |cran (@0.7)                       |
+|dbplyr       |   |1.2.1   |2018-02-19 |cran (@1.2.1)                     |
+|dplyr        |   |0.7.4   |2017-09-28 |cran (@0.7.4)                     |
+|knitr        |   |1.20    |2018-02-20 |cran (@1.20)                      |
+|nycflights13 |   |0.2.2   |2017-01-27 |cran (@0.2.2)                     |
+|purrr        |   |0.2.4   |2017-10-18 |cran (@0.2.4)                     |
+|randomForest |   |4.6-12  |2015-10-07 |cran (@4.6-12)                    |
+|ranger       |   |0.9.0   |2018-01-09 |cran (@0.9.0)                     |
+|rlang        |   |0.2.0   |2018-02-20 |cran (@0.2.0)                     |
+|rmarkdown    |   |1.8     |2017-11-17 |cran (@1.8)                       |
+|RSQLite      |   |2.0     |2017-06-19 |cran (@2.0)                       |
+|testthat     |   |2.0.0   |2017-12-13 |cran (@2.0.0)                     |
+|tibble       |   |1.4.2   |2018-01-22 |cran (@1.4.2)                     |
+|tidypredict  |   |0.2.0   |2018-02-25 |local (edgararuiz/tidypredict@NA) |
+|tidyr        |   |0.8.0   |2018-01-29 |cran (@0.8.0)                     |
 
 # Check results
 
