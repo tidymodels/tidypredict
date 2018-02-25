@@ -12,10 +12,10 @@
 #'
 #' @examples
 #'
-#'library(dplyr)
-#'df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#'model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-#'tidypredict_interval(model)
+#' library(dplyr)
+#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#' tidypredict_interval(model)
 #'
 #' @export
 tidypredict_interval <- function(model, interval = 0.95) {

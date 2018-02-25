@@ -14,7 +14,7 @@
 #' @import tidyr
 #' @import tibble
 #' @keywords internal
-#' 
+#'
 "_PACKAGE"
 NULL
 utils::globalVariables(c("."))

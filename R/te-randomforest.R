@@ -48,6 +48,3 @@ case_formula <- function(vals, field, operator, split_point) {
 
   expr((!!! f) ~ !! vals)
 }
-
-
-get_marker_regx <- function() "\\{\\:\\}"

@@ -65,9 +65,10 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
 
   xrinv <- colnames(qr) %>%
     map(~xr(
-      parsedmodel = parsedmodel, 
-      qr_field = .x, 
-      res.var = res.var)) 
+      parsedmodel = parsedmodel,
+      qr_field = .x,
+      res.var = res.var
+    ))
 
   ip <- reduce(xrinv, function(l, r) expr((!! l) + (!! r)))
 
@@ -77,7 +78,6 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
 }
 
 te_interval_glm <- function(parsedmodel, interval = 0.95) {
-  
   intervals <- te_interval_lm(parsedmodel, interval)
 
   family <- pull(filter(parsedmodel, .data$labels == "family"), .data$vals)

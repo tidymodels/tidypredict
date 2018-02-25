@@ -1,4 +1,4 @@
-strip_factor<-function(x) gsub("factor\\((.+)\\)","\\1",x)
+strip_factor <- function(x) gsub("factor\\((.+)\\)", "\\1", x)
 
 te_fit_lm <- function(parsedmodel) {
   labels <- parsedmodel %>%
@@ -59,13 +59,11 @@ te_fit_glm <- function(parsedmodel) {
     assigned <- 1
     fit <- expr(1 - 1 / (1 + exp(!! fit)))
   }
-  
-  
+
   if (link == "log") {
     assigned <- 1
     fit <- expr(exp(!! fit))
   }
-
 
   if (assigned == 0) {
     stop("Combination of family and link are not supported")

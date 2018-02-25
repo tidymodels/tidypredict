@@ -18,18 +18,20 @@
 #'
 #' @examples
 #'
-#'library(dplyr)
-#'df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#'model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-#'tidypredict_test(model)
+#' library(dplyr)
+#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#' tidypredict_test(model)
 #'
 #' @export
-tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL) {
+tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
+                             include_intervals = FALSE, max_rows = NULL) {
   UseMethod("tidypredict_test")
 }
 
 #' @export
-tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001, include_intervals = FALSE, max_rows = NULL) {
+tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001,
+                                     include_intervals = FALSE, max_rows = NULL) {
   offset <- model$call$offset
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
 
@@ -44,7 +46,7 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 
   base <- predict(model, df, interval = interval, type = "response")
 
-  if (! include_intervals) {
+  if (!include_intervals) {
     base <- data.frame(fit = base, row.names = NULL)
   } else {
     base <- as.data.frame(base)
@@ -97,8 +99,12 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
     message <- paste0(
       message,
       "\nFitted records above the threshold: ", threshold_df$fit_threshold,
-      if (!is.null(threshold_df$lwr_threshold)) "\nLower interval records above the threshold: ", threshold_df$lwr_threshold,
-      if (!is.null(threshold_df$upr_threshold)) "\nUpper interval records above the threshold: ", threshold_df$upr_threshold,
+      if (!is.null(threshold_df$lwr_threshold)) {
+        "\nLower interval records above the threshold: "
+      } , threshold_df$lwr_threshold,
+      if (!is.null(threshold_df$upr_threshold)) {
+        "\nUpper interval records above the threshold: "
+      } , threshold_df$upr_threshold,
       "\n\nFit max  difference:", difference$upr_diff,
       "\nLower max difference:", difference$lwr_diff,
       "\nUpper max difference:", difference$fit_diff
@@ -123,7 +129,8 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
-tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL) {
+tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
+                                          include_intervals = FALSE, max_rows = NULL) {
   raw_results <- df %>%
     mutate(
       predict = as.character(predict(model, df)),
@@ -168,21 +175,22 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0, inclu
 }
 
 #' @export
-tidypredict_test.ranger <- function(model, df = NULL, threshold = 0, include_intervals = FALSE, max_rows = NULL) {
+tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
+                                    include_intervals = FALSE, max_rows = NULL) {
   raw_results <- df %>%
     as_tibble() %>%
     mutate(
       predict = as.character(predict(model, df)$predictions),
       tidypredict = !! tidypredict_fit(model)
     )
-  
+
   differences <- raw_results %>%
     filter(.data$tidypredict != predict | is.na(.data$tidypredict))
-  
+
   alert <- nrow(differences) > threshold
-  
+
   message <- "tidypredict test results\n"
-  
+
   if (!alert) {
     message <- paste0(
       message,
@@ -190,7 +198,7 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0, include_int
       threshold
     )
   }
-  
+
   if (nrow(differences) > 0) {
     message <- paste0(
       message,
@@ -202,14 +210,14 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0, include_int
       "\nAll predictions matched"
     )
   }
-  
+
   results <- list()
-  
+
   results$model_call <- model$call
   results$raw_results <- raw_results
   results$message <- message
   results$alert <- alert
-  
+
   structure(results, class = c("tidypredict_test", "list"))
 }
 setOldClass(c("tidypredict_test", "list"))
