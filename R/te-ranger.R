@@ -1,6 +1,6 @@
 te_ranger_fit <- function(parsedmodel) {
   paths <- parsedmodel %>%
-    filter(.data$type == "path") 
+    filter(.data$type == "path")
 
   all_paths <- seq_len(nrow(paths)) %>%
     map(~case_formula_ranger(
@@ -42,79 +42,8 @@ case_formula_ranger <- function(vals, field, operator, split_point) {
     left <- NULL
   }
 
-
   f <- c(right, left) %>%
     reduce(function(l, r) expr((!! l) & (!! r)))
 
   expr((!!! f) ~ !! vals)
-}
-
-#' @export
-parse_model.ranger <- function(model) {
-  model_frame <- ranger::treeInfo(model) %>%
-    as.tibble() %>%
-    mutate(rowid = nodeID) %>%
-    rename_all(tolower) 
-  
-  all_paths <- model_frame %>%
-    filter(is.na(.data$leftchild), is.na(.data$rightchild)) %>%
-    pull(.data$rowid) %>%
-    map(~get_path_ranger(.x, model_frame)) %>%
-    bind_rows()
-  
-  tidy <- model_frame %>%
-    as.tibble() %>%
-    filter(is.na(.data$leftchild), is.na(.data$rightchild)) %>%
-    rowid_to_column("labels") %>%
-    mutate(
-      labels = paste0("path-", labels),
-      type = "path",
-      estimate = 0
-    ) %>%
-    mutate(vals = .data$prediction) %>%
-    select(
-      .data$labels,
-      .data$vals,
-      .data$type,
-      .data$estimate
-    ) %>%
-    bind_cols(all_paths) %>%
-    add_row(labels = "model", vals = "ranger", type = "variable")
-  
-  tidy
-}
-
-
-get_path_ranger <- function(row_id, model_frame) {
-  
-  field <- NULL
-  operator <- NULL
-  split_point <- NULL
-  current_val <- row_id 
-  
-  for (get_path in row_id:1) {
-    current <- model_frame[get_path,]
-    if(!is.na(current$leftchild)){
-      if(current$leftchild == current_val || current$rightchild == current_val){
-        field <- c(
-          field,
-          as.character(current$splitvarname)
-        )
-        operator <- c(
-          operator,
-          if (current$leftchild == current_val) "left" else "right"
-        )
-        split_point <- c(
-          split_point,
-          as.character(current$splitval)
-        )
-        current_val <- current$rowid
-      }
-    }
-  }
-  tibble(
-    field = paste0(field, collapse = get_marker()),
-    operator = paste0(operator, collapse = get_marker()),
-    split_point = paste0(split_point, collapse = get_marker())
-  )
 }

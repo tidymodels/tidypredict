@@ -1,6 +1,6 @@
 context("randomForest")
 set.seed(100)
-rf_model <- randomForest::randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+rf_model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100, proximity = TRUE)
 
 test_that("Returns the correct type", {
   expect_is(parse_model(rf_model), "data.frame")
@@ -8,8 +8,8 @@ test_that("Returns the correct type", {
   expect_is(tidypredict_fit(rf_model), "call")
 })
 
-test_that("All tests are under the threshold (5)",{
-  expect_false(tidypredict_test(rf_model, threshold = 5, df = iris)$alert) 
+test_that("All tests are under the threshold (5)", {
+  expect_false(tidypredict_test(rf_model, threshold = 5, df = iris)$alert)
 })
 
 pm <- parse_model(rf_model)

@@ -7,7 +7,7 @@
 parse_model(model)
 }
 \arguments{
-\item{model}{An R model object. It currently supports lm(), 
+\item{model}{An R model object. It currently supports lm(),
 glm() and randomForest() models.}
 }
 \description{

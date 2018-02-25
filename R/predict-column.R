@@ -16,11 +16,12 @@
 #' library(dplyr)
 #' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-#' 
+#'
 #' df %>%
 #'   tidypredict_to_column(model, add_interval = TRUE)
 #' @export
-tidypredict_to_column <- function(df, model, add_interval = FALSE, interval = 0.95, vars = c("fit", "upper", "lower")) {
+tidypredict_to_column <- function(df, model, add_interval = FALSE,
+                                  interval = 0.95, vars = c("fit", "upper", "lower")) {
   fit <- vars[1]
   upper <- vars[2]
   lower <- vars[3]
