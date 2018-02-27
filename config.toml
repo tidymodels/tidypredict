@@ -18,7 +18,7 @@ googleAnalytics = "UA-111788788-1"
 	repo_url = "https://github.com/edgararuiz/tidypredict"
 	repo_name = "edgararuiz/tidypredict"
 
-	version = "v.0.1.0"
+	version = "v.0.2.0"
 	logo = "images/logo.png"
 	favicon = "logo.png"
 

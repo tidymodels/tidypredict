@@ -81,7 +81,7 @@ knit_print.tidypredict_test(x, ...)</description>
       
       <guid>/reference/parse_model/</guid>
       <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure and extracts the componentsneeded to create a dplyr formula for prediction. The function alsocreates a data frame using an specific format so that otherfunctions in the future can also pass parsed tables to a givenformula creating function.
-parse_model(model)ArgumentsmodelAn R model object. It currently supports lm(), glm() and randomForest() models.</description>
+parse_model(model)ArgumentsmodelAn R model object. It currently supports lm(),glm() and randomForest() models.</description>
     </item>
     
     <item>
@@ -119,8 +119,10 @@ parse_model(model)ArgumentsmodelAn R model object. It currently supports l
       
       <guid>/</guid>
       <description>Run predictions inside the database. tidypredict parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.
-It works with several databases back-ends because it leverages dplyr and dbplyr for the final SQL translation of the algorithm. It currently supports lm(), glm() and randomForest() models. Models from the ranger() package are now supported in the development version of the tidypredict
-InstallationInstall tidypredict from CRAN using:</description>
+It works with several databases back-ends because it leverages dplyr and dbplyr for the final SQL translation of the algorithm. It currently supports lm(), glm(), randomForest() and ranger() models.
+InstallationInstall tidypredict from CRAN using:
+install.packages(&amp;quot;tidypredict&amp;quot;)Or install the development version using devtools as follows:
+devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)Introtidypredict is able to parse an R model object, such as:</description>
     </item>
     
     <item>
@@ -129,7 +131,7 @@ InstallationInstall tidypredict from CRAN using:</description>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/reference/tidypredict-package/</guid>
-      <description>See alsoIt parses a fitted &#39;R&#39; model object, and returns a formulain &#39;Tidy Eval&#39; code that calculates the predictions.It works with several databases back-ends because it leverages &#39;dplyr&#39;and &#39;dbplyr&#39; for the final &#39;SQL&#39; translation of the algorithm. It currentlysupports lm(), glm() and randomForest() models.
+      <description>See alsoIt parses a fitted &#39;R&#39; model object, and returns a formulain &#39;Tidy Eval&#39; code that calculates the predictions.It works with several databases back-ends because it leverages &#39;dplyr&#39;and &#39;dbplyr&#39; for the final &#39;SQL&#39; translation of the algorithm. It currentlysupports lm(), glm(), randomForest() and ranger() models.
 See alsoUseful links:
 http://tidypredict.netlify.com/
 Report bugs at https://github.com/edgararuiz/tidypredict/issues
