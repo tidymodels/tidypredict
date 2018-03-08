@@ -2,7 +2,7 @@
 title: "ranger() model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{randomForest}
+  %\VignetteIndexEntry{ranger}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 menu:
