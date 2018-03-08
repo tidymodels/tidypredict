@@ -2,7 +2,7 @@
 title: "glm() model"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{lm}
+  %\VignetteIndexEntry{glm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 menu:
