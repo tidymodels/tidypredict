@@ -1,212 +1,0 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-  <channel>
-    <title>tidypredict</title>
-    <link>/</link>
-    <description>Recent content on tidypredict</description>
-    <generator>Hugo -- gohugo.io</generator>
-    <language>en-us</language>
-    <copyright>Released under the GPL-3 license</copyright>
-    
-	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
-    
-    
-    <item>
-      <title>Database write-back</title>
-      <link>/articles/sql/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/articles/sql/</guid>
-      <description>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.
-Example setupTo keep the example reproducible, a SQLite database will be used to simulate a larger scale deployment.
-First the data is prepared in memory. The article will use the nycflights13::flights data, with a couple of modifications
-library(dplyr)library(tibble)flights_table &amp;lt;- nycflights13::flights %&amp;gt;%mutate(current_score = 0) %&amp;gt;%rowid_to_column(&amp;quot;flight_id&amp;quot;)A new database is created using RSQLite.</description>
-    </item>
-    
-    <item>
-      <title>Function Reference</title>
-      <link>/reference/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/</guid>
-      <description>SQL formulasdplyrUtilitiesSQL formulastidypredict_sql Returns a SQL query with formula to calculate fitted values
-tidypredict_sql_interval Returns a SQL query with formula to calculate predicted interval
-dplyrtidypredict_to_column Adds the prediction columns to a piped command set
-tidypredict_fit Returns a Tidy Eval formula to calculate fitted values</description>
-    </item>
-    
-    <item>
-      <title>acceptable_formula</title>
-      <link>/reference/acceptable_formula/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/acceptable_formula/</guid>
-      <description>ArgumentsExamplesUses an S3 method to check that a given formula can be parsed based on its class.It currently scans for contrasts that are not supported and in-line functions.(e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,as opposed to human interaction, a successful check is silent.
-acceptable_formula(model)ArgumentsmodelAn R model object
-Examplesmodel &amp;lt;- lm(mpg ~ wt, mtcars)acceptable_formula(model)</description>
-    </item>
-    
-    <item>
-      <title>glm() model</title>
-      <link>/articles/glm/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/articles/glm/</guid>
-      <description>Highlights &amp;amp; LimitationsDefaults to 0-to-1 predictions for binomial family models. That is akin to running predict(model, type = &amp;quot;response&amp;quot;)Only treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.</description>
-    </item>
-    
-    <item>
-      <title>knit_print.tidypredict_test</title>
-      <link>/reference/knit_print.tidypredict_test/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/knit_print.tidypredict_test/</guid>
-      <description>Knit print method for test predictions results
-knit_print.tidypredict_test(x, ...)</description>
-    </item>
-    
-    <item>
-      <title>lm() model</title>
-      <link>/articles/lm/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/articles/lm/</guid>
-      <description>Highlights &amp;amp; LimitationsSupports prediction intervals, it uses the qr.solve() function to parse the interval coefficient of each term.Supports categorical variables and interactionsOnly treatment contrast (contr.treatment) are supported.offset is supportedCategorical variables are supportedIn-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.</description>
-    </item>
-    
-    <item>
-      <title>parse_model</title>
-      <link>/reference/parse_model/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/parse_model/</guid>
-      <description>ArgumentsExamplesIt parses a fitted R model&#39;s structure and extracts the componentsneeded to create a dplyr formula for prediction. The function alsocreates a data frame using an specific format so that otherfunctions in the future can also pass parsed tables to a givenformula creating function.
-parse_model(model)ArgumentsmodelAn R model object. It currently supports lm(),glm() and randomForest() models.</description>
-    </item>
-    
-    <item>
-      <title>print.tidypredict_test</title>
-      <link>/reference/print.tidypredict_test/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/print.tidypredict_test/</guid>
-      <description>print method for test predictions results
-# S3 method for tidypredict_testprint(x, ...)</description>
-    </item>
-    
-    <item>
-      <title>randomForest() model</title>
-      <link>/articles/randomforest/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/articles/randomforest/</guid>
-      <description>Highlights &amp;amp; LimitationsUses the randomForest::getTree() to parse each decision path.In-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple randomForest() model using the iris dataset:</description>
-    </item>
-    
-    <item>
-      <title>ranger() model</title>
-      <link>/articles/ranger/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/articles/ranger/</guid>
-      <description>Highlights &amp;amp; LimitationsUses the ranger::treeInfo() to parse each decision path.In-line functions in the formulas are not supported:OK - wt ~ mpg + amOK - mutate(mtcars, newam = paste0(am)) and then wt ~ mpg + newamNot OK - wt ~ mpg + as.factor(am)Not OK - wt ~ mpg + as.character(am)Interval functions are not supported: tidypredict_interval() &amp;amp; tidypredict_sql_interval()How it worksHere is a simple ranger() model using the iris dataset:</description>
-    </item>
-    
-    <item>
-      <title>tidypredict</title>
-      <link>/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/</guid>
-      <description>Run predictions inside the database. tidypredict parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.
-It works with several databases back-ends because it leverages dplyr and dbplyr for the final SQL translation of the algorithm. It currently supports lm(), glm(), randomForest() and ranger() models.
-InstallationInstall tidypredict from CRAN using:
-install.packages(&amp;quot;tidypredict&amp;quot;)Or install the development version using devtools as follows:
-devtools::install_github(&amp;quot;edgararuiz/tidypredict&amp;quot;)Introtidypredict is able to parse an R model object, such as:</description>
-    </item>
-    
-    <item>
-      <title>tidypredict,tidypredict-package</title>
-      <link>/reference/tidypredict-package/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict-package/</guid>
-      <description>See alsoIt parses a fitted &#39;R&#39; model object, and returns a formulain &#39;Tidy Eval&#39; code that calculates the predictions.It works with several databases back-ends because it leverages &#39;dplyr&#39;and &#39;dbplyr&#39; for the final &#39;SQL&#39; translation of the algorithm. It currentlysupports lm(), glm(), randomForest() and ranger() models.
-See alsoUseful links:
-http://tidypredict.netlify.com/
-Report bugs at https://github.com/edgararuiz/tidypredict/issues
-</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_fit</title>
-      <link>/reference/tidypredict_fit/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_fit/</guid>
-      <description>ArgumentsExamplesIt parses a model or uses an already parsed model to return aTidy Eval formula that can then be used inside a dplyr command.
-tidypredict_fit(model)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm(), glm() and randomForest() models.
-Exampleslibrary(dplyr)df &amp;lt;- mutate(mtcars, cyl = paste0(&#34;cyl&#34;, cyl))model &amp;lt;- lm(mpg ~ wt + cyl * disp, offset = am, data = df)tidypredict_fit(model)#&amp;gt; (((((((39.</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_interval</title>
-      <link>/reference/tidypredict_interval/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_interval/</guid>
-      <description>ArgumentsDetailsExamplesIt parses a model or uses an already parsed model to return aTidy Eval formula that can then be used inside a dplyr command.
-tidypredict_interval(model, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm() models only.
-intervalThe prediction interval, defaults to 0.95
-DetailsThe result still has to be added to the fit to obtain the upper bound, andsubtracted from fit to obtain the lower bound.</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_sql</title>
-      <link>/reference/tidypredict_sql/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_sql/</guid>
-      <description>ArgumentsExamplesReturns a SQL query with formula to calculate fitted values
-tidypredict_sql(model, con)ArgumentsmodelAn R model or a tibble with a parsed model
-conDatabase connection object. It is used to selectthe correct SQL translation syntax.
-Exampleslibrary(dbplyr)#&amp;gt; #&amp;gt; Attaching package: �dbplyr�#&amp;gt; The following objects are masked from �package:tidypredict�:#&amp;gt; #&amp;gt; ident, sql#&amp;gt; The following objects are masked from �package:dplyr�:#&amp;gt; #&amp;gt; ident, sqlmodel &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql(model, simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (((39.</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_sql_interval</title>
-      <link>/reference/tidypredict_sql_interval/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_sql_interval/</guid>
-      <description>ArgumentsExamplesReturns a SQL query with formula to calculate predicted interval
-tidypredict_sql_interval(model, con, interval = 0.95)ArgumentsmodelAn R model or a tibble with a parsed model
-conDatabase connection object. It is used to selectthe correct SQL translation syntax.
-intervalThe prediction interval, defaults to 0.95
-Exampleslibrary(dbplyr)model &amp;lt;- lm(mpg ~ wt + am + cyl, data = mtcars)tidypredict_sql_interval(model, simulate_dbi())#&amp;gt; &amp;lt;SQL&amp;gt; (2.</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_test</title>
-      <link>/reference/tidypredict_test/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_test/</guid>
-      <description>ArgumentsExamplesCompares the results of predict() and tidypredict_to_column()functions.
-tidypredict_test(model, df = model$model, threshold = 1e-12,include_intervals = FALSE, max_rows = NULL)ArgumentsmodelAn R model or a tibble with a parsed model. It currently supportslm(), glm() and randomForest() models.
-dfA data frame that contains all of the needed fields to run the prediction.It defaults to the &#34;</description>
-    </item>
-    
-    <item>
-      <title>tidypredict_to_column</title>
-      <link>/reference/tidypredict_to_column/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/reference/tidypredict_to_column/</guid>
-      <description>ArgumentsExamplesAdds a new column with the results form tidypredict_fit() to a piped command set.If add_interval is set to TRUE, then it will add two additional columns, onefor the lower and another for the upper prediction interval bounds.
-tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,vars = c(&#34;fit&#34;, &#34;upper&#34;, &#34;lower&#34;))ArgumentsdfA data.frame or tibble
-modelAn R model or a parsed model inside a data frame</description>
-    </item>
-    
-  </channel>
-</rss>
