@@ -290,6 +290,64 @@ get_path_ranger <- function(row_id, model_frame) {
   )
 }
 
+# earth() models ------------------------------------------
+
+#' @export
+parse_model.earth <- function(model){
+  gather_fields <- function(dat, val_name){
+    val_name <- enexpr(val_name)
+    two_dat <- lapply(
+      seq_len(ncol(dat)),
+      function(x) {
+        tibble(
+          labels = as.character(rownames(dat)),
+          !! val_name := dat[, x], 
+          field = colnames(dat)[x]
+        )
+      }
+    )
+    bind_rows(two_dat)
+  }
+  
+  cuts <- gather_fields(model$cuts, cuts)
+  dirs <- gather_fields(model$dirs, dirs)
+  
+  model_table <- tibble(
+    labels = rownames(model$coefficients),
+    estimate = model$coefficients[, 1]
+  )
+  
+  intercept <- model_table[model_table$labels == "(Intercept)",]
+  intercept <- intercept[1, ]
+  intercept$cuts <- NA
+  intercept$dirs <- 0
+  intercept$field <- NA
+  
+  model_table <- inner_join(model_table, cuts, by = "labels")
+  model_table <- inner_join(model_table, dirs, by = "labels")
+  
+  
+  model_table <- model_table[model_table$dirs != 0, ]
+  model_table <- model_table[model_table$field.x == model_table$field.y, ]
+  field <- pull(model_table, field.x)
+  model_table <- model_table[, colnames(model_table) != "field.y"]
+  model_table <- model_table[, colnames(model_table) != "field.x"]
+  model_table$field <- field
+  
+  model_table <- bind_rows(intercept, model_table)
+  
+  model_table$type <- "terms"
+  model_table <- bind_rows(
+    model_table,
+    tibble(
+      labels = "model",
+      vals = "earth"
+    )
+  )
+  model_table
+  
+}
+
 # Helper functions ----------------------------------------
 
 #' @import dplyr

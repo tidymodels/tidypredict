@@ -43,6 +43,13 @@ tidypredict_fit.ranger <- function(model) {
 }
 
 #' @export
+tidypredict_fit.earth <- function(model) {
+  parsedmodel <- parse_model(model)
+  te_earth_fit(parsedmodel)
+}
+
+
+#' @export
 #' @importFrom tibble as.tibble
 `tidypredict_fit.data.frame` <- function(model) {
   model <- model %>%
@@ -74,7 +81,12 @@ tidypredict_fit.ranger <- function(model) {
     assigned <- 1
     fit <- te_ranger_fit(model)
   }
-
+  
+  if (model_type == "earth") {
+    assigned <- 1
+    fit <- te_earth_fit(model)
+  }
+  
   if (assigned == 0) {
     stop("Model not recognized")
   }
