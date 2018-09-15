@@ -3,6 +3,7 @@
 #' @importFrom purrr map
 #' @importFrom purrr map_df
 #' @importFrom purrr reduce
+#' @importFrom purrr transpose
 #' @import dplyr
 #' @import rlang
 #' @importFrom tibble tibble

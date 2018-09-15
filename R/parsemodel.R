@@ -124,8 +124,8 @@ parse_model_lm <- function(model) {
   tidy <- add_variable(tidy, labels = "version", vals = "1.0")
   tidy <- add_variable(tidy, labels = "residual", vals = model$df.residual)
 
-  if (length(summary(model)$sigma ^ 2) > 0) {
-    tidy <- add_variable(tidy, labels = "sigma2", vals = summary(model)$sigma ^ 2)
+  if (length(summary(model)$sigma^2) > 0) {
+    tidy <- add_variable(tidy, labels = "sigma2", vals = summary(model)$sigma^2)
   }
 
   if (!is.null(model$family$family)) {
@@ -290,6 +290,63 @@ get_path_ranger <- function(row_id, model_frame) {
   )
 }
 
+# earth() models ------------------------------------------
+
+#' @export
+parse_model.earth <- function(model) {
+  gather_fields <- function(dat, val_name) {
+    val_name <- enexpr(val_name)
+    two_dat <- lapply(
+      seq_len(ncol(dat)),
+      function(x) {
+        tibble(
+          labels = as.character(rownames(dat)),
+          !!val_name := dat[, x],
+          field = colnames(dat)[x]
+        )
+      }
+    )
+    bind_rows(two_dat)
+  }
+
+  cuts <- gather_fields(model$cuts, cuts)
+  dirs <- gather_fields(model$dirs, dirs)
+
+  mt <- tibble(
+    labels = rownames(model$coefficients),
+    estimate = model$coefficients[, 1]
+  )
+
+  itc <- mt[mt$labels == "(Intercept)", ]
+  itc <- itc[1, ]
+  itc$cuts <- NA
+  itc$dirs <- 0
+  itc$field <- NA
+
+  mt <- inner_join(mt, cuts, by = "labels")
+  mt <- inner_join(mt, dirs, by = "labels")
+
+
+  mt <- mt[mt$dirs != 0, ]
+  mt <- mt[mt$field.x == mt$field.y, ]
+  field <- mt$field.x
+  mt <- mt[, colnames(mt) != "field.y"]
+  mt <- mt[, colnames(mt) != "field.x"]
+  mt$field <- field
+
+  mt <- bind_rows(itc, mt)
+
+  mt$type <- "terms"
+  mt <- bind_rows(
+    mt,
+    tibble(
+      labels = "model",
+      vals = "earth"
+    )
+  )
+  mt
+}
+
 # Helper functions ----------------------------------------
 
 #' @import dplyr
@@ -297,8 +354,8 @@ get_path_ranger <- function(row_id, model_frame) {
 add_variable <- function(df, labels, vals) {
   df %>%
     bind_rows(tibble(
-      labels = !! labels,
-      vals = as.character(!! vals),
+      labels = !!labels,
+      vals = as.character(!!vals),
       type = "variable"
     ))
 }

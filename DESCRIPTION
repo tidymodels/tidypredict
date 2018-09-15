@@ -21,6 +21,7 @@ Suggests:
     testthat,
     randomForest,
     ranger,
+    earth,
     knitr,
     rmarkdown,
     nycflights13,
@@ -30,5 +31,5 @@ Suggests:
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
 VignetteBuilder: knitr
