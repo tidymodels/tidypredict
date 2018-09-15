@@ -329,7 +329,7 @@ parse_model.earth <- function(model) {
 
   mt <- mt[mt$dirs != 0, ]
   mt <- mt[mt$field.x == mt$field.y, ]
-  field <- pull(mt, field.x)
+  field <- mt$field.x
   mt <- mt[, colnames(mt) != "field.y"]
   mt <- mt[, colnames(mt) != "field.x"]
   mt$field <- field

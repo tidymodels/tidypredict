@@ -21,6 +21,7 @@ Suggests:
     testthat,
     randomForest,
     ranger,
+    earth,
     knitr,
     rmarkdown,
     nycflights13,
