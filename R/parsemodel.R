@@ -294,7 +294,6 @@ get_path_ranger <- function(row_id, model_frame) {
 
 #' @export
 parse_model.earth <- function(model) {
-  
   gather_fields <- function(dat, val_name) {
     val_name <- enexpr(val_name)
     two_dat <- lapply(
@@ -309,34 +308,34 @@ parse_model.earth <- function(model) {
     )
     bind_rows(two_dat)
   }
-  
+
   cuts <- gather_fields(model$cuts, cuts)
   dirs <- gather_fields(model$dirs, dirs)
-  
+
   mt <- tibble(
     labels = rownames(model$coefficients),
     estimate = model$coefficients[, 1]
   )
-  
+
   itc <- mt[mt$labels == "(Intercept)", ]
   itc <- itc[1, ]
   itc$cuts <- NA
   itc$dirs <- 0
   itc$field <- NA
-  
+
   mt <- inner_join(mt, cuts, by = "labels")
   mt <- inner_join(mt, dirs, by = "labels")
-  
-  
+
+
   mt <- mt[mt$dirs != 0, ]
   mt <- mt[mt$field.x == mt$field.y, ]
   field <- pull(mt, field.x)
   mt <- mt[, colnames(mt) != "field.y"]
   mt <- mt[, colnames(mt) != "field.x"]
   mt$field <- field
-  
+
   mt <- bind_rows(itc, mt)
-  
+
   mt$type <- "terms"
   mt <- bind_rows(
     mt,
