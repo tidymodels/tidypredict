@@ -35,5 +35,31 @@ te_earth_fit <- function(parsedmodel) {
     }
   )
 
-  reduce(pm_terms, function(x, y) expr(!!x + !!y))
+  fit <- reduce(pm_terms, function(x, y) expr(!!x + !!y))
+  
+  link <- parsedmodel$vals[parsedmodel$labels == "link"]
+  
+  if(length(link) > 0){
+    
+    assigned <- 0
+    
+    if (link == "identity") {
+      assigned <- 1
+    }
+    
+    if (link == "logit") {
+      assigned <- 1
+      fit <- expr(1 - 1 / (1 + exp(!! fit)))
+    }
+    
+    if (link == "log") {
+      assigned <- 1
+      fit <- expr(exp(!! fit))
+    }
+    
+    if (assigned == 0) {
+      stop("Combination of family and link are not supported")
+    }
+  }
+  fit
 }
