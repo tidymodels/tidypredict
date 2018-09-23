@@ -133,7 +133,7 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
                                           include_intervals = FALSE, max_rows = NULL) {
   raw_results <- df %>%
     mutate(
-      predict = as.character(predict(model, df)),
+      predict = as.character(predict(model, newdata = df)),
       tidypredict = !! tidypredict_fit(model)
     )
 
@@ -225,7 +225,7 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
 tidypredict_test.earth <- function(model, df = NULL, threshold = 0.000000000001) {
   
   rs <- mutate(
-    as.tibble(mtcars), 
+    as.tibble(df), 
     tidypredict = !! tidypredict_fit(model),
     predict = predict(model, newdata = df, type = "response"),
     diff = tidypredict - predict
