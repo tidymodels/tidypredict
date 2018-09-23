@@ -312,9 +312,12 @@ parse_model.earth <- function(model) {
   cuts <- gather_fields(model$cuts, cuts)
   dirs <- gather_fields(model$dirs, dirs)
 
+  coefs <- model$coefficients
+  if(!is.null(model$glm.coefficients)) coefs <- model$glm.coefficients
+  
   mt <- tibble(
-    labels = rownames(model$coefficients),
-    estimate = model$coefficients[, 1]
+    labels = rownames(coefs),
+    estimate = coefs[, 1]
   )
 
   itc <- mt[mt$labels == "(Intercept)", ]
@@ -344,8 +347,24 @@ parse_model.earth <- function(model) {
       vals = "earth"
     )
   )
+  
+  if(!is.null(model$glm.coefficients)) {
+    fam <- model$glm.list[[1]]$family
+    mt <- bind_rows(
+      mt,
+      tribble(
+        ~labels,  ~vals,
+        "family", fam$family,
+        "link",   fam$link
+      )
+    )
+    
+  }
+  
   mt
 }
+
+
 
 # Helper functions ----------------------------------------
 
