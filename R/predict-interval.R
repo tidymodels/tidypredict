@@ -36,27 +36,23 @@ tidypredict_interval.glm <- function(model, interval = 0.95) {
 
 #' @export
 `tidypredict_interval.data.frame` <- function(model, interval = 0.95) {
-  model <- model %>%
-    mutate_if(is.factor, as.character) %>%
-    as.tibble()
-
-  model_type <- model %>%
-    filter(.data$labels == "model") %>%
-    pull(.data$vals)
-
+  model_type <- model[model$labels == "model", "vals"][[1]]
+  
   assigned <- 0
-
+  
   if (model_type == "lm") {
     assigned <- 1
-    te_interval_lm(model)
+    ret <- te_interval_lm(model, interval = interval)
   }
-
+  
   if (model_type == "glm") {
     assigned <- 1
-    te_interval_glm(model)
+    ret <- te_interval_glm(model, interval = interval)
   }
-
+  
   if (assigned == 0) {
     stop("Model not recognized")
+  } else {
+    ret
   }
 }
