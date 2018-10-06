@@ -294,27 +294,26 @@ get_path_ranger <- function(row_id, model_frame) {
 
 #' @export
 parse_model.earth <- function(model) {
-  
-  get_values <- function(model, dirs, rep_value = "term"){
+  get_values <- function(model, dirs, rep_value = "term") {
     term_labels <- attr(model$terms, "term.labels")
     col_names <- colnames(model$dirs)
-    if(rep_value == "term"){
+    if (rep_value == "term") {
       map_val <- map_chr
     } else {
       map_val <- map_dbl
     }
     fields <- map_val(
-      term_labels, 
+      term_labels,
       ~{
         sub_cols <- substr(col_names, 1, nchar(.x))
         sub_val <- substr(col_names, nchar(.x) + 1, nchar(col_names))
         col_matched <- .x == sub_cols
         col_notzero <- dirs != 0
         col_select <- col_matched + col_notzero == 2
-        if(any(col_select)){
-          if(rep_value == "term"){
+        if (any(col_select)) {
+          if (rep_value == "term") {
             val_select <- sub_val[col_select]
-            if(val_select == "") val_select <- "{{:}}"
+            if (val_select == "") val_select <- "{{:}}"
           } else {
             val_select <- dirs[col_select]
           }
@@ -322,70 +321,73 @@ parse_model.earth <- function(model) {
           val_select <- NA
         }
         val_select
-      })
-    names(fields) <- term_labels  
+      }
+    )
+    names(fields) <- term_labels
     fields
   }
-  
+
+  coefs <- model$coefficients
+  if (!is.null(model$glm.coefficients)) coefs <- model$glm.coefficients
+
   parsed <- map(
-    rownames(model$coefficients),
+    rownames(coefs),
     ~{
-      coefficients <- rownames(model$coefficients) == .x
-      coefficients <- model$coefficients[coefficients, ]
+      coefficients <- rownames(coefs) == .x
+      coefficients <- coefs[coefficients, ]
       names(coefficients) <- "estimate"
-      
+
       cdir <- rownames(model$dirs) == .x
       cdir <- model$dirs[cdir, ]
-      
+
       ccut <- rownames(model$cuts) == .x
       ccut <- model$cuts[ccut, ]
-      
+
       fields <- get_values(model, cdir)
       names(fields) <- paste0("field_", seq_along(fields))
-      
+
       cuts <- get_values(model, ccut, "")
       names(cuts) <- paste0("cuts_", seq_along(cuts))
-      
+
       dirs <- get_values(model, cdir, "")
       names(dirs) <- paste0("dirs_", seq_along(dirs))
-      
+
       labels <- .x
       names(labels) <- "labels"
-      
+
       type <- "terms"
       names(type) <- "type"
-      
-      
+
+
       row_vec <- c(labels, coefficients, type, fields, dirs, cuts)
       row_list <- as.list(row_vec)
-      
     }
   )
-  
-  parsed_tibble <-  map_df(parsed, ~ as.tibble(.x))
-  
+
+  parsed_tibble <- map_df(parsed, ~as.tibble(.x))
+
   term_labels <- attr(model$terms, "term.labels")
   names(term_labels) <- paste0("field_", seq_along(term_labels))
-  
+
   new <- c("labels", 0, "variable")
   names(new) <- c("labels", "estimate", "type")
-  
+
   new <- c(new, term_labels)
-  
+
   all_names <- colnames(parsed_tibble)
-  
-  rest_names <- all_names[length(new) + 1 :(length(all_names) - length(new)) ]
-  
+
+  rest_names <- all_names[length(new) + 1:(length(all_names) - length(new)) ]
+
   rest <- rep(NA, length(rest_names))
   names(rest) <- rest_names
-  
+
   new <- c(new, rest)
-  
+
   mt <- rbind(
     parsed_tibble,
     as.tibble(as.list(new))
   )
-  
+
   mt <- bind_rows(
     mt,
     tibble(
@@ -394,20 +396,19 @@ parse_model.earth <- function(model) {
       vals = "earth"
     )
   )
-  
-  if(!is.null(model$glm.coefficients)) {
+
+  if (!is.null(model$glm.coefficients)) {
     fam <- model$glm.list[[1]]$family
     mt <- bind_rows(
       mt,
       tribble(
-        ~labels,  ~vals,
+        ~labels, ~vals,
         "family", fam$family,
-        "link",   fam$link
+        "link", fam$link
       )
     )
-    
   }
-  
+
   mt
 }
 
