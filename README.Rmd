@@ -3,6 +3,9 @@ title: "tidypredict"
 output: github_document
 ---
 
+ [![Coverage status](https://codecov.io/gh/edgararuiz/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+ 
+
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)

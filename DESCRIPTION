@@ -25,9 +25,10 @@ Suggests:
     knitr,
     rmarkdown,
     nycflights13,
-    RSQLite, 
+    RSQLite,
     methods,
-    DBI
+    DBI,
+    covr
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
