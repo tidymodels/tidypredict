@@ -1,13 +1,9 @@
 context("glm")
 
-df <- mtcars %>%
-  mutate(cyl = paste0("cyl", cyl))
+df <- mtcars
+df$cyl <- paste0("cyl", df$cyl)
 
-has_alert <- function(model) {
-  tidypredict_test(
-    model
-  )$alert
-}
+has_alert <- function(...) tidypredict_test(...)$alert
 
 test_that("Individual prediction difference is never above 1e-12", {
   expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "gaussian")))
