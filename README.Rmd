@@ -1,10 +1,14 @@
 ---
-title: "tidypredict"
 output: github_document
 ---
 
- [![Coverage status](https://codecov.io/gh/edgararuiz/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
- 
+# tidypredict <img src="tools/images/logo.png" align="right" width = "150px"/>
+
+[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
+[![Coverage Status](https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+
+[![Downloads](https://cranlogs.r-pkg.org/badges/tidypredict)]()
 
 ```{r setup, include=FALSE}
 library(dplyr)

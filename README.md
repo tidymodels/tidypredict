@@ -1,8 +1,13 @@
-tidypredict
-================
 
+# tidypredict <img src="tools/images/logo.png" align="right" width = "150px"/>
+
+[![Build
+Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
 [![Coverage
-status](https://codecov.io/gh/edgararuiz/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+Status](https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+
+[![Downloads](https://cranlogs.r-pkg.org/badges/tidypredict)]()
 
 Run predictions inside the database. `tidypredict` parses a fitted R
 model object, and returns a formula in ‘Tidy Eval’ code that calculates
