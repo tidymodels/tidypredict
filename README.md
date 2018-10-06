@@ -13,6 +13,8 @@ Run predictions inside the database. `tidypredict` parses a fitted R
 model object, and returns a formula in ‘Tidy Eval’ code that calculates
 the predictions.
 
+<img src="tools/images/howitworks.PNG" align="right" width = "600px"/>
+
 **It works with several databases back-ends** because it leverages
 `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It
 currently supports `lm()`, `glm()`, `randomForest()` and `ranger()`
@@ -48,18 +50,3 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
     ## <SQL> 39.6862614802529 + (`wt`) * (-3.19097213898374) + (`cyl`) * (-1.5077949682598)
-
-## Supported models
-
-The following R models are currently supported. For more info please
-review the corresponding vignette:
-
-  - [Linear Regression](http://tidypredict.netlify.com/articles/lm/) -
-    `lm()`
-  - [Generalized Linear
-    model](http://tidypredict.netlify.com/articles/glm/) - `glm()`
-  - [Random
-    Forest](http://tidypredict.netlify.com/articles/randomforest/) -
-    `randomForest()`
-  - [ranger](http://tidypredict.netlify.com/articles/ranger/) -
-    `ranger()`
