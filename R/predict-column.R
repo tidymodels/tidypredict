@@ -25,19 +25,50 @@ tidypredict_to_column <- function(df, model, add_interval = FALSE,
   fit <- vars[1]
   upper <- vars[2]
   lower <- vars[3]
-
-  df <- mutate(df, !! fit := !! tidypredict_fit(model))
-
-  if (add_interval) {
-    formulas <- c(sym(fit), tidypredict_interval(model, interval = interval))
-    upper_formula <- reduce(formulas, function(l, r) expr((!! l) + (!! r)))
-    lower_formula <- reduce(formulas, function(l, r) expr((!! l) - (!! r)))
-
-    df <- mutate(
-      df,
-      !! upper := !! upper_formula,
-      !! lower := !! lower_formula
-    )
+  
+  matched <- FALSE
+  
+  if(class(model) == "ranger"){
+    matched <- TRUE
+    preds <- tidypredict_fit(model)
+    pred_type <- class(model$predictions)
+    all <- NULL
+    for(i in seq_along(preds) ){
+      new <- mutate(df, fit = !! preds[[i]])
+      if(is.null(all)){
+        all <- new
+      } else {
+        all <- union_all(all, new)  
+      }
+    }
+    if(pred_type == "factor"){
+      all <- group_by(all, !!! syms(c(colnames(df), "fit")))
+      all <- tally(all)
+      all <- filter(all, n == max(n, na.rm = TRUE))
+      all <- select(all, -n)
+      df <- ungroup(all)
+    }
+    if(pred_type == "numeric"){
+      all <- group_by(all, !!! syms(colnames(df)))
+      all <- summarise(all, fit == mean(fit))
+      df <- ungroup(all)
+    }
+  }
+  
+  if(matched == FALSE){
+    df <- mutate(df, !! fit := !! tidypredict_fit(model))
+    
+    if (add_interval) {
+      formulas <- c(sym(fit), tidypredict_interval(model, interval = interval))
+      upper_formula <- reduce(formulas, function(l, r) expr((!! l) + (!! r)))
+      lower_formula <- reduce(formulas, function(l, r) expr((!! l) - (!! r)))
+      
+      df <- mutate(
+        df,
+        !! upper := !! upper_formula,
+        !! lower := !! lower_formula
+      )
+    }
   }
 
   df

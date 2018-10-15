@@ -14,7 +14,15 @@
 #' @export
 tidypredict_sql <- function(model, con) {
   f <- tidypredict_fit(model)
-  dbplyr::translate_sql(!! f, con = con)
+  if(length(f) == 1) {
+    dbplyr::translate_sql(!! f, con = con)  
+  } else {
+    all <- map(
+      seq_along(f),
+      ~ dbplyr::translate_sql(!! f[[.x]], con = con)  
+    )
+    set_names(all, names(f))
+  }
 }
 
 #' Returns a SQL query with formula to calculate predicted interval

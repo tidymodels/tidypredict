@@ -179,9 +179,10 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL) {
   raw_results <- df %>%
     as_tibble() %>%
+    tidypredict_to_column(model) %>%
+    rename(tidypredict = fit) %>%
     mutate(
-      predict = as.character(predict(model, df)$predictions),
-      tidypredict = !! tidypredict_fit(model)
+      predict = as.character(predict(model, df)$predictions)
     )
 
   differences <- raw_results %>%

@@ -223,37 +223,16 @@ get_path <- function(row_id, model_frame) {
 
 #' @export
 parse_model.ranger <- function(model) {
-  model_frame <- ranger::treeInfo(model) %>%
-    as.tibble() %>%
-    mutate(rowid = .data$nodeID) %>%
-    rename_all(tolower)
-
-  all_paths <- model_frame %>%
-    filter(is.na(.data$leftchild), is.na(.data$rightchild)) %>%
-    pull(.data$rowid) %>%
-    map(~get_path_ranger(.x, model_frame)) %>%
-    bind_rows()
-
-  tidy <- model_frame %>%
-    as.tibble() %>%
-    filter(is.na(.data$leftchild), is.na(.data$rightchild)) %>%
-    rowid_to_column("labels") %>%
-    mutate(
-      labels = paste0("path-", labels),
-      type = "path",
-      estimate = 0
-    ) %>%
-    mutate(vals = .data$prediction) %>%
-    select(
-      .data$labels,
-      .data$vals,
-      .data$type,
-      .data$estimate
-    ) %>%
-    bind_cols(all_paths) %>%
-    add_row(labels = "model", vals = "ranger", type = "variable")
-
-  tidy
+  
+  all_trees <- map_df(
+    seq_len(model$num.trees),
+    ~ get_tree(model, .x)
+  )
+  
+  add_row(
+    all_trees, 
+    labels = "model", vals = "ranger", type = "variable"
+    )
 }
 
 
@@ -288,6 +267,33 @@ get_path_ranger <- function(row_id, model_frame) {
     operator = paste0(operator, collapse = get_marker()),
     split_point = paste0(split_point, collapse = get_marker())
   )
+}
+
+
+get_tree <- function(model, tree){
+  
+  model_frame <- ranger::treeInfo(model, tree = tree)
+  model_frame$rowid <- model_frame$nodeID
+  colnames(model_frame) <- tolower(colnames(model_frame))
+  
+  all_paths <- model_frame[is.na(model_frame$splitval), ]
+  all_paths <- all_paths$rowid
+  all_paths <- map_df(
+    all_paths, 
+    ~ get_path_ranger(.x, model_frame)
+  )
+  tidy <- model_frame[is.na(model_frame$splitval), ]
+  tidy <- cbind(
+    labels = paste0("tree_", tree),
+    vals = tidy$prediction,
+    type = "path",
+    estimate = 0,
+    all_paths
+  )
+  tidy$labels <- as.character(tidy$labels)
+  tidy$vals <- as.character(tidy$vals)
+  tidy$type <- as.character(tidy$type)
+  as.tibble(tidy)
 }
 
 # earth() models ------------------------------------------
