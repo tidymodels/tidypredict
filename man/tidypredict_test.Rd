@@ -5,7 +5,7 @@
 \title{Tests base predict function against tidypredict}
 \usage{
 tidypredict_test(model, df = model$model, threshold = 1e-12,
-  include_intervals = FALSE, max_rows = NULL)
+  include_intervals = FALSE, max_rows = NULL, id_field = NULL, ...)
 }
 \arguments{
 \item{model}{An R model or a tibble with a parsed model. It currently supports
@@ -24,6 +24,12 @@ included in the test.  It defaults to FALSE.}
 
 \item{max_rows}{The number of rows in the object passed in the df argument. Highly
 recommended for large data sets.}
+
+\item{id_field}{For models with multiple predictions (such as trees).  The final prediction is a result of
+grouping all of the predictions by each observation.  For performance and reproducibility reasons, it is better to
+have a unique identifier for each observation (row).}
+
+\item{...}{Using dots for future argument expansion.}
 }
 \description{
 Compares the results of predict() and tidypredict_to_column()

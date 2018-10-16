@@ -15,6 +15,10 @@
 #' included in the test.  It defaults to FALSE.
 #' @param max_rows The number of rows in the object passed in the df argument. Highly
 #' recommended for large data sets.
+#' @param id_field For models with multiple predictions (such as trees).  The final prediction is a result of
+#' grouping all of the predictions by each observation.  For performance and reproducibility reasons, it is better to
+#' have a unique identifier for each observation (row).
+#' @param ... Using dots for future argument expansion.
 #'
 #' @examples
 #'
@@ -25,7 +29,7 @@
 #'
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
-                             include_intervals = FALSE, max_rows = NULL) {
+                             include_intervals = FALSE, max_rows = NULL, id_field = NULL, ...) {
   UseMethod("tidypredict_test")
 }
 
@@ -176,11 +180,15 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
 
 #' @export
 tidypredict_test.ranger <- function(model, df = NULL, threshold = 0.000000000001,
-                                    include_intervals = FALSE, max_rows = NULL) {
+                                    include_intervals = FALSE, max_rows = NULL, id_field = NULL) {
+  
+  id_field <- enquo(id_field)
+  
+  if(is.null(id_field)) stop("id_field is required")
   
   local_preds <- predict(model, df)$predictions
   
-  raw_results <- tidypredict_to_column(df, model)
+  raw_results <- tidypredict_to_column(df, model, id_field =  !! id_field)
   raw_results$tidypredict<- raw_results$fit
   raw_results$fit <- NULL
   raw_results$predict <- local_preds
@@ -211,7 +219,7 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0.000000000001
     
     differences <- raw_results$tidypredict != raw_results$predict
     
-    alert <- length(differences) > floor(threshold)
+    alert <- sum(differences) > floor(threshold)
     
     message <- "tidypredict test results\n"
     
