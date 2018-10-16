@@ -22,7 +22,7 @@ parse_tree <- function(parsedmodel, tree){
     seq_len(nrow(paths)),
     
     ~ case_formula_ranger(
-      if (is.factor(paths$vals[.x])) as.character(paths$vals[.x]) else paths$vals[.x],
+      paths$estimate[.x],
       paths$field[.x],
       paths$operator[.x],
       paths$split_point[.x]

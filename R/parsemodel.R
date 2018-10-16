@@ -285,13 +285,14 @@ get_tree <- function(model, tree){
   tidy <- model_frame[is.na(model_frame$splitval), ]
   tidy <- cbind(
     labels = paste0("tree_", tree),
-    vals = tidy$prediction,
     type = "path",
-    estimate = 0,
-    all_paths
+    estimate = tidy$prediction,
+    all_paths,
+    vals = ""
   )
   tidy$labels <- as.character(tidy$labels)
-  tidy$vals <- as.character(tidy$vals)
+  if(is.factor(tidy$vals)) tidy$vals <- as.character(tidy$vals)
+  if(is.factor(tidy$estimate)) tidy$estimate <- as.character(tidy$estimate)  
   tidy$type <- as.character(tidy$type)
   as.tibble(tidy)
 }

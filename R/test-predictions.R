@@ -175,45 +175,68 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
 }
 
 #' @export
-tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
+tidypredict_test.ranger <- function(model, df = NULL, threshold = 0.000000000001,
                                     include_intervals = FALSE, max_rows = NULL) {
-  raw_results <- df %>%
-    as_tibble() %>%
-    tidypredict_to_column(model) %>%
-    rename(tidypredict = fit) %>%
-    mutate(
-      predict = as.character(predict(model, df)$predictions)
-    )
-
-  differences <- raw_results %>%
-    filter(.data$tidypredict != predict | is.na(.data$tidypredict))
-
-  alert <- nrow(differences) > threshold
-
-  message <- "tidypredict test results\n"
-
-  if (!alert) {
+  
+  local_preds <- predict(model, df)$predictions
+  
+  raw_results <- tidypredict_to_column(df, model)
+  raw_results$tidypredict<- raw_results$fit
+  raw_results$fit <- NULL
+  raw_results$predict <- local_preds
+  
+  if(class(model$predictions) == "numeric"){
+    differences <-(raw_results$tidypredict - raw_results$predict) >= threshold
+    
+    alert <- any(differences)
+    
     message <- paste0(
-      message,
-      "\nSuccess, test is under the set threshold of: ",
-      threshold
+      "tidypredict test results\n",
+      "Difference threshold: ", threshold,
+      "\n"
     )
-  }
-
-  if (nrow(differences) > 0) {
-    message <- paste0(
-      message,
-      "\nPredictions that did not match predict(): ", nrow(differences)
-    )
+    
+    if (alert) {
+      message <- paste0(
+        message,
+        "\nFitted records above the threshold: ", sum(differences)
+      )
+    } else {
+      message <- paste0(
+        message,
+        "\n All results are within the difference threshold"
+      )
+    }
   } else {
-    message <- paste0(
-      message,
-      "\nAll predictions matched"
-    )
+    
+    differences <- raw_results$tidypredict != raw_results$predict
+    
+    alert <- length(differences) > floor(threshold)
+    
+    message <- "tidypredict test results\n"
+    
+    if (!alert) {
+      message <- paste0(
+        message,
+        "\nSuccess, test is under the set threshold of: ",
+        threshold
+      )
+    }
+    
+    if (sum(differences) > 0) {
+      message <- paste0(
+        message,
+        "\nPredictions that did not match predict(): ", sum(differences)
+      )
+    } else {
+      message <- paste0(
+        message,
+        "\nAll predictions matched"
+      )
+    }
   }
-
+  
   results <- list()
-
   results$model_call <- model$call
   results$raw_results <- raw_results
   results$message <- message

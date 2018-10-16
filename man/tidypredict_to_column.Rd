@@ -5,7 +5,7 @@
 \title{Adds the prediction columns to a piped command set}
 \usage{
 tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,
-  vars = c("fit", "upper", "lower"))
+  vars = c("fit", "upper", "lower"), id_field = NULL, ...)
 }
 \arguments{
 \item{df}{A data.frame or tibble}
@@ -19,6 +19,12 @@ to FALSE}
 FALSE}
 
 \item{vars}{The name of the variables that this function will produce. It defaults to "fit", "upper", and "lower".}
+
+\item{id_field}{For models with multiple predictions (such as trees).  The final prediction is a result of
+grouping all of the predictions by each observation.  For performance and reproducibility reasons, it is better to
+have a unique identifier for each observation (row).}
+
+\item{...}{Using dots for future argument expansion.}
 }
 \description{
 Adds a new column with the results form tidypredict_fit() to a piped command set.
