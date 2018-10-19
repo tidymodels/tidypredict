@@ -280,7 +280,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<section id="highlights-limitations" class="level2">
+<div id="highlights-limitations" class="section level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li>Uses the <code>randomForest::getTree()</code> to parse each decision path.</li>
@@ -293,8 +293,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 </ul></li>
 <li>Interval functions are not supported: <code>tidypredict_interval()</code> &amp; <code>tidypredict_sql_interval()</code></li>
 </ul>
-</section>
-<section id="how-it-works" class="level2">
+</div>
+<div id="how-it-works" class="section level2">
 <h2>How it works</h2>
 <p>Here is a simple <code>randomForest()</code> model using the <code>iris</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(randomForest)</a>
@@ -303,99 +303,37 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">tidypredict_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; CASE
-## WHEN (((`Petal.Length`) &lt;= 2.5)) THEN ('setosa')
-## WHEN ((((`Petal.Length`) &gt; 5.05) AND ((`Petal.Length`) &gt; 2.5))) THEN ('virginica')
-## WHEN (((((`Petal.Width`) &gt; 1.9) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Length`) &lt;= 5.05))) THEN ('virginica')
-## WHEN ((((((`Petal.Length`) &gt; 2.5) AND ((`Sepal.Length`) &lt;= 4.95)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN ('virginica')
-## WHEN (((((((`Sepal.Length`) &gt; 4.95) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Width`) &lt;= 1.75)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN ('versicolor')
-## WHEN ((((((((`Petal.Width`) &gt; 1.75) AND ((`Sepal.Length`) &gt; 4.95)) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Sepal.Width`) &lt;= 3.0)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN ('virginica')
-## WHEN ((((((((`Sepal.Width`) &gt; 3.0) AND ((`Petal.Width`) &gt; 1.75)) AND ((`Sepal.Length`) &gt; 4.95)) AND ((`Petal.Length`) &gt; 2.5)) AND ((`Petal.Width`) &lt;= 1.9)) AND ((`Petal.Length`) &lt;= 5.05))) THEN ('versicolor')
-## END</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">iris <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</a></code></pre></div>
-<pre><code>##    Sepal.Length Sepal.Width Petal.Length Petal.Width Species    fit
-## 1           5.1         3.5          1.4         0.2  setosa setosa
-## 2           4.9         3.0          1.4         0.2  setosa setosa
-## 3           4.7         3.2          1.3         0.2  setosa setosa
-## 4           4.6         3.1          1.5         0.2  setosa setosa
-## 5           5.0         3.6          1.4         0.2  setosa setosa
-## 6           5.4         3.9          1.7         0.4  setosa setosa
-## 7           4.6         3.4          1.4         0.3  setosa setosa
-## 8           5.0         3.4          1.5         0.2  setosa setosa
-## 9           4.4         2.9          1.4         0.2  setosa setosa
-## 10          4.9         3.1          1.5         0.1  setosa setosa</code></pre>
-</section>
-<section id="under-the-hood" class="level2">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">iris <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</a></code></pre></div>
+</div>
+<div id="under-the-hood" class="section level2">
 <h2>Under the hood</h2>
 <p>The parser is based on the output from the <code>randomForest::getTree()</code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">getTree</span>(model, <span class="dt">labelVar =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>()</a></code></pre></div>
-<pre><code>##   left daughter right daughter    split var split point status prediction
-## 1             2              3 Petal.Length        2.50      1       &lt;NA&gt;
-## 2             0              0         &lt;NA&gt;        0.00     -1     setosa
-## 3             4              5 Petal.Length        5.05      1       &lt;NA&gt;
-## 4             6              7  Petal.Width        1.90      1       &lt;NA&gt;
-## 5             0              0         &lt;NA&gt;        0.00     -1  virginica
-## 6             8              9 Sepal.Length        4.95      1       &lt;NA&gt;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">getTree</span>(model, <span class="dt">labelVar =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">head</span>()</a></code></pre></div>
 <p>The parsed model contains one row for each path. The <code>field</code>, <code>operator</code> and <code>split_point</code> field list every step in a concatenated character variable.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
-<pre><code>## # A tibble: 8 x 7
-##   labels vals         type     estimate field      operator   split_point 
-##   &lt;chr&gt;  &lt;chr&gt;        &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;      &lt;chr&gt;      &lt;chr&gt;       
-## 1 path-1 setosa       path            0 Petal.Len~ left       2.5         
-## 2 path-2 virginica    path            0 Petal.Len~ right{:}r~ 5.05{:}2.5  
-## 3 path-3 virginica    path            0 Petal.Wid~ right{:}l~ 1.9{:}5.05{~
-## 4 path-4 virginica    path            0 Sepal.Len~ left{:}le~ 4.95{:}1.9{~
-## 5 path-5 versicolor   path            0 Petal.Wid~ left{:}ri~ 1.75{:}4.95~
-## 6 path-6 virginica    path            0 Sepal.Wid~ left{:}ri~ 3{:}1.75{:}~
-## 7 path-7 versicolor   path            0 Sepal.Wid~ right{:}r~ 3{:}1.75{:}~
-## 8 model  randomForest variable       NA &lt;NA&gt;       &lt;NA&gt;       &lt;NA&gt;</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code>dplyr::case_when()</code> statement</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
-<pre><code>## case_when(((Petal.Length) &lt;= 2.5) ~ &quot;setosa&quot;, (((Petal.Length) &gt; 
-##     5.05) &amp; ((Petal.Length) &gt; 2.5)) ~ &quot;virginica&quot;, ((((Petal.Width) &gt; 
-##     1.9) &amp; ((Petal.Length) &gt; 2.5)) &amp; ((Petal.Length) &lt;= 5.05)) ~ 
-##     &quot;virginica&quot;, (((((Petal.Length) &gt; 2.5) &amp; ((Sepal.Length) &lt;= 
-##     4.95)) &amp; ((Petal.Width) &lt;= 1.9)) &amp; ((Petal.Length) &lt;= 5.05)) ~ 
-##     &quot;virginica&quot;, ((((((Sepal.Length) &gt; 4.95) &amp; ((Petal.Length) &gt; 
-##     2.5)) &amp; ((Petal.Width) &lt;= 1.75)) &amp; ((Petal.Width) &lt;= 1.9)) &amp; 
-##     ((Petal.Length) &lt;= 5.05)) ~ &quot;versicolor&quot;, (((((((Petal.Width) &gt; 
-##     1.75) &amp; ((Sepal.Length) &gt; 4.95)) &amp; ((Petal.Length) &gt; 2.5)) &amp; 
-##     ((Sepal.Width) &lt;= 3)) &amp; ((Petal.Width) &lt;= 1.9)) &amp; ((Petal.Length) &lt;= 
-##     5.05)) ~ &quot;virginica&quot;, (((((((Sepal.Width) &gt; 3) &amp; ((Petal.Width) &gt; 
-##     1.75)) &amp; ((Sepal.Length) &gt; 4.95)) &amp; ((Petal.Length) &gt; 2.5)) &amp; 
-##     ((Petal.Width) &lt;= 1.9)) &amp; ((Petal.Length) &lt;= 5.05)) ~ &quot;versicolor&quot;)</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(iris, !! tidypredict_fit(model))</code></li>
 <li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
-</section>
-<section id="how-it-performs" class="level2">
+</div>
+<div id="how-it-performs" class="section level2">
 <h2>How it performs</h2>
 <p>Currently, the formula matches 147 out of 150 prediction of the test model. The <code>threshold</code> in <code>tidypredict_test()</code> is a integer indicating the number of records are OK to be different than the baseline prediction that the <code>predict()</code> function returns.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1">test &lt;-<span class="st"> </span><span class="kw">tidypredict_test</span>(model, iris, <span class="dt">threshold =</span> <span class="dv">5</span>)</a>
-<a class="sourceLine" id="cb12-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb12-3" data-line-number="3">test</a></code></pre></div>
-<pre><code>## tidypredict test results
-## 
-## Success, test is under the set threshold of: 5
-## Predictions that did not match predict(): 3</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1">test<span class="op">$</span>raw_results <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb14-2" data-line-number="2"><span class="st">  </span><span class="kw">filter</span>(predict <span class="op">!=</span><span class="st"> </span>tidypredict)</a></code></pre></div>
-<pre><code>##   Sepal.Length Sepal.Width Petal.Length Petal.Width    Species    predict
-## 1          4.9         2.4          3.3         1.0 versicolor versicolor
-## 2          6.0         2.7          5.1         1.6 versicolor versicolor
-## 3          6.0         2.2          5.0         1.5  virginica  virginica
-##   tidypredict
-## 1   virginica
-## 2   virginica
-## 3  versicolor</code></pre>
-</section>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">test &lt;-<span class="st"> </span><span class="kw">tidypredict_test</span>(model, iris, <span class="dt">threshold =</span> <span class="dv">5</span>)</a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3">test</a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5">test<span class="op">$</span>raw_results <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="st">  </span><span class="kw">filter</span>(predict <span class="op">!=</span><span class="st"> </span>tidypredict)</a></code></pre></div>
+</div>
 
 
 

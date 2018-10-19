@@ -12,6 +12,7 @@ menu:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(eval = FALSE)
 library(dplyr)
 library(tidypredict)
 ```

@@ -309,46 +309,17 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">tidypredict_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; 1.0 - 1.0 / (1.0 + EXP(20.8527831345691 + (`wt`) * (-7.85934263583835) + (CASE WHEN ((`char_cyl` = 'cyl6') =  'TRUE') THEN (1.0) WHEN ((`char_cyl` = 'cyl6') =  'FALSE') THEN (0.0) END) * (3.10462643177453) + (CASE WHEN ((`char_cyl` = 'cyl8') =  'TRUE') THEN (1.0) WHEN ((`char_cyl` = 'cyl8') =  'FALSE') THEN (0.0) END) * (5.37942092366097)))</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) </a></code></pre></div>
-<pre><code>##       wt char_cyl am        fit
-## 1  2.620     cyl6  1 0.96662269
-## 2  2.875     cyl6  1 0.79605201
-## 3  2.320     cyl4  1 0.93208127
-## 4  3.215     cyl6  0 0.21242376
-## 5  3.440     cyl8  0 0.30918450
-## 6  3.460     cyl6  0 0.03783629
-## 7  3.570     cyl8  0 0.13875740
-## 8  3.190     cyl4  0 0.01450687
-## 9  3.150     cyl4  0 0.01975984
-## 10 3.440     cyl6  0 0.04399324</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) </a></code></pre></div>
 </div>
 <div id="under-the-hood" class="section level2">
 <h2>Under the hood</h2>
 <p>The parser reads several parts of the <code>glm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
-<pre><code>## # A tibble: 10 x 10
-##    labels    estimate type   field_1 field_2    qr_1   qr_2    qr_3   qr_4
-##    &lt;chr&gt;        &lt;dbl&gt; &lt;chr&gt;  &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;  &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;
-##  1 (Interce~    20.9  term   &lt;NA&gt;    &lt;NA&gt;     -0.679  -5.11  -1.15    6.05
-##  2 wt           -7.86 term   &lt;NA&gt;    {{:}}     0       1.62   0.232  -2.58
-##  3 char_cyl~     3.10 term   cyl6    &lt;NA&gt;      0       0      1.56    1.86
-##  4 char_cyl~     5.38 term   cyl8    &lt;NA&gt;      0       0      0       3.20
-##  5 labels        0    varia~ char_c~ wt       NA      NA     NA      NA   
-##  6 model        NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
-##  7 version      NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
-##  8 residual     NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
-##  9 family       NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
-## 10 link         NA    varia~ &lt;NA&gt;    &lt;NA&gt;     NA      NA     NA      NA   
-## # ... with 1 more variable: vals &lt;chr&gt;</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
-<pre><code>## 1 - 1/(1 + exp(20.8527831345691 + (wt) * (-7.85934263583835) + 
-##     (ifelse(char_cyl == &quot;cyl6&quot;, 1, 0)) * (3.10462643177453) + 
-##     (ifelse(char_cyl == &quot;cyl8&quot;, 1, 0)) * (5.37942092366097)))</code></pre>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -360,11 +331,7 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div id="how-it-performs" class="section level2">
 <h2>How it performs</h2>
 <p>Testing the <code>tidypredict</code> results is easy. The <code>tidypredict_test()</code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code>tidypredict_fit()</code>, and <code>tidypredict_interval()</code> to the results given by <code>predict()</code></p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model)</a></code></pre></div>
-<pre><code>## tidypredict test results
-## Difference threshold: 1e-12
-## 
-##  All results are within the difference threshold</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model)</a></code></pre></div>
 </div>
 
 

@@ -1,37 +1,38 @@
 ## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(eval = FALSE)
 library(dplyr)
 library(tidypredict)
 library(ranger)
 set.seed(100)
 
 ## ------------------------------------------------------------------------
-library(ranger)
-model <- ranger::ranger(Species ~ .,data = iris ,num.trees = 100)
+#  library(ranger)
+#  model <- ranger::ranger(Species ~ .,data = iris ,num.trees = 100)
 
 ## ------------------------------------------------------------------------
-library(tidypredict)
-
-tidypredict_sql(model, dbplyr::simulate_mssql())
-
-## ------------------------------------------------------------------------
-iris %>%
-  tidypredict_to_column(model) %>%
-  head(10)
+#  library(tidypredict)
+#  
+#  tidypredict_sql(model, dbplyr::simulate_mssql())
 
 ## ------------------------------------------------------------------------
-treeInfo(model)
+#  iris %>%
+#    tidypredict_to_column(model) %>%
+#    head(10)
 
 ## ------------------------------------------------------------------------
-parse_model(model)
+#  treeInfo(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_fit(model)
+#  parse_model(model)
 
 ## ------------------------------------------------------------------------
-test <- tidypredict_test(model, iris, threshold = 4)
+#  tidypredict_fit(model)
 
-test
-
-test$raw_results %>%
-  filter(predict != tidypredict)
+## ------------------------------------------------------------------------
+#  test <- tidypredict_test(model, iris, threshold = 4)
+#  
+#  test
+#  
+#  test$raw_results %>%
+#    filter(predict != tidypredict)
 

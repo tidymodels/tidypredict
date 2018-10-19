@@ -1,4 +1,5 @@
 ## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(eval = FALSE)
 library(dplyr)
 library(tidypredict)
 library(randomForest)
@@ -8,80 +9,80 @@ library(tibble)
 set.seed(100)
 
 ## ------------------------------------------------------------------------
-library(dplyr)
-library(tibble)
-
-flights_table <- nycflights13::flights %>%
-  mutate(current_score = 0) %>%
-  rowid_to_column("flight_id")
-
-## ------------------------------------------------------------------------
-library(DBI)
-
-con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
-db_fligths <- copy_to(con,flights_table )
+#  library(dplyr)
+#  library(tibble)
+#  
+#  flights_table <- nycflights13::flights %>%
+#    mutate(current_score = 0) %>%
+#    rowid_to_column("flight_id")
 
 ## ------------------------------------------------------------------------
-df <- db_fligths %>%
-  select(dep_delay, hour, distance) %>%
-  head(1000) %>%
-  collect() 
+#  library(DBI)
+#  
+#  con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
+#  db_fligths <- copy_to(con,flights_table )
 
 ## ------------------------------------------------------------------------
-model <- lm(dep_delay ~ ., data = df)
+#  df <- db_fligths %>%
+#    select(dep_delay, hour, distance) %>%
+#    head(1000) %>%
+#    collect()
 
 ## ------------------------------------------------------------------------
-tidypredict_test(model)
+#  model <- lm(dep_delay ~ ., data = df)
+
+## ------------------------------------------------------------------------
+#  tidypredict_test(model)
 
 ## ---- eval = FALSE-------------------------------------------------------
 #  if(tidypredict_test(model)$alert) stop("Threshold exceeded!")
 
 ## ------------------------------------------------------------------------
-library(dbplyr)
-
-update_statement <- build_sql("UPDATE flights_table SET current_score  = ", tidypredict_sql(model, con = con), con = con)
-
-update_statement
-
-## ------------------------------------------------------------------------
-dbSendQuery(con, update_statement)
+#  library(dbplyr)
+#  
+#  update_statement <- build_sql("UPDATE flights_table SET current_score  = ", tidypredict_sql(model, con = con), con = con)
+#  
+#  update_statement
 
 ## ------------------------------------------------------------------------
-db_fligths %>%
-  select(current_score) %>%
-  head(10) 
-  
+#  dbSendQuery(con, update_statement)
 
 ## ------------------------------------------------------------------------
-dbWriteTable(con, "daily_scores", 
-             tibble(
-               flight_id = 0,
-               score = 0,
-               date = ""
-             ))
+#  db_fligths %>%
+#    select(current_score) %>%
+#    head(10)
+#  
 
 ## ------------------------------------------------------------------------
-new_predictions <- db_fligths %>%
-  filter(month == 12) %>% 
-  tidypredict_to_column(model, vars = "score") %>%
-  select(
-    flight_id,
-    score) %>%
-  mutate(date = "01/01/2018")
+#  dbWriteTable(con, "daily_scores",
+#               tibble(
+#                 flight_id = 0,
+#                 score = 0,
+#                 date = ""
+#               ))
 
 ## ------------------------------------------------------------------------
-insert_scores <- build_sql("INSERT INTO daily_scores ", sql_render(new_predictions, con = con), con = con)
-insert_scores
+#  new_predictions <- db_fligths %>%
+#    filter(month == 12) %>%
+#    tidypredict_to_column(model, vars = "score") %>%
+#    select(
+#      flight_id,
+#      score) %>%
+#    mutate(date = "01/01/2018")
 
 ## ------------------------------------------------------------------------
-dbSendQuery(con, insert_scores)
+#  insert_scores <- build_sql("INSERT INTO daily_scores ", sql_render(new_predictions, con = con), con = con)
+#  insert_scores
 
 ## ------------------------------------------------------------------------
-tbl(con, "daily_scores") %>%
-  inner_join(tbl(con, "flights_table"), by = "flight_id") %>%
-  filter(date == "01/01/2018") %>%
-  select(dep_delay, hour, distance, score, date)
+#  dbSendQuery(con, insert_scores)
+
+## ------------------------------------------------------------------------
+#  tbl(con, "daily_scores") %>%
+#    inner_join(tbl(con, "flights_table"), by = "flight_id") %>%
+#    filter(date == "01/01/2018") %>%
+#    select(dep_delay, hour, distance, score, date)
 
 ## ---- include = FALSE----------------------------------------------------
-dbDisconnect(con)
+#  dbDisconnect(con)
 

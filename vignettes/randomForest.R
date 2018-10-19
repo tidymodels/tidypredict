@@ -1,38 +1,40 @@
 ## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(eval = FALSE)
+
 library(dplyr)
 library(tidypredict)
 library(randomForest)
 set.seed(100)
 
 ## ------------------------------------------------------------------------
-library(randomForest)
-model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+#  library(randomForest)
+#  model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
 
 ## ------------------------------------------------------------------------
-library(tidypredict)
-
-tidypredict_sql(model, dbplyr::simulate_mssql())
-
-## ------------------------------------------------------------------------
-iris %>%
-  tidypredict_to_column(model) %>%
-  head(10)
+#  library(tidypredict)
+#  
+#  tidypredict_sql(model, dbplyr::simulate_mssql())
 
 ## ------------------------------------------------------------------------
-getTree(model, labelVar = TRUE) %>%
-  head()
+#  iris %>%
+#    tidypredict_to_column(model) %>%
+#    head(10)
 
 ## ------------------------------------------------------------------------
-parse_model(model)
+#  getTree(model, labelVar = TRUE) %>%
+#    head()
 
 ## ------------------------------------------------------------------------
-tidypredict_fit(model)
+#  parse_model(model)
 
 ## ------------------------------------------------------------------------
-test <- tidypredict_test(model, iris, threshold = 5)
+#  tidypredict_fit(model)
 
-test
-
-test$raw_results %>%
-  filter(predict != tidypredict)
+## ------------------------------------------------------------------------
+#  test <- tidypredict_test(model, iris, threshold = 5)
+#  
+#  test
+#  
+#  test$raw_results %>%
+#    filter(predict != tidypredict)
 

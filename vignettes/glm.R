@@ -1,30 +1,31 @@
 ## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(eval = FALSE)
 library(dplyr)
 library(tidypredict)
 
 ## ------------------------------------------------------------------------
-df <- mtcars %>%
-  mutate(char_cyl = paste0("cyl", cyl)) %>%
-  select(wt, char_cyl, am) 
-
-model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
-
-## ------------------------------------------------------------------------
-library(tidypredict)
-
-tidypredict_sql(model, dbplyr::simulate_mssql())
+#  df <- mtcars %>%
+#    mutate(char_cyl = paste0("cyl", cyl)) %>%
+#    select(wt, char_cyl, am)
+#  
+#  model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 
 ## ------------------------------------------------------------------------
-df %>%
-  tidypredict_to_column(model) %>%
-  head(10) 
+#  library(tidypredict)
+#  
+#  tidypredict_sql(model, dbplyr::simulate_mssql())
 
 ## ------------------------------------------------------------------------
-parse_model(model)
+#  df %>%
+#    tidypredict_to_column(model) %>%
+#    head(10)
 
 ## ------------------------------------------------------------------------
-tidypredict_fit(model)
+#  parse_model(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_test(model)
+#  tidypredict_fit(model)
+
+## ------------------------------------------------------------------------
+#  tidypredict_test(model)
 
