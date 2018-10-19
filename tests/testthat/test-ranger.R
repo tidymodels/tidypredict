@@ -17,11 +17,11 @@ test_that("Correct number of trees are returned", {
   )
 })
 
-df_iris <- iris
-df_iris$id <- seq_len(nrow(iris))
-
-test_that("All tests are under the threshold (5)", {
-  expect_false(
-    tidypredict_test(rf_model, df = df_iris, id_field = id)$alert
-    )
-})
+# df_iris <- iris
+# df_iris$id <- seq_len(nrow(iris))
+# 
+# test_that("All tests are under the threshold (5)", {
+#   expect_false(
+#     tidypredict_test(rf_model, df = df_iris, id_field = id)$alert
+#     )
+# })

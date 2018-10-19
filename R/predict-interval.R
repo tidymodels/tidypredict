@@ -23,18 +23,6 @@ tidypredict_interval <- function(model, interval = 0.95) {
 }
 
 #' @export
-tidypredict_interval.lm <- function(model, interval = 0.95) {
-  parsedmodel <- parse_model(model)
-  te_interval_lm(parsedmodel, interval)
-}
-
-#' @export
-tidypredict_interval.glm <- function(model, interval = 0.95) {
-  parsedmodel <- parse_model(model)
-  te_interval_glm(parsedmodel, interval)
-}
-
-#' @export
 `tidypredict_interval.data.frame` <- function(model, interval = 0.95) {
   model_type <- model[model$labels == "model", "vals"][[1]]
   
