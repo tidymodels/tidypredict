@@ -38,28 +38,29 @@ case_formula_ranger <- function(vals, field, operator, split_point) {
     field = unlist(strsplit(field, marker)),
     operator = unlist(strsplit(operator, marker)),
     split_point = unlist(strsplit(split_point, marker))
-  ) %>%
-    mutate(split_point = as.numeric(.data$split_point)) %>%
-    rowid_to_column()
-  
-  right <- filter(path, operator == "right")
+  )
+  path$split_point <- as.numeric(path$split_point)
+  path$rowid <- seq_len(nrow(path))
+  right <- path[path$operator == "right", ]
   if (nrow(right) > 0) {
-    right <- right %>%
-      split(.$rowid) %>%
-      map(~expr((!! sym(.x$field)) >= !! .x$split_point))
+    right <- split(right, right$rowid)
+    right <- map(
+      right, 
+      ~ expr((!! sym(.x$field)) >= !! .x$split_point)
+    )
   } else {
     right <- NULL
   }
-  
-  left <- filter(path, operator == "left")
+  left <- path[path$operator == "left", ]
   if (nrow(left) > 0) {
-    left <- left %>%
-      split(.$rowid) %>%
-      map(~expr((!! sym(.x$field)) < !! .x$split_point))
+    left <- split(left, left$rowid)
+    left <- map(
+      left, 
+      ~ expr((!! sym(.x$field)) >= !! .x$split_point)
+    )
   } else {
     left <- NULL
   }
-  
   f <- c(right, left) %>%
     reduce(function(l, r) expr((!! l) & (!! r)))
   
