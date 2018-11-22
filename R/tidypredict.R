@@ -1,4 +1,3 @@
-#' @import rlang
 #' @importFrom purrr map2
 #' @importFrom purrr map
 #' @importFrom purrr map_df
@@ -7,16 +6,16 @@
 #' @importFrom purrr map_lgl
 #' @importFrom purrr reduce
 #' @importFrom purrr transpose
-#' @import dplyr
-#' @import rlang
 #' @importFrom tibble tibble
+#' @importFrom tibble as.tibble
 #' @importFrom tibble rowid_to_column
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
 #' @import tidyr
-#' @import tibble
+#' @import dplyr
+#' @import rlang
 #' @keywords internal
 #'
 "_PACKAGE"

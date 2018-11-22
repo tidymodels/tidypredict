@@ -1,13 +1,13 @@
-# context("glm")
-# 
-# df <- mtcars
-# df$cyl <- paste0("cyl", df$cyl)
-# 
-# has_alert <- function(...) tidypredict_test(...)$alert
-# 
-# test_that("Individual prediction difference is never above 1e-12", {
-#   expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "gaussian")))
-#   expect_false(has_alert(glm(am ~ wt + disp, data = df, family = "gaussian")))
-#   expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "binomial")))
-#   expect_false(has_alert(glm(am ~ wt + disp + cyl, data = df, family = "binomial")))
-# })
+context("glm")
+
+df <- mtcars
+df$cyl <- paste0("cyl", df$cyl)
+
+has_alert <- function(...) tidypredict_test(...)$alert
+
+test_that("Individual prediction difference is never above 1e-12", {
+  expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "gaussian")))
+  expect_false(has_alert(glm(am ~ wt + disp, data = df, family = "gaussian")))
+  expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "binomial")))
+  expect_false(has_alert(glm(am ~ wt + disp + cyl, data = df, family = "binomial")))
+})

@@ -12,7 +12,7 @@
 
 
 
-<title>Linear Regression model</title>
+<title>lm() model</title>
 
 
 
@@ -276,11 +276,11 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 
 
 
-<h1 class="title toc-ignore">Linear Regression model</h1>
+<h1 class="title toc-ignore">lm() model</h1>
 
 
 
-<section id="highlights-limitations" class="level2">
+<div id="highlights-limitations" class="section level2">
 <h2>Highlights &amp; Limitations</h2>
 <ul>
 <li><strong>Supports prediction intervals</strong>, it uses the <code>qr.solve()</code> function to parse the interval coefficient of each term.</li>
@@ -296,8 +296,8 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <li>Not OK - <code>wt ~ mpg + as.character(am)</code></li>
 </ul></li>
 </ul>
-</section>
-<section id="how-it-works" class="level2">
+</div>
+<div id="how-it-works" class="section level2">
 <h2>How it works</h2>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">df &lt;-<span class="st"> </span>mtcars <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">char_cyl =</span> <span class="kw">paste0</span>(<span class="st">&quot;cyl&quot;</span>, cyl)) <span class="op">%&gt;%</span></a>
@@ -308,74 +308,29 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(tidypredict)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="kw">tidypredict_sql</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; ((((32.4105336886021) + ((`wt`) * (-2.83243330448326))) + ((CASE WHEN (((`char_cyl`) = ('cyl6')) =  'TRUE') THEN (1.0) WHEN (((`char_cyl`) = ('cyl6')) =  'FALSE') THEN (0.0) END) * (-4.26714873091281))) + ((CASE WHEN (((`char_cyl`) = ('cyl8')) =  'TRUE') THEN (1.0) WHEN (((`char_cyl`) = ('cyl8')) =  'FALSE') THEN (0.0) END) * (-6.12588309683682))) + (`am`)</code></pre>
 <p>Alternatively, use <code>tidypredict_to_column()</code> if the results are the be used or previewed in <code>dplyr</code>.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) </a></code></pre></div>
-<pre><code>##     mpg    wt char_cyl am      fit
-## 1  21.0 2.620     cyl6  1 21.72241
-## 2  21.0 2.875     cyl6  1 21.00014
-## 3  22.8 2.320     cyl4  1 26.83929
-## 4  21.4 3.215     cyl6  0 19.03711
-## 5  18.7 3.440     cyl8  0 16.54108
-## 6  18.1 3.460     cyl6  0 18.34317
-## 7  14.3 3.570     cyl8  0 16.17286
-## 8  24.4 3.190     cyl4  0 23.37507
-## 9  22.8 3.150     cyl4  0 23.48837
-## 10 19.2 3.440     cyl6  0 18.39981</code></pre>
-</section>
-<section id="prediction-intervals" class="level2">
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>) </a></code></pre></div>
+</div>
+<div id="prediction-intervals" class="section level2">
 <h2>Prediction intervals</h2>
 <p>Use <code>tidypredict_sql_interval()</code> to get the SQL query that operates the prediction interval. The <code>interval</code> defaults to 0.95</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">tidypredict_sql_interval</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; (2.04840714179524) * SQRT((((((((-0.176776695296637))) * (((-0.176776695296637))) * (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * (6.63799055122669))) + (6.63799055122669))</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw">tidypredict_sql_interval</span>(model, dbplyr<span class="op">::</span><span class="kw">simulate_mssql</span>())</a></code></pre></div>
 <p>Prediction intervals also works in the <code>tidypredict_to_column()</code>, just set the <code>add_interval</code> argument to <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model, <span class="dt">add_interval =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb8-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</a></code></pre></div>
-<pre><code>##     mpg    wt char_cyl am      fit    upper     lower
-## 1  21.0 2.620     cyl6  1 21.72241 28.28255 15.162272
-## 2  21.0 2.875     cyl6  1 21.00014 27.56028 14.440001
-## 3  22.8 2.320     cyl4  1 26.83929 33.39943 20.279150
-## 4  21.4 3.215     cyl6  0 19.03711 25.59725 12.476974
-## 5  18.7 3.440     cyl8  0 16.54108 23.10122  9.980942
-## 6  18.1 3.460     cyl6  0 18.34317 24.90330 11.783028
-## 7  14.3 3.570     cyl8  0 16.17286 22.73300  9.612726
-## 8  24.4 3.190     cyl4  0 23.37507 29.93521 16.814933
-## 9  22.8 3.150     cyl4  0 23.48837 30.04851 16.928231
-## 10 19.2 3.440     cyl6  0 18.39981 24.95995 11.839676</code></pre>
-</section>
-<section id="under-the-hood" class="level2">
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="st">  </span><span class="kw">tidypredict_to_column</span>(model, <span class="dt">add_interval =</span> <span class="ot">TRUE</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="st">  </span><span class="kw">head</span>(<span class="dv">10</span>)</a></code></pre></div>
+</div>
+<div id="under-the-hood" class="section level2">
 <h2>Under the hood</h2>
 <p>The parser reads several parts of the <code>lm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table, those entries will have the results of <code>qr.solve()</code> already operated and placed in the correct column, they will have a <code>qr_</code> prefix. There will be one <code>qr_</code> column per coefficient.</p>
 <p>Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
-<pre><code>## # A tibble: 10 x 10
-##    labels estima~ type  fiel~ fiel~    qr_1    qr_2     qr_3    qr_4 vals 
-##    &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt; &lt;chr&gt;   &lt;dbl&gt;   &lt;dbl&gt;    &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;
-##  1 (Inte~   32.4  term  &lt;NA&gt;  &lt;NA&gt;  - 0.177 - 0.591 - 0.126    0.386 &lt;NA&gt; 
-##  2 wt      - 2.83 term  &lt;NA&gt;  {{:}}   0       0.184   0.0101 - 0.231 &lt;NA&gt; 
-##  3 char_~  - 4.27 term  cyl6  &lt;NA&gt;    0       0       0.428    0.332 &lt;NA&gt; 
-##  4 char_~  - 6.13 term  cyl8  &lt;NA&gt;    0       0       0        0.646 &lt;NA&gt; 
-##  5 labels    0    vari~ char~ wt     NA      NA      NA       NA     &lt;NA&gt; 
-##  6 model    NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     lm   
-##  7 versi~   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     1.0  
-##  8 resid~   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     28   
-##  9 sigma2   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     6.63~
-## 10 offset   NA    vari~ &lt;NA&gt;  &lt;NA&gt;   NA      NA      NA       NA     am</code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw">parse_model</span>(model)</a></code></pre></div>
 <p>The output from <code>parse_model()</code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code>if_else()</code>.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
-<pre><code>## ((((32.4105336886021) + ((wt) * (-2.83243330448326))) + ((ifelse((char_cyl) == 
-##     (&quot;cyl6&quot;), 1, 0)) * (-4.26714873091281))) + ((ifelse((char_cyl) == 
-##     (&quot;cyl8&quot;), 1, 0)) * (-6.12588309683682))) + (am)</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw">tidypredict_fit</span>(model)</a></code></pre></div>
 <p>A function to put together the Tidy Eval interval formula is also supported</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb14-1" data-line-number="1"><span class="kw">tidypredict_interval</span>(model)</a></code></pre></div>
-<pre><code>## (2.04840714179524) * sqrt((((((((-0.176776695296637))) * (((-0.176776695296637))) * 
-##     (6.63799055122669)) + ((((-0.590557271637747))) * (((-0.590557271637747))) * 
-##     (6.63799055122669))) + ((((-0.126215672528828))) * (((-0.126215672528828))) * 
-##     (6.63799055122669))) + ((((0.386215468111418))) * (((0.386215468111418))) * 
-##     (6.63799055122669))) + (6.63799055122669))</code></pre>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw">tidypredict_interval</span>(model)</a></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code>mutate(df, !! tidypredict_fit(model))</code></li>
@@ -383,28 +338,14 @@ code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
 <p>The same applies to the prediction interval functions.</p>
-</section>
-<section id="how-it-performs" class="level2">
+</div>
+<div id="how-it-performs" class="section level2">
 <h2>How it performs</h2>
 <p>Testing the <code>tidypredict</code> results is easy. The <code>tidypredict_test()</code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code>tidypredict_fit()</code>, and <code>tidypredict_interval()</code> to the results given by <code>predict()</code></p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model)</a></code></pre></div>
-<pre><code>## tidypredict test results
-## Difference threshold: 1e-12
-## 
-##  All results are within the difference threshold</code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model)</a></code></pre></div>
 <p>To run with prediction intervals set the <code>include_intervals</code> argument to <code>TRUE</code></p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model, <span class="dt">include_intervals =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
-<pre><code>## tidypredict test results
-## Difference threshold: 1e-12
-## 
-## Fitted records above the threshold: 0
-## Lower interval records above the threshold: 32
-## Upper interval records above the threshold: 32
-## 
-## Fit max  difference:1.09621641898533
-## Lower max difference:1.09621641898523
-## Upper max difference:5.32907051820075e-14</code></pre>
-</section>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1"><span class="kw">tidypredict_test</span>(model, <span class="dt">include_intervals =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+</div>
 
 
 

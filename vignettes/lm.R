@@ -1,44 +1,45 @@
 ## ----setup, include=FALSE------------------------------------------------
+knitr::opts_chunk$set(eval = FALSE)
 library(dplyr)
 library(tidypredict)
 
 ## ------------------------------------------------------------------------
-df <- mtcars %>%
-  mutate(char_cyl = paste0("cyl", cyl)) %>%
-  select(mpg, wt, char_cyl, am) 
-
-model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
-
-## ------------------------------------------------------------------------
-library(tidypredict)
-
-tidypredict_sql(model, dbplyr::simulate_mssql())
+#  df <- mtcars %>%
+#    mutate(char_cyl = paste0("cyl", cyl)) %>%
+#    select(mpg, wt, char_cyl, am)
+#  
+#  model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
 
 ## ------------------------------------------------------------------------
-df %>%
-  tidypredict_to_column(model) %>%
-  head(10) 
+#  library(tidypredict)
+#  
+#  tidypredict_sql(model, dbplyr::simulate_mssql())
 
 ## ------------------------------------------------------------------------
-tidypredict_sql_interval(model, dbplyr::simulate_mssql())
+#  df %>%
+#    tidypredict_to_column(model) %>%
+#    head(10)
 
 ## ------------------------------------------------------------------------
-df %>%
-  tidypredict_to_column(model, add_interval = TRUE) %>%
-  head(10)
+#  tidypredict_sql_interval(model, dbplyr::simulate_mssql())
 
 ## ------------------------------------------------------------------------
-parse_model(model)
+#  df %>%
+#    tidypredict_to_column(model, add_interval = TRUE) %>%
+#    head(10)
 
 ## ------------------------------------------------------------------------
-tidypredict_fit(model)
+#  parse_model(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_interval(model)
+#  tidypredict_fit(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_test(model)
+#  tidypredict_interval(model)
 
 ## ------------------------------------------------------------------------
-tidypredict_test(model, include_intervals = TRUE)
+#  tidypredict_test(model)
+
+## ------------------------------------------------------------------------
+#  tidypredict_test(model, include_intervals = TRUE)
 

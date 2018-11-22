@@ -35,7 +35,7 @@ tidypredict_to_column <- function(df, model, add_interval = FALSE,
   
   matched <- FALSE
   
-  if(class(model) == "ranger"){
+  if("ranger" %in% class(model) ){
     matched <- TRUE
     preds <- tidypredict_fit(model)
     pred_type <- class(model$predictions)

@@ -63,3 +63,8 @@ tidypredict_fit.glm <- function(model) {
   parsedmodel <- parse_model(model)
   te_fit_glm(parsedmodel)
 }
+
+#' @export
+acceptable_formula.glm <- function(model) {
+  acceptable_lm(model)
+}

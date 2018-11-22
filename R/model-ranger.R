@@ -62,8 +62,11 @@ case_formula_ranger <- function(vals, field, operator, split_point) {
   } else {
     left <- NULL
   }
-  f <- c(right, left) %>%
-    reduce(function(l, r) expr((!! l) & (!! r)))
+  directions <- c(right, left) 
+  f <- reduce(
+    directions, 
+    function(l, r) expr((!! l) & (!! r))
+    )
   
   expr((!!! f) ~ !! vals)
 }

@@ -311,3 +311,46 @@ print.tidypredict_test <- function(x, ...) {
 knit_print.tidypredict_test <- function(x, ...) {
   x$message
 }
+
+test_object <- function(call, raw_results, fit, lwr = NULL, uppr = NULL){
+  
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ", threshold,
+    "\n"
+  )
+  
+  if (alert) {
+    difference <- raw_results %>%
+      select(contains("_diff")) %>%
+      summarise_all(max)
+    
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ", threshold_df$fit_threshold,
+      if (!is.null(threshold_df$lwr_threshold)) {
+        "\nLower interval records above the threshold: "
+      } , threshold_df$lwr_threshold,
+      if (!is.null(threshold_df$upr_threshold)) {
+        "\nUpper interval records above the threshold: "
+      } , threshold_df$upr_threshold,
+      "\n\nFit max  difference:", difference$upr_diff,
+      "\nLower max difference:", difference$lwr_diff,
+      "\nUpper max difference:", difference$fit_diff
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+  
+  results <- list()
+  results$model_call <- call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  
+  structure(results, class = c("tidypredict_test", "list"))
+}
+

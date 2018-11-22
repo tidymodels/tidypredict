@@ -21,26 +21,3 @@
 tidypredict_interval <- function(model, interval = 0.95) {
   UseMethod("tidypredict_interval")
 }
-
-#' @export
-`tidypredict_interval.data.frame` <- function(model, interval = 0.95) {
-  model_type <- model[model$labels == "model", "vals"][[1]]
-  
-  assigned <- 0
-  
-  if (model_type == "lm") {
-    assigned <- 1
-    ret <- te_interval_lm(model, interval = interval)
-  }
-  
-  if (model_type == "glm") {
-    assigned <- 1
-    ret <- te_interval_glm(model, interval = interval)
-  }
-  
-  if (assigned == 0) {
-    stop("Model not recognized")
-  } else {
-    ret
-  }
-}
