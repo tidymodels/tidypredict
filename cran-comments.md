@@ -3,8 +3,8 @@
 * tibble 2.0.0 compatability fix 
 
 ## Test environments
-* Local windows 10 install, R 3.4.3
-* Ubuntu 16.04 with RStudio Server, R 3.4.3 
+* Local windows 10 install, R 3.5.1
+* Ubuntu 16.04 with RStudio Server, R 3.4.4
 * Ubuntu 14.04 (on travis-ci)
 
 ## R CMD check results
