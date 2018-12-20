@@ -1,0 +1,4 @@
+checks
+library
+data.sqlite
+.cache.rds

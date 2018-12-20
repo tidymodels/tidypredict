@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.2.0
+Version: 0.2.1
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -30,5 +30,5 @@ Suggests:
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr

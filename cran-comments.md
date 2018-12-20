@@ -1,8 +1,6 @@
 ## Release summary
 
-* Adds support for 'ranger' models
-
-* Few fixes and code improvements
+* tibble 2.0.0 compatability fix 
 
 ## Test environments
 * Local windows 10 install, R 3.4.3
