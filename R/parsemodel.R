@@ -80,8 +80,7 @@ parse_model_lm <- function(model) {
 
   colnames(all_vals) <- c("coefno", paste0("field_", (2:length(all_vals)) - 1))
 
-  tidy <- as_tibble(model$coefficients) %>%
-    rownames_to_column("labels") %>%
+  tidy <- enframe(model$coefficients, name = "labels") %>%
     rowid_to_column("coefno") %>%
     rename(estimate = .data$value) %>%
     mutate(type = "term") %>%
