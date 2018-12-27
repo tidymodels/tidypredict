@@ -43,6 +43,9 @@ build_fit_formula <- function(parsedmodel) {
     }
   )
   f <- reduce(parsed_f, function(l, r) expr(!!l + !!r))
+  
+  if(!is.null(parsedmodel$general$offset)) 
+    f <- expr(!! f + !! parsedmodel$general$offset)
 
   if (parsedmodel$general$is_glm == 1) {
     link <- parsedmodel$general$link
@@ -96,12 +99,13 @@ parse_model_lm <- function(model) {
   if (!is.null(model$family$link)) {
     pm$general$link <- model$family$link
   }
-
+  if (!is.null(model$call$offset)) {
+    pm$general$offset <- model$call$offset
+  }
   pm$general$is_glm <- 0
   if (class(model)[[1]] == "glm") {
     pm$general$is_glm <- 1
   }
-
   terms <- map(
     seq_len(length(labels)),
     ~ {
