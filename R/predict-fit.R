@@ -19,18 +19,6 @@ tidypredict_fit <- function(model) {
 }
 
 #' @export
-tidypredict_fit.lm <- function(model) {
-  parsedmodel <- parse_model(model)
-  te_fit_lm(parsedmodel)
-}
-
-#' @export
-tidypredict_fit.glm <- function(model) {
-  parsedmodel <- parse_model(model)
-  te_fit_glm(parsedmodel)
-}
-
-#' @export
 tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
   te_randomforest_fit(parsedmodel)
@@ -42,11 +30,7 @@ tidypredict_fit.ranger <- function(model) {
   te_ranger_fit(parsedmodel)
 }
 
-#' @export
-tidypredict_fit.earth <- function(model) {
-  parsedmodel <- parse_model(model)
-  te_earth_fit(parsedmodel)
-}
+
 
 #' @export
 #' @importFrom tibble as.tibble
