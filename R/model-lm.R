@@ -21,9 +21,17 @@ build_fit_formula <- function(parsedmodel) {
           .x$fields,
           ~ {
             f <- NULL
-            if (.x$type == "ordinary") f <- expr(!!sym(.x$col))
-            if (.x$type == "conditional") f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
-            if (.x$type == "operation") f <- parse_expr(.x$col)
+            if (.x$type == "ordinary") 
+              f <- expr(!!sym(.x$col))
+            if (.x$type == "conditional") 
+              f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
+            if (.x$type == "operation") {
+              if(.x$op == "morethan") 
+                f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
+              if(.x$op == "lessthan") 
+                f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
+              
+            }
             f
           }
         )
