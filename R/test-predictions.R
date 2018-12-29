@@ -222,13 +222,14 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
 }
 
 #' @export
-tidypredict_test.earth <- function(model, df = NULL, threshold = 0.000000000001) {
+tidypredict_test.earth <- function(model, df = model$model, threshold = 0.000000000001,
+                                   include_intervals = FALSE, max_rows = NULL){
   
   rs <- mutate(
     as.tibble(df), 
     tidypredict = !! tidypredict_fit(model),
     predict = predict(model, newdata = df, type = "response"),
-    diff = tidypredict - predict
+    diff = .data$tidypredict - predict
   )
   
   fit_over <- sum(rs$diff > threshold)
@@ -265,17 +266,17 @@ tidypredict_test.earth <- function(model, df = NULL, threshold = 0.000000000001)
 
 setOldClass(c("tidypredict_test", "list"))
 
-#' print method for test predictions results
-#' @keywords internal
-#' @export
-print.tidypredict_test <- function(x, ...) {
-  cat(x$message)
-}
-
-#' Knit print method for test predictions results
-#' @keywords internal
-#' @export
-#'
-knit_print.tidypredict_test <- function(x, ...) {
-  x$message
-}
+#' #' print method for test predictions results
+#' #' keywords internal
+#' #' export
+#' print.tidypredict_test <- function(x, ...) {
+#'   cat(x$message)
+#' }
+#' 
+#' #' Knit print method for test predictions results
+#' #' keywords internal
+#' #' export
+#' #'
+#' knit_print.tidypredict_test <- function(x, ...) {
+#'   x$message
+#' }

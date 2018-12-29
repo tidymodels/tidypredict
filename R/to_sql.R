@@ -25,11 +25,6 @@ tidypredict_sql <- function(model, con) {
 #' the correct SQL translation syntax.
 #' @param interval The prediction interval, defaults to 0.95
 #'
-#' @examples
-#' library(dbplyr)
-#'
-#' model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-#' tidypredict_sql_interval(model, simulate_dbi())
 #'
 #' @keywords internal
 #' @export

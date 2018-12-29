@@ -25,11 +25,3 @@ Adds a new column with the results form tidypredict_fit() to a piped command set
 If add_interval is set to TRUE, then it will add two additional columns, one
 for the lower and another for the upper prediction interval bounds.
 }
-\examples{
-library(dplyr)
-df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-
-df \%>\%
-  tidypredict_to_column(model, add_interval = TRUE)
-}

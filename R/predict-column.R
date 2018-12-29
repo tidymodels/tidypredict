@@ -12,13 +12,6 @@
 #' FALSE
 #' @param vars The name of the variables that this function will produce. It defaults to "fit", "upper", and "lower".
 #'
-#' @examples
-#' library(dplyr)
-#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-#'
-#' df %>%
-#'   tidypredict_to_column(model, add_interval = TRUE)
 #' @export
 tidypredict_to_column <- function(df, model, add_interval = FALSE,
                                   interval = 0.95, vars = c("fit", "upper", "lower")) {
