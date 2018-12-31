@@ -17,10 +17,3 @@
 tidypredict_fit <- function(model) {
   UseMethod("tidypredict_fit")
 }
-
-#' @export
-tidypredict_fit.ranger <- function(model) {
-  parsedmodel <- parse_model(model)
-  te_ranger_fit(parsedmodel)
-}
-
