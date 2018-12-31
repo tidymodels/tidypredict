@@ -19,12 +19,6 @@ tidypredict_fit <- function(model) {
 }
 
 #' @export
-tidypredict_fit.randomForest <- function(model) {
-  parsedmodel <- parse_model(model)
-  te_randomforest_fit(parsedmodel)
-}
-
-#' @export
 tidypredict_fit.ranger <- function(model) {
   parsedmodel <- parse_model(model)
   te_ranger_fit(parsedmodel)
