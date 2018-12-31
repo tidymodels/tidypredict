@@ -15,11 +15,16 @@
 #' @export
 tidypredict_to_column <- function(df, model, add_interval = FALSE,
                                   interval = 0.95, vars = c("fit", "upper", "lower")) {
+  
+  fit_model <- tidypredict_fit(model)
+  
+  if(class(fit_model) == "list") stop("tidypredict_to_column does not support tree based models")
+  
   fit <- vars[1]
   upper <- vars[2]
   lower <- vars[3]
 
-  df <- mutate(df, !! fit := !! tidypredict_fit(model))
+  df <- mutate(df, !! fit := !! fit_model)
 
   if (add_interval) {
     formulas <- c(sym(fit), tidypredict_interval(model, interval = interval))
