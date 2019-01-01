@@ -184,17 +184,16 @@ tidypredict_test.earth <- function(model, df = model$model, threshold = 0.000000
 
 setOldClass(c("tidypredict_test", "list"))
 
-#' #' print method for test predictions results
-#' #' keywords internal
-#' #' export
-#' print.tidypredict_test <- function(x, ...) {
-#'   cat(x$message)
-#' }
-#' 
-#' #' Knit print method for test predictions results
-#' #' keywords internal
-#' #' export
-#' #'
-#' knit_print.tidypredict_test <- function(x, ...) {
-#'   x$message
-#' }
+#' print method for test predictions results
+#' @keywords internal
+#' @export
+print.tidypredict_test <- function(x, ...) {
+  cat(x$message)
+}
+
+#' Knit print method for test predictions results
+#' keywords internal
+#' @export
+knit_print.tidypredict_test <- function(x, ...) {
+  x$message
+}

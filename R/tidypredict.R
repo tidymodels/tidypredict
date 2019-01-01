@@ -15,6 +15,7 @@
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
+#' @importFrom knitr knit_print
 #' @import tibble
 #' @keywords internal
 #'
