@@ -6,11 +6,14 @@
 #' The result still has to be added to the fit to obtain the upper bound, and
 #' subtracted from fit to obtain the lower bound.
 #'
-#' @param model An R model or a tibble with a parsed model. It currently supports
-#' lm() models only.
+#' @param model An R model or a list with a parsed model
 #' @param interval The prediction interval, defaults to 0.95
 #'
-#'
+#' @examples 
+#' 
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
+#' tidypredict_interval(model)
+#' 
 #' @export
 tidypredict_interval <- function(model, interval = 0.95) {
   UseMethod("tidypredict_interval")

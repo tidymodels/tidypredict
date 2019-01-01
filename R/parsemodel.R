@@ -6,8 +6,7 @@
 #' functions in the future can also pass parsed tables to a given
 #' formula creating function.
 #'
-#' @param model An R model object. It currently supports lm(),
-#' glm() and randomForest() models.
+#' @param model An R model object. 
 #'
 #' @examples
 #' library(dplyr)

@@ -3,7 +3,7 @@
 #' Compares the results of predict() and tidypredict_to_column()
 #' functions.
 #'
-#' @param model An R model or a tibble with a parsed model. It currently supports
+#' @param model An R model or a list with a parsed model. It currently supports
 #' lm(), glm() and randomForest() models.
 #' @param df A data frame that contains all of the needed fields to run the prediction.
 #' It defaults to the "model" data frame object inside the model object.
@@ -18,11 +18,9 @@
 #'
 #' @examples
 #'
-#' library(dplyr)
-#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_test(model)
-#'
+#' 
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
                              include_intervals = FALSE, max_rows = NULL) {
@@ -124,7 +122,6 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
   results$alert <- alert
   structure(results, class = c("tidypredict_test", "list"))
 }
-
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
@@ -138,50 +135,6 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL) {
   stop("tidypredict_test does not support ranger models")
 }
-
-#' @export
-tidypredict_test.earth <- function(model, df = model$model, threshold = 0.000000000001,
-                                   include_intervals = FALSE, max_rows = NULL){
-  
-  rs <- mutate(
-    as.tibble(df), 
-    tidypredict = !! tidypredict_fit(model),
-    predict = predict(model, newdata = df, type = "response"),
-    diff = .data$tidypredict - predict
-  )
-  
-  fit_over <- sum(rs$diff > threshold)
-  fit_max <- max(abs(rs$diff - threshold))
-  alert <- fit_over != 0
-  
-  message <- paste0(
-    "tidypredict test results\n",
-    "Difference threshold: ", threshold,
-    "\n"
-  )
-  
-  if (alert) {
-    message <- paste0(
-      message,
-      "\nFitted records above the threshold: ", fit_over,
-      "\n\nFit max  difference:", fit_max
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
-  }
-  
-  results <- list()
-  results$model_call <- model$call
-  results$raw_results <- rs
-  results$message <- message
-  results$alert <- alert
-  
-  structure(results, class = c("tidypredict_test", "list"))
-}
-
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results
