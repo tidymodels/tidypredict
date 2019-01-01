@@ -151,3 +151,81 @@ parse_qr_lm <- function(label, qr) {
     paste0("qr_", 1:length(qrs))
   )
 }
+
+# Intervals -----------------------------------------------
+
+#' @export
+tidypredict_interval.lm <- function(model, interval = 0.95) {
+  parsedmodel <- parse_model(model)
+  te_interval_lm(parsedmodel, interval)
+}
+
+#' @export
+tidypredict_interval.glm <- function(model, interval = 0.95) {
+  parsedmodel <- parse_model(model)
+  te_interval_glm(parsedmodel, interval)
+}
+
+get_qr_lm <- function(qr_name, parsedmodel){
+  q <- map(
+    parsedmodel$terms,
+    ~ {
+      cqr <- .x$qr[qr_name][[1]]
+      
+      if (.x$is_intercept == 0) {
+        cols <- map(
+          .x$fields,
+          ~ {
+            f <- NULL
+            if (.x$type == "ordinary") 
+              f <- expr(!!sym(.x$col))
+            if (.x$type == "conditional") 
+              f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
+            if (.x$type == "operation") {
+              if(.x$op == "morethan") 
+                f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
+              if(.x$op == "lessthan") 
+                f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
+              
+            }
+            f
+          }
+        )
+        cols <- reduce(cols, function(l, r) expr(!!l * !!r))
+        if(cqr != 0) expr(!! cols * !! cqr)
+      } else {
+        expr(!! cqr)  
+      }
+    }
+  )
+  f <- reduce(
+    q[!map_lgl(q, is.null)],
+    function(x, y) expr(!! x * !! y)
+  )
+  expr((!! f) * (!! f) * !! parsedmodel$general$sigma2)
+}
+
+te_interval_lm <- function(parsedmodel, interval = 0.95){
+  qr_names <- names(parsedmodel$terms[[1]]$qr)
+  qrs <- map(
+    qr_names,
+    ~ get_qr_lm(.x, parsedmodel)  
+  )
+  qrs <- reduce(qrs, function(x, y) expr(!! x + (!! y)))
+  tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
+  expr(!! tfrac * sqrt((!! qrs) + (!! parsedmodel$general$sigma2)))
+}
+
+te_interval_glm <- function(parsedmodel, interval = 0.95) {
+  intervals <- te_interval_lm(parsedmodel, interval)
+  family <- parsedmodel$general$family
+  link <- parsedmodel$general$link
+  assigned <- 0
+  if (family == "gaussian" && link == "identity") {
+    assigned <- 1
+  }
+  if (assigned == 0) {
+    stop("Combination of family and link are not supported for prediction intervals")
+  }
+  intervals
+}
