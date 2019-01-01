@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.2.0.9000
+Version: 0.2.0.9002
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -13,16 +13,15 @@ Depends:
 Imports:
     dplyr(>= 0.7),
     rlang,
-    purrr,  
+    purrr, 
     tibble,
-    tidyr
+    knitr
 Suggests:
     dbplyr,
     testthat,
     randomForest,
     ranger,
     earth,
-    knitr,
     rmarkdown,
     nycflights13,
     RSQLite,
@@ -32,5 +31,6 @@ Suggests:
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1
 VignetteBuilder: knitr
+Encoding: UTF-8

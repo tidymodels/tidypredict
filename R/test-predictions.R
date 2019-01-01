@@ -34,68 +34,70 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
                                      include_intervals = FALSE, max_rows = NULL) {
   offset <- model$call$offset
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
-
+  
   if (!is.null(offset) && ismodels) {
     index <- colnames(df) == "(offset)"
     colnames(df) <- replace(colnames(df), index, as.character(offset))
   }
-
+  
   interval <- if (include_intervals) "prediction" else "none"
-
+  
   if (is.numeric(max_rows)) df <- head(df, max_rows)
-
+  
   base <- predict(model, df, interval = interval, type = "response")
-
+  
   if (!include_intervals) {
     base <- data.frame(fit = base, row.names = NULL)
   } else {
     base <- as.data.frame(base)
   }
-
-  te <- df %>%
-    tidypredict_to_column(
-      model,
-      add_interval = include_intervals,
-      vars = c("fit_te", "upr_te", "lwr_te")
-    ) %>%
-    select(contains("_te"))
-
-  raw_results <- bind_cols(base, te) %>%
-    mutate(
-      fit_diff = abs(.data$fit - .data$fit_te),
-      fit_threshold = .data$fit_diff > threshold
-    )
-
-  if (include_intervals) {
-    raw_results <- raw_results %>%
-      mutate(
-        lwr_diff = abs(.data$lwr - .data$lwr_te),
-        upr_diff = abs(.data$upr - .data$upr_te),
-        lwr_threshold = .data$lwr_diff > threshold,
-        upr_threshold = .data$upr_diff > threshold
-      )
+  
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = include_intervals,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  ) 
+  if(include_intervals){
+    te <- te[, c("fit_te", "upr_te", "lwr_te")]
+  } else {
+    te <- data.frame(fit_te = te[, "fit_te"])
   }
-
-  raw_results <- raw_results %>%
-    rowid_to_column()
-
-  threshold_df <- raw_results %>%
-    select(contains("_threshold")) %>%
-    summarise_all(sum)
-
+  
+  raw_results <- cbind(base, te)
+  raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
+  raw_results$fit_threshold <- raw_results$fit_diff > threshold
+  
+  if (include_intervals) {
+    raw_results$lwr_diff <-  abs(raw_results$lwr - raw_results$lwr_te)
+    raw_results$upr_diff <-  abs(raw_results$upr - raw_results$upr_te)
+    raw_results$lwr_threshold <- raw_results$lwr_diff > threshold
+    raw_results$upr_threshold <- raw_results$upr_diff > threshold
+  }
+  
+  rowid <- seq_len(nrow(raw_results))
+  raw_results <- cbind(data.frame(rowid), raw_results)
+  
+  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
+  if (include_intervals) {
+    threshold_df$lwr_threshold <- sum(raw_results$lwr_threshold)
+    threshold_df$upr_threshold <- sum(raw_results$upr_threshold)
+  }
+  
   alert <- any(threshold_df > 0)
-
+  
   message <- paste0(
     "tidypredict test results\n",
     "Difference threshold: ", threshold,
     "\n"
   )
-
+  
   if (alert) {
-    difference <- raw_results %>%
-      select(contains("_diff")) %>%
-      summarise_all(max)
-
+    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
+    if (include_intervals) {
+      difference$lwr_diff <- max(raw_results$lwr_diff)
+      difference$upr_diff <- max(raw_results$upr_diff)
+    }
     message <- paste0(
       message,
       "\nFitted records above the threshold: ", threshold_df$fit_threshold,
@@ -115,14 +117,11 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
       "\n All results are within the difference threshold"
     )
   }
-
   results <- list()
-
   results$model_call <- model$call
   results$raw_results <- raw_results
   results$message <- message
   results$alert <- alert
-
   structure(results, class = c("tidypredict_test", "list"))
 }
 
@@ -131,104 +130,24 @@ setOldClass(c("tidypredict_test", "list"))
 #' @export
 tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
                                           include_intervals = FALSE, max_rows = NULL) {
-  raw_results <- df %>%
-    mutate(
-      predict = as.character(predict(model, newdata = df)),
-      tidypredict = !! tidypredict_fit(model)
-    )
-
-  differences <- raw_results %>%
-    filter(.data$tidypredict != predict | is.na(.data$tidypredict))
-
-  alert <- nrow(differences) > threshold
-
-  message <- "tidypredict test results\n"
-
-  if (!alert) {
-    message <- paste0(
-      message,
-      "\nSuccess, test is under the set threshold of: ",
-      threshold
-    )
-  }
-
-  if (nrow(differences) > 0) {
-    message <- paste0(
-      message,
-      "\nPredictions that did not match predict(): ", nrow(differences)
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\nAll predictions matched"
-    )
-  }
-
-  results <- list()
-
-  results$model_call <- model$call
-  results$raw_results <- raw_results
-  results$message <- message
-  results$alert <- alert
-
-  structure(results, class = c("tidypredict_test", "list"))
+  stop("tidypredict_test does not support randomForest models")
 }
 
 #' @export
 tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL) {
-  raw_results <- df %>%
-    as_tibble() %>%
-    mutate(
-      predict = as.character(predict(model, df)$predictions),
-      tidypredict = !! tidypredict_fit(model)
-    )
-
-  differences <- raw_results %>%
-    filter(.data$tidypredict != predict | is.na(.data$tidypredict))
-
-  alert <- nrow(differences) > threshold
-
-  message <- "tidypredict test results\n"
-
-  if (!alert) {
-    message <- paste0(
-      message,
-      "\nSuccess, test is under the set threshold of: ",
-      threshold
-    )
-  }
-
-  if (nrow(differences) > 0) {
-    message <- paste0(
-      message,
-      "\nPredictions that did not match predict(): ", nrow(differences)
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\nAll predictions matched"
-    )
-  }
-
-  results <- list()
-
-  results$model_call <- model$call
-  results$raw_results <- raw_results
-  results$message <- message
-  results$alert <- alert
-
-  structure(results, class = c("tidypredict_test", "list"))
+  stop("tidypredict_test does not support ranger models")
 }
 
 #' @export
-tidypredict_test.earth <- function(model, df = NULL, threshold = 0.000000000001) {
+tidypredict_test.earth <- function(model, df = model$model, threshold = 0.000000000001,
+                                   include_intervals = FALSE, max_rows = NULL){
   
   rs <- mutate(
     as.tibble(df), 
     tidypredict = !! tidypredict_fit(model),
     predict = predict(model, newdata = df, type = "response"),
-    diff = tidypredict - predict
+    diff = .data$tidypredict - predict
   )
   
   fit_over <- sum(rs$diff > threshold)
@@ -275,7 +194,6 @@ print.tidypredict_test <- function(x, ...) {
 #' Knit print method for test predictions results
 #' @keywords internal
 #' @export
-#'
 knit_print.tidypredict_test <- function(x, ...) {
   x$message
 }

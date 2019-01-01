@@ -20,11 +20,3 @@ Tidy Eval formula that can then be used inside a dplyr command.
 The result still has to be added to the fit to obtain the upper bound, and
 subtracted from fit to obtain the lower bound.
 }
-\examples{
-
-library(dplyr)
-df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
-tidypredict_interval(model)
-
-}
