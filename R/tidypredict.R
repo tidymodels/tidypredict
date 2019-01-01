@@ -15,7 +15,6 @@
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
-#' @import tidyr
 #' @import tibble
 #' @keywords internal
 #'
