@@ -11,3 +11,12 @@ test_that("Individual prediction difference is never above 1e-12", {
   expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "binomial")))
   expect_false(has_alert(glm(am ~ wt + disp + cyl, data = df, family = "binomial")))
 })
+
+test_that("Intervals return a call", {
+  expect_is(
+    tidypredict_interval(glm(am ~ cyl * wt + mpg, data = mtcars, family = "gaussian")), 
+    "call"
+    )
+})
+
+
