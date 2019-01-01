@@ -7,8 +7,7 @@
 parse_model(model)
 }
 \arguments{
-\item{model}{An R model object. It currently supports lm(),
-glm() and randomForest() models.}
+\item{model}{An R model object.}
 }
 \description{
 It parses a fitted R model's structure and extracts the components

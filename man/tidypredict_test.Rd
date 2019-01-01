@@ -8,7 +8,7 @@ tidypredict_test(model, df = model$model, threshold = 1e-12,
   include_intervals = FALSE, max_rows = NULL)
 }
 \arguments{
-\item{model}{An R model or a tibble with a parsed model. It currently supports
+\item{model}{An R model or a list with a parsed model. It currently supports
 lm(), glm() and randomForest() models.}
 
 \item{df}{A data frame that contains all of the needed fields to run the prediction.
@@ -31,9 +31,7 @@ functions.
 }
 \examples{
 
-library(dplyr)
-df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 tidypredict_test(model)
 
 }

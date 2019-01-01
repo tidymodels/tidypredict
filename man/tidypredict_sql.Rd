@@ -7,7 +7,7 @@
 tidypredict_sql(model, con)
 }
 \arguments{
-\item{model}{An R model or a tibble with a parsed model}
+\item{model}{An R model or a list with a parsed model}
 
 \item{con}{Database connection object. It is used to select
 the correct SQL translation syntax.}

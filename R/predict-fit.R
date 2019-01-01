@@ -3,14 +3,11 @@
 #' It parses a model or uses an already parsed model to return a
 #' Tidy Eval formula that can then be used inside a dplyr command.
 #'
-#' @param model An R model or a tibble with a parsed model. It currently supports
-#' lm(), glm() and randomForest() models.
+#' @param model An R model or a list with a parsed model. 
 #'
 #' @examples
 #'
-#' library(dplyr)
-#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_fit(model)
 #'
 #' @export

@@ -3,7 +3,7 @@
 #' Compares the results of predict() and tidypredict_to_column()
 #' functions.
 #'
-#' @param model An R model or a tibble with a parsed model. It currently supports
+#' @param model An R model or a list with a parsed model. It currently supports
 #' lm(), glm() and randomForest() models.
 #' @param df A data frame that contains all of the needed fields to run the prediction.
 #' It defaults to the "model" data frame object inside the model object.
@@ -18,11 +18,9 @@
 #'
 #' @examples
 #'
-#' library(dplyr)
-#' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+#' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_test(model)
-#'
+#' 
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
                              include_intervals = FALSE, max_rows = NULL) {
