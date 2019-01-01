@@ -124,7 +124,6 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
   results$alert <- alert
   structure(results, class = c("tidypredict_test", "list"))
 }
-
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
@@ -138,50 +137,6 @@ tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL) {
   stop("tidypredict_test does not support ranger models")
 }
-
-#' @export
-tidypredict_test.earth <- function(model, df = model$model, threshold = 0.000000000001,
-                                   include_intervals = FALSE, max_rows = NULL){
-  
-  rs <- mutate(
-    as.tibble(df), 
-    tidypredict = !! tidypredict_fit(model),
-    predict = predict(model, newdata = df, type = "response"),
-    diff = .data$tidypredict - predict
-  )
-  
-  fit_over <- sum(rs$diff > threshold)
-  fit_max <- max(abs(rs$diff - threshold))
-  alert <- fit_over != 0
-  
-  message <- paste0(
-    "tidypredict test results\n",
-    "Difference threshold: ", threshold,
-    "\n"
-  )
-  
-  if (alert) {
-    message <- paste0(
-      message,
-      "\nFitted records above the threshold: ", fit_over,
-      "\n\nFit max  difference:", fit_max
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
-  }
-  
-  results <- list()
-  results$model_call <- model$call
-  results$raw_results <- rs
-  results$message <- message
-  results$alert <- alert
-  
-  structure(results, class = c("tidypredict_test", "list"))
-}
-
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results

@@ -8,7 +8,7 @@
 
 - All functions that read the parsed models and create the tidy eval formula now use the list object.  Most of the code that depends on dplyr programming has been removed.
 
-- Removes dependencies on: tidyr
+- Removes dependencies on: tidyr, tibble
 
 # tidypredict 0.2.0.9000
 

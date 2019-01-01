@@ -9,14 +9,10 @@
 #' @importFrom purrr transpose
 #' @import dplyr
 #' @import rlang
-#' @importFrom tibble tibble
-#' @importFrom tibble rowid_to_column
-#' @importFrom tibble rownames_to_column
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
 #' @importFrom knitr knit_print
-#' @import tibble
 #' @keywords internal
 #'
 "_PACKAGE"
