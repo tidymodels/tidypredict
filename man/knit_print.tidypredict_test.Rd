@@ -2,12 +2,11 @@
 % Please edit documentation in R/test-predictions.R
 \name{knit_print.tidypredict_test}
 \alias{knit_print.tidypredict_test}
-\title{Knit print method for test predictions results
-keywords internal}
+\title{Knit print method for test predictions results}
 \usage{
 \method{knit_print}{tidypredict_test}(x, ...)
 }
 \description{
 Knit print method for test predictions results
-keywords internal
 }
+\keyword{internal}

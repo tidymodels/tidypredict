@@ -14,14 +14,14 @@ Imports:
     dplyr(>= 0.7),
     rlang,
     purrr, 
-    tibble
+    tibble,
+    knitr
 Suggests:
     dbplyr,
     testthat,
     randomForest,
     ranger,
     earth,
-    knitr,
     rmarkdown,
     nycflights13,
     RSQLite,

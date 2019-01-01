@@ -192,7 +192,7 @@ print.tidypredict_test <- function(x, ...) {
 }
 
 #' Knit print method for test predictions results
-#' keywords internal
+#' @keywords internal
 #' @export
 knit_print.tidypredict_test <- function(x, ...) {
   x$message
