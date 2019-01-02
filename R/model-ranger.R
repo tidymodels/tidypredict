@@ -73,5 +73,5 @@ parse_model.ranger <- function(model){
 
 #' @export
 tidypredict_fit.ranger<- function(model){
-  tidypredict_fit.randomForest(model)
+  build_fit_formula_rf(model)
 }
