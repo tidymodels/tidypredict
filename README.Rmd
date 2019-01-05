@@ -2,7 +2,7 @@
 output: github_document
 ---
 
-# tidypredict <img src="tools/images/logo.png" align="right" width = "150px"/>
+# tidypredict <img src="tools/images/logo.png" align="right" width = "140px"/>
 
 [![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
@@ -21,7 +21,7 @@ Run predictions inside the database. `tidypredict` parses a fitted R model objec
 
 <img src="tools/images/howitworks.PNG" align="right" width = "600px"/>
 
-**It works with several databases back-ends** because it leverages `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It currently supports `lm()`, `glm()`, `randomForest()` and `ranger()` models.
+**It works with several databases back-ends** because it leverages `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It currently supports `lm()`, `glm()`, `randomForest()`, `ranger()` ane `earth()` models.
 
 ## Installation
 
@@ -47,3 +47,14 @@ And then creates the SQL statement needed to calculate the fitted prediction:
 ```{r}
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
+
+## Supported models
+
+The following models are supported:
+
+- Linear Regression - `lm()`
+- Generalized Linear model - `glm()`
+- Random Forest models - `randomForest::randomForest()`
+- Random Forest models, via `ranger` - `ranger::ranger()`
+- MARS models - `earth::earth()`
+

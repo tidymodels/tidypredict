@@ -1,5 +1,5 @@
 
-# tidypredict <img src="tools/images/logo.png" align="right" width = "150px"/>
+# tidypredict <img src="tools/images/logo.png" align="right" width = "140px"/>
 
 [![Build
 Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
@@ -17,8 +17,8 @@ the predictions.
 
 **It works with several databases back-ends** because it leverages
 `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It
-currently supports `lm()`, `glm()`, `randomForest()` and `ranger()`
-models.
+currently supports `lm()`, `glm()`, `randomForest()`, `ranger()` ane
+`earth()` models.
 
 ## Installation
 
@@ -49,4 +49,14 @@ prediction:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-    ## <SQL> 39.6862614802529 + (`wt`) * (-3.19097213898374) + (`cyl`) * (-1.5077949682598)
+    ## <SQL> 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)
+
+## Supported models
+
+The following models are supported:
+
+  - Linear Regression - `lm()`
+  - Generalized Linear model - `glm()`
+  - Random Forest models - `randomForest::randomForest()`
+  - Random Forest models, via `ranger` - `ranger::ranger()`
+  - MARS models - `earth::earth()`
