@@ -200,7 +200,7 @@ get_qr_lm <- function(qr_name, parsedmodel){
   )
   f <- reduce(
     q[!map_lgl(q, is.null)],
-    function(x, y) expr(!! x * !! y)
+    function(x, y) expr(!! x + !! y)
   )
   expr((!! f) * (!! f) * !! parsedmodel$general$sigma2)
 }

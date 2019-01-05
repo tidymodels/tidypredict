@@ -82,8 +82,7 @@ get_rf_case_tree <- function(tree_no, parsedmodel){
   )
 }
 
-build_fit_formula_rf <- function(model){
-  parsedmodel <- parse_model(model)
+build_fit_formula_rf <- function(parsedmodel){
   map(
     seq_len(length(parsedmodel$trees)),
     ~ expr(case_when(!!! get_rf_case_tree(.x, parsedmodel)))
@@ -92,5 +91,6 @@ build_fit_formula_rf <- function(model){
 
 #' @export
 tidypredict_fit.randomForest <- function(model){
-  build_fit_formula_rf(model)
+  parsedmodel <- parse_model(model)
+  build_fit_formula_rf(parsedmodel)
 }
