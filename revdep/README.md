@@ -1,41 +1,58 @@
-# Setup
+# Platform
 
-## Platform
-
-|setting  |value                        |
+|field    |value                        |
 |:--------|:----------------------------|
-|version  |R version 3.4.3 (2017-11-30) |
-|system   |x86_64, linux-gnu            |
-|ui       |RStudio (1.1.383)            |
+|version  |R version 3.5.2 (2018-12-20) |
+|os       |Windows 10 x64               |
+|system   |x86_64, mingw32              |
+|ui       |RStudio                      |
 |language |(EN)                         |
-|collate  |en_US.UTF-8                  |
-|tz       |US/Central                   |
-|date     |2018-02-25                   |
+|collate  |English_United States.1252   |
+|ctype    |English_United States.1252   |
+|tz       |America/Chicago              |
+|date     |2019-01-07                   |
 
-## Packages
+# Dependencies
 
-|package      |*  |version |date       |source                            |
-|:------------|:--|:-------|:----------|:---------------------------------|
-|DBI          |   |0.7     |2017-06-18 |cran (@0.7)                       |
-|dbplyr       |   |1.2.1   |2018-02-19 |cran (@1.2.1)                     |
-|dplyr        |   |0.7.4   |2017-09-28 |cran (@0.7.4)                     |
-|knitr        |   |1.20    |2018-02-20 |cran (@1.20)                      |
-|nycflights13 |   |0.2.2   |2017-01-27 |cran (@0.2.2)                     |
-|purrr        |   |0.2.4   |2017-10-18 |cran (@0.2.4)                     |
-|randomForest |   |4.6-12  |2015-10-07 |cran (@4.6-12)                    |
-|ranger       |   |0.9.0   |2018-01-09 |cran (@0.9.0)                     |
-|rlang        |   |0.2.0   |2018-02-20 |cran (@0.2.0)                     |
-|rmarkdown    |   |1.8     |2017-11-17 |cran (@1.8)                       |
-|RSQLite      |   |2.0     |2017-06-19 |cran (@2.0)                       |
-|testthat     |   |2.0.0   |2017-12-13 |cran (@2.0.0)                     |
-|tibble       |   |1.4.2   |2018-01-22 |cran (@1.4.2)                     |
-|tidypredict  |   |0.2.0   |2018-02-25 |local (edgararuiz/tidypredict@NA) |
-|tidyr        |   |0.8.0   |2018-01-29 |cran (@0.8.0)                     |
+|package     |old      |new      |<U+0394>  |
+|:-----------|:--------|:--------|:--|
+|tidypredict |0.2.1    |0.3.0    |*  |
+|assertthat  |0.2.0    |0.2.0    |   |
+|BH          |1.66.0-1 |1.66.0-1 |   |
+|bindr       |0.1.1    |0.1.1    |   |
+|bindrcpp    |0.2.2    |0.2.2    |   |
+|cli         |1.0.1    |1.0.1    |   |
+|crayon      |1.3.4    |1.3.4    |   |
+|dplyr       |0.7.8    |0.7.8    |   |
+|evaluate    |NA       |0.12     |*  |
+|fansi       |0.4.0    |0.4.0    |   |
+|glue        |1.3.0    |1.3.0    |   |
+|highr       |NA       |0.7      |*  |
+|knitr       |NA       |1.21     |*  |
+|magrittr    |1.5      |1.5      |   |
+|markdown    |NA       |0.9      |*  |
+|mime        |NA       |0.6      |*  |
+|pillar      |1.3.1    |1.3.1    |   |
+|pkgconfig   |2.0.2    |2.0.2    |   |
+|plogr       |0.2.0    |0.2.0    |   |
+|purrr       |0.2.5    |0.2.5    |   |
+|R6          |2.3.0    |2.3.0    |   |
+|Rcpp        |1.0.0    |1.0.0    |   |
+|rlang       |0.3.0.1  |0.3.0.1  |   |
+|stringi     |1.2.4    |1.2.4    |   |
+|stringr     |NA       |1.3.1    |*  |
+|tibble      |1.4.2    |1.4.2    |   |
+|tidyr       |0.8.2    |NA       |*  |
+|tidyselect  |0.2.5    |0.2.5    |   |
+|utf8        |1.1.4    |1.1.4    |   |
+|xfun        |NA       |0.4      |*  |
+|yaml        |NA       |2.2.0    |*  |
 
-# Check results
+# Revdeps
 
-0 packages
+## All (1)
 
-
-
+|package                              |version |error |warning |note |
+|:------------------------------------|:-------|:-----|:-------|:----|
+|[tidymodels](problems.md#tidymodels) |0.0.2   |1     |        |     |
 
