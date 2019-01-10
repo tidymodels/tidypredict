@@ -1,14 +1,14 @@
 context("test-list")
 
-fitted <- function(...) tidypredict_fit(parse_model(...))
+fitted_rf <- function(...) tidypredict_fit(parse_model(...))
 
 test_that("Supports parsed models in list objects", {
-  expect_equal(
-    fitted(lm(mpg~wt, data = mtcars)),
-    expr(37.285126167342 + (wt * -5.34447157272267))
+  expect_is(
+    fitted_rf(lm(mpg~wt, data = mtcars)),
+    "call"
   )
   expect_equal(
-    length(fitted(
+    length(fitted_rf(
       randomForest::randomForest(Species~., data = iris)
     )),
     500

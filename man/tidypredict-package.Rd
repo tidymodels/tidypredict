@@ -6,6 +6,8 @@
 \alias{tidypredict-package}
 \title{tidypredict: Run Predictions Inside the Database}
 \description{
+\if{html}{\figure{logo.png}{options: align='right'}}
+
 It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
     It works with several databases back-ends because it leverages 'dplyr'
