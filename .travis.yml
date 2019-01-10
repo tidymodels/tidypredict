@@ -7,7 +7,6 @@ cache: packages
 matrix:
   include:
     - r: release
-    - r: oldrel
     - r: devel
   
 after_success:
