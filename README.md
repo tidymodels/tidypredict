@@ -1,5 +1,5 @@
 
-# tidypredict <img src="man/figures/logo.png" align="right" width = "140px"/>
+# tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![Build
 Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
@@ -7,13 +7,9 @@ Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https:/
 [![Coverage
 Status](https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
 
-[![Downloads](https://cranlogs.r-pkg.org/badges/tidypredict)]()
-
 Run predictions inside the database. `tidypredict` parses a fitted R
 model object, and returns a formula in ‘Tidy Eval’ code that calculates
 the predictions.
-
-<img src="man/figures/howitworks.PNG" align="right" width = "600px"/>
 
 **It works with several databases back-ends** because it leverages
 `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It
