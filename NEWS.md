@@ -18,6 +18,8 @@
 
 - Removes dependencies on: tidyr, tibble
 
+- The `x/y` interface for `earth` models can now be used. 
+
 ## Bug Fixes
 
 - It now returns all of the trees instead of just one for tree based models (`randomForest` & `ranger`) (#29)

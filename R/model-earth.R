@@ -6,13 +6,19 @@ tidypredict_fit.earth <- function(model) {
 
 #' @export
 parse_model.earth <- function(model) {
-  vars <- attr(model$terms, "dataClasses")
-  vars_names <- names(vars)
+
+  if (any(names(model) == "terms")) {
+    vars <- attr(model$terms, "dataClasses")
+    vars_names <- names(vars)
+  } else {
+    vars_names <- model$namesx.org
+  }
+
   is_glm <- !is.null(model$glm.list)
-  
+
   all_coefs <- model$coefficients
   if(is_glm) all_coefs <- model$glm.coefficients
-  
+
   coef_labels <- rownames(all_coefs)
   all_dirs <- rownames(model$dirs)
   all_terms <- map(
@@ -26,7 +32,7 @@ parse_model.earth <- function(model) {
       )
     }
   )
-  
+
   pm <- list()
   pm$general$model <- "earth"
   pm$general$version <- 2
@@ -38,17 +44,23 @@ parse_model.earth <- function(model) {
     pm$general$link   <- fam$link
   }
   pm$terms <- all_terms
-  
+
   pm
 }
 
 get_fields <- function(term_number, model){
-  vars_names <- names(attr(model$terms, "dataClasses"))
+
+  if (any(names(model) == "terms")) {
+    vars_names <- names(attr(model$terms, "dataClasses"))
+  } else {
+    vars_names <- model$namesx.org
+  }
+
   sel <- model$dirs[term_number, ]
   label <- colnames(model$dirs)[sel != 0]
   dirs <- model$dirs[term_number, sel != 0]
   cuts <- model$cuts[term_number, sel != 0]
-  
+
   map(
     seq_along(label),
     ~{
@@ -72,7 +84,7 @@ get_fields <- function(term_number, model){
           op = ifelse(dirs[.x][[1]] == -1, "lessthan", "morethan")
         )
       }
-      
+
     }
   )
 }
