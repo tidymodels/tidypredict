@@ -76,3 +76,34 @@ test_that("Most pmethods work", {
   )
   expect_false(any(as.logical(res)))
 })
+
+
+test_that("first degree earth model with different interfaces", {
+  f_mod_1 <- earth::earth(Sepal.Length ~ ., data = iris)
+  tp_pred_1 <- eval_tidy(tidypredict_fit(f_mod_1), iris)
+  earth_pred_1 <- predict(f_mod_1, iris[, -1])[, 1]
+  expect_equal(earth_pred_1, tp_pred_1)
+
+  xy_mod_1 <- earth::earth(x = iris[, -1], y = iris$Sepal.Length)
+  tp_pred_x1 <- eval_tidy(tidypredict_fit(xy_mod_1), iris[, -1])
+  earth_pred_x1 <- predict(xy_mod_1, iris[, -1])[, 1]
+  expect_equal(tp_pred_x1, earth_pred_x1)
+  expect_equal(tp_pred_x1, tp_pred_1)
+})
+
+test_that("2nd degree earth model with different interfaces", {
+  f_mod_2 <- earth::earth(Sepal.Length ~ ., data = iris, degree = 2, pmethod = "none")
+  tp_pred_2 <- eval_tidy(tidypredict_fit(f_mod_2), iris)
+  earth_pred_2 <- predict(f_mod_2, iris[, -1])[, 1]
+  expect_equal(earth_pred_2, tp_pred_2)
+
+  xy_mod_2 <- earth::earth(x = iris[, -1], y = iris$Sepal.Length, degree = 2, pmethod = "none")
+  tp_pred_x2 <- eval_tidy(tidypredict_fit(xy_mod_2), iris[, -1])
+  earth_pred_x2 <- predict(xy_mod_2, iris[, -1])[, 1]
+  expect_equal(tp_pred_x2, earth_pred_x2)
+  expect_equal(tp_pred_x2, tp_pred_2)
+})
+
+
+
+
