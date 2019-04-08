@@ -131,6 +131,12 @@ tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
 }
 
 #' @export
+tidypredict_test.xgb.Booster <- function(model, df = NULL, threshold = 0,
+                                          include_intervals = FALSE, max_rows = NULL) {
+  stop("tidypredict_test does not support xgb.Booster models")
+}
+
+#' @export
 tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL) {
   stop("tidypredict_test does not support ranger models")
