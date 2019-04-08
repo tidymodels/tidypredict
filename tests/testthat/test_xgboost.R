@@ -66,4 +66,6 @@ test_that("SQLite - Predictions are correct for different objectives", {
   expect_equal(b$pred_sql_custom, b$pred_r_custom, tol = 1e-6)
   
   expect_warning(tidypredict_fit(xgb_custom))
+  
+  expect_equal(ncol(tidypredict_to_column(b, xgb_binarylogistic)), ncol(b) + 1)
 })
