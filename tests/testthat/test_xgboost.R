@@ -17,8 +17,7 @@ logregobj <- function(preds, dtrain) {
 
 xgb_bin_data <- xgb.DMatrix(as.matrix(mtcars[,-9]), label = mtcars$am)
 xgb_bin_fit <- xgb.train(params =list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 50)
-xgb_dump_text_with_stats <- xgb.dump(xgb_bin_fit, dump_format = "text", with_stats = TRUE)
-tidypredict_fit(xgb_bin_fit)
+
 context("xgboost")
 
 
@@ -61,7 +60,7 @@ test_that("SQLite - Predictions are correct for different objectives", {
     )
   
   expect_equal(b$pred_sql_reglinear, b$pred_r_reglinear, tol = 1e-6)
-  expect_equal(b$pred_sql_binarylogitraw, b$pred_sql_binarylogitraw, tol = 1e-6)
+  expect_equal(b$pred_sql_binarylogitraw, b$pred_r_binarylogitraw, tol = 1e-6)
   expect_equal(b$pred_sql_reglogistic, b$pred_r_reglogistic, tol = 1e-6)
   expect_equal(b$pred_sql_binarylogistic, b$pred_r_binarylogistic, tol = 1e-6)
   expect_equal(b$pred_sql_custom, b$pred_r_custom, tol = 1e-6)
