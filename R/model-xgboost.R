@@ -90,10 +90,10 @@ get_xgb_case <- function(path, prediction){
   cl <- map(
     path, 
     ~{
-      if(.x$op == "over"  & .x$missing)  i <- expr((!! sym(.x$col) >= !! .x$val | is.na(!! sym(.x$col))))
-      if(.x$op == "under" & .x$missing)  i <- expr((!! sym(.x$col) <  !! .x$val | is.na(!! sym(.x$col))))
-      if(.x$op == "over"  & !.x$missing)  i <- expr(!! sym(.x$col) >= !! .x$val)
-      if(.x$op == "under" & !.x$missing) i <- expr(!! sym(.x$col) <  !! .x$val)
+      if(.x$op == "over"  & .x$missing)  i <- expr((!! sym(.x$col) >= !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
+      if(.x$op == "under" & .x$missing)  i <- expr((!! sym(.x$col) <  !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
+      if(.x$op == "over"  & !.x$missing)  i <- expr(!! sym(.x$col) >= !! as.numeric(.x$val))
+      if(.x$op == "under" & !.x$missing) i <- expr(!! sym(.x$col) <  !! as.numeric(.x$val))
       i
     }
   )
