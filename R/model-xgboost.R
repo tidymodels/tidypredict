@@ -59,16 +59,21 @@ get_xgb_trees.xgb.Booster <- function(model) {
 }
 
 get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
-  feature_names_tbl <- tibble::enframe(feature_names, "Feature", "feature_name") %>% dplyr::mutate(Feature = as.character(Feature - 1))
+  feature_names_tbl <- data.frame(
+    Feature = as.character(0:(length(feature_names) - 1)),
+    feature_name = feature_names,
+    stringsAsFactors = FALSE
+  )
   
-  trees <- xgb.model.dt.tree(text = xgb_dump_text_with_stats) %>%
-    dplyr::left_join(feature_names_tbl, by = "Feature") %>%
-    dplyr::mutate_at(dplyr::vars(Yes, No, Missing), ~stringr::str_replace(., "^.*-", "")) %>%
-    dplyr::mutate_at(dplyr::vars(Yes, No, Missing), ~as.integer(.) + 1) %>% # xxgboost is 0-indexed
-    dplyr::group_by(Tree) %>%
-    tidyr::nest(.key = "tree_data")
   
-  purrr::map(trees$tree_data, get_xgb_tree)
+  trees <- xgb.model.dt.tree(text = xgb_dump_text_with_stats)
+  trees$original_order <- 1:nrow(trees)
+  trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
+  trees <- trees[order(trees$original_order),-"original_order"]
+  trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
+  trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
+  
+  purrr::map(split(trees, trees$Tree), get_xgb_tree)
 }
 
 #' @export
