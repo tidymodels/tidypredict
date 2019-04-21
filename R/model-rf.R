@@ -19,8 +19,8 @@ get_rf_path <- function(row_id, tree, columns){
       if(rb["right daughter"] == .x) op <- "over"
       list(
         type = "conditional",
-        col = rb["split var"],
-        val = rb["split point"],
+        col = columns[rb["split var"]],
+        val = rb["split point"][[1]],
         op = op
       )
     }
