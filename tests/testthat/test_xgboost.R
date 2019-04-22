@@ -1,3 +1,12 @@
+context("xgboost")
+
+library(xgboost)
+library(purrr)
+library(dplyr)
+library(magrittr)
+library(RSQLite)
+library(DBI)
+
 logregobj <- function(preds, dtrain) {
   labels <- getinfo(dtrain, "label")
   preds <- 1/(1 + exp(-preds))
@@ -9,7 +18,6 @@ logregobj <- function(preds, dtrain) {
 xgb_bin_data <- xgb.DMatrix(as.matrix(mtcars[,-9]), label = mtcars$am)
 xgb_bin_fit <- xgb.train(params =list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 50)
 
-context("xgboost")
 
 
 test_that("Returns the correct type", {
