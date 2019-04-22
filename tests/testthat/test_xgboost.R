@@ -67,4 +67,6 @@ test_that("SQLite - Predictions are correct for different objectives", {
   expect_warning(tidypredict_fit(xgb_custom))
   
   expect_equal(ncol(tidypredict_to_column(b, xgb_binarylogistic)), ncol(b) + 1)
+  
+  dbDisconnect(con)
 })
