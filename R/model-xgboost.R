@@ -65,19 +65,20 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
     stringsAsFactors = FALSE
   )
   
-  
   trees <- xgb.model.dt.tree(text = xgb_dump_text_with_stats)
+  trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
   trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
-  trees <- trees[order(trees$original_order),-"original_order"]
+  trees <- trees[order(trees$original_order), !names(trees) %in% "original_order"]
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
+  
   
   purrr::map(split(trees, trees$Tree), get_xgb_tree)
 }
 
 #' @export
-parse_model.xgb.Booster <- function(model){
+parse_model.xgb.Booster <- function(model) {
   pm <- list()
   pm$general$model <- "xgb.Booster"
   pm$general$niter <- model$niter
