@@ -6,6 +6,8 @@
 
 - Adds support for MARS models provided by the `earth` package
 
+- Adds support for xgb.Booster models provided by the `xgboost` package (@Athospd, #43)
+
 ## Improvements
 
 - New parsed models are now list objects as opposed to data frames.
