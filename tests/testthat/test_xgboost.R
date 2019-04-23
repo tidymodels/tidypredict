@@ -3,7 +3,6 @@ context("xgboost")
 library(xgboost)
 library(purrr)
 library(dplyr)
-library(magrittr)
 library(RSQLite)
 library(DBI)
 
