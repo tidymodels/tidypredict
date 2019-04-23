@@ -52,7 +52,7 @@ get_xgb_trees <- function (model) {
 }
 
 get_xgb_trees.xgb.Booster <- function(model) {
-  xgb_dump_text_with_stats <- xgb.dump(model, dump_format = "text", with_stats = TRUE)
+  xgb_dump_text_with_stats <- xgboost::xgb.dump(model, dump_format = "text", with_stats = TRUE)
   feature_names <- model$feature_names
   
   get_xgb_trees.character(xgb_dump_text_with_stats, feature_names)
@@ -65,7 +65,7 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
     stringsAsFactors = FALSE
   )
   
-  trees <- xgb.model.dt.tree(text = xgb_dump_text_with_stats)
+  trees <- xgboost::xgb.model.dt.tree(text = xgb_dump_text_with_stats)
   trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
   trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
