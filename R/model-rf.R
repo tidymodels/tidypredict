@@ -10,7 +10,7 @@ get_rf_path <- function(row_id, tree, columns){
       path <- c(path, j)
     }
   }
-  map2(
+  purrr::map2(
     path[1:length(path)-1],
     path[2:length(path)],
     ~ {
@@ -32,7 +32,7 @@ get_rf_tree <- function(tree_no, model){
   term_labels <- attr(model$terms, "term.labels")
   tree <- randomForest::getTree(model, tree_no)
   paths <- seq_len(nrow(tree))[tree[, "status"] == -1]
-  map(
+  purrr::map(
     paths,
     ~ {
       list(
@@ -44,7 +44,7 @@ get_rf_tree <- function(tree_no, model){
 }
 
 get_rf_trees <- function(model){
-  map(
+  purrr::map(
     seq_len(model$ntree),  
     ~ get_rf_tree(.x, model)
   )
