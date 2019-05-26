@@ -2,10 +2,10 @@
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![Build
-Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
 
 Run predictions inside the database. `tidypredict` parses a fitted R
 model object, and returns a formula in ‘Tidy Eval’ code that calculates
@@ -27,7 +27,7 @@ install.packages("tidypredict")
 Or install the development version using `devtools` as follows:
 
 ``` r
-devtools::install_github("edgararuiz/tidypredict")
+devtools::install_github("tidymodels/tidypredict")
 ```
 
 ## Intro

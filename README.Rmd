@@ -4,9 +4,9 @@ output: github_document
 
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
-[![Build Status](https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+[![Build Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
-[![Coverage Status](https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
 
 ```{r setup, include=FALSE}
 library(dplyr)
@@ -28,7 +28,7 @@ install.packages("tidypredict")
 
 Or install the development version using `devtools` as follows:
 ```{r, eval = FALSE}
-devtools::install_github("edgararuiz/tidypredict")
+devtools::install_github("tidymodels/tidypredict")
 ```
 
 ## Intro
