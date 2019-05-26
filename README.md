@@ -2,19 +2,28 @@
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![Build
-Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
 [![Coverage
-Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/tidymodels/tidypredict?branch=master)
 
 Run predictions inside the database. `tidypredict` parses a fitted R
 model object, and returns a formula in ‘Tidy Eval’ code that calculates
 the predictions.
 
-**It works with several databases back-ends** because it leverages
-`dplyr` and `dbplyr` for the final SQL translation of the algorithm. It
-currently supports `lm()`, `glm()`, `randomForest()`, `ranger()` ane
-`earth()` models.
+**It works with several databases back-ends** because it uses `dplyr`
+and `dbplyr` for the final SQL translation of the algorithm.
+
+## Supported models
+
+The following models are supported by `tidypredict`:
+
+  - Linear Regression - `lm()`
+  - Generalized Linear model - `glm()`
+  - Random Forest models - `randomForest::randomForest()`
+  - Random Forest models, via `ranger` - `ranger::ranger()`
+  - MARS models - `earth::earth()`
+  - XGBoost models - `xgboost::xgb.Booster.complete()`
 
 ## Installation
 
@@ -46,13 +55,3 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
     ## <SQL> 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)
-
-## Supported models
-
-The following models are supported:
-
-  - Linear Regression - `lm()`
-  - Generalized Linear model - `glm()`
-  - Random Forest models - `randomForest::randomForest()`
-  - Random Forest models, via `ranger` - `ranger::ranger()`
-  - MARS models - `earth::earth()`

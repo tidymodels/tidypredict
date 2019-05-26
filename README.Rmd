@@ -4,9 +4,9 @@ output: github_document
 
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
-[![Build Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/edgararuiz/tidypredict)
+[![Build Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
-[![Coverage Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/edgararuiz/tidypredict?branch=master)
+[![Coverage Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/tidymodels/tidypredict?branch=master)
 
 ```{r setup, include=FALSE}
 library(dplyr)
@@ -17,7 +17,18 @@ library(randomForest)
 
 Run predictions inside the database. `tidypredict` parses a fitted R model object, and returns a formula in 'Tidy Eval' code that calculates the predictions.
 
-**It works with several databases back-ends** because it leverages `dplyr` and `dbplyr` for the final SQL translation of the algorithm. It currently supports `lm()`, `glm()`, `randomForest()`, `ranger()` ane `earth()` models.
+**It works with several databases back-ends** because it uses `dplyr` and `dbplyr` for the final SQL translation of the algorithm. 
+
+## Supported models
+
+The following models are supported by `tidypredict`:
+
+- Linear Regression - `lm()`
+- Generalized Linear model - `glm()`
+- Random Forest models - `randomForest::randomForest()`
+- Random Forest models, via `ranger` - `ranger::ranger()`
+- MARS models - `earth::earth()`
+- XGBoost models - `xgboost::xgb.Booster.complete()`
 
 ## Installation
 
@@ -44,13 +55,4 @@ And then creates the SQL statement needed to calculate the fitted prediction:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-## Supported models
-
-The following models are supported:
-
-- Linear Regression - `lm()`
-- Generalized Linear model - `glm()`
-- Random Forest models - `randomForest::randomForest()`
-- Random Forest models, via `ranger` - `ranger::ranger()`
-- MARS models - `earth::earth()`
 
