@@ -9,7 +9,7 @@ test_that("Returns the correct type and dimensions", {
   expect_is(pm, "list")
   expect_equal(length(pm), 2)
   expect_equal(length(pm$trees), 100)
-  expect_equal(pm$general$model, "randomForest")
+  expect_equal(pm$general$model, "ranger")
   expect_equal(pm$general$version, 2)
 })
 
