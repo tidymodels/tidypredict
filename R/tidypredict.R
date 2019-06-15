@@ -4,6 +4,7 @@
 #' @importFrom purrr map_chr
 #' @importFrom purrr map_lgl
 #' @importFrom purrr reduce
+#' @importFrom purrr transpose
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
