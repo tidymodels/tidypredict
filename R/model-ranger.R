@@ -62,7 +62,7 @@ get_ra_trees <- function(model){
 parse_model.ranger <- function(model){
   classes <- attr(model$terms, "dataClasses")
   pm <- list()
-  pm$general$model <- "randomForest"
+  pm$general$model <- "ranger"
   pm$general$version <- 2
   pm$trees <- get_ra_trees(model)
   pm
