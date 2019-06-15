@@ -62,7 +62,7 @@ parse_model.randomForest <- function(model){
 
 # Fit model -----------------------------------------------
 
-get_rf_case <- function(path, prediction){
+get_rf_case <- function(path, prediction, calc_mode = ""){
   cl <- map(
     path, 
     ~{
@@ -72,21 +72,53 @@ get_rf_case <- function(path, prediction){
     }
   )
   cl <- reduce(cl, function(x, y) expr(!! x & !! y))
-  expr(!! cl ~ !! prediction)
+  
+  if(length(prediction) > 1){
+    pl <- map(
+      prediction,
+      ~{
+        if(.x$is_intercept) i <- expr(!! .x$val)
+        if(.x$op == "multiply") i <- expr(!! sym(.x$col)* !! .x$val)
+        i
+      }
+    )
+    pl <- reduce(pl, function(x, y) expr(!! x + !! y))
+  } else {
+    pl <- prediction
+  }
+  f <- NULL
+  if(calc_mode == "ifelse") f <- expr(ifelse(!! cl, !!pl, 0))
+  if(is.null(f)) f <- expr(!! cl ~ !! pl)
+  f
 }
 
 get_rf_case_tree <- function(tree_no, parsedmodel){
   map(
     parsedmodel$trees[[tree_no]],
-    ~ get_rf_case(.x$path, .x$prediction)
+    ~ get_rf_case(.x$path, .x$prediction, parsedmodel$general$mode)
   )
 }
 
 build_fit_formula_rf <- function(parsedmodel){
-  map(
-    seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!! get_rf_case_tree(.x, parsedmodel)))
-  )
+  calc_mode <-  parsedmodel$general$mode
+  if(is.null(calc_mode)) calc_mode <- ""
+  divisor <- parsedmodel$general$divisor
+  if(is.null(divisor)) divisor <- 1
+  
+  f <- NULL
+  
+  if(calc_mode == "ifelse") {
+    f <- reduce(get_rf_case_tree(1, parsedmodel), function(x, y) expr(!! x + !! y))
+    f <- expr(!! f / !! divisor)
+  }
+  
+  if(is.null(f)) {
+    f <- map(
+      seq_len(length(parsedmodel$trees)),
+      ~ expr(case_when(!!! get_rf_case_tree(.x, parsedmodel)))
+    )
+  }
+  f
 }
 
 #' @export
