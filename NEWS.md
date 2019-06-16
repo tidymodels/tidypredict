@@ -1,12 +1,16 @@
 # tidypredict (development version)
 
+## New features
+
+- Adds support for xgb.Booster models provided by the `xgboost` package (@Athospd, #43)
+
+- Adds support for `Cubist::cubist()` models
+
 # tidypredict 0.3.0
 
 ## New features
 
 - Adds support for MARS models provided by the `earth` package
-
-- Adds support for xgb.Booster models provided by the `xgboost` package (@Athospd, #43)
 
 ## Improvements
 

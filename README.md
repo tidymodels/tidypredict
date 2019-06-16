@@ -24,6 +24,7 @@ The following models are supported by `tidypredict`:
   - Random Forest models, via `ranger` - `ranger::ranger()`
   - MARS models - `earth::earth()`
   - XGBoost models - `xgboost::xgb.Booster.complete()`
+  - Cubist models - `Cubist::cubist()`
 
 ## Installation
 
