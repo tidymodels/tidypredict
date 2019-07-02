@@ -3,10 +3,8 @@ library(tidypredict)
 library(xgboost)
 library(purrr)
 library(dplyr)
-library(RSQLite)
-library(DBI)
 library(Cubist)
 library(mlbench)
-
+library(rlang)
 
 test_check("tidypredict")

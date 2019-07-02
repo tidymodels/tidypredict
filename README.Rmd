@@ -5,7 +5,7 @@ output: github_document
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![Build Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](http://cran.r-project.org/package=tidypredict)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://cran.r-project.org/package=tidypredict)
 [![Coverage Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/tidymodels/tidypredict?branch=master)
 
 ```{r setup, include=FALSE}

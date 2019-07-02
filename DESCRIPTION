@@ -33,7 +33,7 @@ Suggests:
     mlbench,
     parsnip
 License: GPL-3
-URL: http://tidypredict.netlify.com/
+URL: https://tidymodels.github.io/tidypredict
 BugReports: https://github.com/edgararuiz/tidypredict/issues
 RoxygenNote: 6.1.1
 Encoding: UTF-8

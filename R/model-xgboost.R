@@ -118,7 +118,7 @@ build_fit_formula_xgb <- function(parsedmodel){
   
   f <- map(
     seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!! get_xgb_case_tree(.x, parsedmodel)))
+    ~ expr(dplyr::case_when(!!! get_xgb_case_tree(.x, parsedmodel)))
   )
   
   # additive model
