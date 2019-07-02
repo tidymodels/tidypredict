@@ -3,7 +3,7 @@ context("lm")
 df <- mtcars
 df$cyl <- paste0("cyl", df$cyl)
 
-has_alert <- function(...) tidypredict_test(..., include_intervals = TRUE)$alert
+has_alert <- function(model) tidypredict_test(model, df = df, include_intervals = TRUE)$alert
 
 test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm(mpg ~ wt, offset = am, data = df)))
@@ -15,10 +15,12 @@ test_that("Predictions within threshold and parsed model results are equal", {
 
 context("lm-parsnip")
 
-lm_parsnip <- function(...) parsnip::fit(
-  parsnip::set_engine(parsnip::linear_reg(), "lm"), 
-  ...
-)
+lm_parsnip <- function(...) {
+  parsnip::fit(
+    parsnip::set_engine(parsnip::linear_reg(), "lm"), 
+    ...
+  )
+} 
 
 test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm_parsnip(mpg ~ wt, offset = am, data = df)))
@@ -27,3 +29,4 @@ test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm_parsnip(mpg ~ wt + disp * cyl, data = df)))
   expect_false(has_alert(lm_parsnip(mpg ~ (wt + disp) * cyl, data = df)))
 })
+

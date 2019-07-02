@@ -104,6 +104,52 @@ test_that("2nd degree earth model with different interfaces", {
   expect_equal(tp_pred_x2, tp_pred_2)
 })
 
+context("earth/MARS models - parsnip")
 
-
-
+test_that("Tests with parsnip returns no alert", {
+  # expect_false(
+  #   tidypredict_test(
+  #     parsnip::fit(
+  #       parsnip::set_engine(parsnip::mars(mode = "classification"), "earth"), 
+  #       survived ~ age + sibsp, data = dplyr::mutate(earth::etitanic, survived = as.factor(survived))
+  #     ),
+  #     df = etitanic
+  #   )$alert
+  # )
+  expect_false(
+    tidypredict_test(
+      parsnip::fit(
+        parsnip::set_engine(parsnip::mars(), "earth"), 
+        survived ~ age + sibsp, data = etitanic
+      ),
+      df = etitanic
+    )$alert
+  )
+  expect_false(
+    tidypredict_test(
+      parsnip::fit(
+        parsnip::set_engine(parsnip::mars(), "earth"), 
+        age ~ sibsp + parch, data = etitanic
+      ),
+      df = etitanic
+    )$alert
+  )
+  expect_false(
+    tidypredict_test(
+      parsnip::fit(
+        parsnip::set_engine(parsnip::mars(prod_degree = 2), "earth"), 
+        age ~ sibsp + parch, data = etitanic
+      ),
+      df = etitanic
+    )$alert
+  )
+  expect_false(
+    tidypredict_test(
+      parsnip::fit(
+        parsnip::set_engine(parsnip::mars(prod_degree = 3), "earth"), 
+        age ~ sibsp + parch, data = etitanic
+      ),
+      df = etitanic
+    )$alert
+  )
+})

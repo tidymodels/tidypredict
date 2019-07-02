@@ -127,7 +127,13 @@ setOldClass(c("tidypredict_test", "list"))
 #' @export
 tidypredict_test.model_fit <- function(model, df = model$model, threshold = 0.000000000001,
                                      include_intervals = FALSE, max_rows = NULL) { 
-  tidypredict_test(model$fit)
+  tidypredict_test(
+    model = model$fit,
+    df = df,
+    threshold = threshold,
+    include_intervals = include_intervals,
+    max_rows = max_rows
+    )
   }
 
 #' @export
