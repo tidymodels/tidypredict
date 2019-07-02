@@ -125,6 +125,12 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
+tidypredict_test.model_fit <- function(model, df = model$model, threshold = 0.000000000001,
+                                     include_intervals = FALSE, max_rows = NULL) { 
+  tidypredict_test(model$fit)
+  }
+
+#' @export
 tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
                                           include_intervals = FALSE, max_rows = NULL) {
   stop("tidypredict_test does not support randomForest models")

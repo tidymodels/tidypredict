@@ -26,3 +26,10 @@ tidypredict_fit.list <- function(model) {
   if(is.null(fit)) stop("Model type not supported")
   fit
 }
+
+# parsnip  -----------------------------------
+
+#' @export
+tidypredict_fit.model_fit <- function(model) {
+  tidypredict_fit(model$fit)
+}
