@@ -30,7 +30,8 @@ Suggests:
     covr,
     xgboost,
     Cubist,
-    mlbench
+    mlbench,
+    parsnip
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues

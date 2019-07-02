@@ -59,7 +59,7 @@ acceptable_lm <- function(model) {
 
   # Check for in-line formulas
   funs <- fun_calls(model$call)
-  funs <- funs[!(funs %in% c("~", "+", "-", "*", "(", ")", "::", "lm", "glm", "factor"))]
+  funs <- funs[!(funs %in% c("~", "+", "-", "*", "(", ")", "::", "lm", "glm", "factor", "stats"))]
   if (length(funs) > 0) {
     contains_offset <- any(funs == "offset")
     contains_other <- funs[funs != "offset"]

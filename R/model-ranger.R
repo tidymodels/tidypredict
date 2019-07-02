@@ -42,6 +42,7 @@ get_ra_tree <- function(tree_no, model){
     paths,
     ~ {
       prediction <- tree$prediction[tree$nodeID == .x]
+      if(is.null(prediction)) stop("Prediction column not found")
       if(is.factor(prediction)) prediction <- as.character(prediction)
       list(
         prediction = prediction,
@@ -67,7 +68,6 @@ parse_model.ranger <- function(model){
   pm$trees <- get_ra_trees(model)
   pm
 }
-
 
 # Fit formula -----------------------------------
 

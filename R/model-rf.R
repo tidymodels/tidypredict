@@ -29,7 +29,7 @@ get_rf_path <- function(row_id, tree, columns) {
 
 get_rf_tree <- function(tree_no, model) {
   predictions <- model$classes
-  term_labels <- attr(model$terms, "term.labels")
+  term_labels <- names(model$forest$ncat)
   tree <- randomForest::getTree(model, tree_no)
   paths <- seq_len(nrow(tree))[tree[, "status"] == -1]
   purrr::map(

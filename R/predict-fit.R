@@ -15,6 +15,7 @@ tidypredict_fit <- function(model) {
   UseMethod("tidypredict_fit")
 }
 
+# parsed models --------------------------------
 #' @export
 tidypredict_fit.list <- function(model) {
   mt <- model$general$model
