@@ -1,22 +1,22 @@
 # Model parser -------------------------------------
 
-get_rf_path <- function(row_id, tree, columns){
+get_rf_path <- function(row_id, tree, columns) {
   find <- row_id
   path <- row_id
-  for(j in row_id:1){
+  for (j in row_id:1) {
     dir <- NULL
-    if(tree[j, "left daughter"] == find | tree[j, "right daughter"] == find)  {
+    if (tree[j, "left daughter"] == find | tree[j, "right daughter"] == find) {
       find <- j
       path <- c(path, j)
     }
   }
   purrr::map2(
-    path[1:length(path)-1],
+    path[1:length(path) - 1],
     path[2:length(path)],
     ~ {
       rb <- tree[.y, ]
-      if(rb["left daughter"] == .x) op <- "under"
-      if(rb["right daughter"] == .x) op <- "over"
+      if (rb["left daughter"] == .x) op <- "under"
+      if (rb["right daughter"] == .x) op <- "over"
       list(
         type = "conditional",
         col = columns[rb["split var"]],
@@ -27,7 +27,7 @@ get_rf_path <- function(row_id, tree, columns){
   )
 }
 
-get_rf_tree <- function(tree_no, model){
+get_rf_tree <- function(tree_no, model) {
   predictions <- model$classes
   term_labels <- attr(model$terms, "term.labels")
   tree <- randomForest::getTree(model, tree_no)
@@ -39,19 +39,19 @@ get_rf_tree <- function(tree_no, model){
         prediction = predictions[tree[.x, "prediction"]],
         path = get_rf_path(.x, tree, term_labels)
       )
-    } 
-  )  
+    }
+  )
 }
 
-get_rf_trees <- function(model){
+get_rf_trees <- function(model) {
   purrr::map(
-    seq_len(model$ntree),  
+    seq_len(model$ntree),
     ~ get_rf_tree(.x, model)
   )
 }
 
 #' @export
-parse_model.randomForest <- function(model){
+parse_model.randomForest <- function(model) {
   classes <- attr(model$terms, "dataClasses")
   pm <- list()
   pm$general$model <- "randomForest"
@@ -62,35 +62,67 @@ parse_model.randomForest <- function(model){
 
 # Fit model -----------------------------------------------
 
-get_rf_case <- function(path, prediction){
+get_rf_case <- function(path, prediction, calc_mode = "") {
   cl <- map(
-    path, 
-    ~{
-      if(.x$op == "over") i <- expr(!! sym(.x$col) >= !! .x$val)
-      if(.x$op == "under") i <- expr(!! sym(.x$col) < !! .x$val)
+    path,
+    ~ {
+      if (.x$op == "over") i <- expr(!!sym(.x$col) >= !!.x$val)
+      if (.x$op == "under") i <- expr(!!sym(.x$col) < !!.x$val)
       i
     }
   )
-  cl <- reduce(cl, function(x, y) expr(!! x & !! y))
-  expr(!! cl ~ !! prediction)
+  cl <- reduce(cl, function(x, y) expr(!!x & !!y))
+
+  if (length(prediction) > 1) {
+    pl <- map(
+      prediction,
+      ~ {
+        if (.x$is_intercept) i <- expr(!!.x$val)
+        if (.x$op == "multiply") i <- expr(!!sym(.x$col) * !!.x$val)
+        i
+      }
+    )
+    pl <- reduce(pl, function(x, y) expr(!!x + !!y))
+  } else {
+    pl <- prediction
+  }
+  f <- NULL
+  if (calc_mode == "ifelse") f <- expr(ifelse(!!cl, !!pl, 0))
+  if (is.null(f)) f <- expr(!!cl ~ !!pl)
+  f
 }
 
-get_rf_case_tree <- function(tree_no, parsedmodel){
+get_rf_case_tree <- function(tree_no, parsedmodel) {
   map(
     parsedmodel$trees[[tree_no]],
-    ~ get_rf_case(.x$path, .x$prediction)
+    ~ get_rf_case(.x$path, .x$prediction, parsedmodel$general$mode)
   )
 }
 
-build_fit_formula_rf <- function(parsedmodel){
-  map(
-    seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!! get_rf_case_tree(.x, parsedmodel)))
-  )
+build_fit_formula_rf <- function(parsedmodel) {
+  calc_mode <- parsedmodel$general$mode
+  if (is.null(calc_mode)) calc_mode <- ""
+  divisor <- parsedmodel$general$divisor
+  if (is.null(divisor)) divisor <- 1
+
+  f <- NULL
+
+  if (calc_mode == "ifelse") {
+    f <- reduce(get_rf_case_tree(1, parsedmodel), function(x, y) expr(!!x + !!y))
+    f <- expr(!!f / !!divisor)
+  }
+
+  if (is.null(f)) {
+    f <- map(
+      seq_len(length(parsedmodel$trees)),
+      ~ expr(case_when(!!!get_rf_case_tree(.x, parsedmodel)))
+    )
+  }
+  f
 }
 
 #' @export
-tidypredict_fit.randomForest <- function(model){
+tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
   build_fit_formula_rf(parsedmodel)
 }

@@ -1,11 +1,12 @@
 Package: tidypredict
-Version: 0.3.0
+Version: 0.3.0.9000
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
     It works with several databases back-ends because it leverages 'dplyr'
     and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger() and earth() models. 
+    supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
+    and cubist() models. 
 Authors@R:
     person("Edgar", "Ruiz", email = "edgar@rstudio.com", role = c("aut", "cre"))
 Depends:
@@ -28,7 +29,12 @@ Suggests:
     DBI,
     covr,
     xgboost,
+<<<<<<< HEAD
     parsnip
+=======
+    Cubist,
+    mlbench
+>>>>>>> origin/master
 License: GPL-3
 URL: http://tidypredict.netlify.com/
 BugReports: https://github.com/edgararuiz/tidypredict/issues
