@@ -18,8 +18,8 @@ It parses a fitted 'R' model object, and returns a formula
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://tidypredict.netlify.com/}
-  \item Report bugs at \url{https://github.com/edgararuiz/tidypredict/issues}
+  \item \url{https://tidymodels.github.io/tidypredict}
+  \item Report bugs at \url{https://github.com/tidymodels/tidypredict/issues}
 }
 
 }

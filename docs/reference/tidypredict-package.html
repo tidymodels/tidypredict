@@ -8,13 +8,6 @@
 
 <title>tidypredict: Run Predictions Inside the Database — tidypredict-package • tidypredict</title>
 
-<!-- favicons -->
-<link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png" />
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png" />
 <!-- jquery -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 <!-- Bootstrap -->
@@ -44,7 +37,8 @@ It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
     It works with several databases back-ends because it leverages 'dplyr'
     and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger() and earth() models." />
+    supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
+    and cubist() models." />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -77,7 +71,7 @@ It parses a fitted 'R' model object, and returns a formula
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tidypredict</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -123,7 +117,8 @@ It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
     It works with several databases back-ends because it leverages 'dplyr'
     and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger() and earth() models.</p>
+    supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
+    and cubist() models.</p>
     
     </div>
 

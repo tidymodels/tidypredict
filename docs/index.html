@@ -6,12 +6,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Run Predictions Inside the Database • tidypredict</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
@@ -20,7 +14,8 @@
     in 'Tidy Eval' code that calculates the predictions.
     It works with several databases back-ends because it leverages 'dplyr'
     and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger() and earth() models. ">
+    supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
+    and cubist() models. ">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -41,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">tidypredict</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
       </span>
     </div>
 
@@ -81,28 +76,11 @@
 </h1></div>
 
 <p>Run predictions inside the database. <code>tidypredict</code> parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.</p>
-<p><strong>It works with several databases back-ends</strong> because it leverages <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm. It currently supports <code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code>, <code><a href="https://www.rdocumentation.org/packages/stats/topics/glm">glm()</a></code>, <code>randomForest()</code>, <code>ranger()</code> ane <code>earth()</code> models.</p>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install <code>tidypredict</code> from CRAN using:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tidypredict"</span>)</a></code></pre></div>
-<p>Or install the development version using <code>devtools</code> as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"edgararuiz/tidypredict"</span>)</a></code></pre></div>
-</div>
-<div id="intro" class="section level2">
-<h2 class="hasAnchor">
-<a href="#intro" class="anchor"></a>Intro</h2>
-<p><code>tidypredict</code> is able to parse an R model object, such as:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
-<p>And then creates the SQL statement needed to calculate the fitted prediction:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/dbplyr/topics/simulate_dbi">simulate_mssql</a></span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</code></pre>
-</div>
+<p><strong>It works with several databases back-ends</strong> because it uses <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm.</p>
 <div id="supported-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#supported-models" class="anchor"></a>Supported models</h2>
-<p>The following models are supported:</p>
+<p>The following models are supported by <code>tidypredict</code>:</p>
 <ul>
 <li>Linear Regression - <code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code>
 </li>
@@ -114,7 +92,28 @@
 </li>
 <li>MARS models - <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code>
 </li>
+<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code>
+</li>
+<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code>
+</li>
 </ul>
+</div>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Install <code>tidypredict</code> from CRAN using:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tidypredict"</span>)</a></code></pre></div>
+<p>Or install the development version using <code>devtools</code> as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"tidymodels/tidypredict"</span>)</a></code></pre></div>
+</div>
+<div id="intro" class="section level2">
+<h2 class="hasAnchor">
+<a href="#intro" class="anchor"></a>Intro</h2>
+<p><code>tidypredict</code> is able to parse an R model object, such as:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
+<p>And then creates the SQL statement needed to calculate the fitted prediction:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a></code></pre></div>
+<pre><code>## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</code></pre>
 </div>
 </div>
   </div>
@@ -125,7 +124,7 @@
 <ul class="list-unstyled">
 <li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=tidypredict">https://​cloud.r-project.org/​package=tidypredict</a>
 </li>
-<li>Report a bug at <br><a href="https://github.com/edgararuiz/tidypredict/issues">https://​github.com/​edgararuiz/​tidypredict/​issues</a>
+<li>Report a bug at <br><a href="https://github.com/tidymodels/tidypredict/issues">https://​github.com/​tidymodels/​tidypredict/​issues</a>
 </li>
 </ul>
 </div>
@@ -145,9 +144,9 @@
       <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://travis-ci.org/edgararuiz/tidypredict"><img src="https://travis-ci.org/edgararuiz/tidypredict.svg?branch=master" alt="Build Status"></a></li>
-<li><a href="http://cran.r-project.org/package=tidypredict"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://codecov.io/github/edgararuiz/tidypredict?branch=master"><img src="https://img.shields.io/codecov/c/github/edgararuiz/tidypredict/master.svg" alt="Coverage Status"></a></li>
+<li><a href="https://travis-ci.org/tidymodels/tidypredict"><img src="https://travis-ci.org/tidymodels/tidypredict.svg?branch=master" alt="Build Status"></a></li>
+<li><a href="https://cran.r-project.org/package=tidypredict"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a></li>
+<li><a href="https://codecov.io/github/tidymodels/tidypredict?branch=master"><img src="https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg" alt="Coverage Status"></a></li>
 </ul>
 </div>
 </div>
