@@ -3,6 +3,8 @@
 #' @importFrom purrr map
 #' @importFrom purrr map_chr
 #' @importFrom purrr map_lgl
+#' @importFrom purrr map_dbl
+#' @importFrom purrr map_int
 #' @importFrom purrr reduce
 #' @importFrom purrr transpose
 #' @importFrom utils head
@@ -10,6 +12,7 @@
 #' @importFrom stats qt
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
+#' @importFrom dplyr case_when
 #' @keywords internal
 #'
 "_PACKAGE"
