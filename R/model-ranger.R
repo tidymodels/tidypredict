@@ -1,11 +1,11 @@
 # Model parser ------------------------------------
-get_ra_path <- function(node_id, tree){
+get_ra_path <- function(node_id, tree, default_op = TRUE){
   find <- node_id
   path <- node_id
   for(j in node_id:0){
     row <- tree[tree$nodeID == j, ]
-    lc <- row["leftChild"] == find 
-    lr <- row["rightChild"] == find
+    lc <- row["leftChild"][[1]] == find 
+    lr <- row["rightChild"][[1]] == find
     if(is.na(lc)) lc <- FALSE
     if(is.na(lr)) lr <- FALSE
     dir <- NULL
@@ -23,11 +23,16 @@ get_ra_path <- function(node_id, tree){
       lr <- rb["rightChild"] == .x
       if(is.na(lc)) lc <- FALSE
       if(is.na(lr)) lr <- FALSE
-      if(lc) op <- "under"
-      if(lr) op <- "over"
+      if(default_op) {
+        if (rb["leftChild"] == .x) op <- "less"
+        if (rb["rightChild"] == .x) op <- "more-equal"
+      } else {
+        if (rb["leftChild"] == .x) op <- "less-equal"
+        if (rb["rightChild"] == .x) op <- "more"    
+      }
       list(
         type = "conditional",
-        col = rb["splitvarName"][[1]],
+        col = as.character(rb["splitvarName"][[1]]),
         val = rb["splitval"][[1]],
         op = op
       )
@@ -46,7 +51,7 @@ get_ra_tree <- function(tree_no, model){
       if(is.factor(prediction)) prediction <- as.character(prediction)
       list(
         prediction = prediction,
-        path = get_ra_path(.x, tree)
+        path = get_ra_path(.x, tree, TRUE)
       )
     } 
   )  
