@@ -13,7 +13,6 @@
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
-#' @importFrom partykit nodeapply
 #' @keywords internal
 #'
 "_PACKAGE"

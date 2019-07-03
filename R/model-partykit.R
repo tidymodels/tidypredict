@@ -4,7 +4,7 @@ partykit_tree_info <- function(model) {
   # non-cat model
   mean_resp <- map_dbl(model_nodes, ~ mean(.x$fitted[, "(response)"]  ))
   prediction <- ifelse(!is_split, mean_resp, NA)
-  party_nodes <- map(seq_along(model), ~nodeapply(model, .x))
+  party_nodes <- map(seq_along(model), ~partykit::nodeapply(model, .x))
   kids <- map(party_nodes, ~{
     if(length(.x[[1]]$kids)) {
       map(.x[[1]]$kids, ~.x$id)
