@@ -21,7 +21,7 @@ parse_model.cubist <- function(model) {
               type = "conditional",
               col = .x$variable,
               val = .x$value,
-              op = ifelse(.x$dir == ">", "over", "under")
+              op = ifelse(.x$dir == ">", "more-equal", "less")
             )
           )
           cc_names <- names(cc)
