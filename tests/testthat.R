@@ -6,5 +6,6 @@ library(dplyr)
 library(Cubist)
 library(mlbench)
 library(rlang)
+library(partykit)
 
 test_check("tidypredict")
