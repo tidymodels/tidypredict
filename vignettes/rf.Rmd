@@ -1,0 +1,62 @@
+---
+title: "Random Forest"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{rf}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(dplyr)
+library(tidypredict)
+library(randomForest)
+set.seed(100)
+```
+
+## Highlights & Limitations
+
+- Uses the `randomForest::getTree()` to parse each decision path.
+- In-line functions in the formulas are **not supported**:  
+     - OK - `wt ~ mpg + am` 
+     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
+     - Not OK - `wt ~ mpg + as.factor(am)`
+     - Not OK - `wt ~ mpg + as.character(am)`
+- Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
+   
+
+## How it works
+
+Here is a simple `randomForest()` model using the `iris` dataset:
+```{r}
+library(dplyr)
+library(tidypredict)
+library(randomForest)
+
+model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+```
+
+## Under the hood
+
+The parser is based on the output from the `randomForest::getTree()` function.  It will return as many decision paths as there are non-NA rows in the `prediction` field.
+```{r}
+getTree(model, labelVar = TRUE) %>%
+  head()
+```
+
+
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  The entire decision tree becomes one `dplyr::case_when()` statement
+```{r}
+tidypredict_fit(model)[1]
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+  - Use directly inside `dplyr`,  `mutate(iris, !! tidypredict_fit(model))`
+  - Use `tidypredict_to_column(model)` to a piped command set
+  - Use `tidypredict_to_sql(model)` to retrieve the SQL statement

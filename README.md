@@ -23,8 +23,21 @@ The following models are supported by `tidypredict`:
   - Random Forest models - `randomForest::randomForest()`
   - Random Forest models, via `ranger` - `ranger::ranger()`
   - MARS models - `earth::earth()`
-  - XGBoost models - `xgboost::xgb.Booster.complete()`
-  - Cubist models - `Cubist::cubist()`
+  - XGBoost models - `xgboost::xgb.Booster.complete()` \[In development
+    version\]
+  - Cubist models - `Cubist::cubist()` \[In development version\]
+  - Tree models, via `partykit` - `partykit::ctree()` \[In development
+    version\]
+
+It supports models fitted via `parsnip`. The ones confirmed currently
+work in `tidypredict` are:
+
+  - `lm()` - `parsnip`: `linear_reg()` with *“lm”* as the engine.
+  - `randomForest::randomForest()` - `parsnip`: `rand_forest()` with
+    *“randomForest”* as the engine.
+  - `ranger` - `ranger::ranger()` - `parsnip`: `rand_forest()` with
+    *“ranger”* as the engine.
+  - `earth::earth()` - `parsnip`: `mars()` with *“earth”* as the engine.
 
 ## Installation
 

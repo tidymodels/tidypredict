@@ -38,3 +38,4 @@ URL: https://tidymodels.github.io/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
 RoxygenNote: 6.1.1
 Encoding: UTF-8
+VignetteBuilder: knitr

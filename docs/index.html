@@ -15,7 +15,7 @@
     It works with several databases back-ends because it leverages 'dplyr'
     and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
     supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
-    and cubist() models. ">
+    cubist(), and ctree() models. ">
 <meta property="og:image" content="/logo.png">
 <meta name="twitter:card" content="summary">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -36,7 +36,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">tidypredict</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9001</span>
       </span>
     </div>
 
@@ -50,6 +50,27 @@
 </li>
 <li>
   <a href="reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+<li>
+      <a href="articles/glm.html">Generalized Linear Regression</a>
+    </li>
+    <li>
+      <a href="articles/lm.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="articles/rf.html">Random Forest</a>
+    </li>
+    <li>
+      <a href="articles/sql.html">Database write-back</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="news/index.html">Changelog</a>
@@ -92,10 +113,20 @@
 </li>
 <li>MARS models - <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code>
 </li>
-<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code>
-</li>
-<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code>
-</li>
+<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code> [In development version]</li>
+<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code> [In development version]</li>
+<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code> [In development version]</li>
+</ul>
+<p>It supports models fitted via <code>parsnip</code>. The ones confirmed currently work in <code>tidypredict</code> are:</p>
+<ul>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> with <em>“lm”</em> as the engine.</li>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/randomForest/topics/randomForest">randomForest::randomForest()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“randomForest”</em> as the engine.</li>
+<li>
+<code>ranger</code> - <code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
+<li>
+<code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
 </ul>
 </div>
 <div id="installation" class="section level2">

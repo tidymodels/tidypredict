@@ -63,7 +63,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">tidypredict</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9001</span>
       </span>
     </div>
 
@@ -77,6 +77,27 @@
 </li>
 <li>
   <a href="../reference/index.html">Reference</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="../articles/glm.html">Generalized Linear Regression</a>
+    </li>
+    <li>
+      <a href="../articles/lm.html">Linear Regression</a>
+    </li>
+    <li>
+      <a href="../articles/rf.html">Random Forest</a>
+    </li>
+    <li>
+      <a href="../articles/sql.html">Database write-back</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="../news/index.html">Changelog</a>
@@ -101,6 +122,21 @@
       
     </div>
 
+    <div id="tidypredict-0-3-0-9001" class="section level1">
+<h1 class="page-header">
+<a href="#tidypredict-0-3-0-9001" class="anchor"></a>tidypredict 0.3.0.9001<small> Unreleased </small>
+</h1>
+<div id="new-features" class="section level2">
+<h2 class="hasAnchor">
+<a href="#new-features" class="anchor"></a>New features</h2>
+<ul>
+<li><p>Adds initial support for <code>partykit</code>’s <code>ctree()</code> model</p></li>
+<li><p>Adds support for <code>parsnip</code> fitted models: <code>lm</code>, <code>randomForest</code>, <code>ranger</code>, and <code>earth</code></p></li>
+<li><p>Adds support for xgb.Booster models provided by the <code>xgboost</code> package (<a href='https://github.com/Athospd'>@Athospd</a>, #43)</p></li>
+<li><p>Adds support for <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code> models (# 36)</p></li>
+</ul>
+</div>
+</div>
     <div id="tidypredict-0-3-0" class="section level1">
 <h1 class="page-header">
 <a href="#tidypredict-0-3-0" class="anchor"></a>tidypredict 0.3.0<small> 2019-01-10 </small>
@@ -169,6 +205,7 @@
     <div id="tocnav">
       <h2>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
+        <li><a href="#tidypredict-0-3-0-9001">0.3.0.9001</a></li>
         <li><a href="#tidypredict-0-3-0">0.3.0</a></li>
         <li><a href="#tidypredict-0-2-1">0.2.1</a></li>
         <li><a href="#tidypredict-0-2-0">0.2.0</a></li>

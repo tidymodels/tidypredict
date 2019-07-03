@@ -1,4 +1,4 @@
-# tidypredict (development version)
+# tidypredict 0.3.0.9001
 
 ## New features
 
