@@ -93,11 +93,52 @@
     
 <div id="tidypredict" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#tidypredict" class="anchor"></a>tidypredict <img src="reference/figures/logo.png" align="right" width="120px">
+<a href="#tidypredict" class="anchor"></a>tidypredict <img src="reference/figures/logo.png" align="right" width="240px">
 </h1></div>
 
-<p>Run predictions inside the database. <code>tidypredict</code> parses a fitted R model object, and returns a formula in ‘Tidy Eval’ code that calculates the predictions.</p>
-<p><strong>It works with several databases back-ends</strong> because it uses <code>dplyr</code> and <code>dbplyr</code> for the final SQL translation of the algorithm.</p>
+<p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
+<p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Because it uses <code>dplyr</code>’s database interface, it works with several databases back-ends, such as MS SQL:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a></code></pre></div>
+<pre><code>## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</code></pre>
+<div id="installation" class="section level2">
+<h2 class="hasAnchor">
+<a href="#installation" class="anchor"></a>Installation</h2>
+<p>Install <code>tidypredict</code> from CRAN using:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tidypredict"</span>)</a></code></pre></div>
+<p>Or install the <strong>development version</strong> using <code>devtools</code> as follows:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"tidymodels/tidypredict"</span>)</a></code></pre></div>
+</div>
+<div id="how-it-works" class="section level2">
+<h2 class="hasAnchor">
+<a href="#how-it-works" class="anchor"></a>How it works</h2>
+<p><img src="reference/figures/howitworks.png"></p>
+<p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. That formula can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
+<ol style="list-style-type: decimal">
+<li>Fit the model using a base R model, or one from the packages listed in <a href="#supported-models">Supported Models</a>
+</li>
+<li>
+<code>tidypredict</code> reads model, and creates a list object with the necessary components to run predictions</li>
+<li>
+<code>tidypredict</code> builds an R formula based on the list object</li>
+<li>
+<code>dplyr</code> evaluates the formula created by <code>tidypredict</code>
+</li>
+<li>
+<code>dplyr</code> translates the formula into a SQL statement, or any other interfaces.</li>
+<li>The database executes the SQL statement(s) created by <code>dplyr</code>
+</li>
+</ol>
+<div id="parsed-model-spec" class="section level3">
+<h3 class="hasAnchor">
+<a href="#parsed-model-spec" class="anchor"></a>Parsed model spec</h3>
+<p><code>tidypredict</code> writes and reads a spec based on a model. Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
+<ol style="list-style-type: decimal">
+<li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a Shiny app.</li>
+<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>.</li>
+</ol>
+</div>
+</div>
 <div id="supported-models" class="section level2">
 <h2 class="hasAnchor">
 <a href="#supported-models" class="anchor"></a>Supported models</h2>
@@ -113,38 +154,29 @@
 </li>
 <li>MARS models - <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code>
 </li>
-<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code> [In development version]</li>
-<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code> [In development version]</li>
-<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code> [In development version]</li>
+<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code> <strong>[In development version]</strong>
+</li>
+<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code> <strong>[In development version]</strong>
+</li>
+<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code> <strong>[In development version]</strong>
+</li>
 </ul>
-<p>It supports models fitted via <code>parsnip</code>. The ones confirmed currently work in <code>tidypredict</code> are:</p>
+<div id="parsnip-in-development-version" class="section level3">
+<h3 class="hasAnchor">
+<a href="#parsnip-in-development-version" class="anchor"></a><code>parsnip</code> <strong>[In development version]</strong>
+</h3>
+<p><code>tidypredict</code> supports models fitted via the <code>parsnip</code> interface. The ones confirmed currently work in <code>tidypredict</code> are:</p>
 <ul>
 <li>
 <code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> with <em>“lm”</em> as the engine.</li>
 <li>
 <code><a href="https://www.rdocumentation.org/packages/randomForest/topics/randomForest">randomForest::randomForest()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“randomForest”</em> as the engine.</li>
 <li>
-<code>ranger</code> - <code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
+<code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
 <li>
 <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
 </ul>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
-<p>Install <code>tidypredict</code> from CRAN using:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tidypredict"</span>)</a></code></pre></div>
-<p>Or install the development version using <code>devtools</code> as follows:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"tidymodels/tidypredict"</span>)</a></code></pre></div>
-</div>
-<div id="intro" class="section level2">
-<h2 class="hasAnchor">
-<a href="#intro" class="anchor"></a>Intro</h2>
-<p><code>tidypredict</code> is able to parse an R model object, such as:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
-<p>And then creates the SQL statement needed to calculate the fitted prediction:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</code></pre>
 </div>
 </div>
   </div>
