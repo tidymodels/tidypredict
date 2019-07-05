@@ -1,8 +1,8 @@
 ---
-title: "Random Forest"
+title: "Random Forest, using Ranger"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rf}
+  %\VignetteIndexEntry{ranger}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -15,14 +15,14 @@ knitr::opts_chunk$set(
 
 library(dplyr)
 library(tidypredict)
-library(randomForest)
 library(tidymodels)
+library(ranger)
 set.seed(100)
 ```
 
 ## Highlights & Limitations
 
-- Uses the `randomForest::getTree()` to parse each decision path.
+- Uses the `ranger::getTree()` to parse each decision path.
 - In-line functions in the formulas are **not supported**:  
      - OK - `wt ~ mpg + am` 
      - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
@@ -33,20 +33,20 @@ set.seed(100)
 
 ## How it works
 
-Here is a simple `randomForest()` model using the `iris` dataset:
+Here is a simple `ranger()` model using the `iris` dataset:
 ```{r}
 library(dplyr)
 library(tidypredict)
-library(randomForest)
+library(ranger)
 
-model <- randomForest(Species ~ .,data = iris ,ntree = 100, proximity = TRUE)
+model <- ranger(Species ~ .,data = iris, num.trees =  100)
 ```
 
 ## Under the hood
 
-The parser is based on the output from the `randomForest::getTree()` function.  It will return as many decision paths as there are non-NA rows in the `prediction` field.
+The parser is based on the output from the `ranger::treeInfo()` function.  It will return as many decision paths as there are non-NA rows in the `prediction` field.
 ```{r}
-getTree(model, labelVar = TRUE) %>%
+treeInfo(model) %>%
   head()
 ```
 
@@ -65,13 +65,13 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 
 ## parsnip
 
-`tidypredict` also supports `randomForest` model objects fitted via the `parsnip` package.
+`tidypredict` also supports `ranger` model objects fitted via the `parsnip` package.
 
 ```{r}
 library(tidymodels)
 
 parsnip_model <- rand_forest() %>%
-  set_engine("randomForest") %>%
+  set_engine("ranger") %>%
   fit(Species ~ ., data = iris)
 
 tidypredict_fit(parsnip_model)[[1]]
