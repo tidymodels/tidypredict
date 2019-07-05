@@ -70,7 +70,8 @@ formula adds the following capabilities:
 1.  No more saving models as `.rds` - Specifically for cases when the
     model needs to be used for predictions in a Shiny app.
 2.  Beyond R models - Technically, anything that can write a proper
-    spec, can be read into `tidypredict`.
+    spec, can be read into `tidypredict`. It also means, that the parsed
+    model spec can become a good alternative to using *PMML.*
 
 ## Supported models
 

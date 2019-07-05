@@ -68,6 +68,9 @@
       <a href="articles/rf.html">Random Forest</a>
     </li>
     <li>
+      <a href="articles/save.html">Save and re-load models</a>
+    </li>
+    <li>
       <a href="articles/sql.html">Database write-back</a>
     </li>
   </ul>
@@ -135,7 +138,8 @@
 <p><code>tidypredict</code> writes and reads a spec based on a model. Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
 <ol style="list-style-type: decimal">
 <li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a Shiny app.</li>
-<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>.</li>
+<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means, that the parsed model spec can become a good alternative to using <em>PMML.</em>
+</li>
 </ol>
 </div>
 </div>

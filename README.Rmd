@@ -58,7 +58,7 @@ Instead of translating directly to a SQL statement, `tidypredict` creates an R f
 `tidypredict` writes and reads a spec based on a model.  Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:
 
 1. No more saving models as `.rds` - Specifically for cases when the model needs to be used for predictions in a Shiny app.
-1. Beyond R models - Technically, anything that can write a proper spec, can be read into `tidypredict`.
+1. Beyond R models - Technically, anything that can write a proper spec, can be read into `tidypredict`. It also means, that the parsed model spec can become a good alternative to using *PMML.*
 
 ## Supported models
 
