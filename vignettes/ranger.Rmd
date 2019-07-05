@@ -15,21 +15,10 @@ knitr::opts_chunk$set(
 
 library(dplyr)
 library(tidypredict)
-library(tidymodels)
+library(parsnip)
 library(ranger)
 set.seed(100)
 ```
-
-## Highlights & Limitations
-
-- Uses the `ranger::getTree()` to parse each decision path.
-- In-line functions in the formulas are **not supported**:  
-     - OK - `wt ~ mpg + am` 
-     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
-     - Not OK - `wt ~ mpg + as.factor(am)`
-     - Not OK - `wt ~ mpg + as.character(am)`
-- Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
-   
 
 ## How it works
 
@@ -68,7 +57,7 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 `tidypredict` also supports `ranger` model objects fitted via the `parsnip` package.
 
 ```{r}
-library(tidymodels)
+library(parsnip)
 
 parsnip_model <- rand_forest() %>%
   set_engine("ranger") %>%

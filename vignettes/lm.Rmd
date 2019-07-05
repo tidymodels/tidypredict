@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 
 library(dplyr)
 library(tidypredict)
-library(tidymodels)
+library(parsnip)
 ```
 
 ## Highlights & Limitations
@@ -120,7 +120,7 @@ tidypredict_test(model, include_intervals = TRUE)
 `tidypredict` also supports `lm()` model objects fitted via the `parsnip` package.
 
 ```{r}
-library(tidymodels)
+library(parsnip)
 
 parsnip_model <- linear_reg() %>%
   set_engine("lm") %>%

@@ -31,10 +31,9 @@ Suggests:
     xgboost,
     Cubist,
     mlbench,
-    parsnip,
     partykit,
-    yaml, 
-    tidymodels
+    yaml,
+    parsnip
 License: GPL-3
 URL: https://tidymodels.github.io/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
