@@ -65,7 +65,8 @@ df %>%
 The parser reads several parts of the `glm` object to tabulate all of the needed variables.  One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model.  For example, `offset` is listed because it's part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.
 
 ```{r}
-parse_model(model)
+pm <- parse_model(model)
+str(pm, 2)
 ```
 
 The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.

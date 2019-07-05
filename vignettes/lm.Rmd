@@ -15,6 +15,7 @@ knitr::opts_chunk$set(
 
 library(dplyr)
 library(tidypredict)
+library(tidymodels)
 ```
 
 ## Highlights & Limitations
@@ -39,6 +40,7 @@ library(tidypredict)
 df <- mtcars %>%
   mutate(char_cyl = paste0("cyl", cyl)) %>%
   select(mpg, wt, char_cyl, am) 
+
 model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
 ```
 
@@ -77,7 +79,8 @@ The parser reads several parts of the `lm` object to tabulate all of the needed 
 Other variables are added at the end. Some variables are not required for every parsed model.  For example, `offset` is listed because it's part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.
 
 ```{r}
-parse_model(model)
+pm <- parse_model(model)
+str(pm, 2)
 ```
 
 The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.
@@ -98,9 +101,7 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 
 The same applies to the prediction interval functions.
 
-
 ## How it performs
-
 
 Testing the `tidypredict` results is easy.  The `tidypredict_test()` function automatically uses the `lm` model object's data frame, to compare `tidypredict_fit()`, and `tidypredict_interval()` to the results given by `predict()`
 
@@ -113,3 +114,18 @@ To run with prediction intervals set the `include_intervals` argument to `TRUE`
 ```{r}
 tidypredict_test(model, include_intervals = TRUE)
 ```
+
+## parsnip
+
+`tidypredict` also supports `lm()` model objects fitted via the `parsnip` package.
+
+```{r}
+library(tidymodels)
+
+parsnip_model <- linear_reg() %>%
+  set_engine("lm") %>%
+  fit(mpg ~ wt + cyl, offset = am, data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```
+
