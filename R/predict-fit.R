@@ -18,12 +18,10 @@ tidypredict_fit <- function(model) {
 # parsed models --------------------------------
 #' @export
 tidypredict_fit.list <- function(model) {
-  mt <- model$general$model
+  mt <- model$general$type
   fit <- NULL
-  if(mt == "lm" | mt == "glm" | mt == "earth") 
-    fit <- build_fit_formula(model)
-  if(mt == "randomForest" | mt == "ranger") 
-    fit <- build_fit_formula_rf(model)
+  if(mt == "regression") fit <- build_fit_formula(model)
+  if(mt == "tree") fit <- build_fit_formula_rf(model)
   if(is.null(fit)) stop("Model type not supported")
   fit
 }

@@ -30,3 +30,11 @@ test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm_parsnip(mpg ~ (wt + disp) * cyl, data = df)))
 })
 
+context("lm-saved")
+test_that("Model can be saved and re-loaded", {
+  model <- lm(mpg ~ (wt + disp) * cyl, data = df)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  l <- yaml::read_yaml(mp)
+  expect_silent(tidypredict_fit(l))
+})

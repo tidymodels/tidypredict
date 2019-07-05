@@ -7,5 +7,6 @@ library(Cubist)
 library(mlbench)
 library(rlang)
 library(partykit)
+library(yaml)
 
 test_check("tidypredict")

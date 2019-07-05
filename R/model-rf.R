@@ -60,6 +60,7 @@ parse_model.randomForest <- function(model) {
   classes <- attr(model$terms, "dataClasses")
   pm <- list()
   pm$general$model <- "randomForest"
+  pm$general$type <- "tree"
   pm$general$version <- 2
   pm$trees <- get_rf_trees(model)
   pm
@@ -71,9 +72,9 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
   cl <- map(
     path,
     ~ {
+      if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
       if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
       if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
-      if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
       if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
       i
     }

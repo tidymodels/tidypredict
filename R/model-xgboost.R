@@ -16,11 +16,11 @@ get_xgb_path <- function(row_id, tree){
     ~ {
       rb <- tree[.y, ]
       if(rb["Yes"] %in% .x) {
-        op <- "under"
+        op <- "more-equal"
         missing <- rb["Missing"] %in% rb["Yes"]
       }
       if(rb["No"]  %in% .x)  {
-        op <- "over"
+        op <- "less"
         missing <- rb["Missing"] %in% rb["No"]
       }
       list(
@@ -79,10 +79,16 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
 
 #' @export
 parse_model.xgb.Booster <- function(model) {
+  
+  params <- model$params
+  wosilent <- params[names(params) != "silent"]
+  wosilent$silent <- params$silent
+  
   pm <- list()
   pm$general$model <- "xgb.Booster"
+  pm$general$type <- "tree"
   pm$general$niter <- model$niter
-  pm$general$params <- model$params
+  pm$general$params <- wosilent
   pm$general$feature_names <- model$feature_names
   pm$general$nfeatures <- model$nfeatures
   pm$general$version <- 1
@@ -96,10 +102,10 @@ get_xgb_case <- function(path, prediction){
   cl <- map(
     path, 
     ~{
-      if(.x$op == "over"  & .x$missing)  i <- expr((!! sym(.x$col) >= !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
-      if(.x$op == "under" & .x$missing)  i <- expr((!! sym(.x$col) <  !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
-      if(.x$op == "over"  & !.x$missing)  i <- expr(!! sym(.x$col) >= !! as.numeric(.x$val))
-      if(.x$op == "under" & !.x$missing) i <- expr(!! sym(.x$col) <  !! as.numeric(.x$val))
+      if(.x$op == "less"  & .x$missing)  i <- expr((!! sym(.x$col) >= !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
+      if(.x$op == "more-equal" & .x$missing)  i <- expr((!! sym(.x$col) <  !! as.numeric(.x$val) | is.na(!! sym(.x$col))))
+      if(.x$op == "less"  & !.x$missing)  i <- expr(!! sym(.x$col) >= !! as.numeric(.x$val))
+      if(.x$op == "more-equal" & !.x$missing) i <- expr(!! sym(.x$col) <  !! as.numeric(.x$val))
       i
     }
   )

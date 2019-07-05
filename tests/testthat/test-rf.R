@@ -31,3 +31,12 @@ parsnip::fit(
     Species ~ ., data = iris
   )
 )
+
+context("randomForest-saved")
+test_that("Model can be saved and re-loaded", {
+  model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)  
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  l <- yaml::read_yaml(mp)
+  expect_silent(tidypredict_fit(l))
+})

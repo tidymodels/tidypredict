@@ -153,3 +153,14 @@ test_that("Tests with parsnip returns no alert", {
     )$alert
   )
 })
+
+context("earth/MARS-saved")
+test_that("Model can be saved and re-loaded", {
+  model <- earth::earth(survived ~ .,
+                 data = etitanic,
+                 glm = list(family = binomial), degree = 2)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  l <- yaml::read_yaml(mp)
+  expect_silent(tidypredict_fit(l))
+})

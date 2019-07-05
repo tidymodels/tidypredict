@@ -19,4 +19,11 @@ test_that("Intervals return a call", {
     )
 })
 
-
+context("glm-saved")
+test_that("Model can be saved and re-loaded", {
+  model <- glm(am ~ wt + disp + cyl, data = df, family = "binomial")
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  l <- yaml::read_yaml(mp)
+  expect_silent(tidypredict_fit(l))
+})

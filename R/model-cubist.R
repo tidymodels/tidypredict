@@ -58,6 +58,7 @@ parse_model.cubist <- function(model) {
   list(
     general = list(
       model = "cubist",
+      type = "tree",
       version = 2,
       mode = "ifelse",
       divisor = model$committees

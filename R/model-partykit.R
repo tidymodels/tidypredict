@@ -47,6 +47,7 @@ parse_model.party <- function(model){
   classes <- attr(model$terms, "dataClasses")
   pm <- list()
   pm$general$model <- "party"
+  pm$general$type <- "tree"
   pm$general$version <- 2
   pm$trees <- list(get_pk_tree(model))
   pm
