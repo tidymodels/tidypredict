@@ -1,0 +1,30 @@
+Level_1,Level_2,Level_3,Level_4,Level_5,Level_6,Description,Required,Example
+general,,,,,,Top level for general info about the model,Yes,
+,model,,,,,Name of the package,Yes,ranger
+,version,,,,,Use: 2 ,Yes,2
+,type,,,,,Use: tree,Yes,tree
+,mode,,,,,Only for Cubist,,ifelse
+,divisor,,,,,"Only for Cubist, divide the entire formula by",,3
+,is_glm,,,,,"Boolean, to identify a glm model (MARS models)",Yes,0
+trees,,,,,,Top level for trees  ,Yes,
+,[tree #],,,,,"Index tree number, one per tree",Yes,
+,,[branch #],,,,"Index branch number, one per branch",Yes,
+,,,prediction,,,Estimate value,Yes,versicolor
+,,,path,,,Top level indicating a path,Yes,
+,,,,[[path #]],,Index path number,Yes,
+,,,,,type,"Type of field, use: 'conditional', and 'ordinary' for intercept   ",Yes,conditional
+,,,,,col,Column name  ,Yes,Petal.Length
+,,,,,val,Value of the entry,Yes,2.45
+,,,,,op,Operator for formula ,Yes,equal
+,,,,,is_intercept,Only for Cubist,,0
+terms,,,,,,Top level for terms  ,MARS only,
+,[index],,,,,"Index number, one entry per term  ",MARS only,[[3]]
+,,label,,,,Name of the field to be used  ,MARS only,char_cyl6
+,,coef,,,,Coefficient value  ,MARS only,-4.26
+,,is_intercept,,,,"Boolean, indicates if it is intercept  ",MARS only,0
+,,fields,,,,Top level for fields impacted by term  ,MARS only,
+,,,[index],,,"Index number, one entry per field  ",MARS only,[[1]]
+,,,,type,,"Type of field, use: 'conditional', and 'ordinary' for intercept   ",MARS only,conditional
+,,,,col,,Column name  ,MARS only,char_cyl
+,,,,val,,Value of the entry,MARS only,cyl6
+,,,,op,,"Operation, use: equal",MARS only,equal

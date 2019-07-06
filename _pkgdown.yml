@@ -1,0 +1,43 @@
+template:
+  package: tidytemplate
+  params:
+    part_of: <a href="https://github.com/tidymodels">tidymodels</a>
+    footer: <code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.
+figures:
+  fig.width: 8
+  fig.height: 5.75
+navbar:
+  left:
+  - text: Model list
+    menu:
+    - text: Linear Regression - lm()
+      href: articles/lm.html 
+    - text: General Regression - glm()
+      href: articles/glm.html
+    - text: Random Forest - Ranger - ranger()
+      href: articles/ranger.html
+    - text: Random Forest - randomForest()
+      href: articles/rf.html
+    - text: MARS - earth()
+      href: articles/earth.html
+    - text: Cubist - cubist()
+      href: articles/earth.html
+    - text: XGboost - xgb.Booster.complete()
+      href: articles/xgboost.html
+  - text: Articles  
+    menu:
+    - text: DB Writeback
+      href: articles/sql.html
+    - text: -------      
+    - text: Save/Reload
+      href: articles/save.html
+    - text: -------            
+    - text: Regression spec
+      href: articles/regression.html
+    - text: Tree model spec
+      href: articles/tree.html
+  - text: News
+    href: news/index.html           
+  - text: Reference
+    href: reference/index.html
+
