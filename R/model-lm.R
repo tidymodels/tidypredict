@@ -30,7 +30,6 @@ build_fit_formula <- function(parsedmodel) {
                 f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
               if(.x$op == "lessthan") 
                 f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
-              
             }
             f
           }

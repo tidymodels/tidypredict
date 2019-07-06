@@ -1,0 +1,24 @@
+Level_1,Level_2,Level_3,Level_4,Level_5,Description,Required,Example
+general,,,,,Top level for general info about the model,Yes,
+,model,,,,Model type lm or glm ,Yes,lm
+,version,,,,Use: 2 ,Yes,2
+,type,,,,Use:regression ,Yes,regression
+,residual,,,,Model residual *(If providing intervals)*,,28
+,sigma2,,,,Sigma squared *(If providing intervals)*,,6.63
+,family,,,,Family *(glm only)*,,
+,link,,,,Link *(glm only)*,,
+,offset,,,,Offset,,am
+,is_glm,,,,"Boolean, to identify a glm model ",Yes,0
+terms,,,,,Top level for terms  ,Yes,
+,[index],,,,"Index number, one entry per term  ",Yes,[[3]]
+,,label,,,Name of the field to be used  ,Yes,char_cyl6
+,,coef,,,Coefficient value  ,Yes,-4.26
+,,is_intercept,,,"Boolean, indicates if it is intercept  ",Yes,0
+,,fields,,,Top level for fields impacted by term  ,Yes,
+,,,[index],,"Index number, one entry per field  ",Yes,[[1]]
+,,,,type,"Type of field, use: 'conditional', and 'ordinary' for intercept   ",Yes,conditional
+,,,,col,Column name  ,Yes,char_cyl
+,,,,val,Value of the entry,,cyl6
+,,,,op,"Operation, use: equal",,equal
+,,qr,,,Top level for QR decomposition *(If providing intervals)*,,
+,,,qr_[n],,"[n] for index, and expects the QR result",,0.4

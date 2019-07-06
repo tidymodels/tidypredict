@@ -1,5 +1,5 @@
 
-# tidypredict <img src="man/figures/logo.png" align="right" width = "240px"/>
+# tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![Build
 Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)

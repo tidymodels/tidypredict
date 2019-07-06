@@ -4,6 +4,8 @@ pkgdown_sha: ~
 articles:
   glm: glm.html
   lm: lm.html
+  ranger: ranger.html
+  regression: regression.html
   rf: rf.html
   save: save.html
   sql: sql.html

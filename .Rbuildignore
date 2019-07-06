@@ -12,6 +12,7 @@ travis.yml
 ^themes$
 ^static$
 ^tools$
+^pkgdown$
 ^vignettes-backup$
 ^layouts$
 config.toml
