@@ -12,14 +12,14 @@ navbar:
     menu:
     - text: Linear Regression - lm()
       href: articles/lm.html 
-    - text: General Regression - glm()
+    - text: Generalized Regression - glm()
       href: articles/glm.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()
       href: articles/rf.html
     - text: MARS - earth()
-      href: articles/earth.html
+      href: articles/mars.html
     - text: Cubist - cubist()
       href: articles/earth.html
     - text: XGboost - xgb.Booster.complete()
