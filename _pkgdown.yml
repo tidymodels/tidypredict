@@ -21,7 +21,7 @@ navbar:
     - text: MARS - earth()
       href: articles/mars.html
     - text: Cubist - cubist()
-      href: articles/earth.html
+      href: articles/cubist.html
     - text: XGboost - xgb.Booster.complete()
       href: articles/xgboost.html
   - text: Articles  

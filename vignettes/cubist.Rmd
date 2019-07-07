@@ -1,8 +1,8 @@
 ---
-title: "MARS models via the `earth` package"
+title: "Cubist models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{mars}
+  %\VignetteIndexEntry{cubist}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(tidypredict)
-library(earth)
+library(Cubist)
 library(dplyr)
 ```
 
@@ -24,16 +24,16 @@ library(dplyr)
 |`tidypredict_to_column()`                                      |  ✔  |
 |`tidypredict_test()`                                           |  ✔  |
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
-|`parsnip`                                                      |  ✔  |
+|`parsnip`                                                      |  ✗  |
 
 
 ## `tidypredict_` functions
 
 ```{r}
-library(earth)
-data("etitanic", package = "earth")
+library(Cubist)
+data("BostonHousing", package =  "mlbench")
 
-model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
+model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
 ```
 
 - Create the R formula
@@ -50,44 +50,15 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
     ```{r}
     library(dplyr)
     
-    etitanic %>%
+    BostonHousing %>%
       tidypredict_to_column(model) %>%
       glimpse()
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results
     ```{r}
-    tidypredict_test(model, etitanic)
+    tidypredict_test(model, BostonHousing)
     ```
-
-## GLM models
-
-`tidypredict` supports the `glm` argument as well:
-```{r}
-model <- earth(survived ~ .,
-               data = etitanic,
-               glm = list(family = binomial), degree = 2)
-
-tidypredict_fit(model)
-```
-
-The spec sets the `is_glm` entry to 1, as well as the `family` and `link` entries. 
-```{r}
-str(parse_model(model), 2)
-```
-
-## parsnip
-
-`parsnip` fitted models are also supported by `tidypredict`:
-```{r}
-library(parsnip)
-
-p_model <- mars(prod_degree = 3) %>%
-  set_engine("earth") %>%
-  fit(age ~ sibsp + parch, data = etitanic)
-
-tidypredict_fit(p_model)
-```
 
 ## Parse model spec
 
