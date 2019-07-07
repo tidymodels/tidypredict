@@ -2,7 +2,7 @@
 title: "XGBoost models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{cubist}
+  %\VignetteIndexEntry{xgboost}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
