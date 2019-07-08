@@ -17,10 +17,10 @@ context("lm-parsnip")
 
 lm_parsnip <- function(...) {
   parsnip::fit(
-    parsnip::set_engine(parsnip::linear_reg(), "lm"), 
+    parsnip::set_engine(parsnip::linear_reg(), "lm"),
     ...
   )
-} 
+}
 
 test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm_parsnip(mpg ~ wt, offset = am, data = df)))

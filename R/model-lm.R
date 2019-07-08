@@ -21,15 +21,19 @@ build_fit_formula <- function(parsedmodel) {
           .x$fields,
           ~ {
             f <- NULL
-            if (.x$type == "ordinary") 
+            if (.x$type == "ordinary") {
               f <- expr(!!sym(.x$col))
-            if (.x$type == "conditional") 
+            }
+            if (.x$type == "conditional") {
               f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
+            }
             if (.x$type == "operation") {
-              if(.x$op == "morethan") 
+              if (.x$op == "morethan") {
                 f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
-              if(.x$op == "lessthan") 
+              }
+              if (.x$op == "lessthan") {
                 f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
+              }
             }
             f
           }
@@ -42,9 +46,10 @@ build_fit_formula <- function(parsedmodel) {
     }
   )
   f <- reduce(parsed_f, function(l, r) expr(!!l + !!r))
-  
-  if(!is.null(parsedmodel$general$offset)) 
-    f <- expr(!! f + !! parsedmodel$general$offset)
+
+  if (!is.null(parsedmodel$general$offset)) {
+    f <- expr(!!f + !!parsedmodel$general$offset)
+  }
 
   if (parsedmodel$general$is_glm == 1) {
     link <- parsedmodel$general$link
@@ -166,54 +171,57 @@ tidypredict_interval.glm <- function(model, interval = 0.95) {
   te_interval_glm(parsedmodel, interval)
 }
 
-get_qr_lm <- function(qr_name, parsedmodel){
+get_qr_lm <- function(qr_name, parsedmodel) {
   q <- map(
     parsedmodel$terms,
     ~ {
       cqr <- .x$qr[qr_name][[1]]
-      
+
       if (.x$is_intercept == 0) {
         cols <- map(
           .x$fields,
           ~ {
             f <- NULL
-            if (.x$type == "ordinary") 
+            if (.x$type == "ordinary") {
               f <- expr(!!sym(.x$col))
-            if (.x$type == "conditional") 
+            }
+            if (.x$type == "conditional") {
               f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
+            }
             if (.x$type == "operation") {
-              if(.x$op == "morethan") 
+              if (.x$op == "morethan") {
                 f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
-              if(.x$op == "lessthan") 
+              }
+              if (.x$op == "lessthan") {
                 f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
-              
+              }
             }
             f
           }
         )
         cols <- reduce(cols, function(l, r) expr(!!l * !!r))
-        if(cqr != 0) expr(!! cols * !! cqr)
+        if (cqr != 0) expr(!!cols * !!cqr)
       } else {
-        expr(!! cqr)  
+        expr(!!cqr)
       }
     }
   )
   f <- reduce(
     q[!map_lgl(q, is.null)],
-    function(x, y) expr(!! x + !! y)
+    function(x, y) expr(!!x + !!y)
   )
-  expr((!! f) * (!! f) * !! parsedmodel$general$sigma2)
+  expr((!!f) * (!!f) * !!parsedmodel$general$sigma2)
 }
 
-te_interval_lm <- function(parsedmodel, interval = 0.95){
+te_interval_lm <- function(parsedmodel, interval = 0.95) {
   qr_names <- names(parsedmodel$terms[[1]]$qr)
   qrs <- map(
     qr_names,
-    ~ get_qr_lm(.x, parsedmodel)  
+    ~ get_qr_lm(.x, parsedmodel)
   )
-  qrs <- reduce(qrs, function(x, y) expr(!! x + (!! y)))
+  qrs <- reduce(qrs, function(x, y) expr(!!x + (!!y)))
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
-  expr(!! tfrac * sqrt((!! qrs) + (!! parsedmodel$general$sigma2)))
+  expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
 }
 
 te_interval_glm <- function(parsedmodel, interval = 0.95) {

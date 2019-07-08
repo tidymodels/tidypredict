@@ -11,7 +11,6 @@
 #'
 #' model <- lm(mpg ~ wt, mtcars)
 #' acceptable_formula(model)
-#'
 #' @export
 acceptable_formula <- function(model) {
   UseMethod("acceptable_formula")

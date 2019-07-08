@@ -6,14 +6,13 @@
 #' functions in the future can also pass parsed tables to a given
 #' formula creating function.
 #'
-#' @param model An R model object. 
+#' @param model An R model object.
 #'
 #' @examples
 #' library(dplyr)
 #' df <- mutate(mtcars, cyl = paste0("cyl", cyl))
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
 #' parse_model(model)
-#'
 #' @export
 parse_model <- function(model) {
   UseMethod("parse_model")

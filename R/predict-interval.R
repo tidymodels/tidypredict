@@ -9,11 +9,10 @@
 #' @param model An R model or a list with a parsed model
 #' @param interval The prediction interval, defaults to 0.95
 #'
-#' @examples 
-#' 
+#' @examples
+#'
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_interval(model)
-#' 
 #' @export
 tidypredict_interval <- function(model, interval = 0.95) {
   UseMethod("tidypredict_interval")
@@ -28,8 +27,8 @@ tidypredict_interval <- function(model, interval = 0.95) {
 tidypredict_interval.list <- function(model, interval = 0.95) {
   mt <- model$general$model
   fit <- NULL
-  if(mt == "lm") fit <- te_interval_lm(model)
-  if(mt == "glm") fit <- te_interval_glm(model)
-  if(is.null(fit)) stop("Model type not supported")
+  if (mt == "lm") fit <- te_interval_lm(model)
+  if (mt == "glm") fit <- te_interval_glm(model)
+  if (is.null(fit)) stop("Model type not supported")
   fit
 }

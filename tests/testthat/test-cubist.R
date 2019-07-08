@@ -1,6 +1,6 @@
 context("cubist")
 set.seed(100)
-data("BostonHousing", package =  "mlbench")
+data("BostonHousing", package = "mlbench")
 model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
 tf <- tidypredict_fit(model)
 pm <- parse_model(model)

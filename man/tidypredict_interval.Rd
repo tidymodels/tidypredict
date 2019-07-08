@@ -23,5 +23,4 @@ subtracted from fit to obtain the lower bound.
 
 model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 tidypredict_interval(model)
-
 }

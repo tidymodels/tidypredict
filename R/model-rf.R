@@ -15,12 +15,12 @@ get_rf_path <- function(row_id, tree, columns, default_op = TRUE) {
     path[2:length(path)],
     ~ {
       rb <- tree[.y, ]
-      if(default_op) {
-        if (rb["left daughter"] == .x) op <-  "less"
+      if (default_op) {
+        if (rb["left daughter"] == .x) op <- "less"
         if (rb["right daughter"] == .x) op <- "more-equal"
       } else {
         if (rb["left daughter"] == .x) op <- "less-equal"
-        if (rb["right daughter"] == .x) op <- "more"    
+        if (rb["right daughter"] == .x) op <- "more"
       }
       list(
         type = "conditional",

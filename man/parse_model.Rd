@@ -21,5 +21,4 @@ library(dplyr)
 df <- mutate(mtcars, cyl = paste0("cyl", cyl))
 model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
 parse_model(model)
-
 }

@@ -24,8 +24,9 @@ run_test(
 context("ranger-parsnip")
 run_test(
   parsnip::fit(
-    parsnip::set_engine(parsnip::rand_forest(trees = 100), "ranger", seed = 100), 
-    Species ~ ., data = iris
+    parsnip::set_engine(parsnip::rand_forest(trees = 100), "ranger", seed = 100),
+    Species ~ .,
+    data = iris
   )
 )
 
@@ -37,4 +38,3 @@ test_that("Model can be saved and re-loaded", {
   l <- yaml::read_yaml(mp)
   expect_silent(tidypredict_fit(l))
 })
-

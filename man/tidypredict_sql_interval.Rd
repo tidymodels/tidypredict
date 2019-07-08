@@ -22,6 +22,5 @@ library(dbplyr)
 
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
 tidypredict_sql_interval(model, simulate_dbi())
-
 }
 \keyword{internal}

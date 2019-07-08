@@ -14,9 +14,9 @@ test_that("Individual prediction difference is never above 1e-12", {
 
 test_that("Intervals return a call", {
   expect_is(
-    tidypredict_interval(glm(am ~ cyl * wt + mpg, data = mtcars, family = "gaussian")), 
+    tidypredict_interval(glm(am ~ cyl * wt + mpg, data = mtcars, family = "gaussian")),
     "call"
-    )
+  )
 })
 
 context("glm-saved")

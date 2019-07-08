@@ -17,5 +17,4 @@ Tidy Eval formula that can then be used inside a dplyr command.
 
 model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 tidypredict_fit(model)
-
 }

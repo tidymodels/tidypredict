@@ -1,5 +1,5 @@
 #' @export
-tidypredict_fit._xgb.Booster<- function(model) {
+tidypredict_fit._xgb.Booster <- function(model) {
   tidypredict_fit(model$fit)
 }
 

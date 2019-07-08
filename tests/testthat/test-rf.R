@@ -1,7 +1,7 @@
 run_tests <- function(model) {
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
-  
+
   test_that("Returns the correct type and dimensions", {
     expect_is(pm, "list")
     expect_equal(length(pm), 2)
@@ -20,21 +20,22 @@ run_tests <- function(model) {
 context("randomForest")
 set.seed(100)
 run_tests(
-  randomForest::randomForest(Species ~ ., data = iris, ntree = 100)  
+  randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
 )
 
 context("randomForest-parsnip")
 set.seed(100)
 run_tests(
-parsnip::fit(
-    parsnip::set_engine(parsnip::rand_forest(trees = 100, mode = "classification"), "randomForest"), 
-    Species ~ ., data = iris
+  parsnip::fit(
+    parsnip::set_engine(parsnip::rand_forest(trees = 100, mode = "classification"), "randomForest"),
+    Species ~ .,
+    data = iris
   )
 )
 
 context("randomForest-saved")
 test_that("Model can be saved and re-loaded", {
-  model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)  
+  model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   l <- yaml::read_yaml(mp)
