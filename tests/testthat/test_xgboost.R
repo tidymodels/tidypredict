@@ -40,6 +40,12 @@ test_that("Confirm SQL function returns a query", {
   )
 })
 
+context("xgboost-parsnip")
+test_that("Predictions are correct for different objectives", {
+  m <- parsnip::fit(parsnip::set_engine(parsnip::boost_tree(), "xgboost"), am ~ ., data = mtcars)
+  expect_false(tidypredict_test(m, df = mtcars)$alert)
+})
+
 context("xgboost-saved")
 test_that("Model can be saved and re-loaded", {
   mp <- tempfile(fileext = ".yml")

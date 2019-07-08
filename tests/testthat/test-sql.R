@@ -10,5 +10,3 @@ test_that("Correct SQL query is returned", {
     "sql"
   )  
 })
-
-

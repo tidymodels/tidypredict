@@ -129,27 +129,38 @@
 
     
     
-<div id="highlights-limitations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#highlights-limitations" class="anchor"></a>Highlights &amp; Limitations</h2>
-<ul>
-<li>Uses the <code><a href="https://www.rdocumentation.org/packages/randomForest/topics/getTree">randomForest::getTree()</a></code> to parse each decision path.</li>
-<li>In-line functions in the formulas are <strong>not supported</strong>:
-<ul>
-<li>OK - <code>wt ~ mpg + am</code>
-</li>
-<li>OK - <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(mtcars, newam = paste0(am))</a></code> and then <code>wt ~ mpg + newam</code>
-</li>
-<li>Not OK - <code>wt ~ mpg + as.factor(am)</code>
-</li>
-<li>Not OK - <code>wt ~ mpg + as.character(am)</code>
-</li>
-</ul>
-</li>
-<li>Interval functions are not supported: <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code> &amp; <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
-</li>
-</ul>
-</div>
+<table class="table">
+<thead><tr class="header">
+<th>Function</th>
+<th>Works</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td>
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>, <code><a href="../reference/parse_model.html">parse_model()</a></code>
+</td>
+<td>✔</td>
+</tr>
+<tr class="even">
+<td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
+<td>✗</td>
+</tr>
+<tr class="odd">
+<td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
+<td>✗</td>
+</tr>
+<tr class="even">
+<td>
+<code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>, <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
+</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
+<td><code>parsnip</code></td>
+<td>✔</td>
+</tr>
+</tbody>
+</table>
 <div id="how-it-works" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
@@ -235,8 +246,7 @@
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
       <ul class="nav nav-pills nav-stacked">
-<li><a href="#highlights-limitations">Highlights &amp; Limitations</a></li>
-      <li><a href="#how-it-works">How it works</a></li>
+<li><a href="#how-it-works">How it works</a></li>
       <li><a href="#under-the-hood">Under the hood</a></li>
       <li><a href="#parsnip">parsnip</a></li>
       </ul>
