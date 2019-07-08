@@ -27,6 +27,7 @@
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
                              include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+  if(is.null(df)) stop("Test data is missing, please pass one via the df argument")
   UseMethod("tidypredict_test")
 }
 

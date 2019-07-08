@@ -26,12 +26,18 @@ test_that("Alert is returned", {
 
 test_that("Error is returned for tree based models", {
   expect_error(
-    tidypredict_test(randomForest::randomForest(Species ~., data = iris)),
+    tidypredict_test(randomForest::randomForest(Species ~., data = iris), df = iris),
     "tidypredict_test does not support"
   )
   expect_error(
-    tidypredict_test(ranger::ranger(Species ~., data = iris)),
+    tidypredict_test(ranger::ranger(Species ~., data = iris), df = iris),
     "tidypredict_test does not support"
   )  
 })
 
+test_that("Expect error message",{
+  expect_error(
+    tidypredict_test(earth::earth(am ~ ., data = mtcars)),
+    "Test data is missing"
+  )
+})
