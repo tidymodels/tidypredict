@@ -147,6 +147,53 @@
 <p>Or install the <strong>development version</strong> using <code>devtools</code> as follows:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"tidymodels/tidypredict"</span>)</a></code></pre></div>
 </div>
+<div id="functions" class="section level2">
+<h2 class="hasAnchor">
+<a href="#functions" class="anchor"></a>Functions</h2>
+<p><code>tidypredict</code> has only a few functions, and it is not expected that number to grow much. The main focus at this time is to add more models to support.</p>
+<table class="table table">
+<colgroup>
+<col width="26%">
+<col width="73%">
+</colgroup>
+<thead><tr class="header">
+<th>Function</th>
+<th>Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td><code><a href="reference/tidypredict_fit.html">tidypredict_fit()</a></code></td>
+<td>Returns an R formula that calculates the prediction</td>
+</tr>
+<tr class="even">
+<td><code><a href="reference/tidypredict_sql.html">tidypredict_sql()</a></code></td>
+<td>Returns a SQL query based on the formula from <code><a href="reference/tidypredict_fit.html">tidypredict_fit()</a></code>
+</td>
+</tr>
+<tr class="odd">
+<td><code><a href="reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
+<td>Adds a new column using the formula from <code><a href="reference/tidypredict_fit.html">tidypredict_fit()</a></code>
+</td>
+</tr>
+<tr class="even">
+<td><code><a href="reference/tidypredict_test.html">tidypredict_test()</a></code></td>
+<td>Tests <code>tidyverse</code> predictions against the model’s native <code><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict()</a></code> function</td>
+</tr>
+<tr class="odd">
+<td><code><a href="reference/tidypredict_interval.html">tidypredict_interval()</a></code></td>
+<td>Same as <code><a href="reference/tidypredict_fit.html">tidypredict_fit()</a></code> but for intervals (only works with <code>lm</code> and <code>glm</code>)</td>
+</tr>
+<tr class="even">
+<td><code><a href="reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code></td>
+<td>Same as <code><a href="reference/tidypredict_sql.html">tidypredict_sql()</a></code> but for intervals (only works with <code>lm</code> and <code>glm</code>)</td>
+</tr>
+<tr class="odd">
+<td><code><a href="reference/parse_model.html">parse_model()</a></code></td>
+<td>Creates a list spec based on the R model</td>
+</tr>
+</tbody>
+</table>
+</div>
 <div id="how-it-works" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
