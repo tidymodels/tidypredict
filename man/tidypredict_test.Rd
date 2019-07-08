@@ -5,7 +5,7 @@
 \title{Tests base predict function against tidypredict}
 \usage{
 tidypredict_test(model, df = model$model, threshold = 1e-12,
-  include_intervals = FALSE, max_rows = NULL)
+  include_intervals = FALSE, max_rows = NULL, xg_df = NULL)
 }
 \arguments{
 \item{model}{An R model or a list with a parsed model. It currently supports
@@ -23,6 +23,10 @@ value is 0.000000000001 (1e-12), for categorical predictions, the default value 
 included in the test.  It defaults to FALSE.}
 
 \item{max_rows}{The number of rows in the object passed in the df argument. Highly
+recommended for large data sets.}
+
+\item{xg_df}{A xgb.DMatrix object, required only for XGBoost models. It defaults to
+NULL
 recommended for large data sets.}
 }
 \description{

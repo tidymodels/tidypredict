@@ -54,7 +54,6 @@ get_xgb_trees <- function (model) {
 get_xgb_trees.xgb.Booster <- function(model) {
   xgb_dump_text_with_stats <- xgboost::xgb.dump(model, dump_format = "text", with_stats = TRUE)
   feature_names <- model$feature_names
-  
   get_xgb_trees.character(xgb_dump_text_with_stats, feature_names)
 }
 
@@ -64,7 +63,6 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
     feature_name = feature_names,
     stringsAsFactors = FALSE
   )
-  
   trees <- xgboost::xgb.model.dt.tree(text = xgb_dump_text_with_stats)
   trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
@@ -72,8 +70,6 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
   trees <- trees[order(trees$original_order), !names(trees) %in% "original_order"]
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
-  
-  
   purrr::map(split(trees, trees$Tree), get_xgb_tree)
 }
 
@@ -124,7 +120,7 @@ build_fit_formula_xgb <- function(parsedmodel){
   
   f <- map(
     seq_len(length(parsedmodel$trees)),
-    ~ expr(dplyr::case_when(!!! get_xgb_case_tree(.x, parsedmodel)))
+    ~ expr(case_when(!!! get_xgb_case_tree(.x, parsedmodel)))
   )
   
   # additive model
@@ -159,5 +155,3 @@ tidypredict_fit.xgb.Booster <- function(model){
   parsedmodel <- parse_model(model)
   build_fit_formula_xgb(parsedmodel)
 }
-
-

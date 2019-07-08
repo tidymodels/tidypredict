@@ -168,7 +168,7 @@ functions.</p>
     </div>
 
     <pre class="usage"><span class='fu'>tidypredict_test</span>(<span class='no'>model</span>, <span class='kw'>df</span> <span class='kw'>=</span> <span class='no'>model</span>$<span class='no'>model</span>, <span class='kw'>threshold</span> <span class='kw'>=</span> <span class='fl'>1e-12</span>,
-  <span class='kw'>include_intervals</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>max_rows</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
+  <span class='kw'>include_intervals</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>max_rows</span> <span class='kw'>=</span> <span class='kw'>NULL</span>, <span class='kw'>xg_df</span> <span class='kw'>=</span> <span class='kw'>NULL</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -198,6 +198,12 @@ included in the test.  It defaults to FALSE.</p></td>
     <tr>
       <th>max_rows</th>
       <td><p>The number of rows in the object passed in the df argument. Highly
+recommended for large data sets.</p></td>
+    </tr>
+    <tr>
+      <th>xg_df</th>
+      <td><p>A xgb.DMatrix object, required only for XGBoost models. It defaults to
+NULL
 recommended for large data sets.</p></td>
     </tr>
     </table>

@@ -26,28 +26,18 @@ test_that("Returns the correct type", {
 })
 
 test_that("Predictions are correct for different objectives", {
-  b <- suppressWarnings(
-    dplyr::mutate(mtcars,
-                  pred_sql_reglinear = !!tidypredict_fit(xgb_reglinear),
-                  pred_sql_binarylogitraw = !!tidypredict_fit(xgb_binarylogitraw),
-                  pred_sql_reglogistic = !!tidypredict_fit(xgb_reglogistic),
-                  pred_sql_binarylogistic = !!tidypredict_fit(xgb_binarylogistic),
-                  pred_sql_custom = !!tidypredict_fit(xgb_custom),
-                  pred_r_reglinear = predict(xgb_reglinear, xgb_bin_data),
-                  pred_r_binarylogitraw = predict(xgb_binarylogitraw, xgb_bin_data),
-                  pred_r_reglogistic = predict(xgb_reglogistic, xgb_bin_data),
-                  pred_r_binarylogistic = predict(xgb_binarylogistic, xgb_bin_data),
-                  pred_r_custom = predict(xgb_custom, xgb_bin_data)
-                  )
-    )
-
-  expect_equal(b$pred_sql_reglinear, b$pred_r_reglinear, tol = 1e-6)
-  expect_equal(b$pred_sql_binarylogitraw, b$pred_r_binarylogitraw, tol = 1e-6)
-  expect_equal(b$pred_sql_reglogistic, b$pred_r_reglogistic, tol = 1e-6)
-  expect_equal(b$pred_sql_binarylogistic, b$pred_r_binarylogistic, tol = 1e-6)
-  expect_equal(b$pred_sql_custom, b$pred_r_custom, tol = 1e-6)
+  expect_false(tidypredict_test(xgb_reglinear, df = mtcars, xg_df = xgb_bin_data)$alert)
+  expect_false(tidypredict_test(xgb_binarylogitraw, df = mtcars, xg_df = xgb_bin_data)$alert)
+  expect_false(tidypredict_test(xgb_reglogistic, df = mtcars, xg_df = xgb_bin_data)$alert)
+  expect_false(tidypredict_test(xgb_binarylogistic, df = mtcars, xg_df = xgb_bin_data)$alert)
   expect_warning(tidypredict_fit(xgb_custom))
-  expect_equal(ncol(tidypredict_to_column(b, xgb_binarylogistic)), ncol(b) + 1)
+})
+
+test_that("Confirm SQL function returns a query", {
+  expect_equal(
+    rlang::expr_text(tidypredict_sql(xgb_reglinear, dbplyr::simulate_odbc())[[1]]),
+    "\"0.0 + CASE\\nWHEN ((`qsec` < 19.9549999 OR ((`qsec`) IS NULL)) AND (`wt` < 3.18000007 OR ((`wt`) IS NULL))) THEN (0.138461545)\\nWHEN (`qsec` >= 19.9549999 AND (`wt` < 3.18000007 OR ((`wt`) IS NULL))) THEN (-0.100000009)\\nWHEN ((`hp` < 290.0 OR ((`hp`) IS NULL)) AND `wt` >= 3.18000007) THEN (-0.141666666)\\nWHEN (`hp` >= 290.0 AND `wt` >= 3.18000007) THEN (0.075000003)\\nEND + CASE\\nWHEN ((`qsec` < 19.9549999 OR ((`qsec`) IS NULL)) AND (`wt` < 3.01250005 OR ((`wt`) IS NULL))) THEN (0.0994230807)\\nWHEN (`qsec` >= 19.9549999 AND (`wt` < 3.01250005 OR ((`wt`) IS NULL))) THEN (-0.0599999987)\\nWHEN ((`hp` < 254.5 OR ((`hp`) IS NULL)) AND `wt` >= 3.01250005) THEN (-0.102500007)\\nWHEN (`hp` >= 254.5 AND `wt` >= 3.01250005) THEN (0.0786538497)\\nEND + CASE\\nWHEN ((`gear` < 3.5 OR ((`gear`) IS NULL))) THEN (-0.0735312551)\\nWHEN ((`wt` < 3.01250005 OR ((`wt`) IS NULL)) AND `gear` >= 3.5) THEN (0.0720817298)\\nWHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN (-0.0186758228)\\nEND + CASE\\nWHEN ((`gear` < 3.5 OR ((`gear`) IS NULL))) THEN (-0.0528505854)\\nWHEN ((`qsec` < 19.9500008 OR ((`qsec`) IS NULL)) AND `gear` >= 3.5) THEN (0.0427994467)\\nWHEN (`qsec` >= 19.9500008 AND `gear` >= 3.5) THEN (-0.0515981652)\\nEND + 0.5\""
+  )
 })
 
 context("xgboost-saved")

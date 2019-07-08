@@ -17,7 +17,6 @@ library(earth)
 library(dplyr)
 ```
 
-
 | Function                                                      |Works|
 |---------------------------------------------------------------|-----|
 |`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |

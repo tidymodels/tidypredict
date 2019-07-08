@@ -17,16 +17,13 @@ library(xgboost)
 library(dplyr)
 ```
 
-
 | Function                                                      |Works|
 |---------------------------------------------------------------|-----|
-|`tidypredict_sql()`                                            |  ✗  |
-|`tidypredict_fit()`, `parse_model()`                           |  ✔  |
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
 |`tidypredict_to_column()`                                      |  ✔  |
-|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_test()`                                           |  ✔  |
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
-|`parsnip`                                                      |  ✗  |
-
+|`parsnip`                                                      |  ✔  |
 
 ## `tidypredict_` functions
 
@@ -61,6 +58,27 @@ model <- xgboost::xgb.train(
       tidypredict_to_column(model) %>%
       glimpse()
     ```
+
+- Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the `xgb.DMatrix` data set.
+    ```{r}
+    tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
+    ```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+
+p_model <- boost_tree() %>%
+  set_engine("xgboost") %>%
+  fit(am ~ ., data = mtcars)
+```
+
+
+```{r}
+tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
+```
 
 ## Parse model spec
 
