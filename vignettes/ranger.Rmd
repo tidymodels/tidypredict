@@ -20,6 +20,14 @@ library(ranger)
 set.seed(100)
 ```
 
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
 ## How it works
 
 Here is a simple `ranger()` model using the `iris` dataset:

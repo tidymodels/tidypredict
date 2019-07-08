@@ -20,16 +20,13 @@ library(parsnip)
 set.seed(100)
 ```
 
-## Highlights & Limitations
-
-- Uses the `randomForest::getTree()` to parse each decision path.
-- In-line functions in the formulas are **not supported**:  
-     - OK - `wt ~ mpg + am` 
-     - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
-     - Not OK - `wt ~ mpg + as.factor(am)`
-     - Not OK - `wt ~ mpg + as.character(am)`
-- Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
-   
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
 
 ## How it works
 
