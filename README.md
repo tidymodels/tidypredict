@@ -42,6 +42,23 @@ Or install the **development version** using `devtools` as follows:
 devtools::install_github("tidymodels/tidypredict")
 ```
 
+## Functions
+
+`tidypredict` has only a few functions, and it is not expected that
+number to grow much. The main focus at this time is to add more models
+to
+support.
+
+| Function                     | Description                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------ |
+| `tidypredict_fit()`          | Returns an R formula that calculates the prediction                            |
+| `tidypredict_sql()`          | Returns a SQL query based on the formula from `tidypredict_fit()`              |
+| `tidypredict_to_column()`    | Adds a new column using the formula from `tidypredict_fit()`                   |
+| `tidypredict_test()`         | Tests `tidyverse` predictions against the model’s native `predict()` function  |
+| `tidypredict_interval()`     | Same as `tidypredict_fit()` but for intervals (only works with `lm` and `glm`) |
+| `tidypredict_sql_interval()` | Same as `tidypredict_sql()` but for intervals (only works with `lm` and `glm`) |
+| `parse_model()`              | Creates a list spec based on the R model                                       |
+
 ## How it works
 
 <img src="man/figures/howitworks.png">
