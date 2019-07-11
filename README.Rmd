@@ -53,6 +53,7 @@ devtools::install_github("tidymodels/tidypredict")
 |`tidypredict_interval()`     | Same as `tidypredict_fit()` but for intervals (only works with `lm` and `glm`) |
 |`tidypredict_sql_interval()` | Same as `tidypredict_sql()` but for intervals (only works with `lm` and `glm`) |
 |`parse_model()`              | Creates a list spec based on the R model                                       |
+|`as_parsed_model()`          | Prepares an object to be recognized as a parsed model                          |
 
 ## How it works
 

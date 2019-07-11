@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Adds the prediction columns to a piped command set — tidypredict_to_column • tidypredict</title>
+<title>Prepares parsed model object — as_parsed_model • tidypredict</title>
 
 <!-- jquery -->
 <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script>
@@ -31,11 +31,9 @@
 
 
 
-<meta property="og:title" content="Adds the prediction columns to a piped command set — tidypredict_to_column" />
+<meta property="og:title" content="Prepares parsed model object — as_parsed_model" />
 
-<meta property="og:description" content="Adds a new column with the results form tidypredict_fit() to a piped command set.
-If add_interval is set to TRUE, then it will add two additional columns, one
-for the lower and another for the upper prediction interval bounds." />
+<meta property="og:description" content="Prepares parsed model object" />
 
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
@@ -156,46 +154,25 @@ for the lower and another for the upper prediction interval bounds." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Adds the prediction columns to a piped command set</h1>
+    <h1>Prepares parsed model object</h1>
     
-    <div class="hidden name"><code>tidypredict_to_column.Rd</code></div>
+    <div class="hidden name"><code>as_parsed_model.Rd</code></div>
     </div>
 
     <div class="ref-description">
     
-    <p>Adds a new column with the results form tidypredict_fit() to a piped command set.
-If add_interval is set to TRUE, then it will add two additional columns, one
-for the lower and another for the upper prediction interval bounds.</p>
+    <p>Prepares parsed model object</p>
     
     </div>
 
-    <pre class="usage"><span class='fu'>tidypredict_to_column</span>(<span class='no'>df</span>, <span class='no'>model</span>, <span class='kw'>add_interval</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>,
-  <span class='kw'>vars</span> <span class='kw'>=</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/base/topics/c'>c</a></span>(<span class='st'>"fit"</span>, <span class='st'>"upper"</span>, <span class='st'>"lower"</span>))</pre>
+    <pre class="usage"><span class='fu'>as_parsed_model</span>(<span class='no'>x</span>)</pre>
     
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>df</th>
-      <td><p>A data.frame or tibble</p></td>
-    </tr>
-    <tr>
-      <th>model</th>
-      <td><p>An R model or a parsed model inside a data frame</p></td>
-    </tr>
-    <tr>
-      <th>add_interval</th>
-      <td><p>Switch that indicates if the prediction interval columns should be added. Defaults
-to FALSE</p></td>
-    </tr>
-    <tr>
-      <th>interval</th>
-      <td><p>The prediction interval, defaults to 0.95. It is ignored if add_interval is set to
-FALSE</p></td>
-    </tr>
-    <tr>
-      <th>vars</th>
-      <td><p>The name of the variables that this function will produce. It defaults to "fit", "upper", and "lower".</p></td>
+      <th>x</th>
+      <td><p>A parsed model object</p></td>
     </tr>
     </table>
     

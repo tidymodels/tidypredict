@@ -27,7 +27,7 @@ generics::tidy
 #' @param ...  Reserved for future use
 #' 
 #' @export
-tidy.regression <- function(x, ...) {
+tidy.pm_regression <- function(x, ...) {
   map_dfr(
     x$terms,
     ~tibble::tibble(term = .x$label, estimate = .x$coef)

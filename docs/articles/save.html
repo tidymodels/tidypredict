@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9001</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9003</span>
         </div>
       </div>
     </div>
@@ -154,7 +154,8 @@
 <a class="sourceLine" id="cb2-16" data-line-number="16"><span class="co">#&gt;   ..$ :List of 5</span></a>
 <a class="sourceLine" id="cb2-17" data-line-number="17"><span class="co">#&gt;   ..$ :List of 5</span></a>
 <a class="sourceLine" id="cb2-18" data-line-number="18"><span class="co">#&gt;   ..$ :List of 5</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;   ..$ :List of 5</span></a></code></pre></div>
+<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="co">#&gt;   ..$ :List of 5</span></a>
+<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></a></code></pre></div>
 <p>Usually, we pass an R model object to functions such as: <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>. These functions also accept a previously parsed model.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(parsed)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="co">#&gt; 53.5256637443325 + (wt * -6.38154597431604) + (disp * -0.0458426921825966) + </span></a>
@@ -176,7 +177,9 @@
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
 <a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(yaml)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/read_yaml">read_yaml</a></span>(<span class="st">"my_model"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb5-4" data-line-number="4">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/read_yaml">read_yaml</a></span>(<span class="st">"my_model"</span>)</a>
+<a class="sourceLine" id="cb5-5" data-line-number="5"></a>
+<a class="sourceLine" id="cb5-6" data-line-number="6">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span>(loaded_model)</a></code></pre></div>
 <p>The preview of the file looks exactly as the preview of the original parsed model.</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(loaded_model, <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; List of 2</span></a>
@@ -193,7 +196,8 @@
 <a class="sourceLine" id="cb6-13" data-line-number="13"><span class="co">#&gt;   ..$ :List of 5</span></a>
 <a class="sourceLine" id="cb6-14" data-line-number="14"><span class="co">#&gt;   ..$ :List of 5</span></a>
 <a class="sourceLine" id="cb6-15" data-line-number="15"><span class="co">#&gt;   ..$ :List of 5</span></a>
-<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt;   ..$ :List of 5</span></a></code></pre></div>
+<a class="sourceLine" id="cb6-16" data-line-number="16"><span class="co">#&gt;   ..$ :List of 5</span></a>
+<a class="sourceLine" id="cb6-17" data-line-number="17"><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></a></code></pre></div>
 <p><code>tidypredict</code> is able to read the new R variable and use it to create the formula.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(loaded_model)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * </span></a>
