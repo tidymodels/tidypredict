@@ -47,8 +47,22 @@ get_ra_tree <- function(tree_no, model) {
     paths,
     ~ {
       prediction <- tree$prediction[tree$nodeID == .x]
-      if (is.null(prediction)) stop("Prediction column not found")
-      if (is.factor(prediction)) prediction <- as.character(prediction)
+      if (!is.null(prediction)) {
+        if (is.factor(prediction)) prediction <- as.character(prediction)  
+      } else {
+        preds <- map_lgl(colnames(tree), ~"pred." == substr(.x, 1, 5))
+        preds_table <- tree[tree$nodeID == .x, preds]
+        predictors <- map_chr(colnames(preds_table), ~substr(.x, 6, nchar(.x)))
+        colnames(preds_table) <- predictors
+        predictions <- map(preds_table, ~.x)
+        prediction <- names(
+          which(
+            map_dbl(predictions, ~.x) == max(map_dbl(predictions, ~.x))
+            )
+          )
+        predictions <- imap(predictions, ~list(pred = .y, prob = .x))
+        prediction <- list(prediction = prediction, probs = predictions)
+      }
       list(
         prediction = prediction,
         path = get_ra_path(.x, tree, TRUE)
