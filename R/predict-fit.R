@@ -15,11 +15,11 @@ tidypredict_fit <- function(model) {
 }
 
 #' @export
-tidypredict_fit.regression <- function(model) {
+tidypredict_fit.pm_regression <- function(model) {
   build_fit_formula(model)
 }
 
 #' @export
-tidypredict_fit.tree <- function(model) {
+tidypredict_fit.pm_tree <- function(model) {
   build_fit_formula_rf(model)
 }

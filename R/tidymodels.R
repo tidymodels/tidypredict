@@ -33,4 +33,3 @@ tidy.regression <- function(x, ...) {
     ~tibble::tibble(term = .x$label, estimate = .x$coef)
     )
 }
-

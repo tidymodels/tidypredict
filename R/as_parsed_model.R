@@ -9,7 +9,7 @@ as_parsed_model <- function(x) {
 
 #' @export
 as_parsed_model.list <- function(x) {
-  t <- x$general$type
+  t <- paste0("pm_", x$general$type)
   class(x) <- c("parsed_model", t, class(x))
   x
 }
