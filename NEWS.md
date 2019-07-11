@@ -1,6 +1,8 @@
-# tidypredict 0.3.0.9002
+# tidypredict 0.3.0.9003
 
 ## New features
+
+- Adds method support for `broom`'s `tidy()` function.  Regression models only
 
 - Adds `as_parsed_model()` function. It adds the proper class components to the list.
 

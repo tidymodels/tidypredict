@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.3.0.9002
+Version: 0.3.0.9003
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -12,10 +12,12 @@ Authors@R:
 Depends:
     R (>= 3.1)
 Imports:
-    dplyr(>= 0.7),
+    dplyr (>= 0.7),
     rlang,
-    purrr, 
-    knitr
+    purrr,
+    knitr,
+    generics,
+    tibble
 Suggests:
     dbplyr,
     testthat (>= 2.1.0),

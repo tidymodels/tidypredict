@@ -5,11 +5,13 @@
 #' @importFrom purrr map_lgl
 #' @importFrom purrr map_dbl
 #' @importFrom purrr map_int
+#' @importFrom purrr map_dfr
 #' @importFrom purrr reduce
 #' @importFrom purrr transpose
 #' @importFrom utils head
 #' @importFrom stats predict
 #' @importFrom stats qt
+#' @importFrom tibble tibble
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
@@ -17,4 +19,4 @@
 #'
 "_PACKAGE"
 NULL
-utils::globalVariables(c("."))
+utils::globalVariables(c(".", "pm"))

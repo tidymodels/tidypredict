@@ -15,3 +15,22 @@ parse_model.model_fit <- function(model) {
   parse_model(model$fit)
 }
 
+# broom ------------------------------------------------------------------
+
+#' @importFrom generics tidy
+#' @export
+generics::tidy
+
+#' Tidy the parsed model results 
+#'
+#' @param x A parsed_model object
+#' @param ...  Reserved for future use
+#' 
+#' @export
+tidy.regression <- function(x, ...) {
+  map_dfr(
+    x$terms,
+    ~tibble::tibble(term = .x$label, estimate = .x$coef)
+    )
+}
+
