@@ -44,8 +44,7 @@ parse_model.earth <- function(model) {
     pm$general$link <- fam$link
   }
   pm$terms <- all_terms
-
-  pm
+  as_parsed_model(pm)
 }
 
 get_fields <- function(term_number, model) {

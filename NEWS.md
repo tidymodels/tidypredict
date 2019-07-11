@@ -1,6 +1,8 @@
-# tidypredict 0.3.0.9001
+# tidypredict 0.3.0.9002
 
 ## New features
+
+- Adds `as_parsed_model()` function. It adds the proper class components to the list.
 
 - Adds initial support for `partykit`'s `ctree()` model
 

@@ -48,6 +48,7 @@ library(yaml)
 model_file <- tempfile(fileext = ".yml")
 write_yaml(parsed, model_file)
 loaded_model <- read_yaml(model_file)
+loaded_model <- as_parsed_model(loaded_model)
 ```
 
 ## Saving the model
@@ -69,6 +70,8 @@ library(tidypredict)
 library(yaml)
 
 loaded_model <- read_yaml("my_model")
+
+loaded_model <- as_parsed_model(loaded_model)
 ```
 
 The preview of the file looks exactly as the preview of the original parsed model. 

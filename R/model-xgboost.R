@@ -88,7 +88,7 @@ parse_model.xgb.Booster <- function(model) {
   pm$general$nfeatures <- model$nfeatures
   pm$general$version <- 1
   pm$trees <- get_xgb_trees(model)
-  pm
+  as_parsed_model(pm)
 }
 
 # Fit model -----------------------------------------------

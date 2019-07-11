@@ -1,3 +1,5 @@
+# parsnip ----------------------------------------------------------------
+
 #' @export
 tidypredict_fit._xgb.Booster <- function(model) {
   tidypredict_fit(model$fit)
@@ -12,3 +14,4 @@ tidypredict_fit.model_fit <- function(model) {
 parse_model.model_fit <- function(model) {
   parse_model(model$fit)
 }
+

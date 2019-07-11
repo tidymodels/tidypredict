@@ -14,13 +14,12 @@ tidypredict_fit <- function(model) {
   UseMethod("tidypredict_fit")
 }
 
-# parsed models --------------------------------
 #' @export
-tidypredict_fit.list <- function(model) {
-  mt <- model$general$type
-  fit <- NULL
-  if (mt == "regression") fit <- build_fit_formula(model)
-  if (mt == "tree") fit <- build_fit_formula_rf(model)
-  if (is.null(fit)) stop("Model type not supported")
-  fit
+tidypredict_fit.regression <- function(model) {
+  build_fit_formula(model)
+}
+
+#' @export
+tidypredict_fit.tree <- function(model) {
+  build_fit_formula_rf(model)
 }

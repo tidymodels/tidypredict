@@ -55,7 +55,7 @@ parse_model.cubist <- function(model) {
     }
   )
   comm <- flatten(committees2)
-  list(
+  pm <- list(
     general = list(
       model = "cubist",
       type = "tree",
@@ -65,6 +65,7 @@ parse_model.cubist <- function(model) {
     ),
     trees = list(comm)
   )
+  as_parsed_model(pm)
 }
 
 #' @export

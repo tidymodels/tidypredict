@@ -72,7 +72,7 @@ parse_model.ranger <- function(model) {
   pm$general$type <- "tree"
   pm$general$version <- 2
   pm$trees <- get_ra_trees(model)
-  pm
+  as_parsed_model(pm)
 }
 
 # Fit formula -----------------------------------

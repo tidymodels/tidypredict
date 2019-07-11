@@ -124,7 +124,7 @@ parse_model_lm <- function(model) {
     }
   )
   pm$terms <- terms
-  pm
+  as_parsed_model(pm)
 }
 
 parse_label_lm <- function(label, vars) {

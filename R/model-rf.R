@@ -63,7 +63,7 @@ parse_model.randomForest <- function(model) {
   pm$general$type <- "tree"
   pm$general$version <- 2
   pm$trees <- get_rf_trees(model)
-  pm
+  as_parsed_model(pm)
 }
 
 # Fit model -----------------------------------------------

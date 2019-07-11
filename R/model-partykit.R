@@ -50,7 +50,7 @@ parse_model.party <- function(model) {
   pm$general$type <- "tree"
   pm$general$version <- 2
   pm$trees <- list(get_pk_tree(model))
-  pm
+  as_parsed_model(pm)
 }
 
 # Fit formula -----------------------------------
