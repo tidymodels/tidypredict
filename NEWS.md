@@ -2,6 +2,8 @@
 
 ## New features
 
+- Parses `ranger` classification models.
+
 - Adds method support for `broom`'s `tidy()` function.  Regression models only
 
 - Adds `as_parsed_model()` function. It adds the proper class components to the list.

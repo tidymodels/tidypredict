@@ -49,6 +49,10 @@ get_ra_tree <- function(tree_no, model) {
       prediction <- tree$prediction[tree$nodeID == .x]
       if (!is.null(prediction)) {
         if (is.factor(prediction)) prediction <- as.character(prediction)  
+        list(
+          prediction = prediction,
+          path = get_ra_path(.x, tree, TRUE)
+        )        
       } else {
         preds <- map_lgl(colnames(tree), ~"pred." == substr(.x, 1, 5))
         preds_table <- tree[tree$nodeID == .x, preds]
@@ -61,12 +65,13 @@ get_ra_tree <- function(tree_no, model) {
             )
           )
         predictions <- imap(predictions, ~list(pred = .y, prob = .x))
-        prediction <- list(prediction = prediction, probs = predictions)
+        list(
+          prediction = prediction,
+          probs = predictions,
+          path = get_ra_path(.x, tree, TRUE)
+        )       
       }
-      list(
-        prediction = prediction,
-        path = get_ra_path(.x, tree, TRUE)
-      )
+
     }
   )
 }
