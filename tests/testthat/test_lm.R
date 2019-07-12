@@ -39,3 +39,10 @@ test_that("Model can be saved and re-loaded", {
   pm <- as_parsed_model(l)
   expect_silent(tidypredict_fit(pm))
 })
+
+test_that("tidy() works", {
+  expect_is(
+    tidy(parse_model(lm(mpg ~., mtcars))),
+    "tbl_df"
+  )  
+})

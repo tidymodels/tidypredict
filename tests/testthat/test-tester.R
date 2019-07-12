@@ -15,16 +15,6 @@ test_that("Intervals returns list", {
   )
 })
 
-test_that("Alert is returned", {
-  expect_true(
-    tidypredict_test(
-      lm(mpg ~ wt, offset = am, data = mtcars),
-      include_intervals = TRUE,
-      threshold = 0
-    )$alert
-  )
-})
-
 test_that("Error is returned for tree based models", {
   expect_error(
     tidypredict_test(randomForest::randomForest(Species ~ ., data = iris), df = iris),
