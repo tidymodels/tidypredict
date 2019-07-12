@@ -44,7 +44,7 @@
 
 ## Bug Fixes
 
-- tibble 2.0.0 compatability fix (@krlmlr)
+- tibble 2.0.0 compatibility fix (@krlmlr)
 
 # tidypredict 0.2.0
 

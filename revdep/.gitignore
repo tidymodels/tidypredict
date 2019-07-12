@@ -2,3 +2,4 @@ checks
 data.sqlite
 library
 checks.rds
+failures.md

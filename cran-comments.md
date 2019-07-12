@@ -1,14 +1,15 @@
 ## Release summary
 
-* Adds support for 'earth' models
-
-* Several bug fixes
-
-* Removes dependencies on 'tibble' and 'tidyr'
+* Adds method support for `broom`'s `tidy()` function.  Regression models only
+* Adds `as_parsed_model()` function. It adds the proper class components to the list
+* Adds initial support for `partykit`'s `ctree()` model
+* Adds support for `parsnip` fitted models: `lm`, `randomForest`, `ranger`, and `earth`
+* Adds support for xgb.Booster models provided by the `xgboost` package
+* Adds support for `Cubist::cubist()` models 
 
 ## Test environments
-* Local windows 10 install, R 3.5.2
-* Ubuntu 16.04 with RStudio Server, R 3.4.3 
+* Local windows 10 install, R 3.6.0
+* Ubuntu 18.04.2 LTS, R 3.6.1
 * Ubuntu 14.04 (on travis-ci)
 
 ## R CMD check results
