@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.3.0.9003
+Version: 0.4.0
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.

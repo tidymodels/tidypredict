@@ -69,6 +69,7 @@ parse_model.randomForest <- function(model) {
 # Fit model -----------------------------------------------
 
 get_rf_case <- function(path, prediction, calc_mode = "") {
+  
   cl <- map(
     path,
     ~ {
@@ -80,7 +81,6 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     }
   )
   cl <- reduce(cl, function(x, y) expr(!!x & !!y))
-
   if (length(prediction) > 1) {
     pl <- map(
       prediction,

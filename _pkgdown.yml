@@ -26,16 +26,18 @@ navbar:
       href: articles/xgboost.html
   - text: Articles  
     menu:
-    - text: DB Writeback
-      href: articles/sql.html
-    - text: -------      
     - text: Save/Reload
       href: articles/save.html
-    - text: -------            
+    - text: -------     
+    - text: Non-R models
+      href: articles/non-r.html
     - text: Regression spec
       href: articles/regression.html
     - text: Tree model spec
       href: articles/tree.html
+    - text: -------
+    - text: DB Writeback
+      href: articles/sql.html    
   - text: News
     href: news/index.html           
   - text: Reference

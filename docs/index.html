@@ -46,7 +46,7 @@
         <a class="navbar-brand" href="index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9003</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
         </div>
       </div>
     </div>
@@ -90,20 +90,23 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/sql.html">DB Writeback</a>
-    </li>
-    <li class="divider">
-    </li>
-<li>
       <a href="articles/save.html">Save/Reload</a>
     </li>
     <li class="divider">
     </li>
 <li>
+      <a href="articles/non-r.html">Non-R models</a>
+    </li>
+    <li>
       <a href="articles/regression.html">Regression spec</a>
     </li>
     <li>
       <a href="articles/tree.html">Tree model spec</a>
+    </li>
+    <li class="divider">
+    </li>
+<li>
+      <a href="articles/sql.html">DB Writeback</a>
     </li>
   </ul>
 </li>
@@ -143,9 +146,10 @@
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Install <code>tidypredict</code> from CRAN using:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">"tidypredict"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="co"># install.packages("tidypredict")</span></a></code></pre></div>
 <p>Or install the <strong>development version</strong> using <code>devtools</code> as follows:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">devtools<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">"tidymodels/tidypredict"</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="co"># install.packages("remotes")</span></a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co"># remotes::install_github("tidymodels/tidypredict")</span></a></code></pre></div>
 </div>
 <div id="functions" class="section level2">
 <h2 class="hasAnchor">
@@ -244,16 +248,16 @@
 </li>
 <li>MARS models - <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code>
 </li>
-<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code> <strong>[In development version]</strong>
+<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code>
 </li>
-<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code> <strong>[In development version]</strong>
+<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code>
 </li>
-<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code> <strong>[In development version]</strong>
+<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code>
 </li>
 </ul>
-<div id="parsnip-in-development-version" class="section level3">
+<div id="parsnip" class="section level3">
 <h3 class="hasAnchor">
-<a href="#parsnip-in-development-version" class="anchor"></a><code>parsnip</code> <strong>[In development version]</strong>
+<a href="#parsnip" class="anchor"></a><code>parsnip</code>
 </h3>
 <p><code>tidypredict</code> supports models fitted via the <code>parsnip</code> interface. The ones confirmed currently work in <code>tidypredict</code> are:</p>
 <ul>
@@ -266,6 +270,28 @@
 <li>
 <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
 </ul>
+</div>
+<div id="broom" class="section level3">
+<h3 class="hasAnchor">
+<a href="#broom" class="anchor"></a><code>broom</code>
+</h3>
+<p>The <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> function from broom works with linear models parsed via <code>tidypredict</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">pm &lt;-<span class="st"> </span><span class="kw"><a href="reference/parse_model.html">parse_model</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(wt <span class="op">~</span><span class="st"> </span>., mtcars))</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(pm)</a></code></pre></div>
+<pre><code>## # A tibble: 11 x 2
+##    term        estimate
+##    &lt;chr&gt;          &lt;dbl&gt;
+##  1 (Intercept) -0.231  
+##  2 mpg         -0.0417 
+##  3 cyl         -0.0573 
+##  4 disp         0.00669
+##  5 hp          -0.00323
+##  6 drat        -0.0901 
+##  7 qsec         0.200  
+##  8 vs          -0.0664 
+##  9 am           0.0184 
+## 10 gear        -0.0935 
+## 11 carb         0.249</code></pre>
 </div>
 </div>
 </div>

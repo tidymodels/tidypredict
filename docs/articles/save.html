@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.3.0.9003</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.0</span>
         </div>
       </div>
     </div>
@@ -85,18 +85,21 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="../articles/sql.html">DB Writeback</a>
-    </li>
-    <li class="divider">
-    <li>
       <a href="../articles/save.html">Save/Reload</a>
     </li>
     <li class="divider">
+    <li>
+      <a href="../articles/non-r.html">Non-R models</a>
+    </li>
     <li>
       <a href="../articles/regression.html">Regression spec</a>
     </li>
     <li>
       <a href="../articles/tree.html">Tree model spec</a>
+    </li>
+    <li class="divider">
+    <li>
+      <a href="../articles/sql.html">DB Writeback</a>
     </li>
   </ul>
 </li>
@@ -206,6 +209,22 @@
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span>(loaded_model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_odbc</a></span>())</a>
 <a class="sourceLine" id="cb8-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; 53.5256637 + (`wt` * -6.381546) + (`disp` * -0.0458427) + (`cyl` * -3.6302557) + (`wt` * `cyl` * 0.5356044) + (`disp` * `cyl` * 0.0054062)</span></a></code></pre></div>
 </div>
+<div id="broom" class="section level2">
+<h2 class="hasAnchor">
+<a href="#broom" class="anchor"></a><code>broom</code>
+</h2>
+<p>The <code>parsed_model</code> object integrates with <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> from <code>broom</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(loaded_model)</a>
+<a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
+<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt;   term        estimate</span></a>
+<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb9-5" data-line-number="5"><span class="co">#&gt; 1 (Intercept) 53.5    </span></a>
+<a class="sourceLine" id="cb9-6" data-line-number="6"><span class="co">#&gt; 2 wt          -6.38   </span></a>
+<a class="sourceLine" id="cb9-7" data-line-number="7"><span class="co">#&gt; 3 disp        -0.0458 </span></a>
+<a class="sourceLine" id="cb9-8" data-line-number="8"><span class="co">#&gt; 4 cyl         -3.63   </span></a>
+<a class="sourceLine" id="cb9-9" data-line-number="9"><span class="co">#&gt; 5 wt:cyl       0.536  </span></a>
+<a class="sourceLine" id="cb9-10" data-line-number="10"><span class="co">#&gt; 6 disp:cyl     0.00541</span></a></code></pre></div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -216,6 +235,7 @@
 <li><a href="#parse-model">Parse model</a></li>
       <li><a href="#saving-the-model">Saving the model</a></li>
       <li><a href="#re-load-the-model">Re-load the model</a></li>
+      <li><a href="#broom"><code>broom</code></a></li>
       </ul>
 </div>
       </div>

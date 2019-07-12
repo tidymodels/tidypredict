@@ -92,4 +92,11 @@ The same variable can be used with other `tidypredict` functions, such as `tidyp
 tidypredict_sql(loaded_model, dbplyr::simulate_odbc())
 ```
 
+## `broom`
+
+The `parsed_model` object integrates with `tidy()` from `broom`.  
+
+```{r}
+tidy(loaded_model)
+```
 

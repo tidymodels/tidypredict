@@ -32,12 +32,13 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 Install `tidypredict` from CRAN using:
 ```{r, eval = FALSE}
-install.packages("tidypredict")
+# install.packages("tidypredict")
 ```
 
 Or install the **development version** using `devtools` as follows:
 ```{r, eval = FALSE}
-devtools::install_github("tidymodels/tidypredict")
+# install.packages("remotes")
+# remotes::install_github("tidymodels/tidypredict")
 ```
 
 ## Functions
@@ -84,11 +85,11 @@ The following models are supported by `tidypredict`:
 - Random Forest models - `randomForest::randomForest()`
 - Random Forest models, via `ranger` - `ranger::ranger()`
 - MARS models - `earth::earth()`
-- XGBoost models - `xgboost::xgb.Booster.complete()` **[In development version]**
-- Cubist models - `Cubist::cubist()` **[In development version]**
-- Tree models, via `partykit` - `partykit::ctree()` **[In development version]**
+- XGBoost models - `xgboost::xgb.Booster.complete()` 
+- Cubist models - `Cubist::cubist()` 
+- Tree models, via `partykit` - `partykit::ctree()` 
 
-### `parsnip` **[In development version]** 
+### `parsnip` 
 
 `tidypredict` supports models fitted via the `parsnip` interface. The ones confirmed currently work in `tidypredict` are:
 
@@ -96,3 +97,14 @@ The following models are supported by `tidypredict`:
 - `randomForest::randomForest()` - `parsnip`: `rand_forest()` with *"randomForest"* as the engine.
 - `ranger::ranger()` - `parsnip`: `rand_forest()` with *"ranger"* as the engine.
 - `earth::earth()`  - `parsnip`: `mars()` with *"earth"* as the engine.
+
+### `broom`
+
+The `tidy()` function from broom works with linear models parsed via `tidypredict`
+
+```{r}
+pm <- parse_model(lm(wt ~ ., mtcars))
+tidy(pm)
+```
+
+

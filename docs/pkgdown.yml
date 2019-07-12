@@ -6,6 +6,7 @@ articles:
   glm: glm.html
   lm: lm.html
   mars: mars.html
+  non-r: non-r.html
   ranger: ranger.html
   regression: regression.html
   rf: rf.html

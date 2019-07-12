@@ -59,14 +59,15 @@ get_ra_tree <- function(tree_no, model) {
         predictors <- map_chr(colnames(preds_table), ~substr(.x, 6, nchar(.x)))
         colnames(preds_table) <- predictors
         predictions <- map(preds_table, ~.x)
-        prediction <- names(
-          which(
-            map_dbl(predictions, ~.x) == max(map_dbl(predictions, ~.x))
-            )
-          )
+        max_pred <- map_lgl(predictions, ~.x == max(map_dbl(predictions, ~.x)))
+        prediction <- names(predictions)[max_pred]
+        prediction <- prediction[[1]]
+        prob <- predictions[max_pred]
+        prob <- prob[[1]]
         predictions <- imap(predictions, ~list(pred = .y, prob = .x))
         list(
           prediction = prediction,
+          prob = prob,
           probs = predictions,
           path = get_ra_path(.x, tree, TRUE)
         )       
