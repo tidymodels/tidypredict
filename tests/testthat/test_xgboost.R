@@ -1,5 +1,7 @@
 context("xgboost")
 
+skip_if_not_installed("xgboost")
+
 logregobj <- function(preds, dtrain) {
   labels <- xgboost::getinfo(dtrain, "label")
   preds <- 1 / (1 + exp(-preds))

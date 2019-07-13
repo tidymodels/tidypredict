@@ -1,3 +1,7 @@
+# tidypredict 0.4.1
+
+- Sets conditional requirement for `xgboost`, for test and vignette 
+
 # tidypredict 0.4.0
 
 ## New features
