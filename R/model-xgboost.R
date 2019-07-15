@@ -81,7 +81,7 @@ parse_model.xgb.Booster <- function(model) {
 
   pm <- list()
   pm$general$model <- "xgb.Booster"
-  pm$general$type <- "tree"
+  pm$general$type <- "xgb"
   pm$general$niter <- model$niter
   pm$general$params <- wosilent
   pm$general$feature_names <- model$feature_names

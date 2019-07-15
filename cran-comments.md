@@ -1,6 +1,6 @@
 ## Release summary
 
-* Switches `xgboost` to conditional requirement for tests and vignette
+* Addresses `ranger` test failures
 
 ## Test environments
 * Local windows 10 install, R 3.6.0

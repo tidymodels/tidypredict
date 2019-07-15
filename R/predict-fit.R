@@ -23,3 +23,8 @@ tidypredict_fit.pm_regression <- function(model) {
 tidypredict_fit.pm_tree <- function(model) {
   build_fit_formula_rf(model)
 }
+
+#' @export
+tidypredict_fit.pm_xgb <- function(model) {
+  build_fit_formula_xgb(model)
+}
