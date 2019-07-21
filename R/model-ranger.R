@@ -30,12 +30,25 @@ get_ra_path <- function(node_id, tree, default_op = TRUE) {
         if (rb["leftChild"] == .x) op <- "less-equal"
         if (rb["rightChild"] == .x) op <- "more"
       }
-      list(
-        type = "conditional",
-        col = as.character(rb["splitvarName"][[1]]),
-        val = rb["splitval"][[1]],
-        op = op
-      )
+      if(is.na(rb["splitval"][[1]])) {
+        
+        if (rb["leftChild"] == .x) op <- "in"
+        if (rb["rightChild"] == .x) op <- "not-in"
+        
+        list(
+          type = "conditional",
+          col = as.character(rb["splitvarName"][[1]]),
+          val = map(strsplit(as.character(rb["splitclass"][[1]]), ","), ~.x) ,
+          op = op
+        )
+      } else {
+        list(
+          type = "conditional",
+          col = as.character(rb["splitvarName"][[1]]),
+          val = rb["splitval"][[1]],
+          op = op
+        )
+      }
     }
   )
 }
