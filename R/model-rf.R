@@ -73,10 +73,18 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
   cl <- map(
     path,
     ~ {
-      if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
-      if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
-      if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
-      if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
+      i <- NULL
+      if(.x$type == "conditional") {
+        if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
+        if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
+        if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
+        if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
+      }
+      if(.x$type == "set") {
+        sets <- reduce(.x$vals, c)
+        if (.x$op == "in") i <- expr(!!sym(.x$col) %in% !! sets)
+        if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !! sets) == FALSE)
+      }
       i
     }
   )

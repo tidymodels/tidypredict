@@ -14,24 +14,29 @@ partykit_tree_info <- function(model) {
   vars <- as.character(attr(model$terms, "variables"))
   vars <- vars[2:length(vars)]
   
-  var_class <- as.character(attr(model$terms, "dataClasses"))
-  var_name <- names(attr(model$terms, "dataClasses"))
+  var_details <- map_chr(model$data, class)
+  var_class <- as.character(var_details)
+  var_name <- names(var_details)
   
   splitvarID <- map_int(model_nodes, ~ ifelse(is.null(.x$node$split$varid), NA, .x$node$split$varid))
   
-  class_splits <- map_chr(seq_along(splitvarID), ~{
-    if(is.na(splitvarID[.x])) return(NA)
-    v <- vars[splitvarID[.x]]
-    if(var_class[var_name == v] == "factor") {
-      lvls <- levels(model$data[, colnames(model$data) == v])
-      pn <- party_nodes[[.x]][[1]]$split$index 
-      pn <- ifelse(is.na(pn), 0, pn)
-      if(any(pn == 3)) stop("Three levels are not supported")
-      paste0(lvls[pn == 1], collapse =", ")
-    } else {
-      NA
-    }
-  })
+  if(length(var_class) > 0) {
+    class_splits <- map_chr(seq_along(splitvarID), ~{
+      if(is.na(splitvarID[.x])) return(NA)
+      v <- vars[splitvarID[.x]]
+      if(var_class[var_name == v] == "factor") {
+        lvls <- levels(model$data[, colnames(model$data) == v])
+        pn <- party_nodes[[.x]][[1]]$split$index 
+        pn <- ifelse(is.na(pn), 0, pn)
+        if(any(pn == 3)) stop("Three levels are not supported")
+        paste0(lvls[pn == 1], collapse =", ")
+      } else {
+        NA
+      }
+    })
+  } else {
+    class_splits <- NA
+  }
   
   data.frame(
     nodeID = seq_along(is_split) - 1,

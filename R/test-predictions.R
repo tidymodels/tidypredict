@@ -26,12 +26,35 @@
 #' @export
 tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
                              include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
-  if (is.null(df)) stop("Test data is missing, please pass one via the df argument")
   UseMethod("tidypredict_test")
 }
 
 #' @export
+tidypredict_test.party <- function(model, df = model$data, threshold = 0.000000000001,
+                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+  tidypredict_test_default(
+    model = model, 
+    df = df,
+    threshold = threshold,
+    include_intervals = include_intervals,
+    max_rows = max_rows,
+    xg_df = xg_df
+  )
+}
+
+#' @export
 tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001,
+                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+  tidypredict_test_default(
+    model = model, 
+    df = df,
+    threshold = threshold,
+    include_intervals = include_intervals,
+    max_rows = max_rows,
+    xg_df = xg_df
+  )
+}
+tidypredict_test_default <- function(model, df = model$model, threshold = 0.000000000001,
                                      include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   offset <- model$call$offset
   ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
@@ -67,7 +90,7 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
 
   raw_results <- cbind(base, te)
   raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
-  raw_results$fit_threshold <- raw_results$fit_diff > threshold
+  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
 
   if (include_intervals) {
     raw_results$lwr_diff <- abs(raw_results$lwr - raw_results$lwr_te)

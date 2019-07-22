@@ -25,10 +25,3 @@ test_that("Error is returned for tree based models", {
     "tidypredict_test does not support"
   )
 })
-
-test_that("Expect error message", {
-  expect_error(
-    tidypredict_test(earth::earth(am ~ ., data = mtcars)),
-    "Test data is missing"
-  )
-})
