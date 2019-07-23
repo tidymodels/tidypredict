@@ -21,21 +21,31 @@ get_ra_path <- function(node_id, tree, default_op = TRUE) {
       rb <- tree[tree$nodeID == .y, ]
       lc <- rb["leftChild"] == .x
       lr <- rb["rightChild"] == .x
-      if (is.na(lc)) lc <- FALSE
-      if (is.na(lr)) lr <- FALSE
-      if (default_op) {
-        if (rb["leftChild"] == .x) op <- "less"
-        if (rb["rightChild"] == .x) op <- "more-equal"
+      if(is.na(rb["splitval"][[1]])) {
+        if (lc) op <- "in"
+        if (lr) op <- "not-in"
+        vals <- strsplit(as.character(rb["splitclass"][[1]]), ", ")[[1]]
+        list(
+          type = "set",
+          col = as.character(rb["splitvarName"][[1]]),
+          vals = map(vals, ~.x),
+          op = op
+        )
       } else {
-        if (rb["leftChild"] == .x) op <- "less-equal"
-        if (rb["rightChild"] == .x) op <- "more"
+        if (default_op) {
+          if (lc) op <- "less"
+          if (lr) op <- "more-equal"
+        } else {
+          if (lc) op <- "less-equal"
+          if (lr) op <- "more"
+        }
+        list(
+          type = "conditional",
+          col = as.character(rb["splitvarName"][[1]]),
+          val = rb["splitval"][[1]],
+          op = op
+        )
       }
-      list(
-        type = "conditional",
-        col = as.character(rb["splitvarName"][[1]]),
-        val = rb["splitval"][[1]],
-        op = op
-      )
     }
   )
 }
