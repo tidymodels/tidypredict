@@ -1,3 +1,8 @@
+# tidypredict 0.4.2.9000
+
+- Adds support for categorical predictors in `partykit`
+
+
 # tidypredict 0.4.2
 
 - Simplifies tests that verify `ranger` 
