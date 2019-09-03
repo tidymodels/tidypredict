@@ -78,7 +78,7 @@ model <- xgboost::xgb.train(
 ```{r}
 library(parsnip)
 
-p_model <- boost_tree() %>%
+p_model <- boost_tree(mode = "regression") %>%
   set_engine("xgboost") %>%
   fit(am ~ ., data = mtcars)
 ```
