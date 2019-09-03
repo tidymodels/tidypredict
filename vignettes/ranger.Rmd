@@ -67,7 +67,7 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 ```{r}
 library(parsnip)
 
-parsnip_model <- rand_forest() %>%
+parsnip_model <- rand_forest(mode = "classification") %>%
   set_engine("ranger") %>%
   fit(Species ~ ., data = iris)
 

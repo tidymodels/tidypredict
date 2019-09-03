@@ -2,6 +2,8 @@ context("earth/MARS models")
 
 data("etitanic", package = "earth")
 
+mars_mod <- parsnip::mars(mode = "regression")
+
 test_earth <- function(..., .data = etitanic) {
   p <- invisible(
     tidypredict_test(earth::earth(...), df = .data)
@@ -119,7 +121,7 @@ test_that("Tests with parsnip returns no alert", {
   expect_false(
     tidypredict_test(
       parsnip::fit(
-        parsnip::set_engine(parsnip::mars(mode = "regression"), "earth"),
+        parsnip::set_engine(mars_mod, "earth"),
         survived ~ age + sibsp,
         data = etitanic
       ),
@@ -129,7 +131,7 @@ test_that("Tests with parsnip returns no alert", {
   expect_false(
     tidypredict_test(
       parsnip::fit(
-        parsnip::set_engine(parsnip::mars(mode = "regression"), "earth"),
+        parsnip::set_engine(mars_mod, "earth"),
         age ~ sibsp + parch,
         data = etitanic
       ),
