@@ -1,4 +1,4 @@
-# tidypredict 0.4.2.9000
+# tidypredict 0.4.3
 
 - Adds support for categorical predictors in `partykit`
 

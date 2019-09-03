@@ -1,6 +1,6 @@
 ## Release summary
 
-* Addresses `ranger` test failures
+* Addresses CRAN check failures
 
 ## Test environments
 * Local windows 10 install, R 3.6.0
