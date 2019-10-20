@@ -19,5 +19,4 @@ as opposed to human interaction, a successful check is silent.
 
 model <- lm(mpg ~ wt, mtcars)
 acceptable_formula(model)
-
 }

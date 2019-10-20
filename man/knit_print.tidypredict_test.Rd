@@ -4,7 +4,7 @@
 \alias{knit_print.tidypredict_test}
 \title{Knit print method for test predictions results}
 \usage{
-knit_print.tidypredict_test(x, ...)
+\method{knit_print}{tidypredict_test}(x, ...)
 }
 \description{
 Knit print method for test predictions results

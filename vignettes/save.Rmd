@@ -1,0 +1,102 @@
+---
+title: "Save and re-load models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{save}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidypredict)
+library(yaml)
+```
+
+`tidypredict` splits the translation process in two.  It first parses the model to extract the needed components to produce the prediction.  And second, it uses the object with the parsed information to produce the R formula. Thanks to this two step process, `tidypredict` does not need to parse the model every time.  `tidypredict`'s functions also accept R objects that contained already models that have been parsed already.  Additionally, because the parsed model object is made up of a list made up of basic variables, it is possible to save it in a file.  Currently, the best file format is YAML.
+
+For this article, we will use the following model:
+
+```{r}
+model <- lm(mpg ~ (wt + disp) * cyl, data = mtcars)
+```
+
+## Parse model
+
+The `parse_model()` function allows to run the first step manually.  It will return an R list object which contains all of the needed information to produce a prediction calculation.  The structure of the parsed model varies based on what kind of model is being processed.  In general, it is consistent in what kind of information it expects from each model type. For example, in the example the `lm()` model object will return variables such as `sigma2`,  which would not be used in other model types, such as decision trees.
+
+```{r}
+library(tidypredict)
+
+parsed <- parse_model(model)
+str(parsed, 2)
+```
+
+Usually, we pass an R model object to functions such as: `tidypredict_fit()`, and `tidypredict_sql()`.  These functions also accept a previously parsed model.
+
+```{r}
+tidypredict_fit(parsed)
+```
+
+
+
+```{r, include = FALSE}
+library(yaml)
+model_file <- tempfile(fileext = ".yml")
+write_yaml(parsed, model_file)
+loaded_model <- read_yaml(model_file)
+loaded_model <- as_parsed_model(loaded_model)
+```
+
+## Saving the model
+
+Saving the model is quite easy, use the package such as `yaml` to write the model object as a YAML file.  Any format that can persist a ragged list object should work as well. 
+
+```{r, eval = FALSE}
+library(yaml)
+
+write_yaml(parsed, "my_model.yml")
+```
+
+## Re-load the model
+
+In a new R session, we can read the YAML file into our environment. 
+
+```{r, eval = FALSE}
+library(tidypredict)
+library(yaml)
+
+loaded_model <- read_yaml("my_model")
+
+loaded_model <- as_parsed_model(loaded_model)
+```
+
+The preview of the file looks exactly as the preview of the original parsed model. 
+
+```{r}
+str(loaded_model, 2)
+```
+
+`tidypredict` is able to read the new R variable and use it to create the formula.  
+
+```{r}
+tidypredict_fit(loaded_model)
+```
+
+The same variable can be used with other `tidypredict` functions, such as `tidypredict_sql()`
+
+```{r}
+tidypredict_sql(loaded_model, dbplyr::simulate_odbc())
+```
+
+## `broom`
+
+The `parsed_model` object integrates with `tidy()` from `broom`.  
+
+```{r}
+tidy(loaded_model)
+```
+

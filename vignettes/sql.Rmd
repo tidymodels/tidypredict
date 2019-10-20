@@ -5,10 +5,6 @@ vignette: >
   %\VignetteIndexEntry{randomForest}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-menu:
-  main:
-    parent: "articles"
-    weight: 4
 ---
 
 
@@ -17,8 +13,10 @@ library(dplyr)
 library(tidypredict)
 library(randomForest)
 library(dbplyr)
-library(tibble)
-
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
 set.seed(100)
 ```
 
@@ -31,11 +29,15 @@ To keep the example reproducible, a SQLite database will be used to simulate a l
 First the data is prepared in memory.  The article will use the `nycflights13::flights` data, with a couple of modifications
 ```{r}
 library(dplyr)
-library(tibble)
+library(tidypredict)
+library(randomForest)
+library(dbplyr)
 
 flights_table <- nycflights13::flights %>%
-  mutate(current_score = 0) %>%
-  rowid_to_column("flight_id")
+  mutate(
+    current_score = 0, 
+    flight_id = row_number()
+    ) 
 ```
 
 A new database is created using `RSQLite`. 

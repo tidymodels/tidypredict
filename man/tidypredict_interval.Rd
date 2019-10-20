@@ -7,8 +7,7 @@
 tidypredict_interval(model, interval = 0.95)
 }
 \arguments{
-\item{model}{An R model or a tibble with a parsed model. It currently supports
-lm() models only.}
+\item{model}{An R model or a list with a parsed model}
 
 \item{interval}{The prediction interval, defaults to 0.95}
 }
@@ -22,9 +21,6 @@ subtracted from fit to obtain the lower bound.
 }
 \examples{
 
-library(dplyr)
-df <- mutate(mtcars, cyl = paste0("cyl", cyl))
-model <- lm(mpg ~ wt + cyl * disp, offset = am, data = df)
+model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 tidypredict_interval(model)
-
 }

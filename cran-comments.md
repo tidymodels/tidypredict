@@ -1,12 +1,10 @@
 ## Release summary
 
-* Adds support for 'ranger' models
-
-* Few fixes and code improvements
+* Addresses CRAN check failures
 
 ## Test environments
-* Local windows 10 install, R 3.4.3
-* Ubuntu 16.04 with RStudio Server, R 3.4.3 
+* Local windows 10 install, R 3.6.0
+* Ubuntu 18.04.2 LTS, R 3.6.1
 * Ubuntu 14.04 (on travis-ci)
 
 ## R CMD check results

@@ -1,0 +1,74 @@
+---
+title: "Cubist models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{cubist}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(tidypredict)
+library(Cubist)
+library(dplyr)
+```
+
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✗  |
+
+
+## `tidypredict_` functions
+
+```{r}
+library(Cubist)
+data("BostonHousing", package =  "mlbench")
+
+model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
+```
+
+- Create the R formula
+    ```{r}
+    tidypredict_fit(model)
+    ```
+
+- SQL output example
+    ```{r}
+    tidypredict_sql(model, dbplyr::simulate_odbc())
+    ```
+
+- Add the prediction to the original table
+    ```{r}
+    library(dplyr)
+    
+    BostonHousing %>%
+      tidypredict_to_column(model) %>%
+      glimpse()
+    ```
+
+- Confirm that `tidypredict` results match to the model's `predict()` results
+    ```{r}
+    tidypredict_test(model, BostonHousing)
+    ```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+```{r}
+str(pm$terms[1:2])
+```
+

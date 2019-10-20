@@ -1,17 +1,18 @@
 ---
-title: "glm() model"
+title: "Generalized Linear Regression"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{glm}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
-menu:
-  main:
-    parent: "articles"
-    weight: 2
 ---
 
-```{r setup, include=FALSE}
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
 library(dplyr)
 library(tidypredict)
 ```
@@ -32,6 +33,9 @@ library(tidypredict)
 ## How it works
 
 ```{r}
+library(tidypredict)
+library(dplyr)
+
 df <- mtcars %>%
   mutate(char_cyl = paste0("cyl", cyl)) %>%
   select(wt, char_cyl, am) 
@@ -45,7 +49,6 @@ For `binomial` models, the [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_funct
 
 ```{r}
 library(tidypredict)
-
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
@@ -62,7 +65,8 @@ df %>%
 The parser reads several parts of the `glm` object to tabulate all of the needed variables.  One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model.  For example, `offset` is listed because it's part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.
 
 ```{r}
-parse_model(model)
+pm <- parse_model(model)
+str(pm, 2)
 ```
 
 The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.
