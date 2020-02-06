@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -119,6 +119,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -155,10 +156,10 @@ terms:
 <div id="read-in-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#read-in-r" class="anchor"></a>Read in R</h2>
-<p>The YAML data can be read in R by using the <code>yaml</code> package. In this example, we have copy-pasted most of the models inside a variable called <code>sklearn_model</code>. Because <code>yaml</code> requires local YAML variables to be split by line, we use <code><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit()</a></code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(yaml)</a>
+<p>The YAML data can be read in R by using the <code>yaml</code> package. In this example, we have copy-pasted most of the models inside a variable called <code>sklearn_model</code>. Because <code>yaml</code> requires local YAML variables to be split by line, we use <code><a href="https://rdrr.io/r/base/strsplit.html">strsplit()</a></code>.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(yaml)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(<span class="st">"general:</span></a>
+<a class="sourceLine" id="cb2-3" data-line-number="3">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(<span class="st">"general:</span></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  is_glm: 0</span></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">  model: lm</span></a>
 <a class="sourceLine" id="cb2-6" data-line-number="6"><span class="st">  residual: 0</span></a>
@@ -204,9 +205,9 @@ terms:
 <a class="sourceLine" id="cb2-46" data-line-number="46"><span class="st">  label: s1</span></a>
 <a class="sourceLine" id="cb2-47" data-line-number="47"><span class="st">"</span>, <span class="dt">split =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[[<span class="dv">1</span>]]</a></code></pre></div>
 <p>Now the model is converted to an R <code>list</code> using <code>yaml.load</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/yaml.load">yaml.load</a></span>(sklearn_model)</a>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/yaml/man/yaml.load.html">yaml.load</a></span>(sklearn_model)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(sklearn_model, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(sklearn_model, <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; List of 2</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  $ general:List of 6</span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;   ..$ is_glm  : int 0</span></a>
@@ -228,11 +229,11 @@ terms:
 <a href="#tidypredict" class="anchor"></a><code>tidypredict</code>
 </h2>
 <p>The <code>list</code> object needs to be recognized as a <code>tidypredict</code> parsed model. To do that, we use <code><a href="../reference/as_parsed_model.html">as_parsed_model()</a></code></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb4-3" data-line-number="3">spm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span>(sklearn_model)</a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/class">class</a></span>(spm)</a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="https://rdrr.io/r/base/class.html">class</a></span>(spm)</a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] "parsed_model"  "pm_regression" "list"</span></a></code></pre></div>
 <p>The <code>spm</code> variable now works just as any parsed model inside R. Use <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> to view the resulting formula.</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(spm)</a>
@@ -247,8 +248,8 @@ terms:
 <h2 class="hasAnchor">
 <a href="#broom" class="anchor"></a><code>broom</code>
 </h2>
-<p>Now that we have a <code>parsed_model</code> object, it is possible to use <code>broom</code>’s <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> function. This means that we are able to integrate a totally external model, with <code>broom</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(spm)</a>
+<p>Now that we have a <code>parsed_model</code> object, it is possible to use <code>broom</code>’s <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function. This means that we are able to integrate a totally external model, with <code>broom</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(spm)</a>
 <a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
 <a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;   term        estimate</span></a>
 <a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></a>
@@ -262,6 +263,7 @@ terms:
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -277,6 +279,7 @@ terms:
 </div>
 
 
+
       <footer><div class="tidyverse">
   <p><code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
 </div>
@@ -287,10 +290,12 @@ terms:
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.4.3
+Version: 0.4.4
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -8,7 +8,7 @@ Description: It parses a fitted 'R' model object, and returns a formula
     supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
     cubist(), and ctree() models. 
 Authors@R:
-    person("Edgar", "Ruiz", email = "edgar@rstudio.com", role = c("aut", "cre"))
+    person("Edgar", "Ruiz", email = "edgararuiz@gmail.com", role = c("aut", "cre"))
 Depends:
     R (>= 3.1)
 Imports:
@@ -39,6 +39,6 @@ Suggests:
 License: GPL-3
 URL: https://tidymodels.github.io/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
-RoxygenNote: 6.1.1
+RoxygenNote: 7.0.2
 Encoding: UTF-8
 VignetteBuilder: knitr

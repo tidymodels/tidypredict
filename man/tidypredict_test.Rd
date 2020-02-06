@@ -4,8 +4,14 @@
 \alias{tidypredict_test}
 \title{Tests base predict function against tidypredict}
 \usage{
-tidypredict_test(model, df = model$model, threshold = 1e-12,
-  include_intervals = FALSE, max_rows = NULL, xg_df = NULL)
+tidypredict_test(
+  model,
+  df = model$model,
+  threshold = 1e-12,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+)
 }
 \arguments{
 \item{model}{An R model or a list with a parsed model. It currently supports

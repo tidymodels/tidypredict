@@ -32,12 +32,11 @@
 
 
 <meta property="og:title" content="Returns a Tidy Eval formula to calculate prediction interval — tidypredict_interval" />
-
 <meta property="og:description" content="It parses a model or uses an already parsed model to return a
 Tidy Eval formula that can then be used inside a dplyr command." />
-
 <meta property="og:image" content="/logo.png" />
 <meta name="twitter:card" content="summary" />
+
 
 
 
@@ -58,6 +57,7 @@ Tidy Eval formula that can then be used inside a dplyr command." />
 
  gtag('config', 'UA-115082821-1');
 </script>
+
   </head>
 
   <body>
@@ -77,7 +77,7 @@ Tidy Eval formula that can then be used inside a dplyr command." />
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -153,6 +153,7 @@ Tidy Eval formula that can then be used inside a dplyr command." />
 </div><!--/.navbar -->
 
       
+
       </header>
 
 <div class="row">
@@ -164,14 +165,12 @@ Tidy Eval formula that can then be used inside a dplyr command." />
     </div>
 
     <div class="ref-description">
-    
     <p>It parses a model or uses an already parsed model to return a
 Tidy Eval formula that can then be used inside a dplyr command.</p>
-    
     </div>
 
     <pre class="usage"><span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>, <span class='kw'>interval</span> <span class='kw'>=</span> <span class='fl'>0.95</span>)</pre>
-    
+
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
@@ -184,16 +183,15 @@ Tidy Eval formula that can then be used inside a dplyr command.</p>
       <td><p>The prediction interval, defaults to 0.95</p></td>
     </tr>
     </table>
-    
+
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>The result still has to be added to the fit to obtain the upper bound, and
 subtracted from fit to obtain the lower bound.</p>
-    
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'>
-<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://www.rdocumentation.org/packages/stats/topics/lm'>lm</a></span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
+<span class='no'>model</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span>(<span class='no'>mpg</span> ~ <span class='no'>wt</span> + <span class='no'>cyl</span> * <span class='no'>disp</span>, <span class='kw'>offset</span> <span class='kw'>=</span> <span class='no'>am</span>, <span class='kw'>data</span> <span class='kw'>=</span> <span class='no'>mtcars</span>)
 <span class='fu'>tidypredict_interval</span>(<span class='no'>model</span>)</div><div class='output co'>#&gt; 2.05183051648029 * sqrt(-0.176776695296637 * -0.176776695296637 * 
 #&gt;     6.20704821338125 + (-0.590557271637747 + wt * 0.183559646169165) * 
 #&gt;     (-0.590557271637747 + wt * 0.183559646169165) * 6.20704821338125 + 
@@ -214,14 +212,13 @@ subtracted from fit to obtain the lower bound.</p>
     <h2>Contents</h2>
     <ul class="nav nav-pills nav-stacked">
       <li><a href="#arguments">Arguments</a></li>
-      
       <li><a href="#details">Details</a></li>
-      
       <li><a href="#examples">Examples</a></li>
     </ul>
 
   </div>
 </div>
+
 
       <footer>
       <div class="tidyverse">
@@ -234,11 +231,14 @@ subtracted from fit to obtain the lower bound.</p>
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
    </div>
 
   
 
+
   </body>
 </html>
+
 

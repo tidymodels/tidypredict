@@ -11,10 +11,10 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><link href="tidyverse-2.css" rel="stylesheet">
 <meta property="og:title" content="Run Predictions Inside the Database">
-<meta property="og:description" content="It parses a fitted 'R' model object, and returns a formula
-    in 'Tidy Eval' code that calculates the predictions.
-    It works with several databases back-ends because it leverages 'dplyr'
-    and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
+<meta property="og:description" content="It parses a fitted R model object, and returns a formula
+    in Tidy Eval code that calculates the predictions.
+    It works with several databases back-ends because it leverages dplyr
+    and dbplyr for the final SQL translation of the algorithm. It currently
     supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
     cubist(), and ctree() models. ">
 <meta property="og:image" content="/logo.png">
@@ -31,7 +31,7 @@
 </script>
 </head>
 <body>
-    <div class="container template-article">
+    <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
     <div class="navbar-header">
@@ -46,7 +46,7 @@
         <a class="navbar-brand" href="index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -93,8 +93,7 @@
       <a href="articles/save.html">Save/Reload</a>
     </li>
     <li class="divider">
-    </li>
-<li>
+    <li>
       <a href="articles/non-r.html">Non-R models</a>
     </li>
     <li>
@@ -104,8 +103,7 @@
       <a href="articles/tree.html">Tree model spec</a>
     </li>
     <li class="divider">
-    </li>
-<li>
+    <li>
       <a href="articles/sql.html">DB Writeback</a>
     </li>
   </ul>
@@ -126,22 +124,19 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
-  <div class="col-md-9 contents">
-    
 
-    
-    
+      </header><div class="row">
+  <div class="contents col-md-9">
 <div id="tidypredict" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#tidypredict" class="anchor"></a>tidypredict <img src="reference/figures/logo.png" align="right" width="120px">
 </h1></div>
 
 <p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
 <p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Because it uses <code>dplyr</code>’s database interface, it works with several databases back-ends, such as MS SQL:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a></code></pre></div>
-<pre><code>## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</code></pre>
+<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="co">## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</span></a></code></pre></div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
@@ -155,7 +150,7 @@
 <h2 class="hasAnchor">
 <a href="#functions" class="anchor"></a>Functions</h2>
 <p><code>tidypredict</code> has only a few functions, and it is not expected that number to grow much. The main focus at this time is to add more models to support.</p>
-<table class="table table">
+<table class="table">
 <colgroup>
 <col width="26%">
 <col width="73%">
@@ -181,7 +176,7 @@
 </tr>
 <tr class="even">
 <td><code><a href="reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>Tests <code>tidyverse</code> predictions against the model’s native <code><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict()</a></code> function</td>
+<td>Tests <code>tidyverse</code> predictions against the model’s native <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> function</td>
 </tr>
 <tr class="odd">
 <td><code><a href="reference/tidypredict_interval.html">tidypredict_interval()</a></code></td>
@@ -207,7 +202,7 @@
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
 <p><img src="reference/figures/howitworks.png"></p>
 <p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. That formula can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
-<ol style="list-style-type: decimal">
+<ol>
 <li>Fit the model using a base R model, or one from the packages listed in <a href="#supported-models">Supported Models</a>
 </li>
 <li>
@@ -226,7 +221,7 @@
 <h3 class="hasAnchor">
 <a href="#parsed-model-spec" class="anchor"></a>Parsed model spec</h3>
 <p><code>tidypredict</code> writes and reads a spec based on a model. Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
-<ol style="list-style-type: decimal">
+<ol>
 <li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a Shiny app.</li>
 <li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means, that the parsed model spec can become a good alternative to using <em>PMML.</em>
 </li>
@@ -238,21 +233,21 @@
 <a href="#supported-models" class="anchor"></a>Supported models</h2>
 <p>The following models are supported by <code>tidypredict</code>:</p>
 <ul>
-<li>Linear Regression - <code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code>
+<li>Linear Regression - <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code>
 </li>
-<li>Generalized Linear model - <code><a href="https://www.rdocumentation.org/packages/stats/topics/glm">glm()</a></code>
+<li>Generalized Linear model - <code><a href="https://rdrr.io/r/stats/glm.html">glm()</a></code>
 </li>
-<li>Random Forest models - <code><a href="https://www.rdocumentation.org/packages/randomForest/topics/randomForest">randomForest::randomForest()</a></code>
+<li>Random Forest models - <code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html">randomForest::randomForest()</a></code>
 </li>
-<li>Random Forest models, via <code>ranger</code> - <code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger::ranger()</a></code>
+<li>Random Forest models, via <code>ranger</code> - <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger::ranger()</a></code>
 </li>
-<li>MARS models - <code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code>
+<li>MARS models - <code><a href="https://rdrr.io/pkg/earth/man/earth.html">earth::earth()</a></code>
 </li>
-<li>XGBoost models - <code><a href="https://www.rdocumentation.org/packages/xgboost/topics/xgb.Booster.complete">xgboost::xgb.Booster.complete()</a></code>
+<li>XGBoost models - <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.Booster.complete.html">xgboost::xgb.Booster.complete()</a></code>
 </li>
-<li>Cubist models - <code><a href="https://www.rdocumentation.org/packages/Cubist/topics/cubist.default">Cubist::cubist()</a></code>
+<li>Cubist models - <code><a href="https://rdrr.io/pkg/Cubist/man/cubist.default.html">Cubist::cubist()</a></code>
 </li>
-<li>Tree models, via <code>partykit</code> - <code><a href="https://www.rdocumentation.org/packages/partykit/topics/ctree">partykit::ctree()</a></code>
+<li>Tree models, via <code>partykit</code> - <code><a href="https://rdrr.io/pkg/partykit/man/ctree.html">partykit::ctree()</a></code>
 </li>
 </ul>
 <div id="parsnip" class="section level3">
@@ -262,36 +257,36 @@
 <p><code>tidypredict</code> supports models fitted via the <code>parsnip</code> interface. The ones confirmed currently work in <code>tidypredict</code> are:</p>
 <ul>
 <li>
-<code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> with <em>“lm”</em> as the engine.</li>
+<code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> with <em>“lm”</em> as the engine.</li>
 <li>
-<code><a href="https://www.rdocumentation.org/packages/randomForest/topics/randomForest">randomForest::randomForest()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“randomForest”</em> as the engine.</li>
+<code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html">randomForest::randomForest()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“randomForest”</em> as the engine.</li>
 <li>
-<code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
+<code><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
 <li>
-<code><a href="https://www.rdocumentation.org/packages/earth/topics/earth">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
+<code><a href="https://rdrr.io/pkg/earth/man/earth.html">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
 </ul>
 </div>
 <div id="broom" class="section level3">
 <h3 class="hasAnchor">
 <a href="#broom" class="anchor"></a><code>broom</code>
 </h3>
-<p>The <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> function from broom works with linear models parsed via <code>tidypredict</code></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">pm &lt;-<span class="st"> </span><span class="kw"><a href="reference/parse_model.html">parse_model</a></span>(<span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(wt <span class="op">~</span><span class="st"> </span>., mtcars))</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(pm)</a></code></pre></div>
-<pre><code>## # A tibble: 11 x 2
-##    term        estimate
-##    &lt;chr&gt;          &lt;dbl&gt;
-##  1 (Intercept) -0.231  
-##  2 mpg         -0.0417 
-##  3 cyl         -0.0573 
-##  4 disp         0.00669
-##  5 hp          -0.00323
-##  6 drat        -0.0901 
-##  7 qsec         0.200  
-##  8 vs          -0.0664 
-##  9 am           0.0184 
-## 10 gear        -0.0935 
-## 11 carb         0.249</code></pre>
+<p>The <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function from broom works with linear models parsed via <code>tidypredict</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">pm &lt;-<span class="st"> </span><span class="kw"><a href="reference/parse_model.html">parse_model</a></span>(<span class="kw"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(wt <span class="op">~</span><span class="st"> </span>., mtcars))</a>
+<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(pm)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="co">## # A tibble: 11 x 2</span></a>
+<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">##    term        estimate</span></a>
+<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">##    &lt;chr&gt;          &lt;dbl&gt;</span></a>
+<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">##  1 (Intercept) -0.231  </span></a>
+<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">##  2 mpg         -0.0417 </span></a>
+<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">##  3 cyl         -0.0573 </span></a>
+<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">##  4 disp         0.00669</span></a>
+<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">##  5 hp          -0.00323</span></a>
+<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">##  6 drat        -0.0901 </span></a>
+<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">##  7 qsec         0.200  </span></a>
+<a class="sourceLine" id="cb7-11" data-line-number="11"><span class="co">##  8 vs          -0.0664 </span></a>
+<a class="sourceLine" id="cb7-12" data-line-number="12"><span class="co">##  9 am           0.0184 </span></a>
+<a class="sourceLine" id="cb7-13" data-line-number="13"><span class="co">## 10 gear        -0.0935 </span></a>
+<a class="sourceLine" id="cb7-14" data-line-number="14"><span class="co">## 11 carb         0.249</span></a></code></pre></div>
 </div>
 </div>
 </div>
@@ -320,7 +315,7 @@
 </ul>
 </div>
 
-      <div class="dev-status">
+  <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://travis-ci.org/tidymodels/tidypredict"><img src="https://travis-ci.org/tidymodels/tidypredict.svg?branch=master" alt="Build Status"></a></li>
@@ -329,7 +324,6 @@
 </ul>
 </div>
 </div>
-
 </div>
 
 
@@ -343,10 +337,12 @@
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

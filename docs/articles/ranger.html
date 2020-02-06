@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -119,6 +119,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -167,19 +168,19 @@
 <div id="how-it-works" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
-<p>Here is a simple <code><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger()</a></code> model using the <code>iris</code> dataset:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(ranger)</a>
+<p>Here is a simple <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger()</a></code> model using the <code>iris</code> dataset:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(ranger)</a>
 <a class="sourceLine" id="cb1-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/ranger/topics/ranger">ranger</a></span>(Species <span class="op">~</span><span class="st"> </span>.,<span class="dt">data =</span> iris, <span class="dt">num.trees =</span>  <span class="dv">100</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-5" data-line-number="5">model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger</a></span>(Species <span class="op">~</span><span class="st"> </span>.,<span class="dt">data =</span> iris, <span class="dt">num.trees =</span>  <span class="dv">100</span>)</a></code></pre></div>
 </div>
 <div id="under-the-hood" class="section level2">
 <h2 class="hasAnchor">
 <a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
-<p>The parser is based on the output from the <code><a href="https://www.rdocumentation.org/packages/ranger/topics/treeInfo">ranger::treeInfo()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/ranger/topics/treeInfo">treeInfo</a></span>(model) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>()</a>
+<p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html">ranger::treeInfo()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html">treeInfo</a></span>(model) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>()</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval terminal</span></a>
 <a class="sourceLine" id="cb2-4" data-line-number="4"><span class="co">#&gt; 1      0         1          2          4  Petal.Width     1.75    FALSE</span></a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; 2      1         3          4          3 Petal.Length     2.45    FALSE</span></a>
@@ -215,11 +216,11 @@
 <h2 class="hasAnchor">
 <a href="#parsnip" class="anchor"></a>parsnip</h2>
 <p><code>tidypredict</code> also supports <code>ranger</code> model objects fitted via the <code>parsnip</code> package.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(parsnip)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(parsnip)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">parsnip_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/parsnip/topics/rand_forest">rand_forest</a></span>() <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/parsnip/topics/set_engine">set_engine</a></span>(<span class="st">"ranger"</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/parsnip/topics/reexports">fit</a></span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> iris)</a>
+<a class="sourceLine" id="cb4-3" data-line-number="3">parsnip_model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/parsnip/man/rand_forest.html">rand_forest</a></span>(<span class="dt">mode =</span> <span class="st">"classification"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/parsnip/man/set_engine.html">set_engine</a></span>(<span class="st">"ranger"</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/pkg/parsnip/man/reexports.html">fit</a></span>(Species <span class="op">~</span><span class="st"> </span>., <span class="dt">data =</span> iris)</a>
 <a class="sourceLine" id="cb4-6" data-line-number="6"></a>
 <a class="sourceLine" id="cb4-7" data-line-number="7"><span class="kw"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(parsnip_model)[[<span class="dv">1</span>]]</a>
 <a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; case_when(Petal.Width &lt; 0.8 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span></a>
@@ -228,17 +229,16 @@
 <a class="sourceLine" id="cb4-11" data-line-number="11"><span class="co">#&gt;     Petal.Width &gt;= 1.65 &amp; Petal.Length &lt; 4.75 &amp; Petal.Length &lt; </span></a>
 <a class="sourceLine" id="cb4-12" data-line-number="12"><span class="co">#&gt;         5.05 &amp; Petal.Width &gt;= 0.8 ~ "virginica", Sepal.Length &gt;= </span></a>
 <a class="sourceLine" id="cb4-13" data-line-number="13"><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></a>
-<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt;         0.8 ~ "versicolor", Sepal.Width &gt;= 3.1 &amp; Sepal.Length &lt; </span></a>
+<a class="sourceLine" id="cb4-14" data-line-number="14"><span class="co">#&gt;         0.8 ~ "versicolor", Sepal.Width &lt; 3.1 &amp; Sepal.Length &lt; </span></a>
 <a class="sourceLine" id="cb4-15" data-line-number="15"><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></a>
-<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt;         0.8 ~ "versicolor", Petal.Width &lt; 1.65 &amp; Sepal.Width &lt; </span></a>
-<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt;         3.1 &amp; Sepal.Length &lt; 6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; </span></a>
-<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt;         5.05 &amp; Petal.Width &gt;= 0.8 ~ "versicolor", Petal.Width &gt;= </span></a>
-<a class="sourceLine" id="cb4-19" data-line-number="19"><span class="co">#&gt;         1.65 &amp; Sepal.Width &lt; 3.1 &amp; Sepal.Length &lt; 6.5 &amp; Petal.Length &gt;= </span></a>
-<a class="sourceLine" id="cb4-20" data-line-number="20"><span class="co">#&gt;         4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= 0.8 ~ "virginica")</span></a></code></pre></div>
+<a class="sourceLine" id="cb4-16" data-line-number="16"><span class="co">#&gt;         0.8 ~ "virginica", Sepal.Width &gt;= 3.1 &amp; Sepal.Length &lt; </span></a>
+<a class="sourceLine" id="cb4-17" data-line-number="17"><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></a>
+<a class="sourceLine" id="cb4-18" data-line-number="18"><span class="co">#&gt;         0.8 ~ "versicolor")</span></a></code></pre></div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -253,6 +253,7 @@
 </div>
 
 
+
       <footer><div class="tidyverse">
   <p><code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
 </div>
@@ -263,10 +264,12 @@
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

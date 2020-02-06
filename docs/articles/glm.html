@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -119,6 +119,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -136,7 +137,7 @@
 <h2 class="hasAnchor">
 <a href="#highlights-limitations" class="anchor"></a>Highlights &amp; Limitations</h2>
 <ul>
-<li>Defaults to 0-to-1 predictions for <code>binomial</code> family models. That is akin to running <code><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict(model, type = "response")</a></code>
+<li>Defaults to 0-to-1 predictions for <code>binomial</code> family models. That is akin to running <code><a href="https://rdrr.io/r/stats/predict.html">predict(model, type = "response")</a></code>
 </li>
 <li>Only <em>treatment</em> contrast (<code>contr.treatment</code>) are supported.</li>
 <li>
@@ -161,23 +162,23 @@
 <div id="how-it-works" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(dplyr)</a>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(dplyr)</a>
 <a class="sourceLine" id="cb1-3" data-line-number="3"></a>
 <a class="sourceLine" id="cb1-4" data-line-number="4">df &lt;-<span class="st"> </span>mtcars <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">char_cyl =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/paste">paste0</a></span>(<span class="st">"cyl"</span>, cyl)) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb1-5" data-line-number="5"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span>(<span class="dt">char_cyl =</span> <span class="kw"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span>(<span class="st">"cyl"</span>, cyl)) <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb1-6" data-line-number="6"><span class="st">  </span><span class="kw"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span>(wt, char_cyl, am) </a>
 <a class="sourceLine" id="cb1-7" data-line-number="7"></a>
-<a class="sourceLine" id="cb1-8" data-line-number="8">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/glm">glm</a></span>(am <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>char_cyl, <span class="dt">data =</span> df, <span class="dt">family =</span> <span class="st">"binomial"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-8" data-line-number="8">model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/glm.html">glm</a></span>(am <span class="op">~</span><span class="st"> </span>wt <span class="op">+</span><span class="st"> </span>char_cyl, <span class="dt">data =</span> df, <span class="dt">family =</span> <span class="st">"binomial"</span>)</a></code></pre></div>
 <p>It returns a SQL query that contains the coefficients (<code>model$coefficients</code>) operated against the correct variable or categorical variable value. In most cases the resulting SQL is one short <code>CASE WHEN</code> statement per coefficient. It appends the <code>offset</code> field or value, if one is provided.</p>
 <p>For <code>binomial</code> models, the <a href="https://en.wikipedia.org/wiki/Sigmoid_function">sigmoid</a> equation is applied. This means that the target SQL database type will need to support the exponent function.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"><span class="kw"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span>(model, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a>
 <a class="sourceLine" id="cb2-3" data-line-number="3"><span class="co">#&gt; &lt;SQL&gt; 1.0 - 1.0 / (1.0 + EXP(20.8527831345691 + (`wt` * -7.85934263583835) + (CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) </span><span class="re">END</span><span class="co"> * 3.10462643177453) + (CASE WHEN (`char_cyl` = 'cyl8') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl8') THEN (0.0) </span><span class="re">END</span><span class="co"> * 5.37942092366097)))</span></a></code></pre></div>
 <p>Alternatively, use <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> if the results are the be used or previewed in <code>dplyr</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">df <span class="op">%&gt;%</span></a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"><span class="st">  </span><span class="kw"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span>(model) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(<span class="dv">10</span>) </a>
+<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="st">  </span><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="dv">10</span>) </a>
 <a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt;       wt char_cyl am        fit</span></a>
 <a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt; 1  2.620     cyl6  1 0.96662269</span></a>
 <a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt; 2  2.875     cyl6  1 0.79605201</span></a>
@@ -195,7 +196,7 @@
 <a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
 <p>The parser reads several parts of the <code>glm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table. Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
 <div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">pm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_model.html">parse_model</a></span>(model)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(pm, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(pm, <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt; List of 2</span></a>
 <a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt;  $ general:List of 7</span></a>
 <a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt;   ..$ model   : chr "glm"</span></a>
@@ -228,7 +229,7 @@
 <div id="how-it-performs" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-performs" class="anchor"></a>How it performs</h2>
-<p>Testing the <code>tidypredict</code> results is easy. The <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code> to the results given by <code><a href="https://www.rdocumentation.org/packages/stats/topics/predict">predict()</a></code></p>
+<p>Testing the <code>tidypredict</code> results is easy. The <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code> to the results given by <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code></p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span>(model)</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; tidypredict test results</span></a>
 <a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt; Difference threshold: 1e-12</span></a>
@@ -238,6 +239,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -253,6 +255,7 @@
 </div>
 
 
+
       <footer><div class="tidyverse">
   <p><code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
 </div>
@@ -263,10 +266,12 @@
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

@@ -41,7 +41,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
           <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.4</span>
         </div>
       </div>
     </div>
@@ -119,6 +119,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -134,15 +135,15 @@
     
 <p><code>tidypredict</code> splits the translation process in two. It first parses the model to extract the needed components to produce the prediction. And second, it uses the object with the parsed information to produce the R formula. Thanks to this two step process, <code>tidypredict</code> does not need to parse the model every time. <code>tidypredict</code>’s functions also accept R objects that contained already models that have been parsed already. Additionally, because the parsed model object is made up of a list made up of basic variables, it is possible to save it in a file. Currently, the best file format is YAML.</p>
 <p>For this article, we will use the following model:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>(wt <span class="op">+</span><span class="st"> </span>disp) <span class="op">*</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(mpg <span class="op">~</span><span class="st"> </span>(wt <span class="op">+</span><span class="st"> </span>disp) <span class="op">*</span><span class="st"> </span>cyl, <span class="dt">data =</span> mtcars)</a></code></pre></div>
 <div id="parse-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#parse-model" class="anchor"></a>Parse model</h2>
-<p>The <code><a href="../reference/parse_model.html">parse_model()</a></code> function allows to run the first step manually. It will return an R list object which contains all of the needed information to produce a prediction calculation. The structure of the parsed model varies based on what kind of model is being processed. In general, it is consistent in what kind of information it expects from each model type. For example, in the example the <code><a href="https://www.rdocumentation.org/packages/stats/topics/lm">lm()</a></code> model object will return variables such as <code>sigma2</code>, which would not be used in other model types, such as decision trees.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
+<p>The <code><a href="../reference/parse_model.html">parse_model()</a></code> function allows to run the first step manually. It will return an R list object which contains all of the needed information to produce a prediction calculation. The structure of the parsed model varies based on what kind of model is being processed. In general, it is consistent in what kind of information it expects from each model type. For example, in the example the <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code> model object will return variables such as <code>sigma2</code>, which would not be used in other model types, such as decision trees.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
 <a class="sourceLine" id="cb2-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb2-3" data-line-number="3">parsed &lt;-<span class="st"> </span><span class="kw"><a href="../reference/parse_model.html">parse_model</a></span>(model)</a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(parsed, <span class="dv">2</span>)</a>
+<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(parsed, <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb2-5" data-line-number="5"><span class="co">#&gt; List of 2</span></a>
 <a class="sourceLine" id="cb2-6" data-line-number="6"><span class="co">#&gt;  $ general:List of 6</span></a>
 <a class="sourceLine" id="cb2-7" data-line-number="7"><span class="co">#&gt;   ..$ model   : chr "lm"</span></a>
@@ -169,22 +170,22 @@
 <h2 class="hasAnchor">
 <a href="#saving-the-model" class="anchor"></a>Saving the model</h2>
 <p>Saving the model is quite easy, use the package such as <code>yaml</code> to write the model object as a YAML file. Any format that can persist a ragged list object should work as well.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(yaml)</a>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(yaml)</a>
 <a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/write_yaml">write_yaml</a></span>(parsed, <span class="st">"my_model.yml"</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="kw"><a href="https://rdrr.io/pkg/yaml/man/write_yaml.html">write_yaml</a></span>(parsed, <span class="st">"my_model.yml"</span>)</a></code></pre></div>
 </div>
 <div id="re-load-the-model" class="section level2">
 <h2 class="hasAnchor">
 <a href="#re-load-the-model" class="anchor"></a>Re-load the model</h2>
 <p>In a new R session, we can read the YAML file into our environment.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(yaml)</a>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(tidypredict)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(yaml)</a>
 <a class="sourceLine" id="cb5-3" data-line-number="3"></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/read_yaml">read_yaml</a></span>(<span class="st">"my_model"</span>)</a>
+<a class="sourceLine" id="cb5-4" data-line-number="4">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="https://rdrr.io/pkg/yaml/man/read_yaml.html">read_yaml</a></span>(<span class="st">"my_model"</span>)</a>
 <a class="sourceLine" id="cb5-5" data-line-number="5"></a>
 <a class="sourceLine" id="cb5-6" data-line-number="6">loaded_model &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span>(loaded_model)</a></code></pre></div>
 <p>The preview of the file looks exactly as the preview of the original parsed model.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(loaded_model, <span class="dv">2</span>)</a>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(loaded_model, <span class="dv">2</span>)</a>
 <a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; List of 2</span></a>
 <a class="sourceLine" id="cb6-3" data-line-number="3"><span class="co">#&gt;  $ general:List of 6</span></a>
 <a class="sourceLine" id="cb6-4" data-line-number="4"><span class="co">#&gt;   ..$ model   : chr "lm"</span></a>
@@ -213,8 +214,8 @@
 <h2 class="hasAnchor">
 <a href="#broom" class="anchor"></a><code>broom</code>
 </h2>
-<p>The <code>parsed_model</code> object integrates with <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> from <code>broom</code>.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(loaded_model)</a>
+<p>The <code>parsed_model</code> object integrates with <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> from <code>broom</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(loaded_model)</a>
 <a class="sourceLine" id="cb9-2" data-line-number="2"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
 <a class="sourceLine" id="cb9-3" data-line-number="3"><span class="co">#&gt;   term        estimate</span></a>
 <a class="sourceLine" id="cb9-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></a>
@@ -228,6 +229,7 @@
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
+
         <div id="tocnav">
       <h2 class="hasAnchor">
 <a href="#tocnav" class="anchor"></a>Contents</h2>
@@ -243,6 +245,7 @@
 </div>
 
 
+
       <footer><div class="tidyverse">
   <p><code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
 </div>
@@ -253,10 +256,12 @@
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

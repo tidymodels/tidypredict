@@ -4,8 +4,13 @@
 \alias{tidypredict_to_column}
 \title{Adds the prediction columns to a piped command set}
 \usage{
-tidypredict_to_column(df, model, add_interval = FALSE, interval = 0.95,
-  vars = c("fit", "upper", "lower"))
+tidypredict_to_column(
+  df,
+  model,
+  add_interval = FALSE,
+  interval = 0.95,
+  vars = c("fit", "upper", "lower")
+)
 }
 \arguments{
 \item{df}{A data.frame or tibble}

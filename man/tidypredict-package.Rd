@@ -6,7 +6,7 @@
 \alias{tidypredict-package}
 \title{tidypredict: Run Predictions Inside the Database}
 \description{
-\if{html}{\figure{logo.png}{options: align='right'}}
+\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
 It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -24,7 +24,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Edgar Ruiz \email{edgar@rstudio.com}
+\strong{Maintainer}: Edgar Ruiz \email{edgararuiz@gmail.com}
 
 }
 \keyword{internal}
