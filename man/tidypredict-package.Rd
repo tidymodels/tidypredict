@@ -24,7 +24,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Edgar Ruiz \email{edgararuiz@gmail.com}
+\strong{Maintainer}: Max Kuhn \email{max@rstudio.com}
 
 }
 \keyword{internal}

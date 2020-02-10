@@ -1,6 +1,10 @@
 ## Release summary
 
-* Updates author's email address
+* Switches to the Max Kuhn as package maintainer
+
+## Comments
+
+* Having Max as the maintainer will guarantee good follow through for any communications with CRAN.  This is the reason why there is another update is such short order from the previous update in CRAN.  Thank you for your understanding.
 
 ## Test environments
 
