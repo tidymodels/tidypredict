@@ -18,3 +18,4 @@ travis.yml
 config.toml
 ^revdep$
 ^cran-comments\.md$
+^\.github$

@@ -1,11 +1,11 @@
 
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
-[![Build
-Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)
+[![R build
+status](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://cran.r-project.org/package=tidypredict)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/tidymodels/tidypredict?branch=master)
+[![Codecov test
+coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=master)
 
 The main goal of `tidypredict` is to enable running predictions inside
 databases. It reads the model, extracts the components needed to
@@ -19,8 +19,7 @@ model <- lm(mpg ~ wt + cyl, data = mtcars)
 
 `tidypredict` can return a SQL statement that is ready to run inside the
 database. Because it uses `dplyr`’s database interface, it works with
-several databases back-ends, such as MS
-    SQL:
+several databases back-ends, such as MS SQL:
 
 ``` r
 tidypredict_sql(model, dbplyr::simulate_mssql())
@@ -47,8 +46,7 @@ Or install the **development version** using `devtools` as follows:
 
 `tidypredict` has only a few functions, and it is not expected that
 number to grow much. The main focus at this time is to add more models
-to
-support.
+to support.
 
 | Function                     | Description                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------ |
