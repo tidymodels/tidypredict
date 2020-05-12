@@ -37,7 +37,7 @@ Suggests:
     yaml,
     parsnip
 License: GPL-3
-URL: https://tidymodels.github.io/tidypredict
+URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
 RoxygenNote: 7.0.2
 Encoding: UTF-8
