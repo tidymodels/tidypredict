@@ -6,26 +6,27 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Non-R Models • tidypredict</title>
-<!-- jquery --><script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha384-nrOSfDHtoPMzJHjVTdCopGqIqeYETSXhZDFyniQ8ZHcVy08QesyHcnOUpMpqnmWq" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-T8Gy5hrqNKT+hzMclPo118YTQO6cYprQmhrYwIiQ/3axmI1hQomh7Ud2hPOy8SP1" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
+<!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="../tidyverse.css" rel="stylesheet">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><link href="../tidyverse-2.css" rel="stylesheet">
 <meta property="og:title" content="Non-R Models">
-<meta property="og:description" content="">
-<meta property="og:image" content="/logo.png">
+<meta property="og:description" content="tidypredict">
+<meta property="og:image" content="https://tidypredict.tidymodels.org/logo.png">
 <meta name="twitter:card" content="summary">
-<!-- mathjax --><script src="https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script><!--[if lt IE 9]>
+<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
 <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]--><!-- google analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=UA-115082821-1"></script><script>
- window.dataLayer = window.dataLayer || [];
- function gtag(){dataLayer.push(arguments);}
- gtag('js', new Date());
-
- gtag('config', 'UA-115082821-1');
-</script>
+<![endif]-->
 </head>
-<body>
+<body data-spy="scroll" data-target="#toc">
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -40,8 +41,8 @@
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info">
-          <span class="partof">part of <a href="https://github.com/tidymodels">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.2.9000</span>
+          <span class="partof">part of <a href="https://tidymodels.org">tidymodels</a></span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.5</span>
         </div>
       </div>
     </div>
@@ -109,7 +110,12 @@
 <li>
   <a href="../reference/index.html">Reference</a>
 </li>
-        
+        <li>
+  <a href="https://github.com/tidymodels/tidypredict/">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
 </div>
 <!--/.nav-collapse -->
@@ -119,13 +125,14 @@
 <!--/.navbar -->
 
       
-      </header><div class="row">
+
+      </header><script src="non-r_files/header-attrs-2.1/header-attrs.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1>Non-R Models</h1>
+      <h1 data-toc-skip>Non-R Models</h1>
             
       
-      
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/master/vignettes/non-r.Rmd"><code>vignettes/non-r.Rmd</code></a></small>
       <div class="hidden name"><code>non-r.Rmd</code></div>
 
     </div>
@@ -155,142 +162,138 @@ terms:
 <div id="read-in-r" class="section level2">
 <h2 class="hasAnchor">
 <a href="#read-in-r" class="anchor"></a>Read in R</h2>
-<p>The YAML data can be read in R by using the <code>yaml</code> package. In this example, we have copy-pasted most of the models inside a variable called <code>sklearn_model</code>. Because <code>yaml</code> requires local YAML variables to be split by line, we use <code><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit()</a></code>.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(yaml)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb2-3" data-line-number="3">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/strsplit">strsplit</a></span>(<span class="st">"general:</span></a>
-<a class="sourceLine" id="cb2-4" data-line-number="4"><span class="st">  is_glm: 0</span></a>
-<a class="sourceLine" id="cb2-5" data-line-number="5"><span class="st">  model: lm</span></a>
-<a class="sourceLine" id="cb2-6" data-line-number="6"><span class="st">  residual: 0</span></a>
-<a class="sourceLine" id="cb2-7" data-line-number="7"><span class="st">  sigma2: 0</span></a>
-<a class="sourceLine" id="cb2-8" data-line-number="8"><span class="st">  type: regression</span></a>
-<a class="sourceLine" id="cb2-9" data-line-number="9"><span class="st">  version: 2.0</span></a>
-<a class="sourceLine" id="cb2-10" data-line-number="10"><span class="st">terms:</span></a>
-<a class="sourceLine" id="cb2-11" data-line-number="11"><span class="st">- coef: 152.76430691633442</span></a>
-<a class="sourceLine" id="cb2-12" data-line-number="12"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-13" data-line-number="13"><span class="st">  - col: (Intercept)</span></a>
-<a class="sourceLine" id="cb2-14" data-line-number="14"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-15" data-line-number="15"><span class="st">  is_intercept: 1</span></a>
-<a class="sourceLine" id="cb2-16" data-line-number="16"><span class="st">  label: (Intercept)</span></a>
-<a class="sourceLine" id="cb2-17" data-line-number="17"><span class="st">- coef: 0.3034995490660432</span></a>
-<a class="sourceLine" id="cb2-18" data-line-number="18"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-19" data-line-number="19"><span class="st">  - col: age</span></a>
-<a class="sourceLine" id="cb2-20" data-line-number="20"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-21" data-line-number="21"><span class="st">  is_intercept: 0</span></a>
-<a class="sourceLine" id="cb2-22" data-line-number="22"><span class="st">  label: age</span></a>
-<a class="sourceLine" id="cb2-23" data-line-number="23"><span class="st">- coef: -237.63931533353403</span></a>
-<a class="sourceLine" id="cb2-24" data-line-number="24"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-25" data-line-number="25"><span class="st">  - col: sex</span></a>
-<a class="sourceLine" id="cb2-26" data-line-number="26"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-27" data-line-number="27"><span class="st">  is_intercept: 0</span></a>
-<a class="sourceLine" id="cb2-28" data-line-number="28"><span class="st">  label: sex</span></a>
-<a class="sourceLine" id="cb2-29" data-line-number="29"><span class="st">- coef: 510.5306054362253</span></a>
-<a class="sourceLine" id="cb2-30" data-line-number="30"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-31" data-line-number="31"><span class="st">  - col: bmi</span></a>
-<a class="sourceLine" id="cb2-32" data-line-number="32"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-33" data-line-number="33"><span class="st">  is_intercept: 0</span></a>
-<a class="sourceLine" id="cb2-34" data-line-number="34"><span class="st">  label: bmi</span></a>
-<a class="sourceLine" id="cb2-35" data-line-number="35"><span class="st">- coef: 327.7369804093466</span></a>
-<a class="sourceLine" id="cb2-36" data-line-number="36"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-37" data-line-number="37"><span class="st">  - col: bp</span></a>
-<a class="sourceLine" id="cb2-38" data-line-number="38"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-39" data-line-number="39"><span class="st">  is_intercept: 0</span></a>
-<a class="sourceLine" id="cb2-40" data-line-number="40"><span class="st">  label: bp</span></a>
-<a class="sourceLine" id="cb2-41" data-line-number="41"><span class="st">- coef: -814.1317093725387</span></a>
-<a class="sourceLine" id="cb2-42" data-line-number="42"><span class="st">  fields:</span></a>
-<a class="sourceLine" id="cb2-43" data-line-number="43"><span class="st">  - col: s1</span></a>
-<a class="sourceLine" id="cb2-44" data-line-number="44"><span class="st">    type: ordinary</span></a>
-<a class="sourceLine" id="cb2-45" data-line-number="45"><span class="st">  is_intercept: 0</span></a>
-<a class="sourceLine" id="cb2-46" data-line-number="46"><span class="st">  label: s1</span></a>
-<a class="sourceLine" id="cb2-47" data-line-number="47"><span class="st">"</span>, <span class="dt">split =</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>)[[<span class="dv">1</span>]]</a></code></pre></div>
+<p>The YAML data can be read in R by using the <code>yaml</code> package. In this example, we have copy-pasted most of the models inside a variable called <code>sklearn_model</code>. Because <code>yaml</code> requires local YAML variables to be split by line, we use <code><a href="https://rdrr.io/r/base/strsplit.html">strsplit()</a></code>.</p>
+<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">yaml</span>)
+
+<span class="no">sklearn_model</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html">strsplit</a></span>(<span class="st">"general:
+  is_glm: 0
+  model: lm
+  residual: 0
+  sigma2: 0
+  type: regression
+  version: 2.0
+terms:
+- coef: 152.76430691633442
+  fields:
+  - col: (Intercept)
+    type: ordinary
+  is_intercept: 1
+  label: (Intercept)
+- coef: 0.3034995490660432
+  fields:
+  - col: age
+    type: ordinary
+  is_intercept: 0
+  label: age
+- coef: -237.63931533353403
+  fields:
+  - col: sex
+    type: ordinary
+  is_intercept: 0
+  label: sex
+- coef: 510.5306054362253
+  fields:
+  - col: bmi
+    type: ordinary
+  is_intercept: 0
+  label: bmi
+- coef: 327.7369804093466
+  fields:
+  - col: bp
+    type: ordinary
+  is_intercept: 0
+  label: bp
+- coef: -814.1317093725387
+  fields:
+  - col: s1
+    type: ordinary
+  is_intercept: 0
+  label: s1
+"</span>, <span class="kw">split</span> <span class="kw">=</span> <span class="st">"\n"</span>)<span class="kw">[[</span><span class="fl">1</span>]]</pre></body></html></div>
 <p>Now the model is converted to an R <code>list</code> using <code>yaml.load</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">sklearn_model &lt;-<span class="st"> </span><span class="kw"><a href="https://www.rdocumentation.org/packages/yaml/topics/yaml.load">yaml.load</a></span>(sklearn_model)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb3-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/str">str</a></span>(sklearn_model, <span class="dv">2</span>)</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4"><span class="co">#&gt; List of 2</span></a>
-<a class="sourceLine" id="cb3-5" data-line-number="5"><span class="co">#&gt;  $ general:List of 6</span></a>
-<a class="sourceLine" id="cb3-6" data-line-number="6"><span class="co">#&gt;   ..$ is_glm  : int 0</span></a>
-<a class="sourceLine" id="cb3-7" data-line-number="7"><span class="co">#&gt;   ..$ model   : chr "lm"</span></a>
-<a class="sourceLine" id="cb3-8" data-line-number="8"><span class="co">#&gt;   ..$ residual: int 0</span></a>
-<a class="sourceLine" id="cb3-9" data-line-number="9"><span class="co">#&gt;   ..$ sigma2  : int 0</span></a>
-<a class="sourceLine" id="cb3-10" data-line-number="10"><span class="co">#&gt;   ..$ type    : chr "regression"</span></a>
-<a class="sourceLine" id="cb3-11" data-line-number="11"><span class="co">#&gt;   ..$ version : num 2</span></a>
-<a class="sourceLine" id="cb3-12" data-line-number="12"><span class="co">#&gt;  $ terms  :List of 6</span></a>
-<a class="sourceLine" id="cb3-13" data-line-number="13"><span class="co">#&gt;   ..$ :List of 4</span></a>
-<a class="sourceLine" id="cb3-14" data-line-number="14"><span class="co">#&gt;   ..$ :List of 4</span></a>
-<a class="sourceLine" id="cb3-15" data-line-number="15"><span class="co">#&gt;   ..$ :List of 4</span></a>
-<a class="sourceLine" id="cb3-16" data-line-number="16"><span class="co">#&gt;   ..$ :List of 4</span></a>
-<a class="sourceLine" id="cb3-17" data-line-number="17"><span class="co">#&gt;   ..$ :List of 4</span></a>
-<a class="sourceLine" id="cb3-18" data-line-number="18"><span class="co">#&gt;   ..$ :List of 4</span></a></code></pre></div>
+<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">sklearn_model</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/yaml.load.html">yaml.load</a></span>(<span class="no">sklearn_model</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">sklearn_model</span>, <span class="fl">2</span>)
+<span class="co">#&gt; List of 2</span>
+<span class="co">#&gt;  $ general:List of 6</span>
+<span class="co">#&gt;   ..$ is_glm  : int 0</span>
+<span class="co">#&gt;   ..$ model   : chr "lm"</span>
+<span class="co">#&gt;   ..$ residual: int 0</span>
+<span class="co">#&gt;   ..$ sigma2  : int 0</span>
+<span class="co">#&gt;   ..$ type    : chr "regression"</span>
+<span class="co">#&gt;   ..$ version : num 2</span>
+<span class="co">#&gt;  $ terms  :List of 6</span>
+<span class="co">#&gt;   ..$ :List of 4</span>
+<span class="co">#&gt;   ..$ :List of 4</span>
+<span class="co">#&gt;   ..$ :List of 4</span>
+<span class="co">#&gt;   ..$ :List of 4</span>
+<span class="co">#&gt;   ..$ :List of 4</span>
+<span class="co">#&gt;   ..$ :List of 4</span></pre></body></html></div>
 </div>
 <div id="tidypredict" class="section level2">
 <h2 class="hasAnchor">
 <a href="#tidypredict" class="anchor"></a><code>tidypredict</code>
 </h2>
 <p>The <code>list</code> object needs to be recognized as a <code>tidypredict</code> parsed model. To do that, we use <code><a href="../reference/as_parsed_model.html">as_parsed_model()</a></code></p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(tidypredict)</a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"></a>
-<a class="sourceLine" id="cb4-3" data-line-number="3">spm &lt;-<span class="st"> </span><span class="kw"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span>(sklearn_model)</a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/class">class</a></span>(spm)</a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; [1] "parsed_model"  "pm_regression" "list"</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidypredict</span>)
+
+<span class="no">spm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span>(<span class="no">sklearn_model</span>)
+
+<span class="fu"><a href="https://rdrr.io/r/base/class.html">class</a></span>(<span class="no">spm</span>)
+<span class="co">#&gt; [1] "parsed_model"  "pm_regression" "list"</span></pre></body></html></div>
 <p>The <code>spm</code> variable now works just as any parsed model inside R. Use <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> to view the resulting formula.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(spm)</a>
-<a class="sourceLine" id="cb5-2" data-line-number="2"><span class="co">#&gt; 152.764306916334 + (age * 0.303499549066043) + (sex * -237.639315333534) + </span></a>
-<a class="sourceLine" id="cb5-3" data-line-number="3"><span class="co">#&gt;     (bmi * 510.530605436225) + (bp * 327.736980409347) + (s1 * </span></a>
-<a class="sourceLine" id="cb5-4" data-line-number="4"><span class="co">#&gt;     -814.131709372539)</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(<span class="no">spm</span>)
+<span class="co">#&gt; 152.764306916334 + (age * 0.303499549066043) + (sex * -237.639315333534) + </span>
+<span class="co">#&gt;     (bmi * 510.530605436225) + (bp * 327.736980409347) + (s1 * </span>
+<span class="co">#&gt;     -814.131709372539)</span></pre></body></html></div>
 <p>Now, the model can run <strong>inside a database</strong></p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1"><span class="kw"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span>(spm, dbplyr<span class="op">::</span><span class="kw"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</a>
-<a class="sourceLine" id="cb6-2" data-line-number="2"><span class="co">#&gt; &lt;SQL&gt; 152.764306916334 + (`age` * 0.303499549066043) + (`sex` * -237.639315333534) + (`bmi` * 510.530605436225) + (`bp` * 327.736980409347) + (`s1` * -814.131709372539)</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span>(<span class="no">spm</span>, <span class="kw pkg">dbplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())
+<span class="co">#&gt; &lt;SQL&gt; 152.764306916334 + (`age` * 0.303499549066043) + (`sex` * -237.639315333534) + (`bmi` * 510.530605436225) + (`bp` * 327.736980409347) + (`s1` * -814.131709372539)</span></pre></body></html></div>
 </div>
 <div id="broom" class="section level2">
 <h2 class="hasAnchor">
 <a href="#broom" class="anchor"></a><code>broom</code>
 </h2>
-<p>Now that we have a <code>parsed_model</code> object, it is possible to use <code>broom</code>’s <code><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy()</a></code> function. This means that we are able to integrate a totally external model, with <code>broom</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/generics/topics/tidy">tidy</a></span>(spm)</a>
-<a class="sourceLine" id="cb7-2" data-line-number="2"><span class="co">#&gt; # A tibble: 6 x 2</span></a>
-<a class="sourceLine" id="cb7-3" data-line-number="3"><span class="co">#&gt;   term        estimate</span></a>
-<a class="sourceLine" id="cb7-4" data-line-number="4"><span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span></a>
-<a class="sourceLine" id="cb7-5" data-line-number="5"><span class="co">#&gt; 1 (Intercept)  153.   </span></a>
-<a class="sourceLine" id="cb7-6" data-line-number="6"><span class="co">#&gt; 2 age            0.303</span></a>
-<a class="sourceLine" id="cb7-7" data-line-number="7"><span class="co">#&gt; 3 sex         -238.   </span></a>
-<a class="sourceLine" id="cb7-8" data-line-number="8"><span class="co">#&gt; 4 bmi          511.   </span></a>
-<a class="sourceLine" id="cb7-9" data-line-number="9"><span class="co">#&gt; 5 bp           328.   </span></a>
-<a class="sourceLine" id="cb7-10" data-line-number="10"><span class="co">#&gt; 6 s1          -814.</span></a></code></pre></div>
+<p>Now that we have a <code>parsed_model</code> object, it is possible to use <code>broom</code>’s <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function. This means that we are able to integrate a totally external model, with <code>broom</code>.</p>
+<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="no">spm</span>)
+<span class="co">#&gt; # A tibble: 6 x 2</span>
+<span class="co">#&gt;   term        estimate</span>
+<span class="co">#&gt;   &lt;chr&gt;          &lt;dbl&gt;</span>
+<span class="co">#&gt; 1 (Intercept)  153.   </span>
+<span class="co">#&gt; 2 age            0.303</span>
+<span class="co">#&gt; 3 sex         -238.   </span>
+<span class="co">#&gt; 4 bmi          511.   </span>
+<span class="co">#&gt; 5 bp           328.   </span>
+<span class="co">#&gt; 6 s1          -814.</span></pre></body></html></div>
 </div>
   </div>
 
-  <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
-        <div id="tocnav">
-      <h2 class="hasAnchor">
-<a href="#tocnav" class="anchor"></a>Contents</h2>
-      <ul class="nav nav-pills nav-stacked">
-<li><a href="#python-example">python example</a></li>
-      <li><a href="#read-in-r">Read in R</a></li>
-      <li><a href="#tidypredict"><code>tidypredict</code></a></li>
-      <li><a href="#broom"><code>broom</code></a></li>
-      </ul>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
 </div>
-      </div>
 
 </div>
+
 
 
       <footer><div class="tidyverse">
-  <p><code>tidypredict</code> is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
+  <p>tidypredict is a part of the <strong>tidymodels</strong> ecosystem, a collection of modeling packages designed with common APIs and a shared philosophy.</p>
 </div>
 
 <div class="author">
   <p>
-    Developed by Edgar Ruiz.
+    Developed by Max Kuhn.
     Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
   </p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>

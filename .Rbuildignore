@@ -18,3 +18,5 @@ travis.yml
 config.toml
 ^revdep$
 ^cran-comments\.md$
+^\.github$
+^CODE_OF_CONDUCT\.md$

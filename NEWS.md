@@ -1,3 +1,7 @@
+# tidypredict 0.4.5
+
+- Switches maintainer to Max Kuhn
+
 # tidypredict 0.4.3
 
 - Adds support for categorical predictors in `partykit`

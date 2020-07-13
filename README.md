@@ -1,11 +1,12 @@
 
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
-[![Build
-Status](https://travis-ci.org/tidymodels/tidypredict.svg?branch=master)](https://travis-ci.org/tidymodels/tidypredict)
+[![R build
+status](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://cran.r-project.org/package=tidypredict)
-[![Coverage
-Status](https://img.shields.io/codecov/c/github/tidymodels/tidypredict/master.svg)](https://codecov.io/github/tidymodels/tidypredict?branch=master)
+[![Codecov test
+coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=master)
+[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](http://cran.rstudio.com/package=tidypredict)
 
 The main goal of `tidypredict` is to enable running predictions inside
 databases. It reads the model, extracts the components needed to
@@ -19,8 +20,7 @@ model <- lm(mpg ~ wt + cyl, data = mtcars)
 
 `tidypredict` can return a SQL statement that is ready to run inside the
 database. Because it uses `dplyr`’s database interface, it works with
-several databases back-ends, such as MS
-    SQL:
+several databases back-ends, such as MS SQL:
 
 ``` r
 tidypredict_sql(model, dbplyr::simulate_mssql())
@@ -47,8 +47,7 @@ Or install the **development version** using `devtools` as follows:
 
 `tidypredict` has only a few functions, and it is not expected that
 number to grow much. The main focus at this time is to add more models
-to
-support.
+to support.
 
 | Function                     | Description                                                                    |
 | ---------------------------- | ------------------------------------------------------------------------------ |
@@ -141,3 +140,24 @@ tidy(pm)
     ##  9 am           0.0184 
     ## 10 gear        -0.0935 
     ## 11 carb         0.249
+
+## Contributing
+
+This project is released with a [Contributor Code of
+Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
+
+  - For questions and discussions about tidymodels packages, modeling,
+    and machine learning, please [post on RStudio
+    Community](https://rstd.io/tidymodels-community).
+
+  - If you think you have encountered a bug, please [submit an
+    issue](https://github.com/tidymodels/tidypredict/issues).
+
+  - Either way, learn how to create and share a
+    [reprex](https://rstd.io/reprex) (a minimal, reproducible example),
+    to clearly communicate about your code.
+
+  - Check out further details on [contributing guidelines for tidymodels
+    packages](https://www.tidymodels.org/contribute/) and [how to get
+    help](https://www.tidymodels.org/help/).
