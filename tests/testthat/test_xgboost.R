@@ -81,10 +81,67 @@ xgb_binarylogistic_basescore <-
     nrounds = 4
   )
 
+testthat::test_that("Error expected when base score is equal to 0 or 1", {
+  testthat::expect_error(
+    xgb_reglogistic_basescore <-
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          silent = 1,
+          objective = "reg:logistic",
+          base_score = 1
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      )
+  )
+  
+  testthat::expect_error(
+    xgb_binarylogistic_basescore <-
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          silent = 1,
+          objective = "binary:logistic",
+          base_score = 1
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      )
+  )
+  testthat::expect_error(
+    xgb_reglogistic_basescore <-
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          silent = 1,
+          objective = "reg:logistic",
+          base_score = 0
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      )
+  )
+  
+  testthat::expect_error(
+    xgb_binarylogistic_basescore <-
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          silent = 1,
+          objective = "binary:logistic",
+          base_score = 0
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      )
+  )
+})
+
 parsedmodel_xgb_reglogistic_basescore <- parse_model(xgb_reglogistic_basescore)
 parsedmodel_xgb_binarylogistic_basescore <- parse_model(xgb_binarylogistic_basescore)
 
-test_that("Base scores is same", {
+testthat::test_that("Base scores is same", {
   expect_equal(base_score, parsedmodel_xgb_reglogistic_basescore$general$params$base_score)
   expect_equal(base_score, parsedmodel_xgb_binarylogistic_basescore$general$params$base_score)
 })
@@ -113,7 +170,7 @@ xgb_binarylogistic_basescore_pred_sql <-
   .$yhat_sql %>% 
   round(5)
 
-test_that("Same predictions between model and parsed sql model", {
+testthat::test_that("Same predictions between model and parsed sql model", {
   expect_equal(xgb_reglogistic_basescore_pred_model, xgb_reglogistic_basescore_pred_sql)
   expect_equal(xgb_binarylogistic_basescore_pred_model, xgb_binarylogistic_basescore_pred_sql)
 })
