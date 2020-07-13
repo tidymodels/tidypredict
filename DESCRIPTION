@@ -1,5 +1,5 @@
 Package: tidypredict
-Version: 0.4.5
+Version: 0.4.6
 Title: Run Predictions Inside the Database
 Description: It parses a fitted 'R' model object, and returns a formula
     in 'Tidy Eval' code that calculates the predictions.
@@ -39,6 +39,6 @@ Suggests:
 License: GPL-3
 URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1
 Encoding: UTF-8
 VignetteBuilder: knitr
