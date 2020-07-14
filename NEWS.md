@@ -1,3 +1,7 @@
+# tidypredict 0.4.6
+
+- Small release for `xgboost` changes. 
+
 # tidypredict 0.4.5
 
 - Switches maintainer to Max Kuhn
