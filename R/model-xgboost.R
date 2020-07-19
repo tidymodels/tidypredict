@@ -140,14 +140,13 @@ build_fit_formula_xgb <- function(parsedmodel) {
     assigned <- 1
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
-    f <- expr(1 - 1 / (1 + exp(!!f)))
+    f <- expr(1 - 1 / (1 + exp(!!f + binomial()$linkfun(!!base_score))))
   } else if (objective %in% c("count:poisson")) {
     assigned <- 1
     f <- expr(exp(!!f))
   } else if (objective %in% c("reg:tweedie")) {
     assigned <- 1
     f <- expr(0.5 * exp(!!f)) ## I'm not sure why one has to multiply by 0.5, but it works.
-  
   }
   if (assigned == 0) {
     stop("Only objectives 'binary:logistic', 'reg:squarederror', 'reg:logistic', 'binary:logitraw' are supported yet.")
