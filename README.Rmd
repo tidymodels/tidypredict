@@ -5,9 +5,9 @@ output: github_document
 # tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
 
 [![R build status](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://cran.r-project.org/package=tidypredict)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
 [![Codecov test coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=master)
-[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](http://cran.rstudio.com/package=tidypredict)
+[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
 ```{r setup, include=FALSE}
 library(dplyr)
