@@ -3,10 +3,10 @@
 
 [![R build
 status](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
-[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://cran.r-project.org/package=tidypredict)
+[![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
 [![Codecov test
 coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=master)
-[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](http://cran.rstudio.com/package=tidypredict)
+[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
 The main goal of `tidypredict` is to enable running predictions inside
 databases. It reads the model, extracts the components needed to

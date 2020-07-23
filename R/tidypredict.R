@@ -16,6 +16,7 @@
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
+#' @importFrom stats binomial
 #' @keywords internal
 #'
 "_PACKAGE"
