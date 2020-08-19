@@ -1,16 +1,16 @@
-#' Adds the prediction columns to a piped command set
+#' Adds the prediction columns to a piped command set.
 #'
-#' Adds a new column with the results form tidypredict_fit() to a piped command set.
-#' If add_interval is set to TRUE, then it will add two additional columns, one
+#' Adds a new column with the results from tidypredict_fit() to a piped command set.
+#' If add_interval is set to TRUE, it will add two additional columns- one
 #' for the lower and another for the upper prediction interval bounds.
 #'
 #' @param df A data.frame or tibble
 #' @param model An R model or a parsed model inside a data frame
 #' @param add_interval Switch that indicates if the prediction interval columns should be added. Defaults
 #' to FALSE
-#' @param interval The prediction interval, defaults to 0.95. It is ignored if add_interval is set to
+#' @param interval The prediction interval, defaults to 0.95. Ignored if add_interval is set to
 #' FALSE
-#' @param vars The name of the variables that this function will produce. It defaults to "fit", "upper", and "lower".
+#' @param vars The name of the variables that this function will produce. Defaults to "fit", "upper", and "lower".
 #'
 #' @export
 tidypredict_to_column <- function(df, model, add_interval = FALSE,
