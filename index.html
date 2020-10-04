@@ -147,23 +147,27 @@
 </h1></div>
 
 <p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
-<div class="sourceCode" id="cb1"><pre class="r"><span class="no">model</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(<span class="no">mpg</span> ~ <span class="no">wt</span> + <span class="no">cyl</span>, <span class="kw">data</span> <span class="kw">=</span> <span class="no">mtcars</span>)</pre></div>
-<p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Because it uses <code>dplyr</code>’s database interface, it works with several databases back-ends, such as MS SQL:</p>
-<div class="sourceCode" id="cb2"><pre class="r"><span class="fu"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span>(<span class="no">model</span>, <span class="kw pkg">dbplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span>())</pre></div>
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></pre></div>
+<p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Since it uses <code>dplyr</code>’s database interface, it works with several database back-ends, such as MS SQL:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</span></span></code></pre></div>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
 <p>Install <code>tidypredict</code> from CRAN using:</p>
-<div class="sourceCode" id="cb4"><pre class="r"># install.packages("tidypredict")</pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="co"># install.packages("tidypredict")</span></pre></div>
 <p>Or install the <strong>development version</strong> using <code>devtools</code> as follows:</p>
-<div class="sourceCode" id="cb5"><pre class="r"># install.packages("remotes")
-# remotes::install_github("tidymodels/tidypredict")</pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="co"># install.packages("remotes")</span>
+<span class="co"># remotes::install_github("tidymodels/tidypredict")</span></pre></div>
 </div>
 <div id="functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#functions" class="anchor"></a>Functions</h2>
-<p><code>tidypredict</code> has only a few functions, and it is not expected that number to grow much. The main focus at this time is to add more models to support.</p>
+<p><code>tidypredict</code> has only a few functions and the number is not expected to grow much. The main focus as of now is to add more models to support.</p>
 <table class="table">
 <colgroup>
 <col width="26%">
@@ -215,7 +219,7 @@
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
 <p><img src="reference/figures/howitworks.png"></p>
-<p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. That formula can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
+<p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. The formula generated can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
 <ol>
 <li>Fit the model using a base R model, or one from the packages listed in <a href="#supported-models">Supported Models</a>
 </li>
@@ -227,17 +231,17 @@
 <code>dplyr</code> evaluates the formula created by <code>tidypredict</code>
 </li>
 <li>
-<code>dplyr</code> translates the formula into a SQL statement, or any other interfaces.</li>
+<code>dplyr</code> translates the formula into a SQL statement or any other interface.</li>
 <li>The database executes the SQL statement(s) created by <code>dplyr</code>
 </li>
 </ol>
 <div id="parsed-model-spec" class="section level3">
 <h3 class="hasAnchor">
 <a href="#parsed-model-spec" class="anchor"></a>Parsed model spec</h3>
-<p><code>tidypredict</code> writes and reads a spec based on a model. Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
+<p><code>tidypredict</code> writes and reads a spec based on a model. Instead of writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
 <ol>
-<li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a Shiny app.</li>
-<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means, that the parsed model spec can become a good alternative to using <em>PMML.</em>
+<li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a <em>Shiny app</em>.</li>
+<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means that the parsed model spec can become a good alternative to using <em>PMML.</em>
 </li>
 </ol>
 </div>
@@ -259,7 +263,7 @@
 </li>
 <li>XGBoost models - <code><a href="https://rdrr.io/pkg/xgboost/man/xgb.Booster.complete.html">xgboost::xgb.Booster.complete()</a></code>
 </li>
-<li>Cubist models - <code><a href="https://rdrr.io/pkg/Cubist/man/cubist.default.html">Cubist::cubist()</a></code>
+<li>Cubist models - <code><a href="https://topepo.github.io/Cubist/reference/cubist.default.html">Cubist::cubist()</a></code>
 </li>
 <li>Tree models, via <code>partykit</code> - <code><a href="https://rdrr.io/pkg/partykit/man/ctree.html">partykit::ctree()</a></code>
 </li>
@@ -285,8 +289,9 @@
 <a href="#broom" class="anchor"></a><code>broom</code>
 </h3>
 <p>The <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function from broom works with linear models parsed via <code>tidypredict</code></p>
-<div class="sourceCode" id="cb6"><pre class="r"><span class="no">pm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="reference/parse_model.html">parse_model</a></span>(<span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span>(<span class="no">wt</span> ~ <span class="no">.</span>, <span class="no">mtcars</span>))
-<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span>(<span class="no">pm</span>)</pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">wt</span> <span class="op">~</span> <span class="va">.</span>, <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy</a></span><span class="op">(</span><span class="va">pm</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="co">## # A tibble: 11 x 2</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a><span class="co">##    term        estimate</span></span>
 <span id="cb7-3"><a href="#cb7-3"></a><span class="co">##    &lt;chr&gt;          &lt;dbl&gt;</span></span>

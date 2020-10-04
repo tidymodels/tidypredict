@@ -1,5 +1,5 @@
 pandoc: 2.7.3
-pkgdown: 1.5.1
+pkgdown: 1.6.1
 pkgdown_sha: ~
 articles:
   cubist: cubist.html
@@ -14,7 +14,7 @@ articles:
   sql: sql.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2020-07-23T22:40Z
+last_built: 2020-10-04T22:39Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

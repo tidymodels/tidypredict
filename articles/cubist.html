@@ -182,14 +182,16 @@
 <div id="tidypredict_-functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#tidypredict_-functions" class="anchor"></a><code>tidypredict_</code> functions</h2>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">Cubist</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(<span class="st">"BostonHousing"</span>, <span class="kw">package</span> <span class="kw">=</span>  <span class="st">"mlbench"</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://topepo.github.io/Cubist">Cubist</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"BostonHousing"</span>, package <span class="op">=</span>  <span class="st">"mlbench"</span><span class="op">)</span>
 
-<span class="no">model</span> <span class="kw">&lt;-</span> <span class="kw pkg">Cubist</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/Cubist/man/cubist.default.html">cubist</a></span>(<span class="kw">x</span> <span class="kw">=</span> <span class="no">BostonHousing</span>[, -<span class="fl">14</span>], <span class="kw">y</span> <span class="kw">=</span> <span class="no">BostonHousing</span>$<span class="no">medv</span>, <span class="kw">committees</span> <span class="kw">=</span> <span class="fl">3</span>)</pre></body></html></div>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">Cubist</span><span class="fu">::</span><span class="fu"><a href="https://topepo.github.io/Cubist/reference/cubist.default.html">cubist</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">[</span>, <span class="op">-</span><span class="fl">14</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">$</span><span class="va">medv</span>, committees <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span>(<span class="no">model</span>)
+<div class="sourceCode" id="cb2"><pre class="downlit">
+<span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; (ifelse(nox &gt;= 0.668, -1.11 + crim * -0.02 + nox * 21.4 + rm * </span>
 <span class="co">#&gt;     0.1 + age * -0.003 + dis * 2.93 + ptratio * -0.13 + b * 0.008 + </span>
 <span class="co">#&gt;     lstat * -0.33, 0) + ifelse(lstat &gt;= 9.59 &amp; nox &lt; 0.668, 23.57 + </span>
@@ -226,20 +228,22 @@
 <span class="co">#&gt;     -0.17 + rad * 0.02 + tax * -0.0055 + ptratio * -0.12 + b * </span>
 <span class="co">#&gt;     0.001 + lstat * -0.74, 0) + ifelse(lstat &lt; 9.53 &amp; dis &lt; 2.64, </span>
 <span class="co">#&gt;     136.67 + crim * 7.2 + nox * -96.6 + rm * 1.1 + tax * -0.0033 + </span>
-<span class="co">#&gt;         ptratio * -3.31 + lstat * -0.1, 0))/3</span></pre></body></html></div>
+<span class="co">#&gt;         ptratio * -3.31 + lstat * -0.1, 0))/3</span></pre></div>
 </li>
 <li>
 <p>SQL output example</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span>(<span class="no">model</span>, <span class="kw pkg">dbplyr</span><span class="kw ns">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_odbc</a></span>())
-<span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`nox` &gt;= 0.668) THEN (-1.11 + `crim` * -0.02 + `nox` * 21.4 + `rm` * 0.1 + `age` * -0.003 + `dis` * 2.93 + `ptratio` * -0.13 + `b` * 0.008 + `lstat` * -0.33) WHEN NOT(`nox` &gt;= 0.668) THEN (0.0) END + CASE WHEN (`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN (23.57 + `crim` * 0.05 + `nox` * -5.2 + `rm` * 3.1 + `age` * -0.048 + `dis` * -0.81 + `rad` * 0.02 + `tax` * -0.0041 + `ptratio` * -0.71 + `b` * 0.01 + `lstat` * -0.15) WHEN NOT(`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN (1.18 + `crim` * 3.83 + `rm` * 4.3 + `age` * -0.06 + `dis` * -0.09 + `tax` * -0.003 + `ptratio` * -0.08 + `lstat` * -0.11) WHEN NOT(`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN (-4.71 + `crim` * 2.22 + `zn` * 0.008 + `nox` * -1.7 + `rm` * 9.2 + `age` * -0.04 + `dis` * -0.71 + `rad` * 0.03 + `tax` * -0.0182 + `ptratio` * -0.72 + `lstat` * -0.83) WHEN NOT(`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN (0.0) END + CASE WHEN (`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN (122.32 + `crim` * -0.29 + `nox` * -21.6 + `rm` * -3.0 + `dis` * -30.88 + `rad` * 0.02 + `tax` * -0.001 + `b` * -0.023 + `lstat` * -0.73) WHEN NOT(`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN (27.8 + `crim` * -0.16 + `zn` * 0.007 + `nox` * -3.9 + `rm` * 2.0 + `age` * -0.035 + `dis` * -0.7 + `rad` * 0.28 + `tax` * -0.0135 + `ptratio` * -0.6 + `b` * 0.013 + `lstat` * -0.25) WHEN NOT(`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN (22.21 + `crim` * -0.04 + `zn` * 0.01 + `indus` * -0.02 + `nox` * -4.0 + `rm` * 4.7 + `dis` * -0.34 + `rad` * 0.11 + `tax` * -0.0248 + `ptratio` * -0.9 + `b` * 0.002 + `lstat` * -0.1) WHEN NOT(`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN (-71.95 + `rm` * 17.0 + `age` * -0.06 + `tax` * -0.0112 + `ptratio` * -0.48 + `lstat` * -0.03) WHEN NOT(`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN (0.0) END + CASE WHEN (`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN (-32.79 + `crim` * -0.01 + `zn` * 0.005 + `nox` * -1.8 + `rm` * 12.9 + `age` * -0.117 + `dis` * -0.15 + `rad` * 0.04 + `tax` * -0.0246 + `ptratio` * -1.05 + `lstat` * -0.04) WHEN NOT(`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN (0.0) END + CASE WHEN (`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN (53.41 + `rm` * 1.6 + `dis` * -7.16 + `tax` * 0.0088 + `lstat` * -0.68) WHEN NOT(`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN (0.0) END + CASE WHEN (`nox` &gt;= 0.668) THEN (-36.31 + `crim` * 0.08 + `nox` * 48.4 + `dis` * 7.52 + `b` * 0.01 + `lstat` * -0.24) WHEN NOT(`nox` &gt;= 0.668) THEN (0.0) END + CASE WHEN (`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN (28.04 + `nox` * -4.8 + `rm` * 2.9 + `age` * -0.051 + `dis` * -0.86 + `rad` * 0.01 + `tax` * -0.0019 + `ptratio` * -0.72 + `lstat` * -0.12) WHEN NOT(`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.53) THEN (-26.05 + `crim` * 0.89 + `nox` * -2.3 + `rm` * 9.6 + `dis` * -0.17 + `rad` * 0.02 + `tax` * -0.0055 + `ptratio` * -0.12 + `b` * 0.001 + `lstat` * -0.74) WHEN NOT(`lstat` &lt; 9.53) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN (136.67 + `crim` * 7.2 + `nox` * -96.6 + `rm` * 1.1 + `tax` * -0.0033 + `ptratio` * -3.31 + `lstat` * -0.1) WHEN NOT(`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN (0.0) END / 3.0</span></pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit">
+<span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; CASE WHEN (`nox` &gt;= 0.668) THEN (-1.11 + `crim` * -0.02 + `nox` * 21.4 + `rm` * 0.1 + `age` * -0.003 + `dis` * 2.93 + `ptratio` * -0.13 + `b` * 0.008 + `lstat` * -0.33) WHEN NOT(`nox` &gt;= 0.668) THEN (0.0) END + CASE WHEN (`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN (23.57 + `crim` * 0.05 + `nox` * -5.2 + `rm` * 3.1 + `age` * -0.048 + `dis` * -0.81 + `rad` * 0.02 + `tax` * -0.0041 + `ptratio` * -0.71 + `b` * 0.01 + `lstat` * -0.15) WHEN NOT(`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN (1.18 + `crim` * 3.83 + `rm` * 4.3 + `age` * -0.06 + `dis` * -0.09 + `tax` * -0.003 + `ptratio` * -0.08 + `lstat` * -0.11) WHEN NOT(`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN (-4.71 + `crim` * 2.22 + `zn` * 0.008 + `nox` * -1.7 + `rm` * 9.2 + `age` * -0.04 + `dis` * -0.71 + `rad` * 0.03 + `tax` * -0.0182 + `ptratio` * -0.72 + `lstat` * -0.83) WHEN NOT(`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN (0.0) END + CASE WHEN (`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN (122.32 + `crim` * -0.29 + `nox` * -21.6 + `rm` * -3.0 + `dis` * -30.88 + `rad` * 0.02 + `tax` * -0.001 + `b` * -0.023 + `lstat` * -0.73) WHEN NOT(`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN (27.8 + `crim` * -0.16 + `zn` * 0.007 + `nox` * -3.9 + `rm` * 2.0 + `age` * -0.035 + `dis` * -0.7 + `rad` * 0.28 + `tax` * -0.0135 + `ptratio` * -0.6 + `b` * 0.013 + `lstat` * -0.25) WHEN NOT(`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN (22.21 + `crim` * -0.04 + `zn` * 0.01 + `indus` * -0.02 + `nox` * -4.0 + `rm` * 4.7 + `dis` * -0.34 + `rad` * 0.11 + `tax` * -0.0248 + `ptratio` * -0.9 + `b` * 0.002 + `lstat` * -0.1) WHEN NOT(`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN (0.0) END + CASE WHEN (`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN (-71.95 + `rm` * 17.0 + `age` * -0.06 + `tax` * -0.0112 + `ptratio` * -0.48 + `lstat` * -0.03) WHEN NOT(`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN (0.0) END + CASE WHEN (`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN (-32.79 + `crim` * -0.01 + `zn` * 0.005 + `nox` * -1.8 + `rm` * 12.9 + `age` * -0.117 + `dis` * -0.15 + `rad` * 0.04 + `tax` * -0.0246 + `ptratio` * -1.05 + `lstat` * -0.04) WHEN NOT(`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN (0.0) END + CASE WHEN (`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN (53.41 + `rm` * 1.6 + `dis` * -7.16 + `tax` * 0.0088 + `lstat` * -0.68) WHEN NOT(`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN (0.0) END + CASE WHEN (`nox` &gt;= 0.668) THEN (-36.31 + `crim` * 0.08 + `nox` * 48.4 + `dis` * 7.52 + `b` * 0.01 + `lstat` * -0.24) WHEN NOT(`nox` &gt;= 0.668) THEN (0.0) END + CASE WHEN (`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN (28.04 + `nox` * -4.8 + `rm` * 2.9 + `age` * -0.051 + `dis` * -0.86 + `rad` * 0.01 + `tax` * -0.0019 + `ptratio` * -0.72 + `lstat` * -0.12) WHEN NOT(`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.53) THEN (-26.05 + `crim` * 0.89 + `nox` * -2.3 + `rm` * 9.6 + `dis` * -0.17 + `rad` * 0.02 + `tax` * -0.0055 + `ptratio` * -0.12 + `b` * 0.001 + `lstat` * -0.74) WHEN NOT(`lstat` &lt; 9.53) THEN (0.0) END + CASE WHEN (`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN (136.67 + `crim` * 7.2 + `nox` * -96.6 + `rm` * 1.1 + `tax` * -0.0033 + `ptratio` * -3.31 + `lstat` * -0.1) WHEN NOT(`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN (0.0) END / 3.0</span></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<div class="sourceCode" id="cb4"><pre class="downlit">
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
-<span class="no">BostonHousing</span> <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span>(<span class="no">model</span>) <span class="kw">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/reexports.html">glimpse</a></span>()
+<span class="va">BostonHousing</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
+  <span class="fu"><a href="https://tibble.tidyverse.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 506</span>
 <span class="co">#&gt; Columns: 15</span>
 <span class="co">#&gt; $ crim    &lt;dbl&gt; 0.00632, 0.02731, 0.02729, 0.03237, 0.06905, 0.02985, 0.08829…</span>
@@ -256,11 +260,12 @@
 <span class="co">#&gt; $ b       &lt;dbl&gt; 396.90, 396.90, 392.83, 394.63, 396.90, 394.12, 395.60, 396.9…</span>
 <span class="co">#&gt; $ lstat   &lt;dbl&gt; 4.98, 9.14, 4.03, 2.94, 5.33, 5.21, 12.43, 19.15, 29.93, 17.1…</span>
 <span class="co">#&gt; $ medv    &lt;dbl&gt; 24.0, 21.6, 34.7, 33.4, 36.2, 28.7, 22.9, 27.1, 16.5, 18.9, 1…</span>
-<span class="co">#&gt; $ fit     &lt;dbl&gt; 27.50665, 22.71805, 34.78128, 33.19372, 31.93653, 25.03739, 2…</span></pre></body></html></div>
+<span class="co">#&gt; $ fit     &lt;dbl&gt; 27.50665, 22.71805, 34.78128, 33.19372, 31.93653, 25.03739, 2…</span></pre></div>
 </li>
 <li>
 <p>Confirm that <code>tidypredict</code> results match to the model’s <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> results</p>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span>(<span class="no">model</span>, <span class="no">BostonHousing</span>)
+<div class="sourceCode" id="cb5"><pre class="downlit">
+<span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">BostonHousing</span><span class="op">)</span>
 <span class="co">#&gt; tidypredict test results</span>
 <span class="co">#&gt; Difference threshold: 1e-12</span>
 <span class="co">#&gt; </span>
@@ -268,7 +273,7 @@
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Fit max  difference:</span>
 <span class="co">#&gt; Lower max difference:</span>
-<span class="co">#&gt; Upper max difference:2.62966510913086</span></pre></body></html></div>
+<span class="co">#&gt; Upper max difference:2.62966510913086</span></pre></div>
 </li>
 </ul>
 </div>
@@ -276,8 +281,9 @@
 <h2 class="hasAnchor">
 <a href="#parse-model-spec" class="anchor"></a>Parse model spec</h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="no">pm</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span>(<span class="no">model</span>)
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">pm</span>, <span class="fl">2</span>)
+<div class="sourceCode" id="cb6"><pre class="downlit">
+<span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ general:List of 5</span>
 <span class="co">#&gt;   ..$ model  : chr "cubist"</span>
@@ -287,9 +293,10 @@
 <span class="co">#&gt;   ..$ divisor: num 3</span>
 <span class="co">#&gt;  $ trees  :List of 1</span>
 <span class="co">#&gt;   ..$ :List of 14</span>
-<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_tree" "list"</span></pre></body></html></div>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span>(<span class="no">pm</span>$<span class="no">terms</span>[<span class="fl">1</span>:<span class="fl">2</span>])
-<span class="co">#&gt;  NULL</span></pre></body></html></div>
+<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_tree" "list"</span></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit">
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+<span class="co">#&gt;  NULL</span></pre></div>
 </div>
   </div>
 
