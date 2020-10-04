@@ -16,9 +16,17 @@
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
-#' @importFrom stats binomial
+#' @importFrom dplyr %>% 
+#' @importFrom stats binomial 
+#' @importFrom stats setNames
 #' @keywords internal
 #'
 "_PACKAGE"
 NULL
-utils::globalVariables(c(".", "pm"))
+utils::globalVariables(
+  c(
+    ".", "pm", "coefficient", "column", "feature", "feature_num", "level",
+    "lists", "type", "value"
+  )
+)
+

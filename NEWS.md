@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Change to with with version 5.1.2 and above of the `earth` package. As a result, `tidypredict` will only parse objects created by this and later versions of `earth`. 
+
 # tidypredict 0.4.6
 
 - Small release for `xgboost` changes. 
