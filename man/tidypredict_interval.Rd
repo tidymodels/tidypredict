@@ -2,7 +2,7 @@
 % Please edit documentation in R/predict-interval.R
 \name{tidypredict_interval}
 \alias{tidypredict_interval}
-\title{Returns a Tidy Eval formula to calculate prediction interval}
+\title{Returns a Tidy Eval formula to calculate prediction interval.}
 \usage{
 tidypredict_interval(model, interval = 0.95)
 }
@@ -16,8 +16,8 @@ It parses a model or uses an already parsed model to return a
 Tidy Eval formula that can then be used inside a dplyr command.
 }
 \details{
-The result still has to be added to the fit to obtain the upper bound, and
-subtracted from fit to obtain the lower bound.
+The result still has to be added to and subtracted from the fit to obtain the upper and
+lower bound respectively.
 }
 \examples{
 
