@@ -17,13 +17,15 @@ Imports:
     purrr,
     knitr,
     generics,
-    tibble
+    stringr,
+    tibble,
+    tidyr
 Suggests:
     dbplyr,
     testthat (>= 2.1.0),
     randomForest,
     ranger,
-    earth,
+    earth (>= 5.1.2),
     rmarkdown,
     nycflights13,
     RSQLite,
@@ -35,10 +37,11 @@ Suggests:
     mlbench,
     partykit,
     yaml,
-    parsnip
+    parsnip,
+    modeldata
 License: GPL-3
 URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.1.9000
 Encoding: UTF-8
 VignetteBuilder: knitr
