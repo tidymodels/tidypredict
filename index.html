@@ -55,7 +55,7 @@
         <a class="navbar-brand" href="index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.6.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.7.9000</span>
         </div>
       </div>
     </div>
@@ -149,7 +149,7 @@
 <p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit">
 <span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></pre></div>
-<p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Since it uses <code>dplyr</code>’s database interface, it works with several database back-ends, such as MS SQL:</p>
+<p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Because it uses <code>dplyr</code>’s database interface, it works with several databases back-ends, such as MS SQL:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit">
 <span class="fu"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co">## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</span></span></code></pre></div>
@@ -167,7 +167,7 @@
 <div id="functions" class="section level2">
 <h2 class="hasAnchor">
 <a href="#functions" class="anchor"></a>Functions</h2>
-<p><code>tidypredict</code> has only a few functions and the number is not expected to grow much. The main focus as of now is to add more models to support.</p>
+<p><code>tidypredict</code> has only a few functions, and it is not expected that number to grow much. The main focus at this time is to add more models to support.</p>
 <table class="table">
 <colgroup>
 <col width="26%">
@@ -219,7 +219,7 @@
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
 <p><img src="reference/figures/howitworks.png"></p>
-<p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. The formula generated can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
+<p>Instead of translating directly to a SQL statement, <code>tidypredict</code> creates an R formula. That formula can then be used inside <code>dplyr</code>. The overall workflow would be as illustrated in the image above, and described here:</p>
 <ol>
 <li>Fit the model using a base R model, or one from the packages listed in <a href="#supported-models">Supported Models</a>
 </li>
@@ -231,17 +231,17 @@
 <code>dplyr</code> evaluates the formula created by <code>tidypredict</code>
 </li>
 <li>
-<code>dplyr</code> translates the formula into a SQL statement or any other interface.</li>
+<code>dplyr</code> translates the formula into a SQL statement, or any other interfaces.</li>
 <li>The database executes the SQL statement(s) created by <code>dplyr</code>
 </li>
 </ol>
 <div id="parsed-model-spec" class="section level3">
 <h3 class="hasAnchor">
 <a href="#parsed-model-spec" class="anchor"></a>Parsed model spec</h3>
-<p><code>tidypredict</code> writes and reads a spec based on a model. Instead of writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
+<p><code>tidypredict</code> writes and reads a spec based on a model. Instead of simply writing the R formula directly, splitting the spec from the formula adds the following capabilities:</p>
 <ol>
-<li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a <em>Shiny app</em>.</li>
-<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means that the parsed model spec can become a good alternative to using <em>PMML.</em>
+<li>No more saving models as <code>.rds</code> - Specifically for cases when the model needs to be used for predictions in a Shiny app.</li>
+<li>Beyond R models - Technically, anything that can write a proper spec, can be read into <code>tidypredict</code>. It also means, that the parsed model spec can become a good alternative to using <em>PMML.</em>
 </li>
 </ol>
 </div>
@@ -356,7 +356,7 @@
   <div class="dev-status">
 <h2>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://github.com/tidymodels/tidypredict/actions"><img src="https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg" alt="R build status"></a></li>
+<li><a href="https://github.com/tidymodels/tidypredict/actions"><img src="https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://CRAN.r-project.org/package=tidypredict"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a></li>
 <li><a href="https://codecov.io/gh/tidymodels/tidypredict?branch=master"><img src="https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg" alt="Codecov test coverage"></a></li>
 <li><a href="https://CRAN.R-project.org/package=tidypredict"><img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads"></a></li>
