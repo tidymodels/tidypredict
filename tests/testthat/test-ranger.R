@@ -34,7 +34,7 @@ run_test(
 context("ranger-parsnip")
 run_test(
   parsnip::fit(
-    parsnip::set_engine(parsnip::rand_forest(trees = num_trees, mode = "regression"), "ranger", seed = 100, num.threads = 2),
+    parsnip::set_engine(parsnip::rand_forest(trees = num_trees, mode = "classification"), "ranger", seed = 100, num.threads = 2),
     Species ~ .,
     data = iris
   )
