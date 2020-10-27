@@ -136,11 +136,13 @@ parse_label_lm <- function(label, vars) {
       col = items[i]
     )
     cat_match <- map_lgl(vars, ~ .x == substr(items[i], 1, nchar(.x)))
-    if (any(cat_match) && vars[cat_match] != items[i]) {
+    if (any(cat_match) && any(vars[cat_match] != items[i]) && !(items[i] %in% vars)) {
+      cat_match_vars <- vars[cat_match]
+      sole_cat_match <- cat_match_vars[rank(-nchar(cat_match_vars))][[1]]
       item <- list(
         type = "conditional",
-        col = vars[cat_match],
-        val = substr(items[i], nchar(vars[cat_match]) + 1, nchar(items[i])),
+        col = sole_cat_match,
+        val = substr(items[i], nchar(sole_cat_match) + 1, nchar(items[i])),
         op = "equal"
       )
     }

@@ -19,6 +19,20 @@ test_that("Intervals return a call", {
   )
 })
 
+test_that("tidypredict works when variable names are subset of other variables", {
+  df2 <- df
+  df2$wt_sq <- df2$wt ^ 2
+  df2$char_cyl = as.character(df2$cyl)
+  set.seed(22)
+  df2$char_cyl_2 = sample(letters[1:3], size = nrow(df2), replace = TRUE)
+  model4 <- suppressWarnings(glm(
+    am ~ wt + wt_sq + char_cyl + char_cyl_2, 
+    data = df2, family = "binomial"
+  ))
+  expect_silent(tidypredict_fit(model4))
+  expect_false(tidypredict_test(model4)$alert)
+})
+
 context("glm-saved")
 test_that("Model can be saved and re-loaded", {
   model <- glm(am ~ wt + disp + cyl, data = df, family = "binomial")
