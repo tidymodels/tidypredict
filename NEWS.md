@@ -1,4 +1,6 @@
-# tidypredict (development version)
+# tidypredict 0.4.8
+
+- CRAN submission for a broken test case. 
 
 # tidypredict 0.4.7
 
