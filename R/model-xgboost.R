@@ -140,7 +140,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
     assigned <- 1
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
-    f <- expr(1 - 1 / (1 + exp(!!f + binomial()$linkfun(!!base_score))))
+    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
   }
   if (assigned == 0) {
     stop("Only objectives 'binary:logistic', 'reg:squarederror', 'reg:logistic', 'binary:logitraw' are supported yet.")

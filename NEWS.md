@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Fixes bug in SQL query generation for XGBoost models with objective `binary:logistic`
+
 # tidypredict 0.4.8
 
 - CRAN submission for a broken test case. 
