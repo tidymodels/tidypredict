@@ -164,7 +164,7 @@
 </li>
         <li>
   <a href="https://github.com/tidymodels/tidypredict/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -189,6 +189,10 @@
 <h1 class="page-header" data-toc-text="development version">
 <a href="#tidypredict-development-version" class="anchor"></a>tidypredict (development version)<small> Unreleased </small>
 </h1>
+<ul>
+<li>Fixes bug in SQL query generation for XGBoost models with objective <code>binary:logistic</code>
+</li>
+</ul>
 </div>
     <div id="tidypredict-048" class="section level1">
 <h1 class="page-header" data-toc-text="0.4.8">
@@ -250,7 +254,7 @@
 <a href="#new-features" class="anchor"></a>New features</h2>
 <ul>
 <li><p>Parses <code>ranger</code> classification models.</p></li>
-<li><p>Adds method support for <code>broom</code>’s <code><a href="https://rdrr.io/pkg/generics/man/tidy.html">tidy()</a></code> function. Regression models only</p></li>
+<li><p>Adds method support for <code>broom</code>’s <code><a href="https://generics.r-lib.org/reference/tidy.html">tidy()</a></code> function. Regression models only</p></li>
 <li><p>Adds <code><a href="../reference/as_parsed_model.html">as_parsed_model()</a></code> function. It adds the proper class components to the list.</p></li>
 <li><p>Adds initial support for <code>partykit</code>’s <code>ctree()</code> model</p></li>
 <li><p>Adds support for <code>parsnip</code> fitted models: <code>lm</code>, <code>randomForest</code>, <code>ranger</code>, and <code>earth</code></p></li>

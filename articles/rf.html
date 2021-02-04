@@ -120,7 +120,7 @@
 </li>
         <li>
   <a href="https://github.com/tidymodels/tidypredict/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -134,8 +134,7 @@
 
       
 
-      </header><script src="rf_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="rf_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="rf_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="rf_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Random Forest</h1>
@@ -184,19 +183,19 @@
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
 <p>Here is a simple <code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html">randomForest()</a></code> model using the <code>iris</code> dataset:</p>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stat.berkeley.edu/~breiman/RandomForests/">randomForest</a></span><span class="op">)</span>
 
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html">randomForest</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span> ,ntree <span class="op">=</span> <span class="fl">100</span>, proximity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></pre></div>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html">randomForest</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span> ,ntree <span class="op">=</span> <span class="fl">100</span>, proximity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="under-the-hood" class="section level2">
 <h2 class="hasAnchor">
 <a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
 <p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">randomForest::getTree()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">getTree</a></span><span class="op">(</span><span class="va">model</span>, labelVar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">getTree</a></span><span class="op">(</span><span class="va">model</span>, labelVar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;   left daughter right daughter    split var split point status prediction</span>
 <span class="co">#&gt; 1             2              3 Petal.Length        2.50      1       &lt;NA&gt;</span>
@@ -204,10 +203,10 @@
 <span class="co">#&gt; 3             4              5 Petal.Length        5.05      1       &lt;NA&gt;</span>
 <span class="co">#&gt; 4             6              7  Petal.Width        1.90      1       &lt;NA&gt;</span>
 <span class="co">#&gt; 5             0              0         &lt;NA&gt;        0.00     -1  virginica</span>
-<span class="co">#&gt; 6             8              9 Sepal.Length        4.95      1       &lt;NA&gt;</span></pre></div>
+<span class="co">#&gt; 6             8              9 Sepal.Length        4.95      1       &lt;NA&gt;</span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">dplyr::case_when()</a></code> statement</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="co">#&gt; [[1]]</span>
 <span class="co">#&gt; case_when(Petal.Length &lt; 2.5 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span>
 <span class="co">#&gt;     Petal.Length &gt;= 2.5 ~ "virginica", Petal.Width &gt;= 1.9 &amp; Petal.Length &lt; </span>
@@ -219,7 +218,7 @@
 <span class="co">#&gt;     Sepal.Length &gt;= 4.95 &amp; Petal.Width &lt; 1.9 &amp; Petal.Length &lt; </span>
 <span class="co">#&gt;     5.05 &amp; Petal.Length &gt;= 2.5 ~ "virginica", Sepal.Width &gt;= </span>
 <span class="co">#&gt;     3 &amp; Petal.Width &gt;= 1.75 &amp; Sepal.Length &gt;= 4.95 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;     1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 2.5 ~ "versicolor")</span></pre></div>
+<span class="co">#&gt;     1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 2.5 ~ "versicolor")</span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(iris, !! tidypredict_fit(model))</a></code>
@@ -232,12 +231,12 @@
 <h2 class="hasAnchor">
 <a href="#parsnip" class="anchor"></a>parsnip</h2>
 <p><code>tidypredict</code> also supports <code>randomForest</code> model objects fitted via the <code>parsnip</code> package.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
 
 <span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"randomForest"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
 <span class="co">#&gt; case_when(Petal.Length &lt; 2.45 &amp; Sepal.Length &lt; 5.45 ~ "setosa", </span>
@@ -260,7 +259,7 @@
 <span class="co">#&gt;         5.05 &amp; Petal.Length &gt;= 4.95 &amp; Sepal.Length &gt;= 5.75 &amp; </span>
 <span class="co">#&gt;         Sepal.Length &gt;= 5.45 ~ "virginica", Sepal.Length &gt;= 6.5 &amp; </span>
 <span class="co">#&gt;         Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 4.95 &amp; Sepal.Length &gt;= </span>
-<span class="co">#&gt;         5.75 &amp; Sepal.Length &gt;= 5.45 ~ "versicolor")</span></pre></div>
+<span class="co">#&gt;         5.75 &amp; Sepal.Length &gt;= 5.45 ~ "versicolor")</span></code></pre></div>
 </div>
   </div>
 

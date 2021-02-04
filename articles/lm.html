@@ -120,7 +120,7 @@
 </li>
         <li>
   <a href="https://github.com/tidymodels/tidypredict/">
-    <span class="fab fa fab fa-github fa-lg"></span>
+    <span class="fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -134,8 +134,7 @@
 
       
 
-      </header><script src="lm_files/accessible-code-block-0.0.1/empty-anchor.js"></script><link href="lm_files/anchor-sections-1.0/anchor-sections.css" rel="stylesheet">
-<script src="lm_files/anchor-sections-1.0/anchor-sections.js"></script><div class="row">
+      </header><script src="lm_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Linear Regression</h1>
@@ -176,68 +175,68 @@
 <div id="how-it-works" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-it-works" class="anchor"></a>How it works</h2>
-<div class="sourceCode" id="cb1"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
 
 <span class="va">df</span> <span class="op">&lt;-</span> <span class="va">mtcars</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>char_cyl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html">paste0</a></span><span class="op">(</span><span class="st">"cyl"</span>, <span class="va">cyl</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">mpg</span>, <span class="va">wt</span>, <span class="va">char_cyl</span>, <span class="va">am</span><span class="op">)</span> 
 
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">char_cyl</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></pre></div>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">char_cyl</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">df</span><span class="op">)</span></code></pre></div>
 <p>It returns a SQL query that contains the coefficients (<code>model$coefficients</code>) operated against the correct variable or categorical variable value. In most cases the resulting SQL is one short <code>CASE WHEN</code> statement per coefficient. It appends the <code>offset</code> field or value, if one is provided.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
 <span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; 32.4105336886021 + (`wt` * -2.83243330448326) + (CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) END * -4.26714873091281) + (CASE WHEN (`char_cyl` = 'cyl8') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl8') THEN (0.0) END * -6.12588309683682) + `am`</span></pre></div>
+<span class="co">#&gt; &lt;SQL&gt; 32.4105336886021 + (`wt` * -2.83243330448326) + (IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * -4.26714873091281) + (IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * -6.12588309683682) + `am`</span></code></pre></div>
 <p>Alternatively, use <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> if the results are the be used or previewed in <code>dplyr</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit">
-<span class="va">df</span> <span class="op">%&gt;%</span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> 
-<span class="co">#&gt;     mpg    wt char_cyl am      fit</span>
-<span class="co">#&gt; 1  21.0 2.620     cyl6  1 21.72241</span>
-<span class="co">#&gt; 2  21.0 2.875     cyl6  1 21.00014</span>
-<span class="co">#&gt; 3  22.8 2.320     cyl4  1 26.83929</span>
-<span class="co">#&gt; 4  21.4 3.215     cyl6  0 19.03711</span>
-<span class="co">#&gt; 5  18.7 3.440     cyl8  0 16.54108</span>
-<span class="co">#&gt; 6  18.1 3.460     cyl6  0 18.34317</span>
-<span class="co">#&gt; 7  14.3 3.570     cyl8  0 16.17286</span>
-<span class="co">#&gt; 8  24.4 3.190     cyl4  0 23.37507</span>
-<span class="co">#&gt; 9  22.8 3.150     cyl4  0 23.48837</span>
-<span class="co">#&gt; 10 19.2 3.440     cyl6  0 18.39981</span></pre></div>
+<span class="co">#&gt;                    mpg    wt char_cyl am      fit</span>
+<span class="co">#&gt; Mazda RX4         21.0 2.620     cyl6  1 21.72241</span>
+<span class="co">#&gt; Mazda RX4 Wag     21.0 2.875     cyl6  1 21.00014</span>
+<span class="co">#&gt; Datsun 710        22.8 2.320     cyl4  1 26.83929</span>
+<span class="co">#&gt; Hornet 4 Drive    21.4 3.215     cyl6  0 19.03711</span>
+<span class="co">#&gt; Hornet Sportabout 18.7 3.440     cyl8  0 16.54108</span>
+<span class="co">#&gt; Valiant           18.1 3.460     cyl6  0 18.34317</span>
+<span class="co">#&gt; Duster 360        14.3 3.570     cyl8  0 16.17286</span>
+<span class="co">#&gt; Merc 240D         24.4 3.190     cyl4  0 23.37507</span>
+<span class="co">#&gt; Merc 230          22.8 3.150     cyl4  0 23.48837</span>
+<span class="co">#&gt; Merc 280          19.2 3.440     cyl6  0 18.39981</span></code></pre></div>
 </div>
 <div id="prediction-intervals" class="section level2">
 <h2 class="hasAnchor">
 <a href="#prediction-intervals" class="anchor"></a>Prediction intervals</h2>
 <p>Use <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code> to get the SQL query that operates the prediction interval. The <code>interval</code> defaults to 0.95</p>
-<div class="sourceCode" id="cb4"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; 2.04840714179524 * SQRT(-0.176776695296637 * -0.176776695296637 * 6.63799055122669 + -0.590557271637747 + `wt` * 0.183559646169165 * -0.590557271637747 + `wt` * 0.183559646169165 * 6.63799055122669 + -0.126215672528828 + `wt` * 0.0101118696567173 + CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) END * 0.428266330860589 * -0.126215672528828 + `wt` * 0.0101118696567173 + CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) END * 0.428266330860589 * 6.63799055122669 + 0.386215468111418 + `wt` * -0.230516217152034 + CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) END * 0.332336511639638 + CASE WHEN (`char_cyl` = 'cyl8') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl8') THEN (0.0) END * 0.646203930513815 * 0.386215468111418 + `wt` * -0.230516217152034 + CASE WHEN (`char_cyl` = 'cyl6') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl6') THEN (0.0) END * 0.332336511639638 + CASE WHEN (`char_cyl` = 'cyl8') THEN (1.0) WHEN NOT(`char_cyl` = 'cyl8') THEN (0.0) END * 0.646203930513815 * 6.63799055122669 + 6.63799055122669)</span></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<span class="co">#&gt; &lt;SQL&gt; 2.04840714179524 * SQRT(-0.176776695296637 * -0.176776695296637 * 6.63799055122669 + -0.590557271637747 + `wt` * 0.183559646169165 * -0.590557271637747 + `wt` * 0.183559646169165 * 6.63799055122669 + -0.126215672528828 + `wt` * 0.0101118696567173 + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589 * -0.126215672528828 + `wt` * 0.0101118696567173 + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589 * 6.63799055122669 + 0.386215468111418 + `wt` * -0.230516217152034 + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638 + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815 * 0.386215468111418 + `wt` * -0.230516217152034 + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638 + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815 * 6.63799055122669 + 6.63799055122669)</span></code></pre></div>
 <p>Prediction intervals also works in the <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code>, just set the <code>add_interval</code> argument to <code>TRUE</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit">
-<span class="va">df</span> <span class="op">%&gt;%</span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">df</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span>, add_interval <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span>
-<span class="co">#&gt;     mpg    wt char_cyl am      fit    upper    lower</span>
-<span class="co">#&gt; 1  21.0 2.620     cyl6  1 21.72241 27.41716 16.02765</span>
-<span class="co">#&gt; 2  21.0 2.875     cyl6  1 21.00014 26.65467 15.34560</span>
-<span class="co">#&gt; 3  22.8 2.320     cyl4  1 26.83929 32.35180 21.32678</span>
-<span class="co">#&gt; 4  21.4 3.215     cyl6  0 19.03711 24.68113 13.39309</span>
-<span class="co">#&gt; 5  18.7 3.440     cyl8  0 16.54108 22.07276 11.00940</span>
-<span class="co">#&gt; 6  18.1 3.460     cyl6  0 18.34317 24.01030 12.67603</span>
-<span class="co">#&gt; 7  14.3 3.570     cyl8  0 16.17286 21.67635 10.66938</span>
-<span class="co">#&gt; 8  24.4 3.190     cyl4  0 23.37507 29.06408 17.68606</span>
-<span class="co">#&gt; 9  22.8 3.150     cyl4  0 23.48837 29.16231 17.81443</span>
-<span class="co">#&gt; 10 19.2 3.440     cyl6  0 18.39981 24.06411 12.73552</span></pre></div>
+<span class="co">#&gt;                    mpg    wt char_cyl am      fit    upper    lower</span>
+<span class="co">#&gt; Mazda RX4         21.0 2.620     cyl6  1 21.72241 27.41716 16.02765</span>
+<span class="co">#&gt; Mazda RX4 Wag     21.0 2.875     cyl6  1 21.00014 26.65467 15.34560</span>
+<span class="co">#&gt; Datsun 710        22.8 2.320     cyl4  1 26.83929 32.35180 21.32678</span>
+<span class="co">#&gt; Hornet 4 Drive    21.4 3.215     cyl6  0 19.03711 24.68113 13.39309</span>
+<span class="co">#&gt; Hornet Sportabout 18.7 3.440     cyl8  0 16.54108 22.07276 11.00940</span>
+<span class="co">#&gt; Valiant           18.1 3.460     cyl6  0 18.34317 24.01030 12.67603</span>
+<span class="co">#&gt; Duster 360        14.3 3.570     cyl8  0 16.17286 21.67635 10.66938</span>
+<span class="co">#&gt; Merc 240D         24.4 3.190     cyl4  0 23.37507 29.06408 17.68606</span>
+<span class="co">#&gt; Merc 230          22.8 3.150     cyl4  0 23.48837 29.16231 17.81443</span>
+<span class="co">#&gt; Merc 280          19.2 3.440     cyl6  0 18.39981 24.06411 12.73552</span></code></pre></div>
 </div>
 <div id="under-the-hood" class="section level2">
 <h2 class="hasAnchor">
 <a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
 <p>The parser reads several parts of the <code>lm</code> object to tabulate all of the needed variables. One entry per coefficient is added to the final table, those entries will have the results of <code><a href="https://rdrr.io/r/base/qr.html">qr.solve()</a></code> already operated and placed in the correct column, they will have a <code>qr_</code> prefix. There will be one <code>qr_</code> column per coefficient.</p>
 <p>Other variables are added at the end. Some variables are not required for every parsed model. For example, <code>offset</code> is listed because it’s part of the formula (call) of the model, if there were no offset in a given model, that line would not exist.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit">
-<span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ general:List of 7</span>
@@ -253,16 +252,16 @@
 <span class="co">#&gt;   ..$ :List of 5</span>
 <span class="co">#&gt;   ..$ :List of 5</span>
 <span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></pre></div>
+<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. All categorical variables are operated using <code><a href="https://dplyr.tidyverse.org/reference/if_else.html">if_else()</a></code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; 32.4105336886021 + (wt * -2.83243330448326) + (ifelse(char_cyl == </span>
 <span class="co">#&gt;     "cyl6", 1, 0) * -4.26714873091281) + (ifelse(char_cyl == </span>
-<span class="co">#&gt;     "cyl8", 1, 0) * -6.12588309683682) + am</span></pre></div>
+<span class="co">#&gt;     "cyl8", 1, 0) * -6.12588309683682) + am</span></code></pre></div>
 <p>A function to put together the Tidy Eval interval formula is also supported</p>
-<div class="sourceCode" id="cb8"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_interval.html">tidypredict_interval</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_interval.html">tidypredict_interval</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; 2.04840714179524 * sqrt(-0.176776695296637 * -0.176776695296637 * </span>
 <span class="co">#&gt;     6.63799055122669 + (-0.590557271637747 + wt * 0.183559646169165) * </span>
 <span class="co">#&gt;     (-0.590557271637747 + wt * 0.183559646169165) * 6.63799055122669 + </span>
@@ -275,7 +274,7 @@
 <span class="co">#&gt;     (0.386215468111418 + wt * -0.230516217152034 + ifelse(char_cyl == </span>
 <span class="co">#&gt;         "cyl6", 1, 0) * 0.332336511639638 + ifelse(char_cyl == </span>
 <span class="co">#&gt;         "cyl8", 1, 0) * 0.646203930513815) * 6.63799055122669 + </span>
-<span class="co">#&gt;     6.63799055122669)</span></pre></div>
+<span class="co">#&gt;     6.63799055122669)</span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(df, !! tidypredict_fit(model))</a></code>
@@ -289,33 +288,33 @@
 <h2 class="hasAnchor">
 <a href="#how-it-performs" class="anchor"></a>How it performs</h2>
 <p>Testing the <code>tidypredict</code> results is easy. The <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> function automatically uses the <code>lm</code> model object’s data frame, to compare <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code> to the results given by <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code></p>
-<div class="sourceCode" id="cb9"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; tidypredict test results</span>
 <span class="co">#&gt; Difference threshold: 1e-12</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;  All results are within the difference threshold</span></pre></div>
+<span class="co">#&gt;  All results are within the difference threshold</span></code></pre></div>
 <p>To run with prediction intervals set the <code>include_intervals</code> argument to <code>TRUE</code></p>
-<div class="sourceCode" id="cb10"><pre class="downlit">
-<span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, include_intervals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, include_intervals <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
 <span class="co">#&gt; tidypredict test results</span>
 <span class="co">#&gt; Difference threshold: 1e-12</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;  All results are within the difference threshold</span></pre></div>
+<span class="co">#&gt;  All results are within the difference threshold</span></code></pre></div>
 </div>
 <div id="parsnip" class="section level2">
 <h2 class="hasAnchor">
 <a href="#parsnip" class="anchor"></a>parsnip</h2>
 <p><code>tidypredict</code> also supports <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code> model objects fitted via the <code>parsnip</code> package.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit">
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
 
 <span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html">linear_reg</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"lm"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/pkg/generics/man/fit.html">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span>
-<span class="co">#&gt; 39.6862614802529 + (wt * -3.19097213898374) + (cyl * -1.5077949682598)</span></pre></div>
+<span class="co">#&gt; 39.6862614802529 + (wt * -3.19097213898374) + (cyl * -1.5077949682598)</span></code></pre></div>
 </div>
   </div>
 
