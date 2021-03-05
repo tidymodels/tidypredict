@@ -198,7 +198,7 @@
   params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>max_depth <span class="op">=</span> <span class="fl">2</span>, silent <span class="op">=</span> <span class="fl">1</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span>, base_score <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,
   data <span class="op">=</span> <span class="va">xgb_bin_data</span>, nrounds <span class="op">=</span> <span class="fl">50</span>
 <span class="op">)</span>
-<span class="co">#&gt; [23:14:15] WARNING: amalgamation/../src/learner.cc:541: </span>
+<span class="co">#&gt; [15:46:36] WARNING: amalgamation/../src/learner.cc:541: </span>
 <span class="co">#&gt; Parameters: { silent } might not be used.</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt;   This may not be accurate due to some parameters are only used in language bindings but</span>
@@ -298,21 +298,21 @@
 
 <span class="va">mtcars</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 32</span>
 <span class="co">#&gt; Columns: 12</span>
-<span class="co">#&gt; $ mpg  &lt;dbl&gt; 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8…</span>
-<span class="co">#&gt; $ cyl  &lt;dbl&gt; 6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 8…</span>
-<span class="co">#&gt; $ disp &lt;dbl&gt; 160.0, 160.0, 108.0, 258.0, 360.0, 225.0, 360.0, 146.7, 140.8, 1…</span>
-<span class="co">#&gt; $ hp   &lt;dbl&gt; 110, 110, 93, 110, 175, 105, 245, 62, 95, 123, 123, 180, 180, 18…</span>
-<span class="co">#&gt; $ drat &lt;dbl&gt; 3.90, 3.90, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3.92…</span>
-<span class="co">#&gt; $ wt   &lt;dbl&gt; 2.620, 2.875, 2.320, 3.215, 3.440, 3.460, 3.570, 3.190, 3.150, 3…</span>
-<span class="co">#&gt; $ qsec &lt;dbl&gt; 16.46, 17.02, 18.61, 19.44, 17.02, 20.22, 15.84, 20.00, 22.90, 1…</span>
-<span class="co">#&gt; $ vs   &lt;dbl&gt; 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0…</span>
-<span class="co">#&gt; $ am   &lt;dbl&gt; 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0…</span>
-<span class="co">#&gt; $ gear &lt;dbl&gt; 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3…</span>
-<span class="co">#&gt; $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1, 2…</span>
-<span class="co">#&gt; $ fit  &lt;dbl&gt; 0.98574329, 0.98574329, 0.92725081, 0.01079918, 0.04632517, 0.01…</span></code></pre></div>
+<span class="co">#&gt; $ mpg  &lt;dbl&gt; 21.0, 21.0, 22.8, 21.4, 18.7, 18.1, 14.3, 24.4, 22.8, 19.2, 17.8,…</span>
+<span class="co">#&gt; $ cyl  &lt;dbl&gt; 6, 6, 4, 6, 8, 6, 8, 4, 4, 6, 6, 8, 8, 8, 8, 8, 8, 4, 4, 4, 4, 8,…</span>
+<span class="co">#&gt; $ disp &lt;dbl&gt; 160.0, 160.0, 108.0, 258.0, 360.0, 225.0, 360.0, 146.7, 140.8, 16…</span>
+<span class="co">#&gt; $ hp   &lt;dbl&gt; 110, 110, 93, 110, 175, 105, 245, 62, 95, 123, 123, 180, 180, 180…</span>
+<span class="co">#&gt; $ drat &lt;dbl&gt; 3.90, 3.90, 3.85, 3.08, 3.15, 2.76, 3.21, 3.69, 3.92, 3.92, 3.92,…</span>
+<span class="co">#&gt; $ wt   &lt;dbl&gt; 2.620, 2.875, 2.320, 3.215, 3.440, 3.460, 3.570, 3.190, 3.150, 3.…</span>
+<span class="co">#&gt; $ qsec &lt;dbl&gt; 16.46, 17.02, 18.61, 19.44, 17.02, 20.22, 15.84, 20.00, 22.90, 18…</span>
+<span class="co">#&gt; $ vs   &lt;dbl&gt; 0, 0, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,…</span>
+<span class="co">#&gt; $ am   &lt;dbl&gt; 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0,…</span>
+<span class="co">#&gt; $ gear &lt;dbl&gt; 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4, 4, 3, 3,…</span>
+<span class="co">#&gt; $ carb &lt;dbl&gt; 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2, 1, 1, 2,…</span>
+<span class="co">#&gt; $ fit  &lt;dbl&gt; 0.98574329, 0.98574329, 0.92725081, 0.01079918, 0.04632517, 0.010…</span></code></pre></div>
 </li>
 <li>
 <p>Confirm that <code>tidypredict</code> results match to the model’s <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> results. The <code>xg_df</code> argument expects the <code>xgb.DMatrix</code> data set.</p>

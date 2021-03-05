@@ -213,16 +213,16 @@
 
 <span class="va">etitanic</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://tibble.tidyverse.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
+  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 1,046</span>
 <span class="co">#&gt; Columns: 7</span>
-<span class="co">#&gt; $ pclass   &lt;fct&gt; 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, …</span>
-<span class="co">#&gt; $ survived &lt;int&gt; 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, …</span>
-<span class="co">#&gt; $ sex      &lt;fct&gt; female, male, female, male, female, male, female, male, fema…</span>
-<span class="co">#&gt; $ age      &lt;dbl&gt; 29.0000, 0.9167, 2.0000, 30.0000, 25.0000, 48.0000, 63.0000,…</span>
-<span class="co">#&gt; $ sibsp    &lt;int&gt; 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, …</span>
-<span class="co">#&gt; $ parch    &lt;int&gt; 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, …</span>
-<span class="co">#&gt; $ fit      &lt;dbl&gt; 31.99903, 22.29190, 22.29190, 22.29190, 22.29190, 31.99903, …</span></code></pre></div>
+<span class="co">#&gt; $ pclass   &lt;fct&gt; 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1…</span>
+<span class="co">#&gt; $ survived &lt;int&gt; 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1…</span>
+<span class="co">#&gt; $ sex      &lt;fct&gt; female, male, female, male, female, male, female, male, femal…</span>
+<span class="co">#&gt; $ age      &lt;dbl&gt; 29.0000, 0.9167, 2.0000, 30.0000, 25.0000, 48.0000, 63.0000, …</span>
+<span class="co">#&gt; $ sibsp    &lt;int&gt; 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1…</span>
+<span class="co">#&gt; $ parch    &lt;int&gt; 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1…</span>
+<span class="co">#&gt; $ fit      &lt;dbl&gt; 31.99903, 22.29190, 22.29190, 22.29190, 22.29190, 31.99903, 3…</span></code></pre></div>
 </li>
 <li>
 <p>Confirm that <code>tidypredict</code> results match to the model’s <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> results</p>
