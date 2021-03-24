@@ -39,7 +39,7 @@ Suggests:
     yaml,
     parsnip,
     modeldata
-License: GPL-3
+License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
 RoxygenNote: 7.1.1.9000

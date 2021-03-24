@@ -1,6 +1,8 @@
 # tidypredict (development version)
 
-- Fixes bug in SQL query generation for XGBoost models with objective `binary:logistic`
+- Fixed bug in SQL query generation for XGBoost models with objective `binary:logistic`.
+
+- Re-licensed package from GPL-3 to MIT. See [consent from copyright holders here](https://github.com/tidymodels/tidypredict/issues/95).
 
 # tidypredict 0.4.8
 
