@@ -217,7 +217,7 @@ lower bound respectively.</p>
     <pre class="examples"><div class='input'>
 <span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>~</span> <span class='va'>wt</span> <span class='op'>+</span> <span class='va'>cyl</span> <span class='op'>*</span> <span class='va'>disp</span>, offset <span class='op'>=</span> <span class='va'>am</span>, data <span class='op'>=</span> <span class='va'>mtcars</span><span class='op'>)</span>
 <span class='fu'>tidypredict_interval</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 2.05183051648029 * sqrt(-0.176776695296637 * -0.176776695296637 * 
+</div><div class='output co'>#&gt; 2.05183051648029 * sqrt((-0.176776695296637) * (-0.176776695296637) * 
 #&gt;     6.20704821338125 + (-0.590557271637747 + wt * 0.183559646169165) * 
 #&gt;     (-0.590557271637747 + wt * 0.183559646169165) * 6.20704821338125 + 
 #&gt;     (-0.257207134290773 + wt * -0.230680634727453 + cyl * 0.161513439412957) * 
