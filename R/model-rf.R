@@ -66,10 +66,7 @@ parse_model.randomForest <- function(model) {
   as_parsed_model(pm)
 }
 
-# Fit model -----------------------------------------------
-
-get_rf_case <- function(path, prediction, calc_mode = "") {
-  
+path_formulas <- function(path) {
   if(length(path) == 1 & path[[1]]$type == "all") {
     rcl <- NULL
   } else {
@@ -93,6 +90,14 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     )
     rcl <- reduce(cl, function(x, y) expr(!!x & !!y))
   }
+  rcl
+}
+
+# Fit model -----------------------------------------------
+
+get_rf_case <- function(path, prediction, calc_mode = "") {
+  
+  rcl <- path_formulas(path)
 
   if (length(prediction) > 1) {
     pl <- map(
@@ -108,7 +113,7 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     pl <- prediction
   }
   f <- NULL
-  if(is.null(rcl)) f <- pl
+  if (is.null(rcl)) f <- pl
   if (is.null(f) & calc_mode == "ifelse") f <- expr(ifelse(!!rcl, !!pl, 0))
   if (is.null(f)) f <- expr(!!rcl ~ !!pl)
   f
