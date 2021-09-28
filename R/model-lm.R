@@ -212,16 +212,16 @@ get_qr_lm <- function(qr_name, parsedmodel) {
     q[!map_lgl(q, is.null)],
     function(x, y) expr(!!x + !!y)
   )
-  expr((!!f) * (!!f) * !!parsedmodel$general$sigma2)
+  expr(((!!f)) * ((!!f)) * !!parsedmodel$general$sigma2)
 }
 
 te_interval_lm <- function(parsedmodel, interval = 0.95) {
   qr_names <- names(parsedmodel$terms[[1]]$qr)
-  qrs <- map(
+  qrs_map <- map(
     qr_names,
     ~ get_qr_lm(.x, parsedmodel)
   )
-  qrs <- reduce(qrs, function(x, y) expr(!!x + (!!y)))
+  qrs <- reduce(qrs_map, function(x, y) expr(!!x + (!!y)))
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
 }
