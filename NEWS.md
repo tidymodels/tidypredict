@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Fixes issue handling GLM Binomial earth models (#97)
+
 - Adds capability to handle single simple Cubist models (#57)
 
 - Fixed parenthesis issue in the creation of the interval formula (#76)
