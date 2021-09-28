@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Adds capability to handle single simple Cubist models (#57)
+
 - Fixed parenthesis issue in the creation of the interval formula (#76)
 
 - Fixed bug in SQL query generation for XGBoost models with objective `binary:logistic`.

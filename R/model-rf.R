@@ -66,29 +66,39 @@ parse_model.randomForest <- function(model) {
   as_parsed_model(pm)
 }
 
+path_formulas <- function(path) {
+  if(length(path) == 1 & path[[1]]$type == "all") {
+    rcl <- NULL
+  } else {
+    cl <- map(
+      path,
+      ~ {
+        i <- NULL
+        if(.x$type == "conditional") {
+          if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
+          if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
+          if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
+          if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
+        }
+        if(.x$type == "set") {
+          sets <- reduce(.x$vals, c)
+          if (.x$op == "in") i <- expr(!!sym(.x$col) %in% !! sets)
+          if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !! sets) == FALSE)
+        }
+        i
+      }
+    )
+    rcl <- reduce(cl, function(x, y) expr(!!x & !!y))
+  }
+  rcl
+}
+
 # Fit model -----------------------------------------------
 
 get_rf_case <- function(path, prediction, calc_mode = "") {
   
-  cl <- map(
-    path,
-    ~ {
-      i <- NULL
-      if(.x$type == "conditional") {
-        if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
-        if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
-        if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
-        if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
-      }
-      if(.x$type == "set") {
-        sets <- reduce(.x$vals, c)
-        if (.x$op == "in") i <- expr(!!sym(.x$col) %in% !! sets)
-        if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !! sets) == FALSE)
-      }
-      i
-    }
-  )
-  cl <- reduce(cl, function(x, y) expr(!!x & !!y))
+  rcl <- path_formulas(path)
+
   if (length(prediction) > 1) {
     pl <- map(
       prediction,
@@ -103,8 +113,9 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     pl <- prediction
   }
   f <- NULL
-  if (calc_mode == "ifelse") f <- expr(ifelse(!!cl, !!pl, 0))
-  if (is.null(f)) f <- expr(!!cl ~ !!pl)
+  if (is.null(rcl)) f <- pl
+  if (is.null(f) & calc_mode == "ifelse") f <- expr(ifelse(!!rcl, !!pl, 0))
+  if (is.null(f)) f <- expr(!!rcl ~ !!pl)
   f
 }
 
@@ -125,7 +136,7 @@ build_fit_formula_rf <- function(parsedmodel) {
 
   if (calc_mode == "ifelse") {
     f <- reduce(get_rf_case_tree(1, parsedmodel), function(x, y) expr(!!x + !!y))
-    f <- expr(!!f / !!divisor)
+    if(divisor > 1) f <- expr(!!f / !!divisor)
   }
 
   if (is.null(f)) {
