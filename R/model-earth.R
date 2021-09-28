@@ -14,10 +14,7 @@ parse_model.earth <- function(model) {
   }
 
   is_glm <- !is.null(model$glm.list)
-
-  all_coefs <- model$coefficients
-  if (is_glm) all_coefs <- model$glm.coefficients
-
+  
   pm <- list()
   pm$general$model <- "earth"
   pm$general$type <- "tree"
@@ -29,12 +26,12 @@ parse_model.earth <- function(model) {
     pm$general$family <- fam$family
     pm$general$link <- fam$link
   }
-  pm$terms <- mars_terms(model)
+  pm$terms <- mars_terms(model, is_glm)
   as_parsed_model(pm)
 }
 
 
-mars_terms <- function(mod) { 
+mars_terms <- function(mod, is_glm) { 
   feature_types <- 
     tibble::as_tibble(mod$dirs, rownames = "feature") %>% 
     dplyr::mutate(feature_num = dplyr::row_number()) %>% 
@@ -48,9 +45,16 @@ mars_terms <- function(mod) {
     tidyr::pivot_longer(cols = c(-feature, -feature_num),
                         values_to = "value",
                         names_to = "term")
+  
+  if (is_glm)  {
+    all_coefs <- mod$glm.coefficients
+  } else {
+    all_coefs <- mod$coefficients  
+  }
+
   feature_coefs <- 
     # Note coef(mod) formats data differently for logistic regression
-    tibble::as_tibble(mod$coefficients, rownames = "feature") %>% 
+    tibble::as_tibble(all_coefs, rownames = "feature") %>% 
     setNames(c("feature", "coefficient"))
   
   term_to_column <- 
