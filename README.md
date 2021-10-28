@@ -4,7 +4,7 @@
 [![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
 [![CRAN\_Status\_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
 [![Codecov test
-coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/master/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=master)
+coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=main)
 [![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
 The main goal of `tidypredict` is to enable running predictions inside

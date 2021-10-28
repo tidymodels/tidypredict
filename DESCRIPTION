@@ -1,47 +1,51 @@
 Package: tidypredict
-Version: 0.4.8.9000
 Title: Run Predictions Inside the Database
-Description: It parses a fitted 'R' model object, and returns a formula
-    in 'Tidy Eval' code that calculates the predictions.
-    It works with several databases back-ends because it leverages 'dplyr'
-    and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger(), earth(), xgb.Booster.complete(),
-    cubist(), and ctree() models. 
+Version: 0.4.8.9000
 Authors@R:
-    person("Max", "Kuhn", email = "max@rstudio.com", role = c("aut", "cre"))
+    person("Max", "Kuhn", , "max@rstudio.com", role = c("aut", "cre"))
+Description: It parses a fitted 'R' model object, and returns a formula in
+    'Tidy Eval' code that calculates the predictions.  It works with
+    several databases back-ends because it leverages 'dplyr' and 'dbplyr'
+    for the final 'SQL' translation of the algorithm. It currently
+    supports lm(), glm(), randomForest(), ranger(), earth(),
+    xgb.Booster.complete(), cubist(), and ctree() models.
+License: MIT + file LICENSE
+URL: https://tidypredict.tidymodels.org,
+    https://github.com/tidymodels/tidypredict
+BugReports: https://github.com/tidymodels/tidypredict/issues
 Depends:
     R (>= 3.1)
 Imports:
     dplyr (>= 0.7),
-    rlang,
-    purrr,
-    knitr,
     generics,
+    knitr,
+    purrr,
+    rlang,
     stringr,
     tibble,
     tidyr
 Suggests:
+    covr,
+    Cubist,
+    DBI,
     dbplyr,
-    testthat (>= 2.1.0),
+    earth (>= 5.1.2),
+    methods,
+    mlbench,
+    modeldata,
+    nycflights13,
+    parsnip,
+    partykit,
     randomForest,
     ranger,
-    earth (>= 5.1.2),
     rmarkdown,
-    nycflights13,
     RSQLite,
-    methods,
-    DBI,
-    covr,
+    testthat (>= 2.1.0),
     xgboost,
-    Cubist,
-    mlbench,
-    partykit,
-    yaml,
-    parsnip,
-    modeldata
-License: MIT + file LICENSE
-URL: https://tidypredict.tidymodels.org, https://github.com/tidymodels/tidypredict
-BugReports: https://github.com/tidymodels/tidypredict/issues
-RoxygenNote: 7.1.1.9000
+    yaml
+VignetteBuilder: 
+    knitr
+Config/Needs/website: 
+    tidyverse/tidytemplate
 Encoding: UTF-8
-VignetteBuilder: knitr
+RoxygenNote: 7.1.1.9000
