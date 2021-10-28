@@ -198,43 +198,29 @@
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval terminal</span>
-<span class="co">#&gt; 1      0         1          2          3  Petal.Width     0.75    FALSE</span>
-<span class="co">#&gt; 2      1        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
-<span class="co">#&gt; 3      2         3          4          3  Petal.Width     1.75    FALSE</span>
-<span class="co">#&gt; 4      3         5          6          0 Sepal.Length     7.10    FALSE</span>
-<span class="co">#&gt; 5      4        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
-<span class="co">#&gt; 6      5         7          8          3  Petal.Width     1.65    FALSE</span>
+<span class="co">#&gt; 1      0         1          2          3  Petal.Width     1.75    FALSE</span>
+<span class="co">#&gt; 2      1         3          4          2 Petal.Length     2.45    FALSE</span>
+<span class="co">#&gt; 3      2         5          6          2 Petal.Length     4.85    FALSE</span>
+<span class="co">#&gt; 4      3        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
+<span class="co">#&gt; 5      4         7          8          2 Petal.Length     5.40    FALSE</span>
+<span class="co">#&gt; 6      5        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
 <span class="co">#&gt;   prediction</span>
 <span class="co">#&gt; 1       &lt;NA&gt;</span>
-<span class="co">#&gt; 2     setosa</span>
+<span class="co">#&gt; 2       &lt;NA&gt;</span>
 <span class="co">#&gt; 3       &lt;NA&gt;</span>
-<span class="co">#&gt; 4       &lt;NA&gt;</span>
-<span class="co">#&gt; 5  virginica</span>
-<span class="co">#&gt; 6       &lt;NA&gt;</span></code></pre></div>
+<span class="co">#&gt; 4     setosa</span>
+<span class="co">#&gt; 5       &lt;NA&gt;</span>
+<span class="co">#&gt; 6  virginica</span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">dplyr::case_when()</a></code> statement</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; case_when(Petal.Width &lt; 0.75 ~ "setosa", Petal.Width &gt;= 1.75 &amp; </span>
-<span class="co">#&gt;     Petal.Width &gt;= 0.75 ~ "virginica", Sepal.Length &gt;= 7.1 &amp; </span>
-<span class="co">#&gt;     Petal.Width &lt; 1.75 &amp; Petal.Width &gt;= 0.75 ~ "virginica", Petal.Length &gt;= </span>
-<span class="co">#&gt;     5.35 &amp; Petal.Width &lt; 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;     1.75 &amp; Petal.Width &gt;= 0.75 ~ "virginica", Sepal.Width &lt; 2.75 &amp; </span>
-<span class="co">#&gt;     Petal.Width &gt;= 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;     1.75 &amp; Petal.Width &gt;= 0.75 ~ "virginica", Sepal.Width &gt;= </span>
-<span class="co">#&gt;     2.75 &amp; Petal.Width &gt;= 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;     1.75 &amp; Petal.Width &gt;= 0.75 ~ "versicolor", Petal.Width &lt; </span>
-<span class="co">#&gt;     1.45 &amp; Petal.Length &lt; 5.35 &amp; Petal.Width &lt; 1.65 &amp; Sepal.Length &lt; </span>
-<span class="co">#&gt;     7.1 &amp; Petal.Width &lt; 1.75 &amp; Petal.Width &gt;= 0.75 ~ "versicolor", </span>
-<span class="co">#&gt;     Petal.Length &lt; 5 &amp; Petal.Width &gt;= 1.45 &amp; Petal.Length &lt; 5.35 &amp; </span>
-<span class="co">#&gt;         Petal.Width &lt; 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;         1.75 &amp; Petal.Width &gt;= 0.75 ~ "versicolor", Sepal.Length &lt; </span>
-<span class="co">#&gt;         6.15 &amp; Petal.Length &gt;= 5 &amp; Petal.Width &gt;= 1.45 &amp; Petal.Length &lt; </span>
-<span class="co">#&gt;         5.35 &amp; Petal.Width &lt; 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;         1.75 &amp; Petal.Width &gt;= 0.75 ~ "versicolor", Sepal.Length &gt;= </span>
-<span class="co">#&gt;         6.15 &amp; Petal.Length &gt;= 5 &amp; Petal.Width &gt;= 1.45 &amp; Petal.Length &lt; </span>
-<span class="co">#&gt;         5.35 &amp; Petal.Width &lt; 1.65 &amp; Sepal.Length &lt; 7.1 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;         1.75 &amp; Petal.Width &gt;= 0.75 ~ "virginica")</span></code></pre></div>
+<span class="co">#&gt; case_when(Petal.Length &lt; 2.45 &amp; Petal.Width &lt; 1.75 ~ "setosa", </span>
+<span class="co">#&gt;     Petal.Length &lt; 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span>
+<span class="co">#&gt;     Petal.Length &gt;= 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span>
+<span class="co">#&gt;     Petal.Length &lt; 5.4 &amp; Petal.Length &gt;= 2.45 &amp; Petal.Width &lt; </span>
+<span class="co">#&gt;         1.75 ~ "versicolor", Petal.Length &gt;= 5.4 &amp; Petal.Length &gt;= </span>
+<span class="co">#&gt;         2.45 &amp; Petal.Width &lt; 1.75 ~ "virginica")</span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(iris, !! tidypredict_fit(model))</a></code>
@@ -255,10 +241,17 @@
   <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
-<span class="co">#&gt; case_when(Petal.Width &lt; 0.7 ~ "setosa", Petal.Length &lt; 4.85 &amp; </span>
-<span class="co">#&gt;     Petal.Width &gt;= 0.7 ~ "versicolor", Petal.Width &lt; 1.75 &amp; Petal.Length &gt;= </span>
-<span class="co">#&gt;     4.85 &amp; Petal.Width &gt;= 0.7 ~ "versicolor", Petal.Width &gt;= </span>
-<span class="co">#&gt;     1.75 &amp; Petal.Length &gt;= 4.85 &amp; Petal.Width &gt;= 0.7 ~ "virginica")</span></code></pre></div>
+<span class="co">#&gt; case_when(Petal.Width &lt; 0.8 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span>
+<span class="co">#&gt;     Petal.Width &gt;= 0.8 ~ "virginica", Petal.Width &lt; 1.65 &amp; Petal.Length &lt; </span>
+<span class="co">#&gt;     4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= 0.8 ~ "versicolor", </span>
+<span class="co">#&gt;     Petal.Width &gt;= 1.65 &amp; Petal.Length &lt; 4.75 &amp; Petal.Length &lt; </span>
+<span class="co">#&gt;         5.05 &amp; Petal.Width &gt;= 0.8 ~ "virginica", Sepal.Length &gt;= </span>
+<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
+<span class="co">#&gt;         0.8 ~ "versicolor", Sepal.Width &lt; 3.1 &amp; Sepal.Length &lt; </span>
+<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
+<span class="co">#&gt;         0.8 ~ "virginica", Sepal.Width &gt;= 3.1 &amp; Sepal.Length &lt; </span>
+<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
+<span class="co">#&gt;         0.8 ~ "versicolor")</span></code></pre></div>
 </div>
   </div>
 
