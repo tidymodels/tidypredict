@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 set.seed(100)
 ```
 
-This article reviews two possible scenarios for "writing back" predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.
+This article reviews two possible scenarios for "writing back" predictions to the database, and without importing the data into memory first. Both scenarios share a common model preparation method.
 
 ## Example setup
 
