@@ -206,12 +206,13 @@ Tidy Eval formula that can then be used inside a dplyr command.</p>
 
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>~</span> <span class='va'>wt</span> <span class='op'>+</span> <span class='va'>cyl</span> <span class='op'>*</span> <span class='va'>disp</span>, offset <span class='op'>=</span> <span class='va'>am</span>, data <span class='op'>=</span> <span class='va'>mtcars</span><span class='op'>)</span>
-<span class='fu'>tidypredict_fit</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 46.9691423291323 + (wt * -2.43434983315996) + (cyl * -2.86061920499755) + 
-#&gt;     (disp * -0.0765223074908514) + (cyl * disp * 0.00981028601947223) + 
-#&gt;     am</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>~</span> <span class='va'>wt</span> <span class='op'>+</span> <span class='va'>cyl</span> <span class='op'>*</span> <span class='va'>disp</span>, offset <span class='op'>=</span> <span class='va'>am</span>, data <span class='op'>=</span> <span class='va'>mtcars</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>tidypredict_fit</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 46.9691423291323 + (wt * -2.43434983315996) + (cyl * -2.86061920499755) + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     (disp * -0.0765223074908514) + (cyl * disp * 0.00981028601947223) + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     am</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

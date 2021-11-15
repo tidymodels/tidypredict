@@ -195,7 +195,7 @@
 <a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
 <p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">randomForest::getTree()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">getTree</a></span><span class="op">(</span><span class="va">model</span>, labelVar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/getTree.html">getTree</a></span><span class="op">(</span><span class="va">model</span>, labelVar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;   left daughter right daughter    split var split point status prediction</span>
 <span class="co">#&gt; 1             2              3 Petal.Length        2.50      1       &lt;NA&gt;</span>
@@ -221,9 +221,9 @@
 <span class="co">#&gt;     1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 2.5 ~ "versicolor")</span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
-<li>Use directly inside <code>dplyr</code>, <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate(iris, !! tidypredict_fit(model))</a></code>
+<li>Use directly inside <code>dplyr</code>, <code>mutate(iris, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column(model)</a></code> to a piped command set</li>
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
 </div>
@@ -234,8 +234,8 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
 
-<span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"randomForest"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"randomForest"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>

@@ -214,24 +214,25 @@ Tidy Eval formula that can then be used inside a dplyr command.</p>
 lower bound respectively.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
-    <pre class="examples"><div class='input'>
-<span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>~</span> <span class='va'>wt</span> <span class='op'>+</span> <span class='va'>cyl</span> <span class='op'>*</span> <span class='va'>disp</span>, offset <span class='op'>=</span> <span class='va'>am</span>, data <span class='op'>=</span> <span class='va'>mtcars</span><span class='op'>)</span>
-<span class='fu'>tidypredict_interval</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span>
-</div><div class='output co'>#&gt; 2.05183051648029 * sqrt((-0.176776695296637) * (-0.176776695296637) * 
-#&gt;     6.20704821338125 + (-0.590557271637747 + wt * 0.183559646169165) * 
-#&gt;     (-0.590557271637747 + wt * 0.183559646169165) * 6.20704821338125 + 
-#&gt;     (-0.257207134290773 + wt * -0.230680634727453 + cyl * 0.161513439412957) * 
-#&gt;         (-0.257207134290773 + wt * -0.230680634727453 + cyl * 
-#&gt;             0.161513439412957) * 6.20704821338125 + (-0.868335233010594 + 
-#&gt;     wt * 0.271667738147758 + cyl * 0.169308509351746 + disp * 
-#&gt;     -0.0045651683402764) * (-0.868335233010594 + wt * 0.271667738147758 + 
-#&gt;     cyl * 0.169308509351746 + disp * -0.0045651683402764) * 6.20704821338125 + 
-#&gt;     (-1.53184887490413 + wt * -0.163034819828352 + cyl * 0.221405540626369 + 
-#&gt;         disp * 0.0170837100474746 + cyl * disp * -0.0020081028047214) * 
-#&gt;         (-1.53184887490413 + wt * -0.163034819828352 + cyl * 
-#&gt;             0.221405540626369 + disp * 0.0170837100474746 + cyl * 
-#&gt;             disp * -0.0020081028047214) * 6.20704821338125 + 
-#&gt;     6.20704821338125)</div></pre>
+    <pre class="examples"><span class='r-in'></span>
+<span class='r-in'><span class='va'>model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>mpg</span> <span class='op'>~</span> <span class='va'>wt</span> <span class='op'>+</span> <span class='va'>cyl</span> <span class='op'>*</span> <span class='va'>disp</span>, offset <span class='op'>=</span> <span class='va'>am</span>, data <span class='op'>=</span> <span class='va'>mtcars</span><span class='op'>)</span></span>
+<span class='r-in'><span class='fu'>tidypredict_interval</span><span class='op'>(</span><span class='va'>model</span><span class='op'>)</span></span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span> 2.05183051648029 * sqrt((-0.176776695296637) * (-0.176776695296637) * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     6.20704821338125 + (-0.590557271637747 + wt * 0.183559646169165) * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     (-0.590557271637747 + wt * 0.183559646169165) * 6.20704821338125 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     (-0.257207134290773 + wt * -0.230680634727453 + cyl * 0.161513439412957) * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         (-0.257207134290773 + wt * -0.230680634727453 + cyl * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             0.161513439412957) * 6.20704821338125 + (-0.868335233010594 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     wt * 0.271667738147758 + cyl * 0.169308509351746 + disp * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     -0.0045651683402764) * (-0.868335233010594 + wt * 0.271667738147758 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     cyl * 0.169308509351746 + disp * -0.0045651683402764) * 6.20704821338125 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     (-1.53184887490413 + wt * -0.163034819828352 + cyl * 0.221405540626369 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         disp * 0.0170837100474746 + cyl * disp * -0.0020081028047214) * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>         (-1.53184887490413 + wt * -0.163034819828352 + cyl * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             0.221405540626369 + disp * 0.0170837100474746 + cyl * </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>             disp * -0.0020081028047214) * 6.20704821338125 + </span>
+<span class='r-out co'><span class='r-pr'>#&gt;</span>     6.20704821338125)</span>
+</pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

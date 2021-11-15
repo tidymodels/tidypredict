@@ -198,12 +198,12 @@
   params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>max_depth <span class="op">=</span> <span class="fl">2</span>, silent <span class="op">=</span> <span class="fl">1</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span>, base_score <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,
   data <span class="op">=</span> <span class="va">xgb_bin_data</span>, nrounds <span class="op">=</span> <span class="fl">50</span>
 <span class="op">)</span>
-<span class="co">#&gt; [21:20:03] WARNING: amalgamation/../src/learner.cc:573: </span>
+<span class="co">#&gt; [11:21:34] WARNING: amalgamation/../src/learner.cc:576: </span>
 <span class="co">#&gt; Parameters: { "silent" } might not be used.</span>
 <span class="co">#&gt; </span>
-<span class="co">#&gt;   This may not be accurate due to some parameters are only used in language bindings but</span>
-<span class="co">#&gt;   passed down to XGBoost core.  Or some parameters are not used but slip through this</span>
-<span class="co">#&gt;   verification. Please open an issue if you find above cases.</span></code></pre></div>
+<span class="co">#&gt;   This could be a false alarm, with some parameters getting used by language bindings but</span>
+<span class="co">#&gt;   then being mistakenly passed down to XGBoost core, or some parameter actually being used</span>
+<span class="co">#&gt;   but getting flagged wrongly here. Please open an issue if you find any such cases.</span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
@@ -296,8 +296,8 @@
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
 
-<span class="va">mtcars</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 32</span>
 <span class="co">#&gt; Columns: 12</span>
@@ -332,8 +332,8 @@
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
 
-<span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/boost_tree.html">boost_tree</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"xgboost"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/boost_tree.html">boost_tree</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"xgboost"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">am</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">p_model</span>, <span class="va">mtcars</span>, xg_df <span class="op">=</span> <span class="va">xgb_bin_data</span><span class="op">)</span>

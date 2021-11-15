@@ -147,7 +147,7 @@
 
     
     
-<p>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing importing the data into memory first. Both scenarios share a common model preparation method.</p>
+<p>This article reviews two possible scenarios for “writing back” predictions to the database, and without importing the data into memory first. Both scenarios share a common model preparation method.</p>
 <div id="example-setup" class="section level2">
 <h2 class="hasAnchor">
 <a href="#example-setup" class="anchor"></a>Example setup</h2>
@@ -159,7 +159,7 @@
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stat.berkeley.edu/~breiman/RandomForests/">randomForest</a></span><span class="op">)</span>
 <span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/">dbplyr</a></span><span class="op">)</span>
 
-<span class="va">flights_table</span> <span class="op">&lt;-</span> <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span> <span class="op">%&gt;%</span>
+<span class="va">flights_table</span> <span class="op">&lt;-</span> <span class="fu">nycflights13</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/nycflights13/man/flights.html">flights</a></span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
     current_score <span class="op">=</span> <span class="fl">0</span>, 
     flight_id <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/ranking.html">row_number</a></span><span class="op">(</span><span class="op">)</span>
@@ -176,9 +176,9 @@
 <a href="#model-preparation" class="anchor"></a>Model preparation</h2>
 <p>A sample is downloaded from the database for modeling. This example already selects the needed variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">dep_delay</span>, <span class="va">hour</span>, <span class="va">distance</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">dep_delay</span>, <span class="va">hour</span>, <span class="va">distance</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span> </code></pre></div>
 <p>A linear model is fitted using <code><a href="https://rdrr.io/r/stats/lm.html">lm()</a></code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
@@ -215,8 +215,8 @@
 <span class="co">#&gt;        Changed: 336776</span></code></pre></div>
 <p>Here is a sample of the newly populated field:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">db_fligths</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">current_score</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">current_score</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span> 
 <span class="co">#&gt; Warning: Closing open result set, pending rows</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 1]</span>
@@ -249,12 +249,12 @@
 <p>The plan is to use a SQL statement that most vendors support, is called INSERT INTO SELECT. The idea is to use <code>dplyr</code> laziness to prepare the data transformation and predictions, but it’s not going to be executed until is parsed into SQL and sent as part of a another statement. The INSERT INTO SELECT statement allows for the results of a query to be saved in a table, and without leaving the database.</p>
 <p>In this example, predictions are going to be executed for just the records in the month of December. The data is filtered, and then <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> is used to create the new fit field. The results are then transformed to match to the structure of the new <code>daily_scores</code> table.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">new_predictions</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">12</span><span class="op">)</span> <span class="op">%&gt;%</span> 
-  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span>, vars <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="va">new_predictions</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">12</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span> 
+  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span>, vars <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span>
     <span class="va">flight_id</span>,
-    <span class="va">score</span><span class="op">)</span> <span class="op">%&gt;%</span>
+    <span class="va">score</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>date <span class="op">=</span> <span class="st">"01/01/2018"</span><span class="op">)</span></code></pre></div>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">insert_scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbplyr.tidyverse.org/reference/build_sql.html">build_sql</a></span><span class="op">(</span><span class="st">"INSERT INTO daily_scores "</span>, <span class="fu"><a href="https://dbplyr.tidyverse.org/reference/sql_build.html">sql_render</a></span><span class="op">(</span><span class="va">new_predictions</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span>
@@ -275,9 +275,9 @@
 <span class="co">#&gt;        Changed: 28135</span></code></pre></div>
 <p>A simple table join can be used to confirm that the new update worked. For real life scenarios, a more sophisticated query should be performed in order to only get the latest score. For this example, we simple filter on the same date we inserted</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"daily_scores"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">inner_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights_table"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"flight_id"</span><span class="op">)</span> <span class="op">%&gt;%</span>
-  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="st">"01/01/2018"</span><span class="op">)</span> <span class="op">%&gt;%</span>
+<code class="sourceCode R"><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"daily_scores"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">inner_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights_table"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"flight_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">date</span> <span class="op">==</span> <span class="st">"01/01/2018"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
   <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">select</a></span><span class="op">(</span><span class="va">dep_delay</span>, <span class="va">hour</span>, <span class="va">distance</span>, <span class="va">score</span>, <span class="va">date</span><span class="op">)</span>
 <span class="co">#&gt; Warning: Closing open result set, pending rows</span>
 <span class="co">#&gt; # Source:   lazy query [?? x 5]</span>
