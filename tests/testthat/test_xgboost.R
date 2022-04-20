@@ -1,5 +1,3 @@
-context("xgboost")
-
 skip_if_not_installed("xgboost")
 
 logregobj <- function(preds, dtrain) {
@@ -46,13 +44,11 @@ test_that("Confirm SQL function returns a query", {
   )
 })
 
-context("xgboost-parsnip")
 test_that("Predictions are correct for different objectives", {
   m <- parsnip::fit(parsnip::set_engine(parsnip::boost_tree(mode = "regression"), "xgboost"), am ~ ., data = mtcars)
   expect_false(tidypredict_test(m, df = mtcars)$alert)
 })
 
-context("xgboost-saved")
 test_that("Model can be saved and re-loaded", {
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(xgb_reglinear), mp)

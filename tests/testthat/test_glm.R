@@ -1,5 +1,3 @@
-context("glm")
-
 df <- mtcars
 df$cyl <- paste0("cyl", df$cyl)
 
@@ -33,7 +31,6 @@ test_that("tidypredict works when variable names are subset of other variables",
   expect_false(tidypredict_test(model4)$alert)
 })
 
-context("glm-saved")
 test_that("Model can be saved and re-loaded", {
   model <- glm(am ~ wt + disp + cyl, data = df, family = "binomial")
   mp <- tempfile(fileext = ".yml")

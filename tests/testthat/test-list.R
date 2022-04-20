@@ -1,5 +1,3 @@
-context("test-list")
-
 fitted_rf <- function(...) tidypredict_fit(parse_model(...))
 
 test_that("Supports parsed models in list objects", {

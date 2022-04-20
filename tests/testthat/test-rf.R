@@ -17,13 +17,11 @@ run_tests <- function(model) {
   })
 }
 
-context("randomForest")
 set.seed(100)
 run_tests(
   randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
 )
 
-context("randomForest-parsnip")
 set.seed(100)
 run_tests(
   parsnip::fit(
@@ -33,7 +31,6 @@ run_tests(
   )
 )
 
-context("randomForest-saved")
 test_that("Model can be saved and re-loaded", {
   model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
   mp <- tempfile(fileext = ".yml")

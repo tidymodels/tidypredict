@@ -1,5 +1,3 @@
-context("test-tester")
-
 test_that("Tester returns warning", {
   t <- tidypredict_test(
     lm(mpg ~ wt, data = mtcars),

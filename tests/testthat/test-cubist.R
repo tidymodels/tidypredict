@@ -1,4 +1,3 @@
-context("cubist")
 set.seed(100)
 data("BostonHousing", package = "mlbench")
 model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
@@ -20,7 +19,6 @@ test_that("Returns expected dplyr formula", {
   )
 })
 
-context("cubist-saved")
 test_that("Model can be saved and re-loaded", {
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
