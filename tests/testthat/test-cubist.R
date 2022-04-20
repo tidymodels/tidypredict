@@ -5,7 +5,7 @@ tf <- tidypredict_fit(model)
 pm <- parse_model(model)
 
 test_that("Returns the correct type and dimensions", {
-  expect_is(pm, "list")
+  expect_s3_class(pm, "list")
   expect_equal(length(pm), 2)
   expect_equal(length(pm$trees), 1)
   expect_equal(pm$general$model, "cubist")

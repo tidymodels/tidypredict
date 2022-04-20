@@ -50,7 +50,7 @@ test_that("Model can be saved and re-loaded", {
 })
 
 test_that("tidy() works", {
-  expect_is(
+  expect_s3_class(
     tidy(parse_model(lm(mpg ~., mtcars))),
     "tbl_df"
   )  

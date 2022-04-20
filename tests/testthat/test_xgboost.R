@@ -21,8 +21,8 @@ xgb_binarylogistic <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1
 xgb_custom <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = logregobj, base_score = 0.5), data = xgb_bin_data, nrounds = 4)
 
 test_that("Returns the correct type", {
-  expect_is(parse_model(xgb_bin_fit), "list")
-  expect_is(tidypredict_fit(xgb_bin_fit), "call")
+  expect_s3_class(parse_model(xgb_bin_fit), "list")
+  expect_equal(class(tidypredict_fit(xgb_bin_fit))[1], "call")
 })
 
 test_that("Predictions are correct for different objectives", {

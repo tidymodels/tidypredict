@@ -1,8 +1,8 @@
 fitted_rf <- function(...) tidypredict_fit(parse_model(...))
 
 test_that("Supports parsed models in list objects", {
-  expect_is(
-    fitted_rf(lm(mpg ~ wt, data = mtcars)),
+  expect_equal(
+    class(fitted_rf(lm(mpg ~ wt, data = mtcars)))[1],
     "call"
   )
   expect_equal(
