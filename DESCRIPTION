@@ -40,7 +40,7 @@ Suggests:
     ranger,
     rmarkdown,
     RSQLite,
-    testthat (>= 2.1.0),
+    testthat (>= 3.0.0),
     xgboost,
     yaml
 VignetteBuilder: 
@@ -49,3 +49,4 @@ Config/Needs/website:
     tidyverse/tidytemplate
 Encoding: UTF-8
 RoxygenNote: 7.1.1.9000
+Config/testthat/edition: 3
