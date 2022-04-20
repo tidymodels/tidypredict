@@ -35,6 +35,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -49,15 +51,15 @@
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
-          <span class="partof">part of <a href="https://tidymodels.org">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.8.9000</span>
+          <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.8.9000</span>
         </div>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Model list
      
     <span class="caret"></span>
@@ -87,7 +89,7 @@
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -97,7 +99,8 @@
       <a href="../articles/save.html">Save/Reload</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/non-r.html">Non-R models</a>
     </li>
     <li>
@@ -107,7 +110,8 @@
       <a href="../articles/tree.html">Tree model spec</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/sql.html">DB Writeback</a>
     </li>
   </ul>
@@ -119,7 +123,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
         <li>
-  <a href="https://github.com/tidymodels/tidypredict/">
+  <a href="https://github.com/tidymodels/tidypredict/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -134,13 +138,13 @@
 
       
 
-      </header><script src="mars_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>MARS models via the <code>earth</code> package</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/master/vignettes/mars.Rmd"><code>vignettes/mars.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/HEAD/vignettes/mars.Rmd" class="external-link"><code>vignettes/mars.Rmd</code></a></small>
       <div class="hidden name"><code>mars.Rmd</code></div>
 
     </div>
@@ -179,14 +183,15 @@
 </tr>
 </tbody>
 </table>
-<div id="tidypredict_-functions" class="section level2">
-<h2 class="hasAnchor">
-<a href="#tidypredict_-functions" class="anchor"></a><code>tidypredict_</code> functions</h2>
+<div class="section level2">
+<h2 id="tidypredict_-functions">
+<code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
+</h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://www.milbo.users.sonic.net/earth/">earth</a></span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/data.html">data</a></span><span class="op">(</span><span class="st">"etitanic"</span>, package <span class="op">=</span> <span class="st">"earth"</span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.milbo.users.sonic.net/earth/" class="external-link">earth</a></span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"etitanic"</span>, package <span class="op">=</span> <span class="st">"earth"</span><span class="op">)</span>
 
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/earth/man/earth.html">earth</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">sibsp</span> <span class="op">+</span> <span class="va">parch</span>, data <span class="op">=</span> <span class="va">etitanic</span>, degree <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/earth/man/earth.html" class="external-link">earth</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">sibsp</span> <span class="op">+</span> <span class="va">parch</span>, data <span class="op">=</span> <span class="va">etitanic</span>, degree <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
@@ -203,29 +208,29 @@
 <li>
 <p>SQL output example</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
 <span class="co">#&gt; &lt;SQL&gt; 22.2918960405403 + (CASE WHEN (`parch` &lt; 2.0) THEN (2.0 - `parch`) WHEN NOT(`parch` &lt; 2.0) THEN (0.0) END * 4.85356462114366) + (CASE WHEN (`parch` &gt; 2.0) THEN (`parch` - 2.0) WHEN NOT(`parch` &gt; 2.0) THEN (0.0) END * 13.0493891423277) + (CASE WHEN (`parch` &gt; 4.0) THEN (`parch` - 4.0) WHEN NOT(`parch` &gt; 4.0) THEN (0.0) END * -18.8998708031826) + (CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT(`sibsp` &gt; 1.0) THEN (0.0) END * -7.71566779782023) + (CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT(`sibsp` &gt; 1.0) THEN (0.0) END * CASE WHEN (`parch` &lt; 1.0) THEN (1.0 - `parch`) WHEN NOT(`parch` &lt; 1.0) THEN (0.0) END * 7.40395975552272) + (CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT(`sibsp` &gt; 1.0) THEN (0.0) END * CASE WHEN (`parch` &gt; 1.0) THEN (`parch` - 1.0) WHEN NOT(`parch` &gt; 1.0) THEN (0.0) END * 4.41874354843212)</span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
 
-<span class="va">etitanic</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html">glimpse</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">etitanic</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; Rows: 1,046</span>
 <span class="co">#&gt; Columns: 7</span>
-<span class="co">#&gt; $ pclass   &lt;fct&gt; 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1…</span>
-<span class="co">#&gt; $ survived &lt;int&gt; 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1…</span>
-<span class="co">#&gt; $ sex      &lt;fct&gt; female, male, female, male, female, male, female, male, femal…</span>
-<span class="co">#&gt; $ age      &lt;dbl&gt; 29.0000, 0.9167, 2.0000, 30.0000, 25.0000, 48.0000, 63.0000, …</span>
-<span class="co">#&gt; $ sibsp    &lt;int&gt; 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1…</span>
-<span class="co">#&gt; $ parch    &lt;int&gt; 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1…</span>
-<span class="co">#&gt; $ fit      &lt;dbl&gt; 31.99903, 22.29190, 22.29190, 22.29190, 22.29190, 31.99903, 3…</span></code></pre></div>
+<span class="co">#&gt; $ pclass   <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1st, 1…</span>
+<span class="co">#&gt; $ survived <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1, 1, 0, 0, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 1, 0, 1, 1, 0, 1, 1…</span>
+<span class="co">#&gt; $ sex      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> female, male, female, male, female, male, female, male, femal…</span>
+<span class="co">#&gt; $ age      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 29.0000, 0.9167, 2.0000, 30.0000, 25.0000, 48.0000, 63.0000, …</span>
+<span class="co">#&gt; $ sibsp    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 0, 1, 1, 1, 1, 0, 1, 0, 2, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1…</span>
+<span class="co">#&gt; $ parch    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 0, 2, 2, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1…</span>
+<span class="co">#&gt; $ fit      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 31.99903, 22.29190, 22.29190, 22.29190, 22.29190, 31.99903, 3…</span></code></pre></div>
 </li>
 <li>
-<p>Confirm that <code>tidypredict</code> results match to the model’s <code><a href="https://rdrr.io/r/stats/predict.html">predict()</a></code> results</p>
+<p>Confirm that <code>tidypredict</code> results match to the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">etitanic</span><span class="op">)</span>
 <span class="co">#&gt; tidypredict test results</span>
@@ -235,14 +240,14 @@
 </li>
 </ul>
 </div>
-<div id="glm-models" class="section level2">
-<h2 class="hasAnchor">
-<a href="#glm-models" class="anchor"></a>GLM models</h2>
+<div class="section level2">
+<h2 id="glm-models">GLM models<a class="anchor" aria-label="anchor" href="#glm-models"></a>
+</h2>
 <p><code>tidypredict</code> supports the <code>glm</code> argument as well:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/earth/man/earth.html">earth</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>,
+<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/earth/man/earth.html" class="external-link">earth</a></span><span class="op">(</span><span class="va">survived</span> <span class="op">~</span> <span class="va">.</span>,
                data <span class="op">=</span> <span class="va">etitanic</span>,
-               glm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html">list</a></span><span class="op">(</span>family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>, degree <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
+               glm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>, degree <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
 <span class="co">#&gt; 1 - 1/(1 + exp(0.961709503833137 + (ifelse(age &gt; 32, age - 32, </span>
@@ -256,7 +261,7 @@
 <span class="co">#&gt;     16, 16 - age, 0) * 0.0450523226133542)))</span></code></pre></div>
 <p>The spec sets the <code>is_glm</code> entry to 1, as well as the <code>family</code> and <code>link</code> entries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ general:List of 6</span>
 <span class="co">#&gt;   ..$ model  : chr "earth"</span>
@@ -276,16 +281,16 @@
 <span class="co">#&gt;   ..$ :List of 4</span>
 <span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_tree" "list"</span></code></pre></div>
 </div>
-<div id="parsnip" class="section level2">
-<h2 class="hasAnchor">
-<a href="#parsnip" class="anchor"></a>parsnip</h2>
+<div class="section level2">
+<h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
+</h2>
 <p><code>parsnip</code> fitted models are also supported by <code>tidypredict</code>:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span>
 
-<span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/mars.html">mars</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, prod_degree <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"earth"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">sibsp</span> <span class="op">+</span> <span class="va">parch</span>, data <span class="op">=</span> <span class="va">etitanic</span><span class="op">)</span>
+<span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/mars.html" class="external-link">mars</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, prod_degree <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"earth"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">age</span> <span class="op">~</span> <span class="va">sibsp</span> <span class="op">+</span> <span class="va">parch</span>, data <span class="op">=</span> <span class="va">etitanic</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span>
 <span class="co">#&gt; 22.2918960405403 + (ifelse(parch &lt; 2, 2 - parch, 0) * 4.85356462114366) + </span>
@@ -296,13 +301,13 @@
 <span class="co">#&gt;     (ifelse(sibsp &gt; 1, sibsp - 1, 0) * ifelse(parch &gt; 1, parch - </span>
 <span class="co">#&gt;         1, 0) * 4.41874354843212)</span></code></pre></div>
 </div>
-<div id="parse-model-spec" class="section level2">
-<h2 class="hasAnchor">
-<a href="#parse-model-spec" class="anchor"></a>Parse model spec</h2>
+<div class="section level2">
+<h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
+</h2>
 <p>Here is an example of the model spec:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ general:List of 6</span>
 <span class="co">#&gt;   ..$ model  : chr "earth"</span>
@@ -322,7 +327,7 @@
 <span class="co">#&gt;   ..$ :List of 4</span>
 <span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_tree" "list"</span></code></pre></div>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ :List of 4</span>
 <span class="co">#&gt;   ..$ label       : chr "(Intercept)"</span>
@@ -359,8 +364,8 @@
 
 <div class="author">
   <p>
-    Developed by Max Kuhn.
-    Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
+    Developed by .
+    Site built by <a href="https://pkgdown.r-lib.org" class="external-link">pkgdown</a>.
   </p>
 </div>
 
@@ -369,6 +374,8 @@
 
   
 
+
+  
 
   </body>
 </html>

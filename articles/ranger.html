@@ -35,6 +35,8 @@
 </script>
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -49,15 +51,15 @@
       <div class="navbar-brand-container">
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
-          <span class="partof">part of <a href="https://tidymodels.org">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.4.8.9000</span>
+          <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.8.9000</span>
         </div>
       </div>
     </div>
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav navbar-right">
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Model list
      
     <span class="caret"></span>
@@ -87,7 +89,7 @@
   </ul>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -97,7 +99,8 @@
       <a href="../articles/save.html">Save/Reload</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/non-r.html">Non-R models</a>
     </li>
     <li>
@@ -107,7 +110,8 @@
       <a href="../articles/tree.html">Tree model spec</a>
     </li>
     <li class="divider">
-    <li>
+    </li>
+<li>
       <a href="../articles/sql.html">DB Writeback</a>
     </li>
   </ul>
@@ -119,7 +123,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
         <li>
-  <a href="https://github.com/tidymodels/tidypredict/">
+  <a href="https://github.com/tidymodels/tidypredict/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -134,13 +138,13 @@
 
       
 
-      </header><script src="ranger_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Random Forest, using Ranger</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/master/vignettes/ranger.Rmd"><code>vignettes/ranger.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/HEAD/vignettes/ranger.Rmd" class="external-link"><code>vignettes/ranger.Rmd</code></a></small>
       <div class="hidden name"><code>ranger.Rmd</code></div>
 
     </div>
@@ -179,24 +183,24 @@
 </tr>
 </tbody>
 </table>
-<div id="how-it-works" class="section level2">
-<h2 class="hasAnchor">
-<a href="#how-it-works" class="anchor"></a>How it works</h2>
-<p>Here is a simple <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger()</a></code> model using the <code>iris</code> dataset:</p>
+<div class="section level2">
+<h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
+</h2>
+<p>Here is a simple <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger()</a></code> model using the <code>iris</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger">ranger</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger" class="external-link">ranger</a></span><span class="op">)</span>
 
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ranger/man/ranger.html">ranger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span>, num.trees <span class="op">=</span>  <span class="fl">100</span><span class="op">)</span></code></pre></div>
+<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span>, num.trees <span class="op">=</span>  <span class="fl">100</span><span class="op">)</span></code></pre></div>
 </div>
-<div id="under-the-hood" class="section level2">
-<h2 class="hasAnchor">
-<a href="#under-the-hood" class="anchor"></a>Under the hood</h2>
-<p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html">ranger::treeInfo()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<div class="section level2">
+<h2 id="under-the-hood">Under the hood<a class="anchor" aria-label="anchor" href="#under-the-hood"></a>
+</h2>
+<p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">ranger::treeInfo()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval terminal</span>
 <span class="co">#&gt; 1      0         1          2          3  Petal.Width     1.75    FALSE</span>
 <span class="co">#&gt; 2      1         3          4          2 Petal.Length     2.45    FALSE</span>
@@ -211,7 +215,7 @@
 <span class="co">#&gt; 4     setosa</span>
 <span class="co">#&gt; 5       &lt;NA&gt;</span>
 <span class="co">#&gt; 6  virginica</span></code></pre></div>
-<p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html">dplyr::case_when()</a></code> statement</p>
+<p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
 <span class="co">#&gt; [[1]]</span>
@@ -229,16 +233,16 @@
 <li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
 </ul>
 </div>
-<div id="parsnip" class="section level2">
-<h2 class="hasAnchor">
-<a href="#parsnip" class="anchor"></a>parsnip</h2>
+<div class="section level2">
+<h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
+</h2>
 <p><code>tidypredict</code> also supports <code>ranger</code> model objects fitted via the <code>parsnip</code> package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://parsnip.tidymodels.org">parsnip</a></span><span class="op">)</span>
+<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span>
 
-<span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
+<span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
+  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
 <span class="co">#&gt; case_when(Petal.Width &lt; 0.8 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span>
@@ -271,8 +275,8 @@
 
 <div class="author">
   <p>
-    Developed by Max Kuhn.
-    Site built by <a href="https://pkgdown.r-lib.org">pkgdown</a>.
+    Developed by .
+    Site built by <a href="https://pkgdown.r-lib.org" class="external-link">pkgdown</a>.
   </p>
 </div>
 
@@ -281,6 +285,8 @@
 
   
 
+
+  
 
   </body>
 </html>
