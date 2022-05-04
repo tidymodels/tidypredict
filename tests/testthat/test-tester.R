@@ -1,5 +1,7 @@
 context("test-tester")
 
+skip_if_not_installed("randomForest")
+
 test_that("Tester returns warning", {
   t <- tidypredict_test(
     lm(mpg ~ wt, data = mtcars),
