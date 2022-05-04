@@ -1,3 +1,5 @@
+skip_if_not_installed("randomForest")
+
 run_tests <- function(model) {
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)

@@ -9,6 +9,14 @@ output: github_document
 [![Codecov test coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://codecov.io/gh/tidymodels/tidypredict?branch=main)
 [![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
+```{r pre, include = FALSE}
+if (!rlang::is_installed("randomForest")) {
+  knitr::opts_chunk$set(
+    eval = FALSE
+  )
+}
+```
+
 ```{r setup, include=FALSE}
 library(dplyr)
 library(tidypredict)

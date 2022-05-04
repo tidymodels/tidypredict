@@ -7,6 +7,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+```{r pre, include = FALSE}
+if (!rlang::is_installed("randomForest")) {
+  knitr::opts_chunk$set(
+    eval = FALSE
+  )
+}
+```
 
 ```{r setup, include=FALSE}
 library(dplyr)
