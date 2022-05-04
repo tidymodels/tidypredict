@@ -23,5 +23,5 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })

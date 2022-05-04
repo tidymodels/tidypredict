@@ -27,7 +27,7 @@ test_that("tidypredict works when variable names are subset of other variables",
     am ~ wt + wt_sq + char_cyl + char_cyl_2, 
     data = df2, family = "binomial"
   ))
-  expect_silent(tidypredict_fit(model4))
+  expect_snapshot(tidypredict_fit(model4))
   expect_false(tidypredict_test(model4)$alert)
 })
 
@@ -37,5 +37,5 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(parse_model(model), mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })
