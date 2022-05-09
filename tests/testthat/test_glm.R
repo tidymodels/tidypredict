@@ -27,7 +27,7 @@ test_that("tidypredict works when variable names are subset of other variables",
     am ~ wt + wt_sq + char_cyl + char_cyl_2, 
     data = df2, family = "binomial"
   ))
-  expect_snapshot(tidypredict_fit(model4))
+  expect_silent(tidypredict_fit(model4))
   expect_false(tidypredict_test(model4)$alert)
 })
 
