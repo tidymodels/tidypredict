@@ -1,5 +1,3 @@
-context("earth/MARS models")
-
 data("etitanic", package = "earth")
 
 mars_mod <- parsnip::mars(mode = "regression")
@@ -44,8 +42,6 @@ test_that("Most pmethods work", {
   )
   expect_false(any(as.logical(res)))
 })
-
-context("earth/MARS models - binomial")
 
 test_that("simple binomial works", {
   expect_false(
@@ -106,8 +102,6 @@ test_that("2nd degree earth model with different interfaces", {
   expect_equal(tp_pred_x2, tp_pred_2)
 })
 
-context("earth/MARS models - parsnip")
-
 test_that("Tests with parsnip returns no alert", {
   # expect_false(
   #   tidypredict_test(
@@ -160,7 +154,6 @@ test_that("Tests with parsnip returns no alert", {
   )
 })
 
-context("earth/MARS-saved")
 test_that("Model can be saved and re-loaded", {
   model <- earth::earth(survived ~ .,
     data = etitanic,
@@ -170,5 +163,5 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(parse_model(model), mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })

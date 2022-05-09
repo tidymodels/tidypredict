@@ -1,5 +1,3 @@
-context("party")
-
 df <- mtcars
 df$am1 <- df$am
 df$am <- ifelse(df$am == 1, "auto", "man")
@@ -23,12 +21,11 @@ test_that("Predictions within threshold and parsed model results are equal", {
   
 })
 
-context("party-saved")
 test_that("Model can be saved and re-loaded", {
   model <- partykit::ctree(mpg ~ wt, offset = am, data = df)
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })

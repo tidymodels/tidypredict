@@ -1,5 +1,3 @@
-context("test-tester")
-
 skip_if_not_installed("randomForest")
 
 test_that("Tester returns warning", {
@@ -11,7 +9,7 @@ test_that("Tester returns warning", {
 })
 
 test_that("Intervals returns list", {
-  expect_is(
+  expect_s3_class(
     tidypredict_test(lm(mpg ~ ., data = mtcars), include_intervals = TRUE),
     "tidypredict_test"
   )

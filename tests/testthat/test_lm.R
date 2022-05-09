@@ -1,5 +1,3 @@
-context("lm")
-
 df <- mtcars
 df$cyl <- paste0("cyl", df$cyl)
 
@@ -27,8 +25,6 @@ test_that("tidypredict works when variable names are subset of other variables",
   expect_false(tidypredict_test(model4)$alert)
 })
 
-context("lm-parsnip")
-
 lm_parsnip <- function(...) {
   parsnip::fit(
     parsnip::set_engine(parsnip::linear_reg(), "lm"),
@@ -44,18 +40,17 @@ test_that("Predictions within threshold and parsed model results are equal", {
   expect_false(has_alert(lm_parsnip(mpg ~ (wt + disp) * cyl, data = df)))
 })
 
-context("lm-saved")
 test_that("Model can be saved and re-loaded", {
   model <- lm(mpg ~ (wt + disp) * cyl, data = df)
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })
 
 test_that("tidy() works", {
-  expect_is(
+  expect_s3_class(
     tidy(parse_model(lm(mpg ~., mtcars))),
     "tbl_df"
   )  
