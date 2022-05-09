@@ -1,14 +1,3 @@
-# tidypredict works when variable names are subset of other variables
-
-    Code
-      tidypredict_fit(model4)
-    Output
-      3.18618757155392 + (wt * -1.5247865111278) + (wt_sq * 0.152224442011265) + 
-          (ifelse(char_cyl == "cyl6", 1, 0) * 0.402192959289173) + 
-          (ifelse(char_cyl == "cyl8", 1, 0) * 0.373779132787549) + 
-          (ifelse(char_cyl_2 == "b", 1, 0) * 0.235159663741481) + (ifelse(char_cyl_2 == 
-          "c", 1, 0) * 0.223666615868374)
-
 # Model can be saved and re-loaded
 
     Code
