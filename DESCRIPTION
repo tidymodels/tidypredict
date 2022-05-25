@@ -1,6 +1,6 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
-Version: 0.4.8.9000
+Version: 0.4.9
 Authors@R:
     person("Max", "Kuhn", , "max@rstudio.com", role = c("aut", "cre"))
 Description: It parses a fitted 'R' model object, and returns a formula in

@@ -1,4 +1,4 @@
-# tidypredict (development version)
+# tidypredict 0.4.9
 
 - Adds capability to handle single simple Cubist models (#57)
 
