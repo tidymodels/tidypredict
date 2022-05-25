@@ -250,15 +250,15 @@
                glm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>family <span class="op">=</span> <span class="va">binomial</span><span class="op">)</span>, degree <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
 
 <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
-<span class="co">#&gt; 1 - 1/(1 + exp(0.961709503833137 + (ifelse(age &gt; 32, age - 32, </span>
-<span class="co">#&gt;     0) * -0.00471937845111412) + (ifelse(pclass == "2nd", 1, </span>
-<span class="co">#&gt;     0) * ifelse(sex == "male", 1, 0) * -0.265689204831234) + </span>
-<span class="co">#&gt;     (ifelse(pclass == "3rd", 1, 0) * -0.815453520799443) + (ifelse(pclass == </span>
-<span class="co">#&gt;     "3rd", 1, 0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.102221808806423) + </span>
+<span class="co">#&gt; 1 - 1/(1 + exp(2.91352600741339 + (ifelse(age &gt; 32, age - 32, </span>
+<span class="co">#&gt;     0) * -0.0375714917713112) + (ifelse(pclass == "2nd", 1, 0) * </span>
+<span class="co">#&gt;     ifelse(sex == "male", 1, 0) * -1.76809447811123) + (ifelse(pclass == </span>
+<span class="co">#&gt;     "3rd", 1, 0) * -5.03005595780699) + (ifelse(pclass == "3rd", </span>
+<span class="co">#&gt;     1, 0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.61865274765985) + </span>
 <span class="co">#&gt;     (ifelse(pclass == "3rd", 1, 0) * ifelse(sex == "male", 1, </span>
-<span class="co">#&gt;         0) * 0.19310203418243) + (ifelse(sex == "male", 1, 0) * </span>
-<span class="co">#&gt;     -0.570034960114421) + (ifelse(sex == "male", 1, 0) * ifelse(age &lt; </span>
-<span class="co">#&gt;     16, 16 - age, 0) * 0.0450523226133542)))</span></code></pre></div>
+<span class="co">#&gt;         0) * 1.22269536265148) + (ifelse(sex == "male", 1, 0) * </span>
+<span class="co">#&gt;     -3.1856245024853) + (ifelse(sex == "male", 1, 0) * ifelse(age &lt; </span>
+<span class="co">#&gt;     16, 16 - age, 0) * 0.241814028713265)))</span></code></pre></div>
 <p>The spec sets the <code>is_glm</code> entry to 1, as well as the <code>family</code> and <code>link</code> entries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, <span class="fl">2</span><span class="op">)</span>
@@ -331,13 +331,13 @@
 <span class="co">#&gt; List of 2</span>
 <span class="co">#&gt;  $ :List of 4</span>
 <span class="co">#&gt;   ..$ label       : chr "(Intercept)"</span>
-<span class="co">#&gt;   ..$ coef        : num 0.962</span>
+<span class="co">#&gt;   ..$ coef        : num 2.91</span>
 <span class="co">#&gt;   ..$ is_intercept: num 1</span>
 <span class="co">#&gt;   ..$ fields      :List of 1</span>
 <span class="co">#&gt;   .. ..$ : list()</span>
 <span class="co">#&gt;  $ :List of 4</span>
 <span class="co">#&gt;   ..$ label       : chr "h(age-32)"</span>
-<span class="co">#&gt;   ..$ coef        : num -0.00472</span>
+<span class="co">#&gt;   ..$ coef        : num -0.0376</span>
 <span class="co">#&gt;   ..$ is_intercept: num 0</span>
 <span class="co">#&gt;   ..$ fields      :List of 1</span>
 <span class="co">#&gt;   .. ..$ :List of 4</span>
