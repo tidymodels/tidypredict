@@ -2,7 +2,7 @@
 title: "Database write-back"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{randomForest}
+  %\VignetteIndexEntry{Database write-back}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

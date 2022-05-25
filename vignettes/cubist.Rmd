@@ -2,7 +2,7 @@
 title: "Cubist models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{cubist}
+  %\VignetteIndexEntry{Cubist models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

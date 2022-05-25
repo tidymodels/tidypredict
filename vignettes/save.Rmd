@@ -2,7 +2,7 @@
 title: "Save and re-load models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{save}
+  %\VignetteIndexEntry{Save and re-load models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

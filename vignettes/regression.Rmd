@@ -2,7 +2,7 @@
 title: "Create a regression spec - version 2"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{regression}
+  %\VignetteIndexEntry{Create a regression spec - version 2}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

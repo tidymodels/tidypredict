@@ -2,7 +2,7 @@
 title: "Generalized Linear Regression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{glm}
+  %\VignetteIndexEntry{Generalized Linear Regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -2,7 +2,7 @@
 title: "MARS models via the `earth` package"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{mars}
+  %\VignetteIndexEntry{MARS models via the `earth` package}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

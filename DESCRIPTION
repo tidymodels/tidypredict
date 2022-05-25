@@ -48,5 +48,5 @@ VignetteBuilder:
 Config/Needs/website: 
     tidyverse/tidytemplate
 Encoding: UTF-8
-RoxygenNote: 7.1.1.9000
+RoxygenNote: 7.2.0.9000
 Config/testthat/edition: 3
