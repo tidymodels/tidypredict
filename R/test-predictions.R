@@ -68,12 +68,12 @@ tidypredict_test_default <- function(model, df = model$model, threshold = 0.0000
 
   if (is.numeric(max_rows)) df <- head(df, max_rows)
 
-  base <- predict(model, df, interval = interval, type = "response")
+  preds <- predict(model, df, interval = interval, type = "response")
 
   if (!include_intervals) {
-    base <- data.frame(fit = base, row.names = NULL)
+    base <- data.frame(fit = as.vector(preds), row.names = NULL)
   } else {
-    base <- as.data.frame(base)
+    base <- as.data.frame(preds)
   }
 
   te <- tidypredict_to_column(
