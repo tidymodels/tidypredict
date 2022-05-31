@@ -2,7 +2,7 @@
 title: "Linear Regression"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{lm}
+  %\VignetteIndexEntry{Linear Regression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

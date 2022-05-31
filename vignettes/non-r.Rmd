@@ -2,7 +2,7 @@
 title: "Non-R Models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{non-r}
+  %\VignetteIndexEntry{Non-R Models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

@@ -1,4 +1,4 @@
-# tidypredict (development version)
+# tidypredict 0.4.9
 
 - Fixes issue handling GLM Binomial earth models (#97)
 

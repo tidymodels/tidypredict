@@ -2,7 +2,7 @@
 title: "Random Forest"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{rf}
+  %\VignetteIndexEntry{Random Forest}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
