@@ -1,6 +1,6 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
-Version: 0.4.9
+Version: 0.4.9.9000
 Authors@R:
     c(
       person("Max", "Kuhn", , "max@rstudio.com", role = c("aut", "cre")),
