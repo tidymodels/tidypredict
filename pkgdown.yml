@@ -14,7 +14,7 @@ articles:
   sql: sql.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2022-05-25T17:53Z
+last_built: 2022-05-31T17:35Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles
