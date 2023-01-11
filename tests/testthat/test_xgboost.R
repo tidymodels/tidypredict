@@ -10,15 +10,15 @@ logregobj <- function(preds, dtrain) {
 
 xgb_bin_data <- xgboost::xgb.DMatrix(as.matrix(mtcars[, -9]), label = mtcars$am)
 xgb_bin_fit <- xgboost::xgb.train(
-  params = list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5),
+  params = list(max_depth = 2, objective = "binary:logistic", base_score = 0.5),
   data = xgb_bin_data, nrounds = 50
 )
 
-xgb_reglinear <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "reg:squarederror", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_binarylogitraw <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "binary:logitraw", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_reglogistic <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "reg:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_binarylogistic <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_custom <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = logregobj, base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_reglinear <- xgboost::xgb.train(params = list(max_depth = 2, objective = "reg:squarederror", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_binarylogitraw <- xgboost::xgb.train(params = list(max_depth = 2, objective = "binary:logitraw", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_reglogistic <- xgboost::xgb.train(params = list(max_depth = 2, objective = "reg:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_binarylogistic <- xgboost::xgb.train(params = list(max_depth = 2, objective = "binary:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_custom <- xgboost::xgb.train(params = list(max_depth = 2, objective = logregobj, base_score = 0.5), data = xgb_bin_data, nrounds = 4)
 
 test_that("Returns the correct type", {
   expect_s3_class(parse_model(xgb_bin_fit), "list")
@@ -61,7 +61,7 @@ xgb_reglogistic_basescore <-
   xgboost::xgb.train(
     params = list(
       max_depth = 2,
-      silent = 1,
+     
       objective = "reg:logistic",
       base_score = base_score
     ),
@@ -72,7 +72,7 @@ xgb_binarylogistic_basescore <-
   xgboost::xgb.train(
     params = list(
       max_depth = 2,
-      silent = 1,
+     
       objective = "binary:logistic",
       base_score = base_score
     ),
@@ -86,7 +86,7 @@ testthat::test_that("Error expected when base score is equal to 0 or 1", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          silent = 1,
+         
           objective = "reg:logistic",
           base_score = 1
         ),
@@ -100,7 +100,7 @@ testthat::test_that("Error expected when base score is equal to 0 or 1", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          silent = 1,
+         
           objective = "binary:logistic",
           base_score = 1
         ),
@@ -113,7 +113,7 @@ testthat::test_that("Error expected when base score is equal to 0 or 1", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          silent = 1,
+         
           objective = "reg:logistic",
           base_score = 0
         ),
@@ -127,7 +127,7 @@ testthat::test_that("Error expected when base score is equal to 0 or 1", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          silent = 1,
+         
           objective = "binary:logistic",
           base_score = 0
         ),

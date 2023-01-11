@@ -70,7 +70,15 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
   trees <- trees[order(trees$original_order), !names(trees) %in% "original_order"]
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
   trees[, c("Yes", "No", "Missing")] <- lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
-  purrr::map(split(trees, trees$Tree), get_xgb_tree)
+  
+  
+  trees_split <- split(trees, trees$Tree)
+  
+  trees_over <- map_dbl(trees_split, ~ nrow(.x) > 1)
+  
+  trees_select <- trees_split[trees_over]
+  
+  purrr::map(trees_select, get_xgb_tree)
 }
 
 #' @export
