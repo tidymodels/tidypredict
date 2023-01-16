@@ -89,6 +89,13 @@ test_that("Base scores match", {
     )
 })
 
+test_that("Model can be saved and re-loaded", {
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(xgb_models$reg_sqr), mp)
+  l <- yaml::read_yaml(mp)
+  pm <- as_parsed_model(l)
+  expect_snapshot(tidypredict_fit(pm))
+})
 
 
 # TODO parsnip test
@@ -106,20 +113,4 @@ test_that("Base scores match", {
 #   expect_false(tidypredict_test(m, df = mtcars)$alert)
 # })
 # 
-# test_that("Model can be saved and re-loaded", {
-#   mp <- tempfile(fileext = ".yml")
-#   yaml::write_yaml(parse_model(xgb_reglinear), mp)
-#   l <- yaml::read_yaml(mp)
-#   pm <- as_parsed_model(l)
-#   expect_snapshot(tidypredict_fit(pm))
-# })
-# 
-# testthat::test_that("Same predictions between model and parsed sql model", {
-#   expect_equal(
-#     xgb_reglogistic_basescore_pred_model, 
-#     xgb_reglogistic_basescore_pred_sql)
-#   expect_equal(
-#     xgb_binarylogistic_basescore_pred_model,
-#     xgb_binarylogistic_basescore_pred_sql
-#     )
-# })
+

@@ -28,3 +28,22 @@
       [1] "structure(\"1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE\\nWHEN (`wt` >= 3.18000007) THEN -0.354515553\\nWHEN ((`qsec` < 18.7550011 OR (`qsec` IS NULL)) AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.505574405\\nWHEN (`qsec` >= 18.7550011 AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.131739721\\nEND) + CASE\\nWHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.346223652\\nWHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.436893433\\nWHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.033788003\\nEND) + CASE\\nWHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.302007079\\nWHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.355824143\\nWHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.028081635\\nEND) + CASE\\nWHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.269374669\\nWHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.304945588\\nWHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0233395267\\nEND) + LN(0.40625 / (1.0 - 0.40625))))\", class = c(\"sql\", \n\"character\"))"
       
 
+# Model can be saved and re-loaded
+
+    Code
+      tidypredict_fit(pm)
+    Output
+      0 + case_when((qsec < 19.9549999 | is.na(qsec)) & (wt < 3.1800001 | 
+          is.na(wt)) ~ 0.1384615, qsec >= 19.9549999 & (wt < 3.1800001 | 
+          is.na(wt)) ~ -0.1, (hp < 290 | is.na(hp)) & wt >= 3.1800001 ~ 
+          -0.1416667, hp >= 290 & wt >= 3.1800001 ~ 0.075) + case_when((qsec < 
+          19.9549999 | is.na(qsec)) & (wt < 3.0125 | is.na(wt)) ~ 0.0994231, 
+          qsec >= 19.9549999 & (wt < 3.0125 | is.na(wt)) ~ -0.06, (hp < 
+              254.5 | is.na(hp)) & wt >= 3.0125 ~ -0.1025, hp >= 254.5 & 
+              wt >= 3.0125 ~ 0.0786538) + case_when((gear < 3.5 | is.na(gear)) ~ 
+          -0.0735313, (wt < 3.0125 | is.na(wt)) & gear >= 3.5 ~ 0.0720817, 
+          wt >= 3.0125 & gear >= 3.5 ~ -0.0186758) + case_when((gear < 
+          3.5 | is.na(gear)) ~ -0.0528506, (qsec < 19.9500008 | is.na(qsec)) & 
+          gear >= 3.5 ~ 0.0427994, qsec >= 19.9500008 & gear >= 3.5 ~ 
+          -0.0515982) + 0.5
+
