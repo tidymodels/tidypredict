@@ -17,7 +17,7 @@ parse_model.earth <- function(model) {
   
   pm <- list()
   pm$general$model <- "earth"
-  pm$general$type <- "tree"
+  pm$general$type <- "regression"
   pm$general$version <- 2
   pm$general$is_glm <- 0
   if (is_glm) {
