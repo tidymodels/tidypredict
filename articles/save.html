@@ -52,7 +52,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -151,107 +151,132 @@
 
     
     
-<p><code>tidypredict</code> splits the translation process in two. It first parses the model to extract the needed components to produce the prediction. And second, it uses the object with the parsed information to produce the R formula. Thanks to this two step process, <code>tidypredict</code> does not need to parse the model every time. <code>tidypredict</code>’s functions also accept R objects that contained already models that have been parsed already. Additionally, because the parsed model object is made up of a list made up of basic variables, it is possible to save it in a file. Currently, the best file format is YAML.</p>
+<p><code>tidypredict</code> splits the translation process in two. It
+first parses the model to extract the needed components to produce the
+prediction. And second, it uses the object with the parsed information
+to produce the R formula. Thanks to this two step process,
+<code>tidypredict</code> does not need to parse the model every time.
+<code>tidypredict</code>’s functions also accept R objects that
+contained already models that have been parsed already. Additionally,
+because the parsed model object is made up of a list made up of basic
+variables, it is possible to save it in a file. Currently, the best file
+format is YAML.</p>
 <p>For this article, we will use the following model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="op">(</span><span class="va">wt</span> <span class="op">+</span> <span class="va">disp</span><span class="op">)</span> <span class="op">*</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="op">(</span><span class="va">wt</span> <span class="op">+</span> <span class="va">disp</span><span class="op">)</span> <span class="op">*</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="parse-model">Parse model<a class="anchor" aria-label="anchor" href="#parse-model"></a>
 </h2>
-<p>The <code><a href="../reference/parse_model.html">parse_model()</a></code> function allows to run the first step manually. It will return an R list object which contains all of the needed information to produce a prediction calculation. The structure of the parsed model varies based on what kind of model is being processed. In general, it is consistent in what kind of information it expects from each model type. For example, in the example the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> model object will return variables such as <code>sigma2</code>, which would not be used in other model types, such as decision trees.</p>
+<p>The <code><a href="../reference/parse_model.html">parse_model()</a></code> function allows to run the first step
+manually. It will return an R list object which contains all of the
+needed information to produce a prediction calculation. The structure of
+the parsed model varies based on what kind of model is being processed.
+In general, it is consistent in what kind of information it expects from
+each model type. For example, in the example the <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> model
+object will return variables such as <code>sigma2</code>, which would
+not be used in other model types, such as decision trees.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
-
-<span class="va">parsed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; List of 2</span>
-<span class="co">#&gt;  $ general:List of 6</span>
-<span class="co">#&gt;   ..$ model   : chr "lm"</span>
-<span class="co">#&gt;   ..$ version : num 2</span>
-<span class="co">#&gt;   ..$ type    : chr "regression"</span>
-<span class="co">#&gt;   ..$ residual: int 26</span>
-<span class="co">#&gt;   ..$ sigma2  : num 5.91</span>
-<span class="co">#&gt;   ..$ is_glm  : num 0</span>
-<span class="co">#&gt;  $ terms  :List of 6</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></code></pre></div>
-<p>Usually, we pass an R model object to functions such as: <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>. These functions also accept a previously parsed model.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">parsed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ general:List of 6</span></span>
+<span><span class="co">#&gt;   ..$ model   : chr "lm"</span></span>
+<span><span class="co">#&gt;   ..$ version : num 2</span></span>
+<span><span class="co">#&gt;   ..$ type    : chr "regression"</span></span>
+<span><span class="co">#&gt;   ..$ residual: int 26</span></span>
+<span><span class="co">#&gt;   ..$ sigma2  : num 5.91</span></span>
+<span><span class="co">#&gt;   ..$ is_glm  : num 0</span></span>
+<span><span class="co">#&gt;  $ terms  :List of 6</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
+<p>Usually, we pass an R model object to functions such as:
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, and <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>.
+These functions also accept a previously parsed model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsed</span><span class="op">)</span>
-<span class="co">#&gt; 53.5256637443325 + (wt * -6.38154597431604) + (disp * -0.0458426921825966) + </span>
-<span class="co">#&gt;     (cyl * -3.6302556793944) + (wt * cyl * 0.535604359938273) + </span>
-<span class="co">#&gt;     (disp * cyl * 0.00540618405824797)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsed</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + </span></span>
+<span><span class="co">#&gt;     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938274) + </span></span>
+<span><span class="co">#&gt;     (disp * cyl * 0.00540618405824793)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="saving-the-model">Saving the model<a class="anchor" aria-label="anchor" href="#saving-the-model"></a>
 </h2>
-<p>Saving the model is quite easy, use the package such as <code>yaml</code> to write the model object as a YAML file. Any format that can persist a ragged list object should work as well.</p>
+<p>Saving the model is quite easy, use the package such as
+<code>yaml</code> to write the model object as a YAML file. Any format
+that can persist a ragged list object should work as well.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/pkg/yaml/man/write_yaml.html" class="external-link">write_yaml</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="st">"my_model.yml"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/yaml/man/write_yaml.html" class="external-link">write_yaml</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="st">"my_model.yml"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="re-load-the-model">Re-load the model<a class="anchor" aria-label="anchor" href="#re-load-the-model"></a>
 </h2>
-<p>In a new R session, we can read the YAML file into our environment.</p>
+<p>In a new R session, we can read the YAML file into our
+environment.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span>
-
-<span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="st">"my_model"</span><span class="op">)</span>
-
-<span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></code></pre></div>
-<p>The preview of the file looks exactly as the preview of the original parsed model.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="st">"my_model"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span></code></pre></div>
+<p>The preview of the file looks exactly as the preview of the original
+parsed model.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; List of 2</span>
-<span class="co">#&gt;  $ general:List of 6</span>
-<span class="co">#&gt;   ..$ model   : chr "lm"</span>
-<span class="co">#&gt;   ..$ version : num 2</span>
-<span class="co">#&gt;   ..$ type    : chr "regression"</span>
-<span class="co">#&gt;   ..$ residual: int 26</span>
-<span class="co">#&gt;   ..$ sigma2  : num 5.91</span>
-<span class="co">#&gt;   ..$ is_glm  : num 0</span>
-<span class="co">#&gt;  $ terms  :List of 6</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;   ..$ :List of 5</span>
-<span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></code></pre></div>
-<p><code>tidypredict</code> is able to read the new R variable and use it to create the formula.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ general:List of 6</span></span>
+<span><span class="co">#&gt;   ..$ model   : chr "lm"</span></span>
+<span><span class="co">#&gt;   ..$ version : num 2</span></span>
+<span><span class="co">#&gt;   ..$ type    : chr "regression"</span></span>
+<span><span class="co">#&gt;   ..$ residual: int 26</span></span>
+<span><span class="co">#&gt;   ..$ sigma2  : num 5.91</span></span>
+<span><span class="co">#&gt;   ..$ is_glm  : num 0</span></span>
+<span><span class="co">#&gt;  $ terms  :List of 6</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;   ..$ :List of 5</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
+<p><code>tidypredict</code> is able to read the new R variable and use
+it to create the formula.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span>
-<span class="co">#&gt; 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * </span>
-<span class="co">#&gt;     -3.6302557) + (wt * cyl * 0.5356044) + (disp * cyl * 0.0054062)</span></code></pre></div>
-<p>The same variable can be used with other <code>tidypredict</code> functions, such as <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code></p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * </span></span>
+<span><span class="co">#&gt;     -3.6302557) + (wt * cyl * 0.5356044) + (disp * cyl * 0.0054062)</span></span></code></pre></div>
+<p>The same variable can be used with other <code>tidypredict</code>
+functions, such as <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; 53.5256637 + (`wt` * -6.381546) + (`disp` * -0.0458427) + (`cyl` * -3.6302557) + (`wt` * `cyl` * 0.5356044) + (`disp` * `cyl` * 0.0054062)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((53.5256637 + (`wt` * -6.381546)) + (`disp` * -0.0458427)) + (`cyl` * -3.6302557)) + ((`wt` * `cyl`) * 0.5356044)) + ((`disp` * `cyl`) * 0.0054062)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="broom">
 <code>broom</code><a class="anchor" aria-label="anchor" href="#broom"></a>
 </h2>
-<p>The <code>parsed_model</code> object integrates with <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> from <code>broom</code>.</p>
+<p>The <code>parsed_model</code> object integrates with
+<code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> from <code>broom</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span>
-<span class="co">#&gt;   term        estimate</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> (Intercept) 53.5    </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> wt          -<span style="color: #BB0000;">6.38</span>   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> disp        -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">8</span> </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cyl         -<span style="color: #BB0000;">3.63</span>   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> wt:cyl       0.536  </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> disp:cyl     0.005<span style="text-decoration: underline;">41</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
+<span><span class="co">#&gt;   term        estimate</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> (Intercept) 53.5    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> wt          -<span style="color: #BB0000;">6.38</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> disp        -<span style="color: #BB0000;">0.045</span><span style="color: #BB0000; text-decoration: underline;">8</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> cyl         -<span style="color: #BB0000;">3.63</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> wt:cyl       0.536  </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> disp:cyl     0.005<span style="text-decoration: underline;">41</span></span></span></code></pre></div>
 </div>
   </div>
 

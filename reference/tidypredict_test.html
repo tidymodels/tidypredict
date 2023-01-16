@@ -27,7 +27,7 @@ functions."><meta property="og:image" content="https://tidypredict.tidymodels.or
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -116,14 +116,14 @@ functions.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tidypredict_test</span><span class="op">(</span>
-  <span class="va">model</span>,
-  df <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">model</span>,
-  threshold <span class="op">=</span> <span class="fl">1e-12</span>,
-  include_intervals <span class="op">=</span> <span class="cn">FALSE</span>,
-  max_rows <span class="op">=</span> <span class="cn">NULL</span>,
-  xg_df <span class="op">=</span> <span class="cn">NULL</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidypredict_test</span><span class="op">(</span></span>
+<span>  <span class="va">model</span>,</span>
+<span>  df <span class="op">=</span> <span class="va">model</span><span class="op">$</span><span class="va">model</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="fl">1e-12</span>,</span>
+<span>  include_intervals <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  max_rows <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  xg_df <span class="op">=</span> <span class="cn">NULL</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -131,31 +131,42 @@ functions.</p>
     <dl><dt>model</dt>
 <dd><p>An R model or a list with a parsed model. It currently supports
 lm(), glm() and randomForest() models.</p></dd>
+
+
 <dt>df</dt>
 <dd><p>A data frame that contains all of the needed fields to run the prediction.
 It defaults to the "model" data frame object inside the model object.</p></dd>
+
+
 <dt>threshold</dt>
 <dd><p>The number that a given result difference, between predict() and
 tidypredict_to_column() should not exceed. For continuous predictions, the default
 value is 0.000000000001 (1e-12), and for categorical predictions, the default value is
 0.</p></dd>
+
+
 <dt>include_intervals</dt>
 <dd><p>Switch to indicate if the prediction intervals should be
 included in the test. It defaults to FALSE.</p></dd>
+
+
 <dt>max_rows</dt>
 <dd><p>The number of rows in the object passed in the df argument. Highly
 recommended for large data sets.</p></dd>
+
+
 <dt>xg_df</dt>
 <dd><p>A xgb.DMatrix object, required only for XGBoost models. It defaults to
 NULL
 recommended for large data sets.</p></dd>
+
 </dl></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"></span>
-<span class="r-in"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">*</span> <span class="va">disp</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
-<span class="r-in"><span class="fu">tidypredict_test</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">*</span> <span class="va">disp</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">tidypredict_test</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> tidypredict test results</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> Difference threshold: 1e-12</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>

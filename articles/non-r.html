@@ -52,7 +52,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -151,138 +151,160 @@
 
     
     
-<p>A model that is trained in any language are able to integrate with <code>tidypredict</code>, and thus with <code>broom</code>. The requirement is that the model in that language is exported using the parse model spec. The easiest file format would be YAML.</p>
+<p>A model that is trained in any language are able to integrate with
+<code>tidypredict</code>, and thus with <code>broom</code>. The
+requirement is that the model in that language is exported using the
+parse model spec. The easiest file format would be YAML.</p>
 <div class="section level2">
 <h2 id="python-example">python example<a class="anchor" aria-label="anchor" href="#python-example"></a>
 </h2>
-<p>A model that was fitted using <code>sklearn</code>’s <code>linear_model</code>. The model is based on diabetes data. Ten baseline variables, age, sex, body mass index, average blood pressure, and six blood serum measurements were obtained for each of n = 442 diabetes patients, as well as the response of interest, a quantitative measure of disease progression one year after baseline. The model’s results were converted to YAML by the same python script, I copied and pasted the top part here:</p>
-<pre><code><span class="va">general</span><span class="op">:</span>
-  <span class="va">is_glm</span><span class="op">:</span> <span class="fl">0</span>
-  <span class="va">model</span><span class="op">:</span> <span class="va">lm</span>
-  <span class="va">residual</span><span class="op">:</span> <span class="fl">0</span>
-  <span class="va">sigma2</span><span class="op">:</span> <span class="fl">0</span>
-  <span class="va">type</span><span class="op">:</span> <span class="va">regression</span>
-  <span class="va">version</span><span class="op">:</span> <span class="fl">2.0</span>
-<span class="va">terms</span><span class="op">:</span>
-<span class="op">-</span> <span class="va">coef</span><span class="op">:</span> <span class="fl">152.76430691633442</span>
-  <span class="va">fields</span><span class="op">:</span>
-  <span class="op">-</span> <span class="va">col</span><span class="op">:</span> <span class="op">(</span><span class="va">Intercept</span><span class="op">)</span>
-    <span class="va">type</span><span class="op">:</span> <span class="va">ordinary</span>
-  <span class="va">is_intercept</span><span class="op">:</span> <span class="fl">1</span>
-  <span class="va">label</span><span class="op">:</span> <span class="op">(</span><span class="va">Intercept</span><span class="op">)</span></code></pre>
+<p>A model that was fitted using <code>sklearn</code>’s
+<code>linear_model</code>. The model is based on diabetes data. Ten
+baseline variables, age, sex, body mass index, average blood pressure,
+and six blood serum measurements were obtained for each of n = 442
+diabetes patients, as well as the response of interest, a quantitative
+measure of disease progression one year after baseline. The model’s
+results were converted to YAML by the same python script, I copied and
+pasted the top part here:</p>
+<pre><code><span><span class="va">general</span><span class="op">:</span></span>
+<span>  <span class="va">is_glm</span><span class="op">:</span> <span class="fl">0</span></span>
+<span>  <span class="va">model</span><span class="op">:</span> <span class="va">lm</span></span>
+<span>  <span class="va">residual</span><span class="op">:</span> <span class="fl">0</span></span>
+<span>  <span class="va">sigma2</span><span class="op">:</span> <span class="fl">0</span></span>
+<span>  <span class="va">type</span><span class="op">:</span> <span class="va">regression</span></span>
+<span>  <span class="va">version</span><span class="op">:</span> <span class="fl">2.0</span></span>
+<span><span class="va">terms</span><span class="op">:</span></span>
+<span><span class="op">-</span> <span class="va">coef</span><span class="op">:</span> <span class="fl">152.76430691633442</span></span>
+<span>  <span class="va">fields</span><span class="op">:</span></span>
+<span>  <span class="op">-</span> <span class="va">col</span><span class="op">:</span> <span class="op">(</span><span class="va">Intercept</span><span class="op">)</span></span>
+<span>    <span class="va">type</span><span class="op">:</span> <span class="va">ordinary</span></span>
+<span>  <span class="va">is_intercept</span><span class="op">:</span> <span class="fl">1</span></span>
+<span>  <span class="va">label</span><span class="op">:</span> <span class="op">(</span><span class="va">Intercept</span><span class="op">)</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 id="read-in-r">Read in R<a class="anchor" aria-label="anchor" href="#read-in-r"></a>
 </h2>
-<p>The YAML data can be read in R by using the <code>yaml</code> package. In this example, we have copy-pasted most of the models inside a variable called <code>sklearn_model</code>. Because <code>yaml</code> requires local YAML variables to be split by line, we use <code><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit()</a></code>.</p>
+<p>The YAML data can be read in R by using the <code>yaml</code>
+package. In this example, we have copy-pasted most of the models inside
+a variable called <code>sklearn_model</code>. Because <code>yaml</code>
+requires local YAML variables to be split by line, we use
+<code><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span>
-
-<span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="st">"general:
-  is_glm: 0
-  model: lm
-  residual: 0
-  sigma2: 0
-  type: regression
-  version: 2.0
-terms:
-- coef: 152.76430691633442
-  fields:
-  - col: (Intercept)
-    type: ordinary
-  is_intercept: 1
-  label: (Intercept)
-- coef: 0.3034995490660432
-  fields:
-  - col: age
-    type: ordinary
-  is_intercept: 0
-  label: age
-- coef: -237.63931533353403
-  fields:
-  - col: sex
-    type: ordinary
-  is_intercept: 0
-  label: sex
-- coef: 510.5306054362253
-  fields:
-  - col: bmi
-    type: ordinary
-  is_intercept: 0
-  label: bmi
-- coef: 327.7369804093466
-  fields:
-  - col: bp
-    type: ordinary
-  is_intercept: 0
-  label: bp
-- coef: -814.1317093725387
-  fields:
-  - col: s1
-    type: ordinary
-  is_intercept: 0
-  label: s1
-"</span>, split <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></code></pre></div>
-<p>Now the model is converted to an R <code>list</code> using <code>yaml.load</code>.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="st">"general:</span></span>
+<span><span class="st">  is_glm: 0</span></span>
+<span><span class="st">  model: lm</span></span>
+<span><span class="st">  residual: 0</span></span>
+<span><span class="st">  sigma2: 0</span></span>
+<span><span class="st">  type: regression</span></span>
+<span><span class="st">  version: 2.0</span></span>
+<span><span class="st">terms:</span></span>
+<span><span class="st">- coef: 152.76430691633442</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: (Intercept)</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 1</span></span>
+<span><span class="st">  label: (Intercept)</span></span>
+<span><span class="st">- coef: 0.3034995490660432</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: age</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 0</span></span>
+<span><span class="st">  label: age</span></span>
+<span><span class="st">- coef: -237.63931533353403</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: sex</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 0</span></span>
+<span><span class="st">  label: sex</span></span>
+<span><span class="st">- coef: 510.5306054362253</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: bmi</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 0</span></span>
+<span><span class="st">  label: bmi</span></span>
+<span><span class="st">- coef: 327.7369804093466</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: bp</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 0</span></span>
+<span><span class="st">  label: bp</span></span>
+<span><span class="st">- coef: -814.1317093725387</span></span>
+<span><span class="st">  fields:</span></span>
+<span><span class="st">  - col: s1</span></span>
+<span><span class="st">    type: ordinary</span></span>
+<span><span class="st">  is_intercept: 0</span></span>
+<span><span class="st">  label: s1</span></span>
+<span><span class="st">"</span>, split <span class="op">=</span> <span class="st">"\n"</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
+<p>Now the model is converted to an R <code>list</code> using
+<code>yaml.load</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/yaml.load.html" class="external-link">yaml.load</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sklearn_model</span>, <span class="fl">2</span><span class="op">)</span>
-<span class="co">#&gt; List of 2</span>
-<span class="co">#&gt;  $ general:List of 6</span>
-<span class="co">#&gt;   ..$ is_glm  : int 0</span>
-<span class="co">#&gt;   ..$ model   : chr "lm"</span>
-<span class="co">#&gt;   ..$ residual: int 0</span>
-<span class="co">#&gt;   ..$ sigma2  : int 0</span>
-<span class="co">#&gt;   ..$ type    : chr "regression"</span>
-<span class="co">#&gt;   ..$ version : num 2</span>
-<span class="co">#&gt;  $ terms  :List of 6</span>
-<span class="co">#&gt;   ..$ :List of 4</span>
-<span class="co">#&gt;   ..$ :List of 4</span>
-<span class="co">#&gt;   ..$ :List of 4</span>
-<span class="co">#&gt;   ..$ :List of 4</span>
-<span class="co">#&gt;   ..$ :List of 4</span>
-<span class="co">#&gt;   ..$ :List of 4</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/yaml.load.html" class="external-link">yaml.load</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sklearn_model</span>, <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt;  $ general:List of 6</span></span>
+<span><span class="co">#&gt;   ..$ is_glm  : int 0</span></span>
+<span><span class="co">#&gt;   ..$ model   : chr "lm"</span></span>
+<span><span class="co">#&gt;   ..$ residual: int 0</span></span>
+<span><span class="co">#&gt;   ..$ sigma2  : int 0</span></span>
+<span><span class="co">#&gt;   ..$ type    : chr "regression"</span></span>
+<span><span class="co">#&gt;   ..$ version : num 2</span></span>
+<span><span class="co">#&gt;  $ terms  :List of 6</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 4</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="tidypredict">
 <code>tidypredict</code><a class="anchor" aria-label="anchor" href="#tidypredict"></a>
 </h2>
-<p>The <code>list</code> object needs to be recognized as a <code>tidypredict</code> parsed model. To do that, we use <code><a href="../reference/as_parsed_model.html">as_parsed_model()</a></code></p>
+<p>The <code>list</code> object needs to be recognized as a
+<code>tidypredict</code> parsed model. To do that, we use
+<code><a href="../reference/as_parsed_model.html">as_parsed_model()</a></code></p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
-
-<span class="va">spm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span>
-
-<span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span>
-<span class="co">#&gt; [1] "parsed_model"  "pm_regression" "list"</span></code></pre></div>
-<p>The <code>spm</code> variable now works just as any parsed model inside R. Use <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> to view the resulting formula.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">spm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/class.html" class="external-link">class</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "parsed_model"  "pm_regression" "list"</span></span></code></pre></div>
+<p>The <code>spm</code> variable now works just as any parsed model
+inside R. Use <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> to view the resulting
+formula.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span>
-<span class="co">#&gt; 152.764306916334 + (age * 0.303499549066043) + (sex * -237.639315333534) + </span>
-<span class="co">#&gt;     (bmi * 510.530605436225) + (bp * 327.736980409347) + (s1 * </span>
-<span class="co">#&gt;     -814.131709372539)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 152.764306916334 + (age * 0.303499549066043) + (sex * -237.639315333534) + </span></span>
+<span><span class="co">#&gt;     (bmi * 510.530605436225) + (bp * 327.736980409347) + (s1 * </span></span>
+<span><span class="co">#&gt;     -814.131709372539)</span></span></code></pre></div>
 <p>Now, the model can run <strong>inside a database</strong></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">spm</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt; &lt;SQL&gt; 152.764306916334 + (`age` * 0.303499549066043) + (`sex` * -237.639315333534) + (`bmi` * 510.530605436225) + (`bp` * 327.736980409347) + (`s1` * -814.131709372539)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">spm</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((152.764306916334 + (`age` * 0.303499549066043)) + (`sex` * -237.639315333534)) + (`bmi` * 510.530605436225)) + (`bp` * 327.736980409347)) + (`s1` * -814.131709372539)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="broom">
 <code>broom</code><a class="anchor" aria-label="anchor" href="#broom"></a>
 </h2>
-<p>Now that we have a <code>parsed_model</code> object, it is possible to use <code>broom</code>’s <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> function. This means that we are able to integrate a totally external model, with <code>broom</code>.</p>
+<p>Now that we have a <code>parsed_model</code> object, it is possible
+to use <code>broom</code>’s <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> function. This means
+that we are able to integrate a totally external model, with
+<code>broom</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span>
-<span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span>
-<span class="co">#&gt;   term        estimate</span>
-<span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">1</span> (Intercept)  153.   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">2</span> age            0.303</span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sex         -<span style="color: #BB0000;">238.</span>   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">4</span> bmi          511.   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">5</span> bp           328.   </span>
-<span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s1          -<span style="color: #BB0000;">814.</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">spm</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
+<span><span class="co">#&gt;   term        estimate</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> (Intercept)  153.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> age            0.303</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> sex         -<span style="color: #BB0000;">238.</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> bmi          511.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> bp           328.   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> s1          -<span style="color: #BB0000;">814.</span></span></span></code></pre></div>
 </div>
   </div>
 

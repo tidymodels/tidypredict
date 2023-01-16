@@ -57,7 +57,7 @@
         <a class="navbar-brand" href="index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -148,24 +148,24 @@
 <div class="section level1">
 <div class="page-header"><h1 id="tidypredict-">tidypredict <img src="reference/figures/logo.png" align="right" width="120px"><a class="anchor" aria-label="anchor" href="#tidypredict-"></a>
 </h1></div>
-
+<p><a href="https://github.com/tidymodels/tidypredict/actions" class="external-link"><img src="https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://CRAN.r-project.org/package=tidypredict" class="external-link"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a> <a href="https://app.codecov.io/gh/tidymodels/tidypredict?branch=main" class="external-link"><img src="https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://CRAN.R-project.org/package=tidypredict" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads"></a></p>
 <p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
 <p><code>tidypredict</code> can return a SQL statement that is ready to run inside the database. Because it uses <code>dplyr</code>’s database interface, it works with several databases back-ends, such as MS SQL:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="do">## &lt;SQL&gt; 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>Install <code>tidypredict</code> from CRAN using:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("tidypredict")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("tidypredict")</span></span></code></pre></div>
 <p>Or install the <strong>development version</strong> using <code>devtools</code> as follows:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="co"># install.packages("remotes")</span>
-<span class="co"># remotes::install_github("tidymodels/tidypredict")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># install.packages("remotes")</span></span>
+<span><span class="co"># remotes::install_github("tidymodels/tidypredict")</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="functions">Functions<a class="anchor" aria-label="anchor" href="#functions"></a>
@@ -293,8 +293,8 @@
 </h3>
 <p>The <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> function from broom works with linear models parsed via <code>tidypredict</code></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">wt</span> <span class="op">~</span> <span class="va">.</span>, <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span>
-<span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">pm</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">wt</span> <span class="op">~</span> <span class="va">.</span>, <span class="va">mtcars</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">pm</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## # A tibble: 11 × 2</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="do">##    term        estimate</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="do">##    &lt;chr&gt;          &lt;dbl&gt;</span></span>
@@ -360,20 +360,12 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Max Kuhn <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Edgar Ruiz <br><small class="roles"> Author </small>  </li>
+<li>Edgar Ruiz <br><small class="roles"> Author, maintainer </small>  </li>
+<li>Max Kuhn <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
-<div class="dev-status">
-<h2 data-toc-skip>Dev status</h2>
-<ul class="list-unstyled">
-<li><a href="https://github.com/tidymodels/tidypredict/actions" class="external-link"><img src="https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a></li>
-<li><a href="https://CRAN.r-project.org/package=tidypredict" class="external-link"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a></li>
-<li><a href="https://app.codecov.io/gh/tidymodels/tidypredict?branch=main" class="external-link"><img src="https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></li>
-<li><a href="https://CRAN.R-project.org/package=tidypredict" class="external-link"><img src="http://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads"></a></li>
-</ul>
-</div>
+
 
   </div>
 </div>

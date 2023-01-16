@@ -52,7 +52,7 @@
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -159,7 +159,8 @@
 <tbody>
 <tr class="odd">
 <td>
-<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>, <code><a href="../reference/parse_model.html">parse_model()</a></code>
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>,
+<code><a href="../reference/parse_model.html">parse_model()</a></code>
 </td>
 <td>✔</td>
 </tr>
@@ -173,7 +174,8 @@
 </tr>
 <tr class="even">
 <td>
-<code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>, <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
+<code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>,
+<code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
 </td>
 <td>✗</td>
 </tr>
@@ -186,76 +188,87 @@
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
-<p>Here is a simple <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger()</a></code> model using the <code>iris</code> dataset:</p>
+<p>Here is a simple <code><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger()</a></code> model using the
+<code>iris</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger" class="external-link">ranger</a></span><span class="op">)</span>
-
-<span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span>, num.trees <span class="op">=</span>  <span class="fl">100</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/imbs-hl/ranger" class="external-link">ranger</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/ranger/man/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,data <span class="op">=</span> <span class="va">iris</span>, num.trees <span class="op">=</span>  <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="under-the-hood">Under the hood<a class="anchor" aria-label="anchor" href="#under-the-hood"></a>
 </h2>
-<p>The parser is based on the output from the <code><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">ranger::treeInfo()</a></code> function. It will return as many decision paths as there are non-NA rows in the <code>prediction</code> field.</p>
+<p>The parser is based on the output from the
+<code><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">ranger::treeInfo()</a></code> function. It will return as many
+decision paths as there are non-NA rows in the <code>prediction</code>
+field.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span>
-<span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval terminal</span>
-<span class="co">#&gt; 1      0         1          2          3  Petal.Width     1.75    FALSE</span>
-<span class="co">#&gt; 2      1         3          4          2 Petal.Length     2.45    FALSE</span>
-<span class="co">#&gt; 3      2         5          6          2 Petal.Length     4.85    FALSE</span>
-<span class="co">#&gt; 4      3        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
-<span class="co">#&gt; 5      4         7          8          2 Petal.Length     5.40    FALSE</span>
-<span class="co">#&gt; 6      5        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span>
-<span class="co">#&gt;   prediction</span>
-<span class="co">#&gt; 1       &lt;NA&gt;</span>
-<span class="co">#&gt; 2       &lt;NA&gt;</span>
-<span class="co">#&gt; 3       &lt;NA&gt;</span>
-<span class="co">#&gt; 4     setosa</span>
-<span class="co">#&gt; 5       &lt;NA&gt;</span>
-<span class="co">#&gt; 6  virginica</span></code></pre></div>
-<p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a <code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/ranger/man/treeInfo.html" class="external-link">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval terminal</span></span>
+<span><span class="co">#&gt; 1      0         1          2          3  Petal.Width     1.75    FALSE</span></span>
+<span><span class="co">#&gt; 2      1         3          4          2 Petal.Length     2.45    FALSE</span></span>
+<span><span class="co">#&gt; 3      2         5          6          2 Petal.Length     4.85    FALSE</span></span>
+<span><span class="co">#&gt; 4      3        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span></span>
+<span><span class="co">#&gt; 5      4         7          8          2 Petal.Length     5.40    FALSE</span></span>
+<span><span class="co">#&gt; 6      5        NA         NA         NA         &lt;NA&gt;       NA     TRUE</span></span>
+<span><span class="co">#&gt;   prediction</span></span>
+<span><span class="co">#&gt; 1       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 2       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 3       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 4     setosa</span></span>
+<span><span class="co">#&gt; 5       &lt;NA&gt;</span></span>
+<span><span class="co">#&gt; 6  virginica</span></span></code></pre></div>
+<p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a
+<code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree
+becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>
-<span class="co">#&gt; [[1]]</span>
-<span class="co">#&gt; case_when(Petal.Length &lt; 2.45 &amp; Petal.Width &lt; 1.75 ~ "setosa", </span>
-<span class="co">#&gt;     Petal.Length &lt; 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span>
-<span class="co">#&gt;     Petal.Length &gt;= 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span>
-<span class="co">#&gt;     Petal.Length &lt; 5.4 &amp; Petal.Length &gt;= 2.45 &amp; Petal.Width &lt; </span>
-<span class="co">#&gt;         1.75 ~ "versicolor", Petal.Length &gt;= 5.4 &amp; Petal.Length &gt;= </span>
-<span class="co">#&gt;         2.45 &amp; Petal.Width &lt; 1.75 ~ "virginica")</span></code></pre></div>
-<p>From there, the Tidy Eval formula can be used anywhere where it can be operated. <code>tidypredict</code> provides three paths:</p>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="co">#&gt; [[1]]</span></span>
+<span><span class="co">#&gt; case_when(Petal.Length &lt; 2.45 &amp; Petal.Width &lt; 1.75 ~ "setosa", </span></span>
+<span><span class="co">#&gt;     Petal.Length &lt; 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span></span>
+<span><span class="co">#&gt;     Petal.Length &gt;= 4.85 &amp; Petal.Width &gt;= 1.75 ~ "virginica", </span></span>
+<span><span class="co">#&gt;     Petal.Length &lt; 5.4 &amp; Petal.Length &gt;= 2.45 &amp; Petal.Width &lt; </span></span>
+<span><span class="co">#&gt;         1.75 ~ "versicolor", Petal.Length &gt;= 5.4 &amp; Petal.Length &gt;= </span></span>
+<span><span class="co">#&gt;         2.45 &amp; Petal.Width &lt; 1.75 ~ "virginica")</span></span></code></pre></div>
+<p>From there, the Tidy Eval formula can be used anywhere where it can
+be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
-<li>Use directly inside <code>dplyr</code>, <code>mutate(iris, !! tidypredict_fit(model))</code>
+<li>Use directly inside <code>dplyr</code>,
+<code>mutate(iris, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code>tidypredict_to_column(model)</code> to a piped command set</li>
-<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL statement</li>
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command
+set</li>
+<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL
+statement</li>
 </ul>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
-<p><code>tidypredict</code> also supports <code>ranger</code> model objects fitted via the <code>parsnip</code> package.</p>
+<p><code>tidypredict</code> also supports <code>ranger</code> model
+objects fitted via the <code>parsnip</code> package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span>
-
-<span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span>
-  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span>
-
-<span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span>
-<span class="co">#&gt; case_when(Petal.Width &lt; 0.8 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span>
-<span class="co">#&gt;     Petal.Width &gt;= 0.8 ~ "virginica", Petal.Width &lt; 1.65 &amp; Petal.Length &lt; </span>
-<span class="co">#&gt;     4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= 0.8 ~ "versicolor", </span>
-<span class="co">#&gt;     Petal.Width &gt;= 1.65 &amp; Petal.Length &lt; 4.75 &amp; Petal.Length &lt; </span>
-<span class="co">#&gt;         5.05 &amp; Petal.Width &gt;= 0.8 ~ "virginica", Sepal.Length &gt;= </span>
-<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
-<span class="co">#&gt;         0.8 ~ "versicolor", Sepal.Width &lt; 3.1 &amp; Sepal.Length &lt; </span>
-<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
-<span class="co">#&gt;         0.8 ~ "virginica", Sepal.Width &gt;= 3.1 &amp; Sepal.Length &lt; </span>
-<span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span>
-<span class="co">#&gt;         0.8 ~ "versicolor")</span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; case_when(Petal.Width &lt; 0.8 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span></span>
+<span><span class="co">#&gt;     Petal.Width &gt;= 0.8 ~ "virginica", Petal.Width &lt; 1.65 &amp; Petal.Length &lt; </span></span>
+<span><span class="co">#&gt;     4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= 0.8 ~ "versicolor", </span></span>
+<span><span class="co">#&gt;     Petal.Width &gt;= 1.65 &amp; Petal.Length &lt; 4.75 &amp; Petal.Length &lt; </span></span>
+<span><span class="co">#&gt;         5.05 &amp; Petal.Width &gt;= 0.8 ~ "virginica", Sepal.Length &gt;= </span></span>
+<span><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></span>
+<span><span class="co">#&gt;         0.8 ~ "versicolor", Sepal.Width &lt; 3.1 &amp; Sepal.Length &lt; </span></span>
+<span><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></span>
+<span><span class="co">#&gt;         0.8 ~ "virginica", Sepal.Width &gt;= 3.1 &amp; Sepal.Length &lt; </span></span>
+<span><span class="co">#&gt;         6.5 &amp; Petal.Length &gt;= 4.75 &amp; Petal.Length &lt; 5.05 &amp; Petal.Width &gt;= </span></span>
+<span><span class="co">#&gt;         0.8 ~ "versicolor")</span></span></code></pre></div>
 </div>
   </div>
 

@@ -28,7 +28,7 @@ for the lower and another for the upper prediction interval bounds."><meta prope
         <a class="navbar-brand" href="../index.html">tidypredict</a>
         <div class="info hidden-xs hidden-sm">
           <span class="partof">part of <a href="https://tidymodels.org" class="external-link">tidymodels</a></span>
-          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9000</span>
+          <span class="version version-default" data-toggle="tooltip" data-placement="bottom" title="">0.4.9.9001</span>
         </div>
       </div>
     </div>
@@ -118,29 +118,38 @@ for the lower and another for the upper prediction interval bounds.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="fu">tidypredict_to_column</span><span class="op">(</span>
-  <span class="va">df</span>,
-  <span class="va">model</span>,
-  add_interval <span class="op">=</span> <span class="cn">FALSE</span>,
-  interval <span class="op">=</span> <span class="fl">0.95</span>,
-  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fit"</span>, <span class="st">"upper"</span>, <span class="st">"lower"</span><span class="op">)</span>
-<span class="op">)</span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">tidypredict_to_column</span><span class="op">(</span></span>
+<span>  <span class="va">df</span>,</span>
+<span>  <span class="va">model</span>,</span>
+<span>  add_interval <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fl">0.95</span>,</span>
+<span>  vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"fit"</span>, <span class="st">"upper"</span>, <span class="st">"lower"</span><span class="op">)</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
     <h2>Arguments</h2>
     <dl><dt>df</dt>
 <dd><p>A data.frame or tibble</p></dd>
+
+
 <dt>model</dt>
 <dd><p>An R model or a parsed model inside a data frame</p></dd>
+
+
 <dt>add_interval</dt>
 <dd><p>Switch that indicates if the prediction interval columns should be added. Defaults
 to FALSE</p></dd>
+
+
 <dt>interval</dt>
 <dd><p>The prediction interval, defaults to 0.95. Ignored if add_interval is set to
 FALSE</p></dd>
+
+
 <dt>vars</dt>
 <dd><p>The name of the variables that this function will produce. Defaults to "fit", "upper", and "lower".</p></dd>
+
 </dl></div>
 
   </div>
