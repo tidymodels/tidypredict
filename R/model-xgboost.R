@@ -28,8 +28,7 @@ get_xgb_path <- function(row_id, tree) {
         col = rb$feature_name,
         val = rb$Split,
         op = op,
-        missing = missing, 
-        quality = rb$Quality
+        missing = missing
       )
     }
   )
@@ -40,13 +39,9 @@ get_xgb_tree <- function(tree) {
   x <- map(
     paths,
     ~ {
-      path <- get_xgb_path(.x, tree)
-      predictions <- purrr::map_dbl(path, ~.x$quality)
-      prediction <- sum(predictions) + tree[.x, "Quality", drop = TRUE]
       list(
-        #prediction = tree[.x, "Quality", drop = TRUE],
-        prediction = prediction, 
-        path = path
+        prediction = tree[.x, "Quality", drop = TRUE],
+        path = get_xgb_path(.x, tree)
       )
     }
   )
@@ -64,16 +59,16 @@ get_xgb_trees.xgb.Booster <- function(model) {
     with_stats = TRUE
     )
   feature_names <- model$feature_names
-  get_xgb_trees.character(xd, feature_names)
+  get_xgb_trees_character(xd, feature_names)
 }
 
-get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
+get_xgb_trees_character <- function(xd, feature_names) {
   feature_names_tbl <- data.frame(
     Feature = as.character(0:(length(feature_names) - 1)),
     feature_name = feature_names,
     stringsAsFactors = FALSE
   )
-  trees <- xgboost::xgb.model.dt.tree(text = xgb_dump_text_with_stats)
+  trees <- xgboost::xgb.model.dt.tree(text = xd)
   trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
   trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
@@ -83,14 +78,9 @@ get_xgb_trees.character <- function(xgb_dump_text_with_stats, feature_names) {
   trees[, c("Yes", "No", "Missing")] <- 
     lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
   
-  
   trees_split <- split(trees, trees$Tree)
   
-  trees_over <- map_dbl(trees_split, ~ nrow(.x) > 1)
-  
-  trees_select <- trees_split[trees_over]
-  
-  purrr::map(trees_select, get_xgb_tree)
+  purrr::map(trees_split, get_xgb_tree)
 }
 
 #' @export
@@ -169,11 +159,9 @@ build_fit_formula_xgb <- function(parsedmodel) {
             "explicitly apply it to the output."
             )
       )
-  } else if (objective %in% c("reg:squarederror")) {
+  } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
     assigned <- 1
-    f <- expr(!!f + !!base_score)
-  } else if (objective %in% c("binary:logitraw")) {
-    assigned <- 1
+    f <- expr((!!f) + !!base_score)
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))

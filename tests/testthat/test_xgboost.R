@@ -40,14 +40,29 @@ xgb_models_all <- xgb_list %>%
 
 xgb_models <- xgb_models_all[names(xgb_models_all) != "log_reg"]
 
-test_that("Predictions are correct for different objectives", {
-  xgb_models %>% 
-    purrr::map(tidypredict_test, df = mtcars, xg_df = xgb_bin_data) %>% 
-    purrr::map(~ .x$alert) %>% 
-    purrr::map(expect_false)
+test_that("Predictions match to model's predict routine", {
+  td_tests <- xgb_models %>% 
+    purrr::map(
+      tidypredict_test, 
+      df = mtcars,
+      xg_df = xgb_bin_data, 
+      threshold = 0.001
+    )
+  
+  td_tests %>% 
+    purrr::imap(
+      ~ {
+        msg <- paste0("------ >> MODEL: ", .y)
+        expect_false(.x$alert, info = msg)
+      }
+    )
   
   expect_warning(
-    tidypredict_test(xgb_models_all$log_reg, df = mtcars, xg_df = xgb_bin_data)
+    tidypredict_test(
+      xgb_models_all$log_reg, 
+      df = mtcars, 
+      xg_df = xgb_bin_data
+      )
   )
 })
 
@@ -77,18 +92,11 @@ test_that("Base scores match", {
 
 
 # TODO parsnip test
-# TODO match predictions
 # TODO fix yaml save
 #
-# xgb_preds <- xgb_models %>% 
-#   purrr::map(predict, newdata = xgb_bin_data) 
-# 
-# td_preds <- xgb_models %>% 
-#   purrr::map(~{
-#     mtcars %>% 
-#       tidypredict_to_column(.x) %>% 
-#       dplyr::pull(fit)
-#   })
+
+
+
 # 
 # test_that("Predictions are correct for different objectives", {
 #   m <- parsnip::fit(

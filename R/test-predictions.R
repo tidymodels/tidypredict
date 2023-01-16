@@ -186,7 +186,7 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
     vars = c("fit_te", "upr_te", "lwr_te")
   )
   raw_results <- cbind(base, te)
-  raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
+  raw_results$fit_diff <- raw_results$base - raw_results$fit_te
   raw_results$fit_threshold <- raw_results$fit_diff > threshold
 
   rowid <- seq_len(nrow(raw_results))
