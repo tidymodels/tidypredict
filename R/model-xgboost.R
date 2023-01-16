@@ -54,10 +54,10 @@ get_xgb_trees <- function(model) {
 
 get_xgb_trees.xgb.Booster <- function(model) {
   xd <- xgboost::xgb.dump(
-    model = model, 
-    dump_format = "text", 
+    model = model,
+    dump_format = "text",
     with_stats = TRUE
-    )
+  )
   feature_names <- model$feature_names
   get_xgb_trees_character(xd, feature_names)
 }
@@ -73,13 +73,13 @@ get_xgb_trees_character <- function(xd, feature_names) {
   trees$original_order <- 1:nrow(trees)
   trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
   trees <- trees[order(trees$original_order), !names(trees) %in% "original_order"]
-  trees[, c("Yes", "No", "Missing")] <- 
+  trees[, c("Yes", "No", "Missing")] <-
     lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
-  trees[, c("Yes", "No", "Missing")] <- 
+  trees[, c("Yes", "No", "Missing")] <-
     lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
-  
+
   trees_split <- split(trees, trees$Tree)
-  
+
   purrr::map(trees_split, get_xgb_tree)
 }
 
@@ -109,24 +109,24 @@ get_xgb_case <- function(path, prediction) {
     ~ {
       if (.x$op == "less" & .x$missing) {
         i <- expr((!!sym(.x$col) >= !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
-        }
+      }
       if (.x$op == "more-equal" & .x$missing) {
         i <- expr((!!sym(.x$col) < !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
-        }
+      }
       if (.x$op == "less" & !.x$missing) {
         i <- expr(!!sym(.x$col) >= !!as.numeric(.x$val))
-        }
+      }
       if (.x$op == "more-equal" & !.x$missing) {
         i <- expr(!!sym(.x$col) < !!as.numeric(.x$val))
-        }
+      }
       i
     }
   )
   cl <- if (length(cl) > 0) {
     reduce(cl, function(x, y) expr(!!x & !!y))
   } else {
-      TRUE
-    }
+    TRUE
+  }
   expr(!!cl ~ !!prediction)
 }
 
@@ -155,10 +155,11 @@ build_fit_formula_xgb <- function(parsedmodel) {
     assigned <- 1
     f <- expr(!!f + !!base_score)
     warning(
-      paste("If the objective is a custom function, please",
-            "explicitly apply it to the output."
-            )
+      paste(
+        "If the objective is a custom function, please",
+        "explicitly apply it to the output."
       )
+    )
   } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
     assigned <- 1
     f <- expr((!!f) + !!base_score)
@@ -168,10 +169,11 @@ build_fit_formula_xgb <- function(parsedmodel) {
   }
   if (assigned == 0) {
     stop(
-      paste0("Only objectives 'binary:logistic', 'reg:squarederror',",
-             "'reg:logistic', 'binary:logitraw' are supported yet."
-             )
+      paste0(
+        "Only objectives 'binary:logistic', 'reg:squarederror',",
+        "'reg:logistic', 'binary:logitraw' are supported yet."
       )
+    )
   }
   f
 }

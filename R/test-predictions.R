@@ -179,6 +179,7 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
                         include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   if (is.numeric(max_rows)) df <- head(df, max_rows)
   base <- predict(model, xg_df)
+  if("model_fit" %in% class(model)) base <- base$.pred
   te <- tidypredict_to_column(
     df,
     model,
