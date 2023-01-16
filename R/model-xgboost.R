@@ -49,10 +49,6 @@ get_xgb_tree <- function(tree) {
 }
 
 get_xgb_trees <- function(model) {
-  UseMethod("get_xgb_trees", model)
-}
-
-get_xgb_trees.xgb.Booster <- function(model) {
   xd <- xgboost::xgb.dump(
     model = model,
     dump_format = "text",
@@ -79,8 +75,10 @@ get_xgb_trees_character <- function(xd, feature_names) {
     lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
 
   trees_split <- split(trees, trees$Tree)
-
-  purrr::map(trees_split, get_xgb_tree)
+  trees_rows <- purrr::map_dbl(trees_split, nrow)
+  trees_filtered <- trees_split[trees_rows > 1]
+  
+  purrr::map(trees_filtered, get_xgb_tree)
 }
 
 #' @export
@@ -162,7 +160,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
     )
   } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
     assigned <- 1
-    f <- expr((!!f) + !!base_score)
+    f <- expr(!!f + !!base_score)
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
