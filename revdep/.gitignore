@@ -3,3 +3,6 @@ data.sqlite
 library
 checks.rds
 failures.md
+checks.noindex/
+library.noindex/
+cran.md

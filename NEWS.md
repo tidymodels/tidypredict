@@ -1,5 +1,13 @@
 # tidypredict (development version)
 
+- Changes maintainer to Edgar Ruiz
+
+- Updates author's email addresses.
+
+- Removes dependency with `stringr`
+
+- Fixes issue with `earth` parsed_models (#108)
+
 - Addresses issues with XGBoost models
 
 - Improvements to XGBoosts tests

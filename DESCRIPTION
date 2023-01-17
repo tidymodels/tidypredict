@@ -1,6 +1,6 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
-Version: 0.4.9.9001
+Version: 0.5
 Authors@R:
     c(
       person("Edgar", "Ruiz", email = "edgar@posit.co", role = c("aut", "cre")),
