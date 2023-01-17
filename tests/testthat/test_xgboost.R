@@ -73,11 +73,13 @@ test_that("Predictions match to model's predict routine", {
 })
 
 test_that("Confirm SQL function returns SQL query", {
-  expect_snapshot(
-    xgb_models_all %>%
+    xgb_sql <- xgb_models %>%
       purrr::map(tidypredict_sql, dbplyr::simulate_odbc()) %>%
       purrr::map(rlang::expr_text)
-  )
+    
+    for(i in seq_along(xgb_sql)) {
+      expect_snapshot(xgb_sql[i])
+    }
 })
 
 test_that("Base scores match", {
