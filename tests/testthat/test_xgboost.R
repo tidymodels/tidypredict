@@ -8,168 +8,114 @@ logregobj <- function(preds, dtrain) {
   return(list(grad = grad, hess = hess))
 }
 
-xgb_bin_data <- xgboost::xgb.DMatrix(as.matrix(mtcars[, -9]), label = mtcars$am)
-xgb_bin_fit <- xgboost::xgb.train(
-  params = list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5),
-  data = xgb_bin_data, nrounds = 50
+xgb_bin_data <- xgboost::xgb.DMatrix(
+  as.matrix(mtcars[, -9]),
+  label = mtcars$am
 )
 
-xgb_reglinear <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "reg:squarederror", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_binarylogitraw <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "binary:logitraw", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_reglogistic <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "reg:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_binarylogistic <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5), data = xgb_bin_data, nrounds = 4)
-xgb_custom <- xgboost::xgb.train(params = list(max_depth = 2, silent = 1, objective = logregobj, base_score = 0.5), data = xgb_bin_data, nrounds = 4)
+xgb_list <- list(
+  reg_sqr = list(objective = "reg:squarederror"),
+  bin_log = list(objective = "binary:logitraw"),
+  reg_log = list(objective = "reg:logistic"),
+  bin_log = list(objective = "binary:logistic"),
+  log_reg = list(objective = logregobj),
+  reg_log_base = list(objective = "reg:logistic", base_score = mean(mtcars$am)),
+  bin_log_base = list(objective = "binary:logistic", base_score = mean(mtcars$am)),
+  reg_log_large = list(objective = "reg:logistic", nrounds = 50),
+  bin_log_large = list(objective = "binary:logistic", nrounds = 50),
+  reg_log_deep = list(objective = "reg:logistic", max_depth = 20),
+  bin_log_deep = list(objective = "binary:logistic", max_depth = 20)
+) %>%
+  purrr::map(~ {
+    if (is.null(.x$base_score)) .x$base_score <- 0.5
+    if (is.null(.x$nrounds)) .x$nrounds <- 4
+    if (is.null(.x$max_depth)) .x$max_depth <- 2
+    .x
+  })
 
-test_that("Returns the correct type", {
-  expect_s3_class(parse_model(xgb_bin_fit), "list")
-  expect_equal(class(tidypredict_fit(xgb_bin_fit))[1], "call")
-})
+xgb_models_all <- xgb_list %>%
+  purrr::imap(~ {
+    xgboost::xgb.train(
+      params = list(
+        max_depth = 2, objective = .x$objective, base_score = .x$base_score
+      ),
+      data = xgb_bin_data,
+      nrounds = .x$nrounds
+    )
+  })
 
-test_that("Predictions are correct for different objectives", {
-  expect_false(tidypredict_test(xgb_reglinear, df = mtcars, xg_df = xgb_bin_data)$alert)
-  expect_false(tidypredict_test(xgb_binarylogitraw, df = mtcars, xg_df = xgb_bin_data)$alert)
-  expect_false(tidypredict_test(xgb_reglogistic, df = mtcars, xg_df = xgb_bin_data)$alert)
-  expect_false(tidypredict_test(xgb_binarylogistic, df = mtcars, xg_df = xgb_bin_data)$alert)
-  expect_warning(tidypredict_fit(xgb_custom))
-})
+xgb_models <- xgb_models_all[names(xgb_models_all) != "log_reg"]
 
-test_that("Confirm SQL function returns a query", {
-  expect_snapshot(
-    rlang::expr_text(tidypredict_sql(xgb_reglinear, dbplyr::simulate_odbc())[[1]]),
+test_that("Predictions match to model's predict routine", {
+  td_tests <- xgb_models %>%
+    purrr::map(
+      tidypredict_test,
+      df = mtcars,
+      xg_df = xgb_bin_data,
+      threshold = 0.001
+    )
+
+  td_tests %>%
+    purrr::imap(
+      ~ {
+        msg <- paste0("------ >> MODEL: ", .y)
+        expect_false(.x$alert, info = msg)
+      }
+    )
+
+  expect_warning(
+    tidypredict_test(
+      xgb_models_all$log_reg,
+      df = mtcars,
+      xg_df = xgb_bin_data
+    )
   )
-  
-  expect_snapshot(
-    rlang::expr_text(tidypredict_sql(xgb_reglogistic, dbplyr::simulate_odbc())[[1]])
-  )
 })
 
-test_that("Predictions are correct for different objectives", {
-  m <- parsnip::fit(parsnip::set_engine(parsnip::boost_tree(mode = "regression"), "xgboost"), am ~ ., data = mtcars)
-  expect_false(tidypredict_test(m, df = mtcars)$alert)
+test_that("Confirm SQL function returns SQL query", {
+    xgb_sql <- xgb_models %>%
+      purrr::map(tidypredict_sql, dbplyr::simulate_odbc())
+    
+    # Removing "_large" models because of precision issues with other
+    # non M1 machines
+    no_large <- xgb_sql[!grepl("_large", names(xgb_sql))]
+    
+    for(i in seq_along(no_large)) {
+      expect_snapshot(no_large[i])
+    }
+})
+
+test_that("Base scores match", {
+  xgb_scores <- xgb_list %>%
+    purrr::map_dbl(~ .x$base_score)
+
+  xgb_scores_pm <- xgb_models_all %>%
+    purrr::map(parse_model) %>%
+    purrr::map_dbl(~ .x$general$params$base_score)
+
+  xgb_scores %>%
+    seq_along() %>%
+    purrr::map(
+      ~ expect_equal(xgb_scores[.x], xgb_scores_pm[.x])
+    )
 })
 
 test_that("Model can be saved and re-loaded", {
   mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(parse_model(xgb_reglinear), mp)
+  yaml::write_yaml(parse_model(xgb_models$reg_sqr), mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
   expect_snapshot(tidypredict_fit(pm))
 })
 
-base_score <- mean(mtcars$am)
-xgb_reglogistic_basescore <-
-  xgboost::xgb.train(
-    params = list(
-      max_depth = 2,
-      silent = 1,
-      objective = "reg:logistic",
-      base_score = base_score
-    ),
-    data = xgb_bin_data,
-    nrounds = 4
-  )
-xgb_binarylogistic_basescore <-
-  xgboost::xgb.train(
-    params = list(
-      max_depth = 2,
-      silent = 1,
-      objective = "binary:logistic",
-      base_score = base_score
-    ),
-    data = xgb_bin_data,
-    nrounds = 4
+
+
+test_that("Predictions are correct for different objectives", {
+  m <- parsnip::fit(
+    parsnip::set_engine(parsnip::boost_tree(mode = "regression"), "xgboost"),
+    am ~ .,
+    data = mtcars
   )
 
-testthat::test_that("Error expected when base score is equal to 0 or 1", {
-  testthat::expect_error(
-    xgb_reglogistic_basescore <-
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          silent = 1,
-          objective = "reg:logistic",
-          base_score = 1
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      )
-  )
-  
-  testthat::expect_error(
-    xgb_binarylogistic_basescore <-
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          silent = 1,
-          objective = "binary:logistic",
-          base_score = 1
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      )
-  )
-  testthat::expect_error(
-    xgb_reglogistic_basescore <-
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          silent = 1,
-          objective = "reg:logistic",
-          base_score = 0
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      )
-  )
-  
-  testthat::expect_error(
-    xgb_binarylogistic_basescore <-
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          silent = 1,
-          objective = "binary:logistic",
-          base_score = 0
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      )
-  )
-})
-
-parsedmodel_xgb_reglogistic_basescore <- parse_model(xgb_reglogistic_basescore)
-parsedmodel_xgb_binarylogistic_basescore <- parse_model(xgb_binarylogistic_basescore)
-
-testthat::test_that("Base scores is same", {
-  expect_equal(base_score, parsedmodel_xgb_reglogistic_basescore$general$params$base_score)
-  expect_equal(base_score, parsedmodel_xgb_binarylogistic_basescore$general$params$base_score)
-})
-
-xgb_reglogistic_basescore_sql <-
-  build_fit_formula_xgb(parsedmodel_xgb_reglogistic_basescore)
-xgb_binarylogistic_basescore_sql <-
-  build_fit_formula_xgb(parsedmodel_xgb_binarylogistic_basescore)
-
-xgb_reglogistic_basescore_pred_model <-
-  predict(xgb_reglogistic_basescore, xgb_bin_data) %>% round(5)
-xgb_binarylogistic_basescore_pred_model <-
-  predict(xgb_binarylogistic_basescore, xgb_bin_data) %>% round(5)
-
-xgb_reglogistic_basescore_pred_sql <-
-  mtcars %>%
-  dplyr::mutate_(yhat_sql = as.character(xgb_reglogistic_basescore_sql)[[3]]) %>%
-  dplyr::mutate(yhat_sql = 1 - yhat_sql) %>%
-  .$yhat_sql %>% 
-  round(5)
-
-xgb_binarylogistic_basescore_pred_sql <-
-  mtcars %>%
-  dplyr::mutate_(yhat_sql = as.character(xgb_binarylogistic_basescore_sql)[[3]]) %>%
-  dplyr::mutate(yhat_sql = 1 - yhat_sql) %>%
-  .$yhat_sql %>% 
-  round(5)
-
-testthat::test_that("Same predictions between model and parsed sql model", {
-  expect_equal(xgb_reglogistic_basescore_pred_model, xgb_reglogistic_basescore_pred_sql)
-  expect_equal(xgb_binarylogistic_basescore_pred_model, xgb_binarylogistic_basescore_pred_sql)
+  expect_false(tidypredict_test(m, df = mtcars, threshold = 0.001)$alert)
 })

@@ -1,10 +1,10 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
-Version: 0.4.9.9000
+Version: 0.4.9.9001
 Authors@R:
     c(
-      person("Max", "Kuhn", , "max@rstudio.com", role = c("aut", "cre")),
-      person("Edgar", "Ruiz", email = "edgar@rstudio.com", role = c("aut"))
+      person("Edgar", "Ruiz", email = "edgar@posit.co", role = c("aut", "cre")),
+      person("Max", "Kuhn", email = "max@posit.co", role = c("aut"))
     )
 Description: It parses a fitted 'R' model object, and returns a formula in
     'Tidy Eval' code that calculates the predictions.  It works with
@@ -51,5 +51,5 @@ VignetteBuilder:
 Config/Needs/website: 
     tidyverse/tidytemplate
 Encoding: UTF-8
-RoxygenNote: 7.2.0.9000
+RoxygenNote: 7.2.3
 Config/testthat/edition: 3
