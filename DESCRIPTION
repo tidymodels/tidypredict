@@ -24,7 +24,6 @@ Imports:
     knitr,
     purrr,
     rlang,
-    stringr,
     tibble,
     tidyr
 Suggests:
