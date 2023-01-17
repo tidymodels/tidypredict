@@ -1,7 +1,7 @@
 # Confirm SQL function returns SQL query
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $reg_sqr
       <SQL> ((((0.0 + CASE
@@ -28,7 +28,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $bin_log
       <SQL> ((((0.0 + CASE
@@ -53,7 +53,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $reg_log
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
@@ -78,7 +78,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $bin_log
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
@@ -103,7 +103,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $reg_log_base
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
@@ -128,7 +128,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $bin_log_base
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
@@ -153,299 +153,7 @@
 ---
 
     Code
-      xgb_sql[i]
-    Output
-      $reg_log_large
-      <SQL> 1.0 - 1.0 / (1.0 + EXP(((((((((((((((((((((((((((((((((((((((((((0.0 + CASE
-      WHEN (`wt` >= 3.18000007) THEN -0.436363667
-      WHEN ((`qsec` < 19.1849995 OR (`qsec` IS NULL)) AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.428571463
-      WHEN (`qsec` >= 19.1849995 AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN -0.0
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.311573088
-      WHEN ((`hp` < 222.5 OR (`hp` IS NULL)) AND `wt` >= 3.01250005) THEN -0.392053694
-      WHEN (`hp` >= 222.5 AND `wt` >= 3.01250005) THEN -0.0240745768
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.355945677
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.325712085
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0384863913
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.309683114
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.283893973
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.032039877
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.275577009
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.252453178
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0266750772
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.248323873
-      WHEN ((`qsec` < 17.6599998 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.261978835
-      WHEN (`qsec` >= 17.6599998 AND `gear` >= 3.5) THEN -0.00959526002
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.225384533
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.218285918
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0373593047
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.205454513
-      WHEN ((`qsec` < 18.7550011 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.196076646
-      WHEN (`qsec` >= 18.7550011 AND `gear` >= 3.5) THEN -0.0544253439
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.149246693
-      WHEN ((`qsec` < 17.4099998 OR (`qsec` IS NULL)) AND `wt` >= 3.01250005) THEN 0.0354709327
-      WHEN (`qsec` >= 17.4099998 AND `wt` >= 3.01250005) THEN -0.226075932
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.184417158
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.176768288
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0237750355
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.168993726
-      WHEN ((`qsec` < 18.6049995 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.155569643
-      WHEN (`qsec` >= 18.6049995 AND `gear` >= 3.5) THEN -0.0325752236
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.119126029
-      WHEN (`wt` >= 3.01250005) THEN -0.105012275
-      END) + CASE
-      WHEN ((`qsec` < 17.1749992 OR (`qsec` IS NULL))) THEN 0.117254682
-      WHEN (`qsec` >= 17.1749992) THEN -0.0994235724
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.097100094
-      WHEN (`wt` >= 3.18000007) THEN -0.10567718
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0824323222
-      WHEN (`wt` >= 3.18000007) THEN -0.091120176
-      END) + CASE
-      WHEN ((`qsec` < 17.5100002 OR (`qsec` IS NULL))) THEN 0.0854752287
-      WHEN (`qsec` >= 17.5100002) THEN -0.0764453933
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0749477893
-      WHEN (`wt` >= 3.18000007) THEN -0.0799863264
-      END) + CASE
-      WHEN ((`qsec` < 17.7099991 OR (`qsec` IS NULL))) THEN 0.0728750378
-      WHEN (`qsec` >= 17.7099991) THEN -0.0646049976
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0682478622
-      WHEN (`wt` >= 3.18000007) THEN -0.0711427554
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0579533465
-      WHEN (`wt` >= 3.18000007) THEN -0.0613371208
-      END) + CASE
-      WHEN ((`qsec` < 18.1499996 OR (`qsec` IS NULL))) THEN 0.0595484748
-      WHEN (`qsec` >= 18.1499996) THEN -0.0546668135
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0535288528
-      WHEN (`wt` >= 3.18000007) THEN -0.0558333211
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0454574414
-      WHEN (`wt` >= 3.18000007) THEN -0.048143398
-      END) + CASE
-      WHEN ((`qsec` < 18.5600014 OR (`qsec` IS NULL))) THEN 0.0422042683
-      WHEN (`qsec` >= 18.5600014) THEN -0.0454404354
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0420555808
-      WHEN (`wt` >= 3.18000007) THEN -0.0449385941
-      END) + CASE
-      WHEN ((`qsec` < 18.5600014 OR (`qsec` IS NULL))) THEN 0.0393446013
-      WHEN (`qsec` >= 18.5600014) THEN -0.0425945036
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0391179025
-      WHEN (`wt` >= 3.18000007) THEN -0.0420661867
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0304145869
-      WHEN (`qsec` >= 18.4099998) THEN -0.031833414
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0362136625
-      WHEN (`wt` >= 3.18000007) THEN -0.038949281
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0295153651
-      WHEN (`qsec` >= 18.4099998) THEN -0.0307046026
-      END) + CASE
-      WHEN ((`drat` < 3.80999994 OR (`drat` IS NULL))) THEN -0.0306891855
-      WHEN (`drat` >= 3.80999994) THEN 0.0288283136
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0271221269
-      WHEN (`qsec` >= 18.4099998) THEN -0.0281750448
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0228891298
-      WHEN (`qsec` >= 18.4099998) THEN -0.0238814205
-      END) + CASE
-      WHEN ((`drat` < 3.80999994 OR (`drat` IS NULL))) THEN -0.0296511576
-      WHEN (`drat` >= 3.80999994) THEN 0.0280048084
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0214707125
-      WHEN (`qsec` >= 18.4099998) THEN -0.0224219449
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0181306079
-      WHEN (`qsec` >= 18.4099998) THEN -0.0190209728
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0379650332
-      WHEN (`wt` >= 3.18000007) THEN -0.0395050682
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0194106717
-      WHEN (`qsec` >= 18.4099998) THEN -0.0202215631
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0164139606
-      WHEN (`qsec` >= 18.4099998) THEN -0.0171694476
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.013879573
-      WHEN (`qsec` >= 18.4099998) THEN -0.0145772668
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0117362784
-      WHEN (`qsec` >= 18.4099998) THEN -0.0123759825
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0388614088
-      WHEN (`wt` >= 3.18000007) THEN -0.0400568396
-      END) + LN(0.5 / (1.0 - 0.5))))
-      
-
----
-
-    Code
-      xgb_sql[i]
-    Output
-      $bin_log_large
-      <SQL> 1.0 - 1.0 / (1.0 + EXP(((((((((((((((((((((((((((((((((((((((((((0.0 + CASE
-      WHEN (`wt` >= 3.18000007) THEN -0.436363667
-      WHEN ((`qsec` < 19.1849995 OR (`qsec` IS NULL)) AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.428571463
-      WHEN (`qsec` >= 19.1849995 AND (`wt` < 3.18000007 OR (`wt` IS NULL))) THEN -0.0
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.311573088
-      WHEN ((`hp` < 222.5 OR (`hp` IS NULL)) AND `wt` >= 3.01250005) THEN -0.392053694
-      WHEN (`hp` >= 222.5 AND `wt` >= 3.01250005) THEN -0.0240745768
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.355945677
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.325712085
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0384863913
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.309683114
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.283893973
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.032039877
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.275577009
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.252453178
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0266750772
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.248323873
-      WHEN ((`qsec` < 17.6599998 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.261978835
-      WHEN (`qsec` >= 17.6599998 AND `gear` >= 3.5) THEN -0.00959526002
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.225384533
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.218285918
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0373593047
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.205454513
-      WHEN ((`qsec` < 18.7550011 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.196076646
-      WHEN (`qsec` >= 18.7550011 AND `gear` >= 3.5) THEN -0.0544253439
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.149246693
-      WHEN ((`qsec` < 17.4099998 OR (`qsec` IS NULL)) AND `wt` >= 3.01250005) THEN 0.0354709327
-      WHEN (`qsec` >= 17.4099998 AND `wt` >= 3.01250005) THEN -0.226075932
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.184417158
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL)) AND `gear` >= 3.5) THEN 0.176768288
-      WHEN (`wt` >= 3.01250005 AND `gear` >= 3.5) THEN -0.0237750355
-      END) + CASE
-      WHEN ((`gear` < 3.5 OR (`gear` IS NULL))) THEN -0.168993726
-      WHEN ((`qsec` < 18.6049995 OR (`qsec` IS NULL)) AND `gear` >= 3.5) THEN 0.155569643
-      WHEN (`qsec` >= 18.6049995 AND `gear` >= 3.5) THEN -0.0325752236
-      END) + CASE
-      WHEN ((`wt` < 3.01250005 OR (`wt` IS NULL))) THEN 0.119126029
-      WHEN (`wt` >= 3.01250005) THEN -0.105012275
-      END) + CASE
-      WHEN ((`qsec` < 17.1749992 OR (`qsec` IS NULL))) THEN 0.117254682
-      WHEN (`qsec` >= 17.1749992) THEN -0.0994235724
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.097100094
-      WHEN (`wt` >= 3.18000007) THEN -0.10567718
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0824323222
-      WHEN (`wt` >= 3.18000007) THEN -0.091120176
-      END) + CASE
-      WHEN ((`qsec` < 17.5100002 OR (`qsec` IS NULL))) THEN 0.0854752287
-      WHEN (`qsec` >= 17.5100002) THEN -0.0764453933
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0749477893
-      WHEN (`wt` >= 3.18000007) THEN -0.0799863264
-      END) + CASE
-      WHEN ((`qsec` < 17.7099991 OR (`qsec` IS NULL))) THEN 0.0728750378
-      WHEN (`qsec` >= 17.7099991) THEN -0.0646049976
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0682478622
-      WHEN (`wt` >= 3.18000007) THEN -0.0711427554
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0579533465
-      WHEN (`wt` >= 3.18000007) THEN -0.0613371208
-      END) + CASE
-      WHEN ((`qsec` < 18.1499996 OR (`qsec` IS NULL))) THEN 0.0595484748
-      WHEN (`qsec` >= 18.1499996) THEN -0.0546668135
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0535288528
-      WHEN (`wt` >= 3.18000007) THEN -0.0558333211
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0454574414
-      WHEN (`wt` >= 3.18000007) THEN -0.048143398
-      END) + CASE
-      WHEN ((`qsec` < 18.5600014 OR (`qsec` IS NULL))) THEN 0.0422042683
-      WHEN (`qsec` >= 18.5600014) THEN -0.0454404354
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0420555808
-      WHEN (`wt` >= 3.18000007) THEN -0.0449385941
-      END) + CASE
-      WHEN ((`qsec` < 18.5600014 OR (`qsec` IS NULL))) THEN 0.0393446013
-      WHEN (`qsec` >= 18.5600014) THEN -0.0425945036
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0391179025
-      WHEN (`wt` >= 3.18000007) THEN -0.0420661867
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0304145869
-      WHEN (`qsec` >= 18.4099998) THEN -0.031833414
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0362136625
-      WHEN (`wt` >= 3.18000007) THEN -0.038949281
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0295153651
-      WHEN (`qsec` >= 18.4099998) THEN -0.0307046026
-      END) + CASE
-      WHEN ((`drat` < 3.80999994 OR (`drat` IS NULL))) THEN -0.0306891855
-      WHEN (`drat` >= 3.80999994) THEN 0.0288283136
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0271221269
-      WHEN (`qsec` >= 18.4099998) THEN -0.0281750448
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0228891298
-      WHEN (`qsec` >= 18.4099998) THEN -0.0238814205
-      END) + CASE
-      WHEN ((`drat` < 3.80999994 OR (`drat` IS NULL))) THEN -0.0296511576
-      WHEN (`drat` >= 3.80999994) THEN 0.0280048084
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0214707125
-      WHEN (`qsec` >= 18.4099998) THEN -0.0224219449
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0181306079
-      WHEN (`qsec` >= 18.4099998) THEN -0.0190209728
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0379650332
-      WHEN (`wt` >= 3.18000007) THEN -0.0395050682
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0194106717
-      WHEN (`qsec` >= 18.4099998) THEN -0.0202215631
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0164139606
-      WHEN (`qsec` >= 18.4099998) THEN -0.0171694476
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.013879573
-      WHEN (`qsec` >= 18.4099998) THEN -0.0145772668
-      END) + CASE
-      WHEN ((`qsec` < 18.4099998 OR (`qsec` IS NULL))) THEN 0.0117362784
-      WHEN (`qsec` >= 18.4099998) THEN -0.0123759825
-      END) + CASE
-      WHEN ((`wt` < 3.18000007 OR (`wt` IS NULL))) THEN 0.0388614088
-      WHEN (`wt` >= 3.18000007) THEN -0.0400568396
-      END) + LN(0.5 / (1.0 - 0.5))))
-      
-
----
-
-    Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $reg_log_deep
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
@@ -470,7 +178,7 @@
 ---
 
     Code
-      xgb_sql[i]
+      no_large[i]
     Output
       $bin_log_deep
       <SQL> 1.0 - 1.0 / (1.0 + EXP(((((0.0 + CASE
