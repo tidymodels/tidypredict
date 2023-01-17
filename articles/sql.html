@@ -227,7 +227,7 @@ work in most databases:</p>
 <span><span class="va">update_statement</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbplyr.tidyverse.org/reference/build_sql.html" class="external-link">build_sql</a></span><span class="op">(</span><span class="st">"UPDATE flights_table SET current_score  = "</span>, <span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">update_statement</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span></code></pre></div>
 <p>This statement can be then passed on to the database team, via
 documentation or an automated process. In cases where the analyst has
 the responsibility to run the new SQL statement, or if R is being used
@@ -235,7 +235,7 @@ to automate the scoring, the next line can be used:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">update_statement</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQLiteResult&gt;</span></span>
-<span><span class="co">#&gt;   SQL  UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span>
+<span><span class="co">#&gt;   SQL  UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span>
 <span><span class="co">#&gt;   ROWS Fetched: 0 [complete]</span></span>
 <span><span class="co">#&gt;        Changed: 336776</span></span></code></pre></div>
 <p>Here is a sample of the newly populated field:</p>
@@ -306,7 +306,7 @@ new <code>daily_scores</code> table.</p>
 <span><span class="co">#&gt; FROM (</span></span>
 <span><span class="co">#&gt;   SELECT</span></span>
 <span><span class="co">#&gt;     `flight_id`,</span></span>
-<span><span class="co">#&gt;     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
+<span><span class="co">#&gt;     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
 <span><span class="co">#&gt;   FROM `flights_table`</span></span>
 <span><span class="co">#&gt;   WHERE (`month` = 12.0)</span></span>
 <span><span class="co">#&gt; )</span></span></code></pre></div>
@@ -321,7 +321,7 @@ is being used to automate the scoring, the next line can be used:</p>
 <span><span class="co">#&gt; FROM (</span></span>
 <span><span class="co">#&gt;   SELECT</span></span>
 <span><span class="co">#&gt;     `flight_id`,</span></span>
-<span><span class="co">#&gt;     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
+<span><span class="co">#&gt;     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
 <span><span class="co">#&gt;   FROM `flights_table`</span></span>
 <span><span class="co">#&gt;   WHERE (`month` = 12.0)</span></span>
 <span><span class="co">#&gt; )</span></span>
