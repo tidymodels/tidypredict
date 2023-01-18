@@ -5,7 +5,6 @@
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
 [![Codecov test
 coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict?branch=main)
-[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
 The main goal of `tidypredict` is to enable running predictions inside
 databases. It reads the model, extracts the components needed to
@@ -25,21 +24,21 @@ several databases back-ends, such as MS SQL:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-    ## <SQL> 39.6862614802529 + (`wt` * -3.19097213898374) + (`cyl` * -1.5077949682598)
+    ## <SQL> (39.6862614802529 + (`wt` * -3.19097213898375)) + (`cyl` * -1.5077949682598)
 
 ## Installation
 
 Install `tidypredict` from CRAN using:
 
 ``` r
-# install.packages("tidypredict")
+install.packages("tidypredict")
 ```
 
 Or install the **development version** using `devtools` as follows:
 
 ``` r
-# install.packages("remotes")
-# remotes::install_github("tidymodels/tidypredict")
+install.packages("remotes")
+remotes::install_github("tidymodels/tidypredict")
 ```
 
 ## Functions
@@ -94,26 +93,26 @@ formula adds the following capabilities:
 
 The following models are supported by `tidypredict`:
 
--   Linear Regression - `lm()`
--   Generalized Linear model - `glm()`
--   Random Forest models - `randomForest::randomForest()`
--   Random Forest models, via `ranger` - `ranger::ranger()`
--   MARS models - `earth::earth()`
--   XGBoost models - `xgboost::xgb.Booster.complete()`
--   Cubist models - `Cubist::cubist()`
--   Tree models, via `partykit` - `partykit::ctree()`
+- Linear Regression - `lm()`
+- Generalized Linear model - `glm()`
+- Random Forest models - `randomForest::randomForest()`
+- Random Forest models, via `ranger` - `ranger::ranger()`
+- MARS models - `earth::earth()`
+- XGBoost models - `xgboost::xgb.Booster.complete()`
+- Cubist models - `Cubist::cubist()`
+- Tree models, via `partykit` - `partykit::ctree()`
 
 ### `parsnip`
 
 `tidypredict` supports models fitted via the `parsnip` interface. The
 ones confirmed currently work in `tidypredict` are:
 
--   `lm()` - `parsnip`: `linear_reg()` with *“lm”* as the engine.
--   `randomForest::randomForest()` - `parsnip`: `rand_forest()` with
-    *“randomForest”* as the engine.
--   `ranger::ranger()` - `parsnip`: `rand_forest()` with *“ranger”* as
-    the engine.
--   `earth::earth()` - `parsnip`: `mars()` with *“earth”* as the engine.
+- `lm()` - `parsnip`: `linear_reg()` with *“lm”* as the engine.
+- `randomForest::randomForest()` - `parsnip`: `rand_forest()` with
+  *“randomForest”* as the engine.
+- `ranger::ranger()` - `parsnip`: `rand_forest()` with *“ranger”* as the
+  engine.
+- `earth::earth()` - `parsnip`: `mars()` with *“earth”* as the engine.
 
 ### `broom`
 
@@ -146,17 +145,18 @@ This project is released with a [Contributor Code of
 Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
 
--   For questions and discussions about tidymodels packages, modeling,
-    and machine learning, please [post on RStudio
-    Community](https://community.rstudio.com/new-topic?category_id=15&tags=tidymodels,question).
+- For questions and discussions about tidymodels packages, modeling, and
+  machine learning, please [post on RStudio
+  Community](https://community.rstudio.com/new-topic?category_id=15&tags=tidymodels,question).
 
--   If you think you have encountered a bug, please [submit an
-    issue](https://github.com/tidymodels/tidypredict/issues).
+- If you think you have encountered a bug, please [submit an
+  issue](https://github.com/tidymodels/tidypredict/issues).
 
--   Either way, learn how to create and share a
-    [reprex](https://reprex.tidyverse.org/articles/articles/learn-reprex.html) (a minimal, reproducible example),
-    to clearly communicate about your code.
+- Either way, learn how to create and share a
+  [reprex](https://reprex.tidyverse.org/articles/articles/learn-reprex.html)
+  (a minimal, reproducible example), to clearly communicate about your
+  code.
 
--   Check out further details on [contributing guidelines for tidymodels
-    packages](https://www.tidymodels.org/contribute/) and [how to get
-    help](https://www.tidymodels.org/help/).
+- Check out further details on [contributing guidelines for tidymodels
+  packages](https://www.tidymodels.org/contribute/) and [how to get
+  help](https://www.tidymodels.org/help/).

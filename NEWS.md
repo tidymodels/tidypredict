@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+# tidypredict 0.5
+
 - Changes maintainer to Edgar Ruiz
 
 - Updates author's email addresses.

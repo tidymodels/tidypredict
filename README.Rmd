@@ -7,7 +7,6 @@ output: github_document
 [![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
 [![Codecov test coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict?branch=main)
-[![Downloads](http://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 
 ```{r pre, include = FALSE}
 if (!rlang::is_installed("randomForest")) {
@@ -41,13 +40,13 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 Install `tidypredict` from CRAN using:
 ```{r, eval = FALSE}
-# install.packages("tidypredict")
+install.packages("tidypredict")
 ```
 
 Or install the **development version** using `devtools` as follows:
 ```{r, eval = FALSE}
-# install.packages("remotes")
-# remotes::install_github("tidymodels/tidypredict")
+install.packages("remotes")
+remotes::install_github("tidymodels/tidypredict")
 ```
 
 ## Functions
