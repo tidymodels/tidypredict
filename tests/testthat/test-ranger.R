@@ -10,7 +10,7 @@ run_test <- function(model, test_formula = TRUE) {
     expect_equal(pm$general$model, "ranger")
     expect_equal(pm$general$version, 2)
   })
-  if(test_formula) {
+  if (test_formula) {
     test_that("Returns expected case_when() dplyr formula", {
       expect_type(tidypredict_fit(pm), "list")
     })
@@ -26,7 +26,8 @@ run_test(
     parsnip::set_engine(parsnip::rand_forest(trees = num_trees, mode = "classification"), "ranger", seed = 100, num.threads = 2),
     Species ~ .,
     data = iris
-  ), test_formula = FALSE
+  ),
+  test_formula = FALSE
 )
 
 run_test(

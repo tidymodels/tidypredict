@@ -14,7 +14,7 @@ parse_model.earth <- function(model) {
   }
 
   is_glm <- !is.null(model$glm.list)
-  
+
   pm <- list()
   pm$general$model <- "earth"
   pm$general$type <- "regression"
@@ -31,63 +31,68 @@ parse_model.earth <- function(model) {
 }
 
 
-mars_terms <- function(mod, is_glm) { 
-  feature_types <- 
-    tibble::as_tibble(mod$dirs, rownames = "feature") %>% 
-    dplyr::mutate(feature_num = dplyr::row_number()) %>% 
-    tidyr::pivot_longer(cols = c(-feature, -feature_num),
-                        values_to = "type",
-                        names_to = "term")
-  
-  feature_values <- 
-    tibble::as_tibble(mod$cuts, rownames = "feature") %>% 
-    dplyr::mutate(feature_num = dplyr::row_number()) %>% 
-    tidyr::pivot_longer(cols = c(-feature, -feature_num),
-                        values_to = "value",
-                        names_to = "term")
-  
-  if (is_glm)  {
+mars_terms <- function(mod, is_glm) {
+  feature_types <-
+    tibble::as_tibble(mod$dirs, rownames = "feature") %>%
+    dplyr::mutate(feature_num = dplyr::row_number()) %>%
+    tidyr::pivot_longer(
+      cols = c(-feature, -feature_num),
+      values_to = "type",
+      names_to = "term"
+    )
+
+  feature_values <-
+    tibble::as_tibble(mod$cuts, rownames = "feature") %>%
+    dplyr::mutate(feature_num = dplyr::row_number()) %>%
+    tidyr::pivot_longer(
+      cols = c(-feature, -feature_num),
+      values_to = "value",
+      names_to = "term"
+    )
+
+  if (is_glm) {
     all_coefs <- mod$glm.coefficients
   } else {
-    all_coefs <- mod$coefficients  
+    all_coefs <- mod$coefficients
   }
 
-  feature_coefs <- 
+  feature_coefs <-
     # Note coef(mod) formats data differently for logistic regression
-    tibble::as_tibble(all_coefs, rownames = "feature") %>% 
+    tibble::as_tibble(all_coefs, rownames = "feature") %>%
     setNames(c("feature", "coefficient"))
-  
-  term_to_column <- 
-    tibble::as_tibble(mod$modvars, rownames = "column") %>% 
-    tidyr::pivot_longer(cols = c(-column),
-                        values_to = "value",
-                        names_to = "term") %>% 
-    purrr::transpose() %>% 
+
+  term_to_column <-
+    tibble::as_tibble(mod$modvars, rownames = "column") %>%
+    tidyr::pivot_longer(
+      cols = c(-column),
+      values_to = "value",
+      names_to = "term"
+    ) %>%
+    purrr::transpose() %>%
     purrr::map(~ {
-      if(.x$value == 1) {
-        .x$level <- gsub(.x$column, "", .x$term)  
+      if (.x$value == 1) {
+        .x$level <- gsub(.x$column, "", .x$term)
       } else {
         .x$level <- NA
       }
       .x
-    }) %>% 
-    dplyr::bind_rows() %>% 
-    dplyr::filter(value == 1) %>% 
+    }) %>%
+    dplyr::bind_rows() %>%
+    dplyr::filter(value == 1) %>%
     dplyr::select(-value)
-  
-  feature_types %>% 
-    dplyr::full_join(feature_values, by = c("feature", "feature_num", "term")) %>% 
-    dplyr::filter(type != 0) %>% 
-    dplyr::right_join(feature_coefs,  by = "feature") %>% 
+
+  feature_types %>%
+    dplyr::full_join(feature_values, by = c("feature", "feature_num", "term")) %>%
+    dplyr::filter(type != 0) %>%
+    dplyr::right_join(feature_coefs, by = "feature") %>%
     dplyr::mutate(feature_num = ifelse(feature == "(Intercept)", 0, feature_num)) %>%
-    dplyr::arrange(feature_num) %>% 
-    dplyr::left_join(term_to_column, by = "term") %>% 
-    dplyr::rowwise() %>% 
-    dplyr::mutate(lists = list(make_lists(type, column, value, level))) %>% 
-    dplyr::group_by(feature, feature_num) %>% 
-    dplyr::summarize(final = collapse_lists(feature, coefficient, lists), .groups = "drop") %>% 
+    dplyr::arrange(feature_num) %>%
+    dplyr::left_join(term_to_column, by = "term") %>%
+    dplyr::rowwise() %>%
+    dplyr::mutate(lists = list(make_lists(type, column, value, level))) %>%
+    dplyr::group_by(feature, feature_num) %>%
+    dplyr::summarize(final = collapse_lists(feature, coefficient, lists), .groups = "drop") %>%
     purrr::pluck("final")
-  
 }
 
 
@@ -132,7 +137,7 @@ operation_list <- function(direction, column, split) {
 collapse_lists <- function(label, coef, lst) {
   label <- unique(label)
   coef <- unique(coef)
-  if (length(label)  >1 ){
+  if (length(label) > 1) {
     browser()
   }
   list(

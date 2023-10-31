@@ -3,7 +3,7 @@ parse_model.cubist <- function(model) {
   coefs <- model$coefficients
   splits <- model$splits
   splits$variable <- as.character(splits$variable)
-  splits$dir <- as.character(splits$dir)  
+  splits$dir <- as.character(splits$dir)
 
   committees2 <- map(
     unique(coefs$committee),
@@ -13,7 +13,7 @@ parse_model.cubist <- function(model) {
         coefs$rule[coefs$committee == comm],
         ~ {
           cc <- coefs[coefs$rule == .x & coefs$committee == comm, ]
-          if(!is.null(model$splits)) {
+          if (!is.null(model$splits)) {
             cs <- splits[splits$rule == .x & splits$committee == comm, ]
             tcs <- transpose(cs)
             mcs <- map(

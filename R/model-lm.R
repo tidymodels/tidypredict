@@ -66,7 +66,7 @@ build_fit_formula <- function(parsedmodel) {
       f <- expr(exp(!!f))
     }
     if (assigned == 0) {
-      stop("Combination of family and link are not supported")
+      cli::cli_abort("Combination of family and link are not supported")
     }
   }
   f
@@ -152,7 +152,7 @@ parse_label_lm <- function(label, vars) {
 }
 
 parse_qr_lm <- function(label, qr) {
-  qrs <- qr[label == rownames(qr) ]
+  qrs <- qr[label == rownames(qr)]
   qrs <- set_names(
     as.list(qrs),
     paste0("qr_", 1:length(qrs))
@@ -235,7 +235,7 @@ te_interval_glm <- function(parsedmodel, interval = 0.95) {
     assigned <- 1
   }
   if (assigned == 0) {
-    stop("Combination of family and link are not supported for prediction intervals")
+    cli::cli_abort("Combination of family and link are not supported for prediction intervals")
   }
   intervals
 }

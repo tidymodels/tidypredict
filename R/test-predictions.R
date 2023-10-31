@@ -31,9 +31,9 @@ tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001
 
 #' @export
 tidypredict_test.party <- function(model, df = model$data, threshold = 0.000000000001,
-                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+                                   include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   tidypredict_test_default(
-    model = model, 
+    model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
@@ -46,7 +46,7 @@ tidypredict_test.party <- function(model, df = model$data, threshold = 0.0000000
 tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001,
                                      include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   tidypredict_test_default(
-    model = model, 
+    model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
@@ -179,7 +179,7 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
                         include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   if (is.numeric(max_rows)) df <- head(df, max_rows)
   base <- predict(model, xg_df)
-  if("model_fit" %in% class(model)) base <- base$.pred
+  if ("model_fit" %in% class(model)) base <- base$.pred
   te <- tidypredict_to_column(
     df,
     model,
@@ -252,13 +252,13 @@ tidypredict_test.model_fit <- function(model, df = model$model, threshold = 0.00
 #' @export
 tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
                                           include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
-  stop("tidypredict_test does not support randomForest models")
+  cli::cli_abort("tidypredict_test does not support randomForest models")
 }
 
 #' @export
 tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
-  stop("tidypredict_test does not support ranger models")
+  cli::cli_abort("tidypredict_test does not support ranger models")
 }
 setOldClass(c("tidypredict_test", "list"))
 

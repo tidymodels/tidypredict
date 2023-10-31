@@ -42,9 +42,9 @@ library(dbplyr)
 
 flights_table <- nycflights13::flights %>%
   mutate(
-    current_score = 0, 
+    current_score = 0,
     flight_id = row_number()
-    ) 
+  )
 ```
 
 A new database is created using `RSQLite`. 
@@ -52,7 +52,7 @@ A new database is created using `RSQLite`.
 library(DBI)
 
 con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
-db_fligths <- copy_to(con,flights_table )
+db_fligths <- copy_to(con, flights_table)
 ```
 
 ## Model preparation
@@ -62,7 +62,7 @@ A sample is downloaded from the database for modeling. This example already sele
 df <- db_fligths %>%
   select(dep_delay, hour, distance) %>%
   head(1000) %>%
-  collect() 
+  collect()
 ```
 
 A linear model is fitted using `lm()`
@@ -79,7 +79,7 @@ tidypredict_test(model)
 
 In cases where the model re-fitting is automated, the `tidypredict_test()` function returns an `alert` in case the threshold is exceeded, which can be used to fail the automated script. 
 ```{r, eval = FALSE}
-if(tidypredict_test(model)$alert) stop("Threshold exceeded!")
+if (tidypredict_test(model)$alert) stop("Threshold exceeded!")
 ```
 
 ## Scenario 1 - Update scores
@@ -102,8 +102,7 @@ Here is a sample of the newly populated field:
 ```{r}
 db_fligths %>%
   select(current_score) %>%
-  head(10) 
-  
+  head(10)
 ```
 
 ## Scenario 2- Append new scores
@@ -112,12 +111,14 @@ There may be the need to retain not only the new score, but when it was determin
 
 In this example, the new scores will be stored in a new table called `daily_scores`.  The following code is part of the example preparation, it creates the table and seeds it with a single row.  This is not the best way to create an empty table, but it'll do for the purposes of this example.
 ```{r}
-dbWriteTable(con, "daily_scores", 
-             tibble(
-               flight_id = 0,
-               score = 0,
-               date = ""
-             ))
+dbWriteTable(
+  con, "daily_scores",
+  tibble(
+    flight_id = 0,
+    score = 0,
+    date = ""
+  )
+)
 ```
 
 The plan is to use a SQL statement that most vendors support, is called INSERT INTO SELECT.  The idea is to use `dplyr` laziness to prepare the data transformation and predictions, but it's not going to be executed until is parsed into SQL and sent as part of a another statement.  The INSERT INTO SELECT statement allows for the results of a query to be saved in a table, and without leaving the database. 
@@ -125,11 +126,12 @@ The plan is to use a SQL statement that most vendors support, is called INSERT I
 In this example, predictions are going to be executed for just the records in the month of December. The data is filtered, and then `tidypredict_to_column()` is used to create the new fit field.  The results are then transformed to match to the structure of the new `daily_scores` table. 
 ```{r}
 new_predictions <- db_fligths %>%
-  filter(month == 12) %>% 
+  filter(month == 12) %>%
   tidypredict_to_column(model, vars = "score") %>%
   select(
     flight_id,
-    score) %>%
+    score
+  ) %>%
   mutate(date = "01/01/2018")
 ```
 

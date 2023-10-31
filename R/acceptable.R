@@ -28,12 +28,11 @@ acceptable_formula.glm <- function(model) {
 }
 
 ## As suggested by @topepo, brought in from the `pryr` package
-## via the `recepies` package
+## via the `recipes` package
 fun_calls <- function(f) {
   if (is.function(f)) {
     fun_calls(body(f))
-  } 
-  else if (is.call(f)) {
+  } else if (is.call(f)) {
     fname <- as.character(f[[1]])
     # Calls inside .Internal are special and shouldn't be included
     if (identical(fname, ".Internal")) {
@@ -49,7 +48,7 @@ acceptable_lm <- function(model) {
     contr <- model$contrasts
     contr <- contr[!("contr.treatment" %in% contr)]
     if (length(contr) > 0) {
-      stop(
+      cli::cli_abort(
         "The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: ",
         paste0("`", names(contr), "`", collapse = ","),
         call. = FALSE
@@ -63,7 +62,7 @@ acceptable_lm <- function(model) {
   if (length(funs) > 0) {
     contains_offset <- any(funs == "offset")
     contains_other <- funs[funs != "offset"]
-    stop(
+    cli::cli_abort(
       paste0(
         "Functions inside the formula are not supported.",
         if (contains_offset) "\n- Offset detected.  Try using offset as an argument instead.",

@@ -1,11 +1,10 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
 Version: 0.5
-Authors@R:
-    c(
-      person("Edgar", "Ruiz", email = "edgar@posit.co", role = c("aut", "cre")),
-      person("Max", "Kuhn", email = "max@posit.co", role = c("aut"))
-    )
+Authors@R: c(
+    person("Edgar", "Ruiz", , "edgar@posit.co", role = c("aut", "cre")),
+    person("Max", "Kuhn", , "max@posit.co", role = "aut")
+  )
 Description: It parses a fitted 'R' model object, and returns a formula in
     'Tidy Eval' code that calculates the predictions.  It works with
     several databases back-ends because it leverages 'dplyr' and 'dbplyr'
@@ -17,13 +16,14 @@ URL: https://tidypredict.tidymodels.org,
     https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
 Depends:
-    R (>= 3.1)
+    R (>= 3.6)
 Imports:
+    cli,
     dplyr (>= 0.7),
     generics,
     knitr,
     purrr,
-    rlang,
+    rlang (>= 1.1.1),
     tibble,
     tidyr
 Suggests:
@@ -42,13 +42,12 @@ Suggests:
     ranger,
     rmarkdown,
     RSQLite,
-    testthat (>= 3.0.0),
+    testthat (>= 3.2.0),
     xgboost,
     yaml
 VignetteBuilder: 
     knitr
-Config/Needs/website: 
-    tidyverse/tidytemplate
+Config/Needs/website: tidyverse/tidytemplate
+Config/testthat/edition: 3
 Encoding: UTF-8
 RoxygenNote: 7.2.3
-Config/testthat/edition: 3

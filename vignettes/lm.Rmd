@@ -39,7 +39,7 @@ library(tidypredict)
 
 df <- mtcars %>%
   mutate(char_cyl = paste0("cyl", cyl)) %>%
-  select(mpg, wt, char_cyl, am) 
+  select(mpg, wt, char_cyl, am)
 
 model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
 ```
@@ -55,7 +55,7 @@ Alternatively, use `tidypredict_to_column()` if the results are the be used or p
 ```{r}
 df %>%
   tidypredict_to_column(model) %>%
-  head(10) 
+  head(10)
 ```
 
 ## Prediction intervals

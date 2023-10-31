@@ -38,7 +38,7 @@ library(dplyr)
 
 df <- mtcars %>%
   mutate(char_cyl = paste0("cyl", cyl)) %>%
-  select(wt, char_cyl, am) 
+  select(wt, char_cyl, am)
 
 model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 ```
@@ -57,7 +57,7 @@ Alternatively, use `tidypredict_to_column()` if the results are the be used or p
 ```{r}
 df %>%
   tidypredict_to_column(model) %>%
-  head(10) 
+  head(10)
 ```
 
 ## Under the hood
