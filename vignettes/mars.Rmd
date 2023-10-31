@@ -37,26 +37,26 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
 
 - Create the R formula
     ```{r}
-    tidypredict_fit(model)
+tidypredict_fit(model)
     ```
 
 - SQL output example
     ```{r}
-    tidypredict_sql(model, dbplyr::simulate_odbc())
+tidypredict_sql(model, dbplyr::simulate_odbc())
     ```
 
 - Add the prediction to the original table
     ```{r}
-    library(dplyr)
-    
-    etitanic %>%
-      tidypredict_to_column(model) %>%
-      glimpse()
+library(dplyr)
+
+etitanic %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results
     ```{r}
-    tidypredict_test(model, etitanic)
+tidypredict_test(model, etitanic)
     ```
 
 ## GLM models
@@ -64,8 +64,9 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
 `tidypredict` supports the `glm` argument as well:
 ```{r}
 model <- earth(survived ~ .,
-               data = etitanic,
-               glm = list(family = binomial), degree = 2)
+  data = etitanic,
+  glm = list(family = binomial), degree = 2
+)
 
 tidypredict_fit(model)
 ```

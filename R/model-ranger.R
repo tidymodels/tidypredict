@@ -21,7 +21,7 @@ get_ra_path <- function(node_id, tree, default_op = TRUE) {
       rb <- tree[tree$nodeID == .y, ]
       lc <- rb["leftChild"] == .x
       lr <- rb["rightChild"] == .x
-      if(is.na(rb["splitval"][[1]])) {
+      if (is.na(rb["splitval"][[1]])) {
         if (lc) op <- "in"
         if (lr) op <- "not-in"
         vals <- strsplit(as.character(rb["splitclass"][[1]]), ", ")[[1]]
@@ -58,31 +58,30 @@ get_ra_tree <- function(tree_no, model) {
     ~ {
       prediction <- tree$prediction[tree$nodeID == .x]
       if (!is.null(prediction)) {
-        if (is.factor(prediction)) prediction <- as.character(prediction)  
+        if (is.factor(prediction)) prediction <- as.character(prediction)
         list(
           prediction = prediction,
           path = get_ra_path(.x, tree, TRUE)
-        )        
+        )
       } else {
-        preds <- map_lgl(colnames(tree), ~"pred." == substr(.x, 1, 5))
+        preds <- map_lgl(colnames(tree), ~ "pred." == substr(.x, 1, 5))
         preds_table <- tree[tree$nodeID == .x, preds]
-        predictors <- map_chr(colnames(preds_table), ~substr(.x, 6, nchar(.x)))
+        predictors <- map_chr(colnames(preds_table), ~ substr(.x, 6, nchar(.x)))
         colnames(preds_table) <- predictors
         predictions <- map(preds_table, ~.x)
-        max_pred <- map_lgl(predictions, ~.x == max(map_dbl(predictions, ~.x)))
+        max_pred <- map_lgl(predictions, ~ .x == max(map_dbl(predictions, ~.x)))
         prediction <- names(predictions)[max_pred]
         prediction <- prediction[[1]]
         prob <- predictions[max_pred]
         prob <- prob[[1]]
-        predictions <- imap(predictions, ~list(pred = .y, prob = .x))
+        predictions <- imap(predictions, ~ list(pred = .y, prob = .x))
         list(
           prediction = prediction,
           prob = prob,
           probs = predictions,
           path = get_ra_path(.x, tree, TRUE)
-        )       
+        )
       }
-
     }
   )
 }

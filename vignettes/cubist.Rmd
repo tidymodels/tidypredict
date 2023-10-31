@@ -31,33 +31,33 @@ library(dplyr)
 
 ```{r}
 library(Cubist)
-data("BostonHousing", package =  "mlbench")
+data("BostonHousing", package = "mlbench")
 
 model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
 ```
 
 - Create the R formula
     ```{r}
-    tidypredict_fit(model)
+tidypredict_fit(model)
     ```
 
 - SQL output example
     ```{r}
-    tidypredict_sql(model, dbplyr::simulate_odbc())
+tidypredict_sql(model, dbplyr::simulate_odbc())
     ```
 
 - Add the prediction to the original table
     ```{r}
-    library(dplyr)
-    
-    BostonHousing %>%
-      tidypredict_to_column(model) %>%
-      glimpse()
+library(dplyr)
+
+BostonHousing %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results
     ```{r}
-    tidypredict_test(model, BostonHousing)
+tidypredict_test(model, BostonHousing)
     ```
 
 ## Parse model spec

@@ -73,16 +73,16 @@ test_that("Predictions match to model's predict routine", {
 })
 
 test_that("Confirm SQL function returns SQL query", {
-    xgb_sql <- xgb_models %>%
-      purrr::map(tidypredict_sql, dbplyr::simulate_odbc())
-    
-    # Removing "_large" models because of precision issues with other
-    # non M1 machines
-    no_large <- xgb_sql[!grepl("_large", names(xgb_sql))]
-    
-    for(i in seq_along(no_large)) {
-      expect_snapshot(no_large[i])
-    }
+  xgb_sql <- xgb_models %>%
+    purrr::map(tidypredict_sql, dbplyr::simulate_odbc())
+
+  # Removing "_large" models because of precision issues with other
+  # non M1 machines
+  no_large <- xgb_sql[!grepl("_large", names(xgb_sql))]
+
+  for (i in seq_along(no_large)) {
+    expect_snapshot(no_large[i])
+  }
 })
 
 test_that("Base scores match", {

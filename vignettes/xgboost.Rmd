@@ -8,7 +8,6 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-
 if (requireNamespace("xgboost", quietly = TRUE)) {
   library(tidypredict)
   library(xgboost)
@@ -22,7 +21,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = eval_code
 )
-
 ```
 
 | Function                                                      |Works|
@@ -47,9 +45,9 @@ logregobj <- function(preds, dtrain) {
 }
 
 xgb_bin_data <- xgboost::xgb.DMatrix(
-  as.matrix(mtcars[, -9]), 
+  as.matrix(mtcars[, -9]),
   label = mtcars$am
-  )
+)
 
 model <- xgboost::xgb.train(
   params = list(max_depth = 2, objective = "binary:logistic", base_score = 0.5),
@@ -59,21 +57,21 @@ model <- xgboost::xgb.train(
 
 - Create the R formula
     ```{r}
-    tidypredict_fit(model)
+tidypredict_fit(model)
     ```
 
 - Add the prediction to the original table
     ```{r}
-    library(dplyr)
-    
-    mtcars %>%
-      tidypredict_to_column(model) %>%
-      glimpse()
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the `xgb.DMatrix` data set.
     ```{r}
-    tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
+tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
     ```
 
 ## parsnip

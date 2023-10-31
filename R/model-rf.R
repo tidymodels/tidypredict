@@ -67,23 +67,23 @@ parse_model.randomForest <- function(model) {
 }
 
 path_formulas <- function(path) {
-  if(length(path) == 1 & path[[1]]$type == "all") {
+  if (length(path) == 1 & path[[1]]$type == "all") {
     rcl <- NULL
   } else {
     cl <- map(
       path,
       ~ {
         i <- NULL
-        if(.x$type == "conditional") {
+        if (.x$type == "conditional") {
           if (.x$op == "more") i <- expr(!!sym(.x$col) > !!.x$val)
           if (.x$op == "more-equal") i <- expr(!!sym(.x$col) >= !!.x$val)
           if (.x$op == "less") i <- expr(!!sym(.x$col) < !!.x$val)
           if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
         }
-        if(.x$type == "set") {
+        if (.x$type == "set") {
           sets <- reduce(.x$vals, c)
-          if (.x$op == "in") i <- expr(!!sym(.x$col) %in% !! sets)
-          if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !! sets) == FALSE)
+          if (.x$op == "in") i <- expr(!!sym(.x$col) %in% !!sets)
+          if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !!sets) == FALSE)
         }
         i
       }
@@ -96,7 +96,6 @@ path_formulas <- function(path) {
 # Fit model -----------------------------------------------
 
 get_rf_case <- function(path, prediction, calc_mode = "") {
-  
   rcl <- path_formulas(path)
 
   if (length(prediction) > 1) {
@@ -136,7 +135,7 @@ build_fit_formula_rf <- function(parsedmodel) {
 
   if (calc_mode == "ifelse") {
     f <- reduce(get_rf_case_tree(1, parsedmodel), function(x, y) expr(!!x + !!y))
-    if(divisor > 1) f <- expr(!!f / !!divisor)
+    if (divisor > 1) f <- expr(!!f / !!divisor)
   }
 
   if (is.null(f)) {

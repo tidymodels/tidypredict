@@ -1,7 +1,7 @@
 #' Prepares parsed model object
-#' 
+#'
 #' @param x A parsed model object
-#' 
+#'
 #' @export
 as_parsed_model <- function(x) {
   UseMethod("as_parsed_model")

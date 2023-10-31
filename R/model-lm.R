@@ -152,7 +152,7 @@ parse_label_lm <- function(label, vars) {
 }
 
 parse_qr_lm <- function(label, qr) {
-  qrs <- qr[label == rownames(qr) ]
+  qrs <- qr[label == rownames(qr)]
   qrs <- set_names(
     as.list(qrs),
     paste0("qr_", 1:length(qrs))

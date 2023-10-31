@@ -13,14 +13,14 @@ test_that("Predictions within threshold and parsed model results are equal", {
 
 test_that("tidypredict works when variable names are subset of other variables", {
   df2 <- df
-  df2$wt_sq <- df2$wt ^ 2
-  df2$char_cyl = as.character(df2$cyl)
-  df2$char_cyl_2 = sample(letters[1:3], size = nrow(df2), replace = TRUE)
+  df2$wt_sq <- df2$wt^2
+  df2$char_cyl <- as.character(df2$cyl)
+  df2$char_cyl_2 <- sample(letters[1:3], size = nrow(df2), replace = TRUE)
   model4 <- lm(
-    am ~ wt + wt_sq + char_cyl + char_cyl_2, 
+    am ~ wt + wt_sq + char_cyl + char_cyl_2,
     data = df2
   )
-  
+
   expect_silent(tidypredict_fit(model4))
   expect_false(tidypredict_test(model4)$alert)
 })
@@ -51,7 +51,7 @@ test_that("Model can be saved and re-loaded", {
 
 test_that("tidy() works", {
   expect_s3_class(
-    tidy(parse_model(lm(mpg ~., mtcars))),
+    tidy(parse_model(lm(mpg ~ ., mtcars))),
     "tbl_df"
-  )  
+  )
 })

@@ -77,7 +77,7 @@ get_xgb_trees_character <- function(xd, feature_names) {
   trees_split <- split(trees, trees$Tree)
   trees_rows <- purrr::map_dbl(trees_split, nrow)
   trees_filtered <- trees_split[trees_rows > 1]
-  
+
   purrr::map(trees_filtered, get_xgb_tree)
 }
 

@@ -31,9 +31,9 @@ tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001
 
 #' @export
 tidypredict_test.party <- function(model, df = model$data, threshold = 0.000000000001,
-                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+                                   include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   tidypredict_test_default(
-    model = model, 
+    model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
@@ -46,7 +46,7 @@ tidypredict_test.party <- function(model, df = model$data, threshold = 0.0000000
 tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001,
                                      include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   tidypredict_test_default(
-    model = model, 
+    model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
@@ -179,7 +179,7 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
                         include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
   if (is.numeric(max_rows)) df <- head(df, max_rows)
   base <- predict(model, xg_df)
-  if("model_fit" %in% class(model)) base <- base$.pred
+  if ("model_fit" %in% class(model)) base <- base$.pred
   te <- tidypredict_to_column(
     df,
     model,

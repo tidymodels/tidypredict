@@ -36,7 +36,7 @@ library(dplyr)
 library(tidypredict)
 library(ranger)
 
-model <- ranger(Species ~ .,data = iris, num.trees =  100)
+model <- ranger(Species ~ ., data = iris, num.trees = 100)
 ```
 
 ## Under the hood
