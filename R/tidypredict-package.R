@@ -20,6 +20,7 @@
 #' @importFrom stats binomial
 #' @importFrom stats setNames
 #' @keywords internal
+#' @importFrom generics tidy
 #'
 "_PACKAGE"
 NULL
