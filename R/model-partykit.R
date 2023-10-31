@@ -30,7 +30,7 @@ partykit_tree_info <- function(model) {
         lvls <- levels(model$data[, colnames(model$data) == v])
         pn <- party_nodes[[.x]][[1]]$split$index
         pn <- ifelse(is.na(pn), 0, pn)
-        if (any(pn == 3)) stop("Three levels are not supported")
+        if (any(pn == 3)) cli::cli_abort("Three levels are not supported")
         paste0(lvls[pn == 1], collapse = ", ")
       } else {
         NA
@@ -60,7 +60,7 @@ get_pk_tree <- function(model) {
     paths,
     ~ {
       prediction <- tree$prediction[tree$nodeID == .x]
-      if (is.null(prediction)) stop("Prediction column not found")
+      if (is.null(prediction)) cli::cli_abort("Prediction column not found")
       if (is.factor(prediction)) prediction <- as.character(prediction)
       list(
         prediction = prediction,

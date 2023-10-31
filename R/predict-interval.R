@@ -20,7 +20,7 @@ tidypredict_interval <- function(model, interval = 0.95) {
 
 #' @export
 `tidypredict_interval.data.frame` <- function(model, interval = 0.95) {
-  stop("data.frame based parsed models are no longer supported")
+  cli::cli_abort("data.frame based parsed models are no longer supported")
 }
 
 #' @export
@@ -29,6 +29,6 @@ tidypredict_interval.list <- function(model, interval = 0.95) {
   fit <- NULL
   if (mt == "lm") fit <- te_interval_lm(model)
   if (mt == "glm") fit <- te_interval_glm(model)
-  if (is.null(fit)) stop("Model type not supported")
+  if (is.null(fit)) cli::cli_abort("Model type not supported")
   fit
 }

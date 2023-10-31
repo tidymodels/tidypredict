@@ -152,7 +152,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
   if (is.null(objective)) {
     assigned <- 1
     f <- expr(!!f + !!base_score)
-    warning(
+    cli::cli_warn(
       paste(
         "If the objective is a custom function, please",
         "explicitly apply it to the output."
@@ -166,7 +166,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
   }
   if (assigned == 0) {
-    stop(
+    cli::cli_abort(
       paste0(
         "Only objectives 'binary:logistic', 'reg:squarederror',",
         "'reg:logistic', 'binary:logitraw' are supported yet."
