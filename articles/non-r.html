@@ -283,7 +283,7 @@ formula.</p>
 <span><span class="co">#&gt;     -814.131709372539)</span></span></code></pre></div>
 <p>Now, the model can run <strong>inside a database</strong></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">spm</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/simulate_dbi.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">spm</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; ((((152.764306916334 + (`age` * 0.303499549066043)) + (`sex` * -237.639315333534)) + (`bmi` * 510.530605436225)) + (`bp` * 327.736980409347)) + (`s1` * -814.131709372539)</span></span></code></pre></div>
 </div>
 <div class="section level2">
