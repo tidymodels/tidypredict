@@ -11,8 +11,8 @@ get_xgb_path <- function(row_id, tree) {
     }
   }
   purrr::map2(
-    path[1:length(path) - 1],
-    path[2:length(path)],
+    path[seq2(1, length(path) - 1)],
+    path[seq2(2, length(path))],
     ~ {
       rb <- tree[.y, ]
       if (rb["Yes"] %in% .x) {
