@@ -1,4 +1,4 @@
-# tidypredict (development version)
+# tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
 
