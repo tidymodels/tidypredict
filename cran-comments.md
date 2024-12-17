@@ -18,15 +18,6 @@
 
 * Having Max as the maintainer will guarantee good follow through for any communications with CRAN.  This is the reason why there is another update is such short order from the previous update in CRAN.  Thank you for your understanding.
 
-## Test environments
-
-* macOS M1.     R: 4.2.1
-* macOS         R: Release
-* Windows       R: Release
-* Windows       R: 3.6
-* Ubuntu 18.04  R: Release
-* Ubuntu 18.04  R: Devel
-
 ## R CMD check results
 
 * 0 errors | 0 warnings | 0 notes
