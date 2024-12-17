@@ -24,7 +24,7 @@ several databases back-ends, such as MS SQL:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-    ## <SQL> (39.6862614802529 + (`wt` * -3.19097213898375)) + (`cyl` * -1.5077949682598)
+    ## <SQL> (39.686261480253 + (`wt` * -3.19097213898374)) + (`cyl` * -1.5077949682598)
 
 ## Installation
 
@@ -47,16 +47,16 @@ remotes::install_github("tidymodels/tidypredict")
 number to grow much. The main focus at this time is to add more models
 to support.
 
-| Function                     | Description                                                                    |
-|------------------------------|--------------------------------------------------------------------------------|
-| `tidypredict_fit()`          | Returns an R formula that calculates the prediction                            |
-| `tidypredict_sql()`          | Returns a SQL query based on the formula from `tidypredict_fit()`              |
-| `tidypredict_to_column()`    | Adds a new column using the formula from `tidypredict_fit()`                   |
-| `tidypredict_test()`         | Tests `tidyverse` predictions against the model’s native `predict()` function  |
-| `tidypredict_interval()`     | Same as `tidypredict_fit()` but for intervals (only works with `lm` and `glm`) |
+| Function | Description |
+|----|----|
+| `tidypredict_fit()` | Returns an R formula that calculates the prediction |
+| `tidypredict_sql()` | Returns a SQL query based on the formula from `tidypredict_fit()` |
+| `tidypredict_to_column()` | Adds a new column using the formula from `tidypredict_fit()` |
+| `tidypredict_test()` | Tests `tidyverse` predictions against the model’s native `predict()` function |
+| `tidypredict_interval()` | Same as `tidypredict_fit()` but for intervals (only works with `lm` and `glm`) |
 | `tidypredict_sql_interval()` | Same as `tidypredict_sql()` but for intervals (only works with `lm` and `glm`) |
-| `parse_model()`              | Creates a list spec based on the R model                                       |
-| `as_parsed_model()`          | Prepares an object to be recognized as a parsed model                          |
+| `parse_model()` | Creates a list spec based on the R model |
+| `as_parsed_model()` | Prepares an object to be recognized as a parsed model |
 
 ## How it works
 
@@ -146,8 +146,8 @@ Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
 By contributing to this project, you agree to abide by its terms.
 
 - For questions and discussions about tidymodels packages, modeling, and
-  machine learning, please [post on RStudio
-  Community](https://community.rstudio.com/new-topic?category_id=15&tags=tidymodels,question).
+  machine learning, please [post on Posit
+  Community](https://forum.posit.co/new-topic?category_id=15&tags=tidymodels,question).
 
 - If you think you have encountered a bug, please [submit an
   issue](https://github.com/tidymodels/tidypredict/issues).
