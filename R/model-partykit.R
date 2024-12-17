@@ -6,7 +6,11 @@ partykit_tree_info <- function(model) {
     prediction <- ifelse(!is_split, mean_resp, NA)
   } else {
     stat_mode <- function(x) {
-      counts <- sort(table(x))
+      counts <- rev(sort(table(x)))
+      if (counts[[1]] == counts[[2]]) {        
+        ties <- counts[counts[1] == counts]
+        return(names(rev(ties))[1])
+      }
       names(counts)[1]
     }
     mode_resp <- map_chr(model_nodes, ~ stat_mode(.x$fitted[, "(response)"]))
