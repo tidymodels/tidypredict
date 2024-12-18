@@ -185,6 +185,9 @@ tidypredict_fit.xgb.Booster <- function(model) {
 }
 
 # For {orbital}
+#' Extract processed xgboost trees
+#' 
+#' For use in orbital package.
 #' @keywords internal
 #' @export
 .extract_xgb_trees <- function(model) {
