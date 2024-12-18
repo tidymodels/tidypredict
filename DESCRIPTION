@@ -2,7 +2,8 @@ Package: tidypredict
 Title: Run Predictions Inside the Database
 Version: 0.5.1
 Authors@R: c(
-    person("Edgar", "Ruiz", , "edgar@posit.co", role = c("aut", "cre")),
+    person("Emil", "Hvitfeldt", , "emil.hvitfeldt@posit.co", role = c("aut", "cre")),
+    person("Edgar", "Ruiz", , "edgar@posit.co", role = "aut"),
     person("Max", "Kuhn", , "max@posit.co", role = "aut")
   )
 Description: It parses a fitted 'R' model object, and returns a formula in
