@@ -21,6 +21,8 @@
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/acceptable_formula.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/knit_print.tidypredict_test.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/parse_model.html</loc></url>
