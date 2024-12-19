@@ -1,5 +1,9 @@
 # tidypredict (development version)
 
+# tidypredict 0.5.1
+
+- Exported a number of internal functions to be used in {orbital} package
+
 # tidypredict 0.5
 
 - Changes maintainer to Edgar Ruiz

@@ -103,6 +103,9 @@ tidypredict_fit.party <- function(model) {
 }
 
 # For {orbital}
+#' Extract classprob trees for partykit models
+#' 
+#' For use in orbital package.
 #' @keywords internal
 #' @export
 .extract_partykit_classprob <- function(model) {

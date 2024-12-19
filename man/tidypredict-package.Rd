@@ -20,10 +20,11 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Edgar Ruiz \email{edgar@posit.co}
+\strong{Maintainer}: Emil Hvitfeldt \email{emil.hvitfeldt@posit.co}
 
 Authors:
 \itemize{
+  \item Edgar Ruiz \email{edgar@posit.co}
   \item Max Kuhn \email{max@posit.co}
 }
 
