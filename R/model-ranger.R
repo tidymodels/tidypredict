@@ -1,25 +1,27 @@
 # Model parser ------------------------------------
-get_ra_path <- function(node_id, tree, default_op = TRUE) {
+get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
   find <- node_id
   path <- node_id
-  
+
   leftChild <- tree$leftChild
   rightChild <- tree$rightChild
   splitval <- tree$splitval
   splitclass <- tree$splitclass
   splitvarName <- tree$splitvarName
   
-  for (j in node_id:0) {
-    lc <- leftChild[[j+1]] == find
-    lr <- rightChild[[j+1]] == find
-    if (is.na(lc)) next
-    if (is.na(lr)) next
-    
-    if (lc || lr) {
-      find <- j
-      path <- c(path, j)
+  new <- child_info[[find]]
+  path <- find
+  repeat {
+    path <- c(path, new)
+    find <- new
+    new <- child_info[[find]]
+    new
+    if (new == 0) {
+      path <- c(path, 0)
+      break
     }
   }
+
   map2(
     path[1:length(path) - 1],
     path[2:length(path)],
@@ -58,6 +60,26 @@ get_ra_path <- function(node_id, tree, default_op = TRUE) {
 get_ra_tree <- function(tree_no, model) {
   tree <- ranger::treeInfo(model, tree_no)
   paths <- tree$nodeID[tree[, "terminal"]]
+  
+  child_info <- numeric(max(tree$nodeID))
+  left_child <- tree$leftChild
+  right_child <- tree$rightChild
+  node_id <- tree$nodeID
+  
+  for (i in seq_len(nrow(tree))) {
+    node <- node_id[[i]]
+    
+    child <- left_child[[i]]
+    if (!is.na(child)) {
+      child_info[child] <- node
+    }
+    
+    child <- right_child[[i]]
+    if (!is.na(child)) {
+      child_info[child] <- node
+    }
+  }
+  
   map(
     paths,
     ~ {
@@ -66,7 +88,7 @@ get_ra_tree <- function(tree_no, model) {
         if (is.factor(prediction)) prediction <- as.character(prediction)
         list(
           prediction = prediction,
-          path = get_ra_path(.x, tree, TRUE)
+          path = get_ra_path(.x, tree, child_info, TRUE)
         )
       } else {
         preds <- map_lgl(colnames(tree), ~ "pred." == substr(.x, 1, 5))
@@ -84,7 +106,7 @@ get_ra_tree <- function(tree_no, model) {
           prediction = prediction,
           prob = prob,
           probs = predictions,
-          path = get_ra_path(.x, tree, TRUE)
+          path = get_ra_path(.x, tree, child_info, TRUE)
         )
       }
     }
