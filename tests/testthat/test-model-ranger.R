@@ -17,7 +17,7 @@ run_test <- function(model, test_formula = TRUE) {
   }
 }
 
-run_test(
+tidypredict_fit(
   ranger::ranger(Species ~ ., data = iris, num.trees = num_trees, seed = 100, num.threads = 2)
 )
 
