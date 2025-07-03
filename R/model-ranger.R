@@ -12,14 +12,13 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
   new <- child_info[[find]]
   path <- find
   repeat {
-    path <- c(path, new)
-    find <- new
-    new <- child_info[[find]]
-    new
     if (new == 0) {
       path <- c(path, 0)
       break
     }
+    path <- c(path, new)
+    find <- new
+    new <- child_info[[find]]
   }
 
   map2(
@@ -57,10 +56,7 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
   )
 }
 
-get_ra_tree <- function(tree_no, model) {
-  tree <- ranger::treeInfo(model, tree_no)
-  paths <- tree$nodeID[tree[, "terminal"]]
-  
+get_child_info <- function(tree) {
   child_info <- numeric(max(tree$nodeID))
   left_child <- tree$leftChild
   right_child <- tree$rightChild
@@ -79,6 +75,15 @@ get_ra_tree <- function(tree_no, model) {
       child_info[child] <- node
     }
   }
+
+  child_info
+}
+
+get_ra_tree <- function(tree_no, model) {
+  tree <- ranger::treeInfo(model, tree_no)
+  paths <- tree$nodeID[tree[, "terminal"]]
+  
+  child_info <- get_child_info(tree)
   
   map(
     paths,

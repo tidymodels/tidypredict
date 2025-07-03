@@ -69,6 +69,9 @@ partykit_tree_info <- function(model) {
 get_pk_tree <- function(model) {
   tree <- partykit_tree_info(model)
   paths <- tree$nodeID[tree[, "terminal"]]
+
+  child_info <- get_child_info(tree)
+
   map(
     paths,
     ~ {
@@ -77,7 +80,7 @@ get_pk_tree <- function(model) {
       if (is.factor(prediction)) prediction <- as.character(prediction)
       list(
         prediction = prediction,
-        path = get_ra_path(.x, tree, FALSE)
+        path = get_ra_path(.x, tree, child_info, FALSE)
       )
     }
   )
@@ -132,6 +135,9 @@ tidypredict_fit.party <- function(model) {
   
   generate_one_tree <- function(tree_info) {
     paths <- tree_info$nodeID[tree_info[, "terminal"]]
+
+    child_info <- get_child_info(tree_info)
+
     paths <- map(
       paths,
       ~ {
@@ -140,7 +146,7 @@ tidypredict_fit.party <- function(model) {
           if (is.factor(prediction)) prediction <- as.character(prediction)
           list(
             prediction = prediction,
-            path = get_ra_path(.x, tree_info, FALSE)
+            path = get_ra_path(.x, tree_info, child_info, FALSE)
           )
        }
     )
