@@ -25,3 +25,16 @@ test_that("Model can be saved and re-loaded", {
   pm <- as_parsed_model(l)
   expect_snapshot(tidypredict_fit(pm))
 })
+
+test_that("Model can be saved and re-loaded", {
+  model <- Cubist::cubist(
+    x = BostonHousing[, -14], 
+    y = BostonHousing$medv, 
+    committees = 2, 
+    control = Cubist::cubistControl(rules = 1)
+  )
+  tf <- tidypredict_fit(model)
+  expect_no_error(
+    parse_model(model)
+  )
+})
