@@ -67,6 +67,10 @@ parse_model.randomForest <- function(model) {
 }
 
 path_formulas <- function(path) {
+  if (length(path) == 0) {
+    return(TRUE)
+  }
+
   if (length(path) == 1 & path[[1]]$type == "all") {
     rcl <- NULL
   } else {
