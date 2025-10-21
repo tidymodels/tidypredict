@@ -13,24 +13,27 @@ get_xgb_path <- function(row_id, tree) {
   purrr::map2(
     path[seq2(1, length(path) - 1)],
     path[seq2(2, length(path))],
-    ~ {
-      rb <- tree[.y, ]
-      if (rb["Yes"] %in% .x) {
-        op <- "more-equal"
-        missing <- rb["Missing"] %in% rb["Yes"]
-      }
-      if (rb["No"] %in% .x) {
-        op <- "less"
-        missing <- rb["Missing"] %in% rb["No"]
-      }
-      list(
-        type = "conditional",
-        col = rb$feature_name,
-        val = rb$Split,
-        op = op,
-        missing = missing
-      )
-    }
+    get_xgb_path_fun,
+    tree = tree
+  )
+}
+
+get_xgb_path_fun <- function(.x, .y, tree) {
+  rb <- tree[.y, ]
+  if (rb["Yes"] %in% .x) {
+    op <- "more-equal"
+    missing <- rb["Missing"] %in% rb["Yes"]
+  }
+  if (rb["No"] %in% .x) {
+    op <- "less"
+    missing <- rb["Missing"] %in% rb["No"]
+  }
+  list(
+    type = "conditional",
+    col = rb$feature_name,
+    val = rb$Split,
+    op = op,
+    missing = missing
   )
 }
 
