@@ -3,34 +3,48 @@
 get_xgb_path <- function(row_id, tree) {
   find <- row_id
   path <- row_id
+
+  yes_vec <- tree$Yes
+  no_vec <- tree$No
+
   for (j in row_id:1) {
-    dir <- NULL
-    if (tree[j, "Yes"] %in% find | tree[j, "No"] %in% find) {
-      find <- j
-      path <- c(path, j)
+    yes <- yes_vec[[j]]
+    no <- no_vec[[j]]
+
+    if (!is.na(yes) && !is.na(no)) {
+      if (yes == find || no == find) {
+        find <- j
+        path <- c(path, j)
+      }
     }
   }
+
   purrr::map2(
     path[seq2(1, length(path) - 1)],
     path[seq2(2, length(path))],
-    ~ {
-      rb <- tree[.y, ]
-      if (rb["Yes"] %in% .x) {
-        op <- "more-equal"
-        missing <- rb["Missing"] %in% rb["Yes"]
-      }
-      if (rb["No"] %in% .x) {
-        op <- "less"
-        missing <- rb["Missing"] %in% rb["No"]
-      }
-      list(
-        type = "conditional",
-        col = rb$feature_name,
-        val = rb$Split,
-        op = op,
-        missing = missing
-      )
-    }
+    get_xgb_path_fun,
+    tree = tree
+  )
+}
+
+get_xgb_path_fun <- function(.x, .y, tree) {
+  yes <- tree$Yes[[.y]] 
+  no <- tree$No[[.y]]
+  missing <- tree$Missing[[.y]]
+  if (yes %in% .x) {
+    op <- "more-equal"
+    missing <- missing %in% yes
+  }
+  if (no %in% .x) {
+    op <- "less"
+    missing <- missing %in% no
+  }
+  list(
+    type = "conditional",
+    col = tree$feature_name[[.y]],
+    val = tree$Split[[.y]],
+    op = op,
+    missing = missing
   )
 }
 
@@ -40,7 +54,7 @@ get_xgb_tree <- function(tree) {
     paths,
     ~ {
       list(
-        prediction = tree[.x, "Quality", drop = TRUE],
+        prediction = tree$Quality[[.x]],
         path = get_xgb_path(.x, tree)
       )
     }
@@ -104,30 +118,37 @@ parse_model.xgb.Booster <- function(model) {
 # Fit model -----------------------------------------------
 
 get_xgb_case <- function(path, prediction) {
-  cl <- map(
-    path,
-    ~ {
-      if (.x$op == "less" & .x$missing) {
-        i <- expr((!!sym(.x$col) >= !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
-      }
-      if (.x$op == "more-equal" & .x$missing) {
-        i <- expr((!!sym(.x$col) < !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
-      }
-      if (.x$op == "less" & !.x$missing) {
-        i <- expr(!!sym(.x$col) >= !!as.numeric(.x$val))
-      }
-      if (.x$op == "more-equal" & !.x$missing) {
-        i <- expr(!!sym(.x$col) < !!as.numeric(.x$val))
-      }
-      i
-    }
-  )
-  cl <- if (length(cl) > 0) {
-    reduce(cl, function(x, y) expr(!!x & !!y))
+  cl <- map(path, get_xgb_case_fun)
+  cl_length <- length(cl)
+  if (cl_length == 0) {
+    cl <- TRUE
+  } else if (cl_length == 1) {
+    cl <- cl[[1]]
+  } else if (cl_length == 2) {
+    cl <- expr(!!cl[[1]] & !!cl[[2]])
   } else {
-    TRUE
+    cl <- reduce(cl, function(x, y) expr(!!x & !!y))
   }
+
   expr(!!cl ~ !!prediction)
+}
+
+get_xgb_case_fun <- function(.x) {
+  if (.x$op == "less") {
+    if (.x$missing) {
+      i <- expr((!!sym(.x$col) >= !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
+    } else {
+      i <- expr(!!sym(.x$col) >= !!as.numeric(.x$val))
+    }
+  } else if (.x$op == "more-equal") {
+    if (.x$missing) {
+      i <- expr((!!sym(.x$col) < !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
+    } else {
+      i <- expr(!!sym(.x$col) < !!as.numeric(.x$val))
+    }
+
+  }
+  i
 }
 
 get_xgb_case_tree <- function(tree_no, parsedmodel) {
