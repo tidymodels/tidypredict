@@ -2,6 +2,8 @@
 
 - Speed up `tidypredict_fit()` for partykit and ranger packages. (#125)
 
+- Speed up `tidypredict_fit()` for xxgboost models. (#130)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
