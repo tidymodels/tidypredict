@@ -13,11 +13,18 @@
 #' @param vars The name of the variables that this function will produce. Defaults to "fit", "upper", and "lower".
 #'
 #' @export
-tidypredict_to_column <- function(df, model, add_interval = FALSE,
-                                  interval = 0.95, vars = c("fit", "upper", "lower")) {
+tidypredict_to_column <- function(
+  df,
+  model,
+  add_interval = FALSE,
+  interval = 0.95,
+  vars = c("fit", "upper", "lower")
+) {
   fit_model <- tidypredict_fit(model)
 
-  if (inherits(fit_model, "list")) cli::cli_abort("tidypredict_to_column does not support tree based models")
+  if (inherits(fit_model, "list")) {
+    cli::cli_abort("tidypredict_to_column does not support tree based models")
+  }
 
   fit <- vars[1]
   upper <- vars[2]

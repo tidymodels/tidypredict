@@ -20,29 +20,44 @@ xgb_list <- list(
   bin_log = list(objective = "binary:logistic"),
   log_reg = list(objective = logregobj),
   reg_log_base = list(objective = "reg:logistic", base_score = mean(mtcars$am)),
-  bin_log_base = list(objective = "binary:logistic", base_score = mean(mtcars$am)),
+  bin_log_base = list(
+    objective = "binary:logistic",
+    base_score = mean(mtcars$am)
+  ),
   reg_log_large = list(objective = "reg:logistic", nrounds = 50),
   bin_log_large = list(objective = "binary:logistic", nrounds = 50),
   reg_log_deep = list(objective = "reg:logistic", max_depth = 20),
   bin_log_deep = list(objective = "binary:logistic", max_depth = 20)
 ) %>%
-  purrr::map(~ {
-    if (is.null(.x$base_score)) .x$base_score <- 0.5
-    if (is.null(.x$nrounds)) .x$nrounds <- 4
-    if (is.null(.x$max_depth)) .x$max_depth <- 2
-    .x
-  })
+  purrr::map(
+    ~ {
+      if (is.null(.x$base_score)) {
+        .x$base_score <- 0.5
+      }
+      if (is.null(.x$nrounds)) {
+        .x$nrounds <- 4
+      }
+      if (is.null(.x$max_depth)) {
+        .x$max_depth <- 2
+      }
+      .x
+    }
+  )
 
 xgb_models_all <- xgb_list %>%
-  purrr::imap(~ {
-    xgboost::xgb.train(
-      params = list(
-        max_depth = 2, objective = .x$objective, base_score = .x$base_score
-      ),
-      data = xgb_bin_data,
-      nrounds = .x$nrounds
-    )
-  })
+  purrr::imap(
+    ~ {
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          objective = .x$objective,
+          base_score = .x$base_score
+        ),
+        data = xgb_bin_data,
+        nrounds = .x$nrounds
+      )
+    }
+  )
 
 xgb_models <- xgb_models_all[names(xgb_models_all) != "log_reg"]
 
@@ -107,7 +122,6 @@ test_that("Model can be saved and re-loaded", {
   pm <- as_parsed_model(l)
   expect_snapshot(tidypredict_fit(pm))
 })
-
 
 
 test_that("Predictions are correct for different objectives", {

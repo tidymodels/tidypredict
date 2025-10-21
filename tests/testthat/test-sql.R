@@ -4,7 +4,10 @@ test_that("Correct SQL query is returned", {
     "sql"
   )
   expect_s3_class(
-    tidypredict_sql_interval(lm(mpg ~ wt, data = mtcars), dbplyr::simulate_dbi()),
+    tidypredict_sql_interval(
+      lm(mpg ~ wt, data = mtcars),
+      dbplyr::simulate_dbi()
+    ),
     "sql"
   )
 })

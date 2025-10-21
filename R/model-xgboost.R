@@ -28,7 +28,7 @@ get_xgb_path <- function(row_id, tree) {
 }
 
 get_xgb_path_fun <- function(.x, .y, tree) {
-  yes <- tree$Yes[[.y]] 
+  yes <- tree$Yes[[.y]]
   no <- tree$No[[.y]]
   missing <- tree$Missing[[.y]]
   if (yes %in% .x) {
@@ -82,7 +82,10 @@ get_xgb_trees_character <- function(xd, feature_names, filter_trees) {
   trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
   trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
-  trees <- trees[order(trees$original_order), !names(trees) %in% "original_order"]
+  trees <- trees[
+    order(trees$original_order),
+    !names(trees) %in% "original_order"
+  ]
   trees[, c("Yes", "No", "Missing")] <-
     lapply(trees[, c("Yes", "No", "Missing")], function(x) sub("^.*-", "", x))
   trees[, c("Yes", "No", "Missing")] <-
@@ -146,7 +149,6 @@ get_xgb_case_fun <- function(.x) {
     } else {
       i <- expr(!!sym(.x$col) < !!as.numeric(.x$val))
     }
-
   }
   i
 }
@@ -168,7 +170,9 @@ build_fit_formula_xgb <- function(parsedmodel) {
   f <- purrr::reduce(f, ~ expr(!!.x + !!.y), .init = expr(0))
 
   base_score <- parsedmodel$general$params$base_score
-  if (is.null(base_score)) base_score <- 0.5
+  if (is.null(base_score)) {
+    base_score <- 0.5
+  }
 
   objective <- parsedmodel$general$params$objective
   assigned <- 0
@@ -207,7 +211,7 @@ tidypredict_fit.xgb.Booster <- function(model) {
 
 # For {orbital}
 #' Extract processed xgboost trees
-#' 
+#'
 #' For use in orbital package.
 #' @keywords internal
 #' @export
@@ -231,7 +235,7 @@ tidypredict_fit.xgb.Booster <- function(model) {
   pm$general$nfeatures <- model$nfeatures
   pm$general$version <- 1
   pm$trees <- get_xgb_trees(model, filter_trees = FALSE)
-  
+
   parsedmodel <- as_parsed_model(pm)
   map(
     seq_len(length(parsedmodel$trees)),

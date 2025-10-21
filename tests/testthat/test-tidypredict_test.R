@@ -17,7 +17,10 @@ test_that("Intervals returns list", {
 
 test_that("Error is returned for tree based models", {
   expect_error(
-    tidypredict_test(randomForest::randomForest(Species ~ ., data = iris), df = iris),
+    tidypredict_test(
+      randomForest::randomForest(Species ~ ., data = iris),
+      df = iris
+    ),
     "tidypredict_test does not support"
   )
   expect_error(

@@ -23,10 +23,18 @@ build_fit_formula <- function(parsedmodel) {
             }
             if (.x$type == "operation") {
               if (.x$op == "morethan") {
-                f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
+                f <- expr(ifelse(
+                  !!sym(.x$col) > !!.x$val,
+                  !!sym(.x$col) - !!.x$val,
+                  0
+                ))
               }
               if (.x$op == "lessthan") {
-                f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
+                f <- expr(ifelse(
+                  !!sym(.x$col) < !!.x$val,
+                  !!.x$val - !!sym(.x$col),
+                  0
+                ))
               }
             }
             f
@@ -78,7 +86,9 @@ parse_model_lm <- function(model) {
   labels <- names(model$coefficients)
   vars <- names(attr(model$terms, "dataClasses"))
   qr <- NULL
-  if (!is.null(model$qr)) qr <- qr.solve(qr.R(model$qr))
+  if (!is.null(model$qr)) {
+    qr <- qr.solve(qr.R(model$qr))
+  }
 
   pm <- list()
   pm$general$model <- class(model)[[1]]
@@ -127,7 +137,11 @@ parse_label_lm <- function(label, vars) {
       col = items[i]
     )
     cat_match <- map_lgl(vars, ~ .x == substr(items[i], 1, nchar(.x)))
-    if (any(cat_match) && any(vars[cat_match] != items[i]) && !(items[i] %in% vars)) {
+    if (
+      any(cat_match) &&
+        any(vars[cat_match] != items[i]) &&
+        !(items[i] %in% vars)
+    ) {
       cat_match_vars <- vars[cat_match]
       sole_cat_match <- cat_match_vars[rank(-nchar(cat_match_vars))][[1]]
       item <- list(
@@ -177,10 +191,18 @@ get_qr_lm <- function(qr_name, parsedmodel) {
             }
             if (.x$type == "operation") {
               if (.x$op == "morethan") {
-                f <- expr(ifelse(!!sym(.x$col) > !!.x$val, !!sym(.x$col) - !!.x$val, 0))
+                f <- expr(ifelse(
+                  !!sym(.x$col) > !!.x$val,
+                  !!sym(.x$col) - !!.x$val,
+                  0
+                ))
               }
               if (.x$op == "lessthan") {
-                f <- expr(ifelse(!!sym(.x$col) < !!.x$val, !!.x$val - !!sym(.x$col), 0))
+                f <- expr(ifelse(
+                  !!sym(.x$col) < !!.x$val,
+                  !!.x$val - !!sym(.x$col),
+                  0
+                ))
               }
             }
             f

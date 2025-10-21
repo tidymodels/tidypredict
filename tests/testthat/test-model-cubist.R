@@ -1,6 +1,10 @@
 set.seed(100)
 data("BostonHousing", package = "mlbench")
-model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
+model <- Cubist::cubist(
+  x = BostonHousing[, -14],
+  y = BostonHousing$medv,
+  committees = 3
+)
 tf <- tidypredict_fit(model)
 pm <- parse_model(model)
 
@@ -28,9 +32,9 @@ test_that("Model can be saved and re-loaded", {
 
 test_that("Model can be saved and re-loaded", {
   model <- Cubist::cubist(
-    x = BostonHousing[, -14], 
-    y = BostonHousing$medv, 
-    committees = 2, 
+    x = BostonHousing[, -14],
+    y = BostonHousing$medv,
+    committees = 2,
     control = Cubist::cubistControl(rules = 1)
   )
   tf <- tidypredict_fit(model)

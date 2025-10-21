@@ -26,7 +26,10 @@ run_tests(
 set.seed(100)
 run_tests(
   parsnip::fit(
-    parsnip::set_engine(parsnip::rand_forest(trees = 100, mode = "classification"), "randomForest"),
+    parsnip::set_engine(
+      parsnip::rand_forest(trees = 100, mode = "classification"),
+      "randomForest"
+    ),
     Species ~ .,
     data = iris
   )

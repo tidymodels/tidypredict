@@ -39,7 +39,12 @@ parse_model.cubist <- function(model) {
                 op <- "multiply"
                 is_intercept <- 0
               }
-              list(col = cc_names[.x], val = cc[, .x], op = op, is_intercept = is_intercept)
+              list(
+                col = cc_names[.x],
+                val = cc[, .x],
+                op = op,
+                is_intercept = is_intercept
+              )
             }
           )
 
