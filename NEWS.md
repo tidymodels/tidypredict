@@ -4,6 +4,8 @@
 
 - Fixed bug where tidypredict would error on Cubist models without conditions. (#127)
 
+- Speed up `tidypredict_fit()` for xxgboost models. (#130)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
