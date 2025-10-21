@@ -3,13 +3,22 @@
 get_xgb_path <- function(row_id, tree) {
   find <- row_id
   path <- row_id
+
+  yes_vec <- tree$Yes
+  no_vec <- tree$No
+
   for (j in row_id:1) {
-    dir <- NULL
-    if (tree[j, "Yes"] %in% find | tree[j, "No"] %in% find) {
-      find <- j
-      path <- c(path, j)
+    yes <- yes_vec[[j]]
+    no <- no_vec[[j]]
+
+    if (!is.na(yes) && !is.na(no)) {
+      if (yes == find || no == find) {
+        find <- j
+        path <- c(path, j)
+      }
     }
   }
+
   purrr::map2(
     path[seq2(1, length(path) - 1)],
     path[seq2(2, length(path))],
