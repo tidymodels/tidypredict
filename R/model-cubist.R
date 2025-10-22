@@ -22,7 +22,7 @@ parse_model.cubist <- function(model) {
                 type = "conditional",
                 col = .x$variable,
                 val = .x$value,
-                op = ifelse(.x$dir == ">", "more-equal", "less")
+                op = ifelse(.x$dir == ">", "more", "less-equal")
               )
             )
           } else {
