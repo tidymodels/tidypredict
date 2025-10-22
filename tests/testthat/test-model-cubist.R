@@ -42,3 +42,18 @@ test_that("Model can be saved and re-loaded", {
     parse_model(model)
   )
 })
+
+test_that("intercept is done correctly (#58)", {
+  biomass_tr <- modeldata::biomass %>%
+    dplyr::filter(dataset == "Training") %>%
+    dplyr::select(-dataset, -sample)
+
+  set.seed(1)
+  mod <- Cubist::cubist(
+    x = biomass_tr %>% dplyr::select(-HHV),
+    y = biomass_tr$HHV
+  )
+
+  res <- tidypredict_fit(mod)
+  expect_false(any(grepl("list", res)))
+})
