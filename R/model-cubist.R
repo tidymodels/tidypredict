@@ -63,7 +63,7 @@ parse_model.cubist <- function(model) {
       )
     }
   )
-  comm <- flatten(committees2)
+  comm <- purrr::list_flatten(committees2)
   pm <- list(
     general = list(
       model = "cubist",
