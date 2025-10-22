@@ -80,6 +80,7 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
+  parsedmodel$general$divisor <- 1
   out <- build_fit_formula_rf(parsedmodel)
 
   # cubist averages out rules if multiple apply
