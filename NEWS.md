@@ -6,6 +6,8 @@
 
 - Speed up `tidypredict_fit()` for xxgboost models. (#130)
 
+- Fixed a bug where the intercept was added incorrectly to the result for cubist models. (#58)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
