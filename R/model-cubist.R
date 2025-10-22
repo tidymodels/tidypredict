@@ -22,7 +22,7 @@ parse_model.cubist <- function(model) {
                 type = "conditional",
                 col = .x$variable,
                 val = .x$value,
-                op = ifelse(.x$dir == ">", "more-equal", "less")
+                op = ifelse(.x$dir == ">", "more", "less-equal")
               )
             )
           } else {
@@ -80,5 +80,14 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_rf(parsedmodel)
+  parsedmodel$general$divisor <- 1
+  out <- build_fit_formula_rf(parsedmodel)
+
+  # cubist averages out rules if multiple apply
+  paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
+  paths <- lapply(paths, function(x) x %||% TRUE)
+  paths <- reduce(paths, function(x, y) expr(!!x + !!y))
+  out <- expr(!!out / !!paths)
+
+  out
 }
