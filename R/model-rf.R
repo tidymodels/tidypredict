@@ -129,6 +129,9 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     )
     pl <- reduce(pl, function(x, y) expr(!!x + !!y))
   } else {
+    if (is.list(prediction) && prediction[[1]]$is_intercept) {
+      prediction <- prediction[[1]]$val
+    }
     pl <- prediction
   }
   f <- NULL
