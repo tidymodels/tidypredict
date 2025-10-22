@@ -80,5 +80,12 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_rf(parsedmodel)
+  out <- build_fit_formula_rf(parsedmodel)
+
+  # cubist averages out rules if multiple apply
+  paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
+  paths <- reduce(paths, function(x, y) expr(!!x + !!y))
+  out <- expr(!!out / !!paths)
+
+  out
 }
