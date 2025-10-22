@@ -17,7 +17,6 @@ parse_model.model_fit <- function(model) {
 
 # broom ------------------------------------------------------------------
 
-
 #' @export
 generics::tidy
 

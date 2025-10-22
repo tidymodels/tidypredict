@@ -21,12 +21,20 @@
 #' @importFrom stats setNames
 #' @keywords internal
 #' @importFrom generics tidy
-#' 
+#'
 "_PACKAGE"
 NULL
 utils::globalVariables(
   c(
-    ".", "pm", "coefficient", "column", "feature", "feature_num", "level",
-    "lists", "type", "value"
+    ".",
+    "pm",
+    "coefficient",
+    "column",
+    "feature",
+    "feature_num",
+    "level",
+    "lists",
+    "type",
+    "value"
   )
 )

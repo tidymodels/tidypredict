@@ -8,7 +8,7 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
   splitval <- tree$splitval
   splitclass <- tree$splitclass
   splitvarName <- tree$splitvarName
-  
+
   new <- child_info[[find]]
   path <- find
   repeat {
@@ -25,30 +25,38 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
     path[1:length(path) - 1],
     path[2:length(path)],
     ~ {
-      lc <- leftChild[.y+1] == .x
-      lr <- rightChild[.y+1] == .x
-      if (is.na(splitval[.y+1])) {
-        if (lc) op <- "in"
-        if (lr) op <- "not-in"
-        vals <- strsplit(as.character(splitclass[.y+1]), ", ")[[1]]
+      lc <- leftChild[.y + 1] == .x
+      lr <- rightChild[.y + 1] == .x
+      if (is.na(splitval[.y + 1])) {
+        if (lc) {
+          op <- "in"
+        }
+        if (lr) {
+          op <- "not-in"
+        }
+        vals <- strsplit(as.character(splitclass[.y + 1]), ", ")[[1]]
         list(
           type = "set",
-          col = as.character(splitvarName[.y+1]),
+          col = as.character(splitvarName[.y + 1]),
           vals = map(vals, ~.x),
           op = op
         )
       } else {
         if (default_op) {
-          if (lc) op <- "less"
+          if (lc) {
+            op <- "less"
+          }
           if (lr) op <- "more-equal"
         } else {
-          if (lc) op <- "less-equal"
+          if (lc) {
+            op <- "less-equal"
+          }
           if (lr) op <- "more"
         }
         list(
           type = "conditional",
-          col = as.character(splitvarName[.y+1]),
-          val = splitval[.y+1],
+          col = as.character(splitvarName[.y + 1]),
+          val = splitval[.y + 1],
           op = op
         )
       }
@@ -61,15 +69,15 @@ get_child_info <- function(tree) {
   left_child <- tree$leftChild
   right_child <- tree$rightChild
   node_id <- tree$nodeID
-  
+
   for (i in seq_len(nrow(tree))) {
     node <- node_id[[i]]
-    
+
     child <- left_child[[i]]
     if (!is.na(child)) {
       child_info[child] <- node
     }
-    
+
     child <- right_child[[i]]
     if (!is.na(child)) {
       child_info[child] <- node
@@ -82,15 +90,17 @@ get_child_info <- function(tree) {
 get_ra_tree <- function(tree_no, model) {
   tree <- ranger::treeInfo(model, tree_no)
   paths <- tree$nodeID[tree[, "terminal"]]
-  
+
   child_info <- get_child_info(tree)
-  
+
   map(
     paths,
     ~ {
       prediction <- tree$prediction[tree$nodeID == .x]
       if (!is.null(prediction)) {
-        if (is.factor(prediction)) prediction <- as.character(prediction)
+        if (is.factor(prediction)) {
+          prediction <- as.character(prediction)
+        }
         list(
           prediction = prediction,
           path = get_ra_path(.x, tree, child_info, TRUE)

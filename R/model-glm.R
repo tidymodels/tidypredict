@@ -28,7 +28,9 @@ te_interval_glm <- function(parsedmodel, interval = 0.95) {
     assigned <- 1
   }
   if (assigned == 0) {
-    cli::cli_abort("Combination of family and link are not supported for prediction intervals")
+    cli::cli_abort(
+      "Combination of family and link are not supported for prediction intervals"
+    )
   }
   intervals
 }

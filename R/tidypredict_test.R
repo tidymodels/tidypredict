@@ -24,14 +24,26 @@
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_test(model)
 #' @export
-tidypredict_test <- function(model, df = model$model, threshold = 0.000000000001,
-                             include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   UseMethod("tidypredict_test")
 }
 
 #' @export
-tidypredict_test.party <- function(model, df = model$data, threshold = 0.000000000001,
-                                   include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.party <- function(
+  model,
+  df = model$data,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   tidypredict_test_default(
     model = model,
     df = df,
@@ -43,8 +55,14 @@ tidypredict_test.party <- function(model, df = model$data, threshold = 0.0000000
 }
 
 #' @export
-tidypredict_test.default <- function(model, df = model$model, threshold = 0.000000000001,
-                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.default <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   tidypredict_test_default(
     model = model,
     df = df,
@@ -54,10 +72,17 @@ tidypredict_test.default <- function(model, df = model$model, threshold = 0.0000
     xg_df = xg_df
   )
 }
-tidypredict_test_default <- function(model, df = model$model, threshold = 0.000000000001,
-                                     include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test_default <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   offset <- model$call$offset
-  ismodels <- paste0(colnames(model$model), collapse = " ") == paste0(colnames(df), collapse = " ")
+  ismodels <- paste0(colnames(model$model), collapse = " ") ==
+    paste0(colnames(df), collapse = " ")
 
   if (!is.null(offset) && ismodels) {
     index <- colnames(df) == "(offset)"
@@ -66,7 +91,9 @@ tidypredict_test_default <- function(model, df = model$model, threshold = 0.0000
 
   interval <- if (include_intervals) "prediction" else "none"
 
-  if (is.numeric(max_rows)) df <- head(df, max_rows)
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+  }
 
   preds <- predict(model, df, interval = interval, type = "response")
 
@@ -112,7 +139,8 @@ tidypredict_test_default <- function(model, df = model$model, threshold = 0.0000
 
   message <- paste0(
     "tidypredict test results\n",
-    "Difference threshold: ", threshold,
+    "Difference threshold: ",
+    threshold,
     "\n"
   )
 
@@ -124,16 +152,22 @@ tidypredict_test_default <- function(model, df = model$model, threshold = 0.0000
     }
     message <- paste0(
       message,
-      "\nFitted records above the threshold: ", threshold_df$fit_threshold,
+      "\nFitted records above the threshold: ",
+      threshold_df$fit_threshold,
       if (!is.null(threshold_df$lwr_threshold)) {
         "\nLower interval records above the threshold: "
-      }, threshold_df$lwr_threshold,
+      },
+      threshold_df$lwr_threshold,
       if (!is.null(threshold_df$upr_threshold)) {
         "\nUpper interval records above the threshold: "
-      }, threshold_df$upr_threshold,
-      "\n\nFit max  difference:", difference$upr_diff,
-      "\nLower max difference:", difference$lwr_diff,
-      "\nUpper max difference:", difference$fit_diff
+      },
+      threshold_df$upr_threshold,
+      "\n\nFit max  difference:",
+      difference$upr_diff,
+      "\nLower max difference:",
+      difference$lwr_diff,
+      "\nUpper max difference:",
+      difference$fit_diff
     )
   } else {
     message <- paste0(
@@ -150,8 +184,14 @@ tidypredict_test_default <- function(model, df = model$model, threshold = 0.0000
 }
 
 #' @export
-tidypredict_test.xgb.Booster <- function(model, df = model$model, threshold = 0.000000000001,
-                                         include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.xgb.Booster <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   xgb_booster(
     model = model,
     df = df,
@@ -163,8 +203,14 @@ tidypredict_test.xgb.Booster <- function(model, df = model$model, threshold = 0.
 }
 
 #' @export
-tidypredict_test._xgb.Booster <- function(model, df = model$model, threshold = 0.000000000001,
-                                          include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test._xgb.Booster <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   xgb_booster(
     model = model,
     df = df,
@@ -175,11 +221,21 @@ tidypredict_test._xgb.Booster <- function(model, df = model$model, threshold = 0
   )
 }
 
-xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
-                        include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
-  if (is.numeric(max_rows)) df <- head(df, max_rows)
+xgb_booster <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+  }
   base <- predict(model, xg_df)
-  if ("model_fit" %in% class(model)) base <- base$.pred
+  if ("model_fit" %in% class(model)) {
+    base <- base$.pred
+  }
   te <- tidypredict_to_column(
     df,
     model,
@@ -197,7 +253,8 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
   alert <- any(threshold_df > 0)
   message <- paste0(
     "tidypredict test results\n",
-    "Difference threshold: ", threshold,
+    "Difference threshold: ",
+    threshold,
     "\n"
   )
 
@@ -209,16 +266,22 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
     }
     message <- paste0(
       message,
-      "\nFitted records above the threshold: ", threshold_df$fit_threshold,
+      "\nFitted records above the threshold: ",
+      threshold_df$fit_threshold,
       if (!is.null(threshold_df$lwr_threshold)) {
         "\nLower interval records above the threshold: "
-      }, threshold_df$lwr_threshold,
+      },
+      threshold_df$lwr_threshold,
       if (!is.null(threshold_df$upr_threshold)) {
         "\nUpper interval records above the threshold: "
-      }, threshold_df$upr_threshold,
-      "\n\nFit max  difference:", difference$upr_diff,
-      "\nLower max difference:", difference$lwr_diff,
-      "\nUpper max difference:", difference$fit_diff
+      },
+      threshold_df$upr_threshold,
+      "\n\nFit max  difference:",
+      difference$upr_diff,
+      "\nLower max difference:",
+      difference$lwr_diff,
+      "\nUpper max difference:",
+      difference$fit_diff
     )
   } else {
     message <- paste0(
@@ -237,8 +300,14 @@ xgb_booster <- function(model, df = model$model, threshold = 0.000000000001,
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
-tidypredict_test.model_fit <- function(model, df = model$model, threshold = 0.000000000001,
-                                       include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.model_fit <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   tidypredict_test(
     model = model$fit,
     df = df,
@@ -250,14 +319,26 @@ tidypredict_test.model_fit <- function(model, df = model$model, threshold = 0.00
 }
 
 #' @export
-tidypredict_test.randomForest <- function(model, df = NULL, threshold = 0,
-                                          include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.randomForest <- function(
+  model,
+  df = NULL,
+  threshold = 0,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   cli::cli_abort("tidypredict_test does not support randomForest models")
 }
 
 #' @export
-tidypredict_test.ranger <- function(model, df = NULL, threshold = 0,
-                                    include_intervals = FALSE, max_rows = NULL, xg_df = NULL) {
+tidypredict_test.ranger <- function(
+  model,
+  df = NULL,
+  threshold = 0,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
   cli::cli_abort("tidypredict_test does not support ranger models")
 }
 setOldClass(c("tidypredict_test", "list"))
