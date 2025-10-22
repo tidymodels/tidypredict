@@ -85,6 +85,7 @@ tidypredict_fit.cubist <- function(model) {
 
   # cubist averages out rules if multiple apply
   paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
+  paths <- lapply(paths, function(x) x %||% TRUE)
   paths <- reduce(paths, function(x, y) expr(!!x + !!y))
   out <- expr(!!out / !!paths)
 
