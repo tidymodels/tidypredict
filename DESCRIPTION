@@ -29,7 +29,7 @@ Imports:
     tidyr
 Suggests:
     covr,
-    Cubist,
+    Cubist (>= 0.5.0.9000),
     DBI,
     dbplyr,
     earth (>= 5.1.2),
@@ -53,3 +53,5 @@ Config/testthat/edition: 3
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
+Remotes:  
+    topepo/Cubist
