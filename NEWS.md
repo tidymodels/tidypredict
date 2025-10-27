@@ -8,6 +8,8 @@
 
 - Fixed a bug where the intercept was added incorrectly to the result for cubist models. (#58)
 
+- Fixed bug where Cubst models incorrectly combined rules and committees. (#134)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
