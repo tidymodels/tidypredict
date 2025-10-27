@@ -83,10 +83,25 @@ tidypredict_fit.cubist <- function(model) {
   rules <- get_rf_case_tree(1, parsedmodel)
   paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
 
-  n_rules <- length(rules)
   n_committees <- model$committees
 
-  ommittee_id <- rep(seq_len(n_committees), each = n_rules / n_committees)
+  if (n_committees == 1) {
+    ommittee_id <- rep(1, length(rules))
+  } else {
+    model_print <- utils::capture.output(print(model))
+    model_print <- model_print[grep(
+      "Number of rules per committee",
+      model_print
+    )]
+    model_print <- regmatches(
+      model_print,
+      m = gregexpr("[0-9]+", model_print)
+    )[[
+      1
+    ]]
+    ommittee_id <- as.integer(model_print)
+    ommittee_id <- rep(seq_along(ommittee_id), times = ommittee_id)
+  }
 
   committees <- purrr::map2(
     split(rules, ommittee_id),
