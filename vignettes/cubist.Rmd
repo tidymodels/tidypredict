@@ -59,6 +59,8 @@ BostonHousing %>%
   glimpse()
     ```
 
+We are not able to give an exact match of the original predictions [due to a minor bug](https://github.com/topepo/Cubist/issues/62) in Cubist.
+
 ## Parse model spec
 
 Here is an example of the model spec:
