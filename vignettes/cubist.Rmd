@@ -22,7 +22,7 @@ library(dplyr)
 |---------------------------------------------------------------|-----|
 |`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
 |`tidypredict_to_column()`                                      |  ✔  |
-|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_test()`                                           |  ✗  |
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
 |`parsnip`                                                      |  ✗  |
 
@@ -33,7 +33,11 @@ library(dplyr)
 library(Cubist)
 data("BostonHousing", package = "mlbench")
 
-model <- Cubist::cubist(x = BostonHousing[, -14], y = BostonHousing$medv, committees = 3)
+model <- Cubist::cubist(
+  x = BostonHousing[, -14],
+  y = BostonHousing$medv,
+  committees = 3
+)
 ```
 
 - Create the R formula
@@ -53,11 +57,6 @@ library(dplyr)
 BostonHousing %>%
   tidypredict_to_column(model) %>%
   glimpse()
-    ```
-
-- Confirm that `tidypredict` results match to the model's `predict()` results
-    ```{r}
-tidypredict_test(model, BostonHousing)
     ```
 
 ## Parse model spec
