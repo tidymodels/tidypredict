@@ -80,14 +80,37 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
-  parsedmodel$general$divisor <- 1
-  out <- build_fit_formula_rf(parsedmodel)
-
-  # cubist averages out rules if multiple apply
+  rules <- get_rf_case_tree(1, parsedmodel)
   paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
-  paths <- lapply(paths, function(x) x %||% TRUE)
-  paths <- reduce(paths, function(x, y) expr(!!x + !!y))
-  out <- expr(!!out / !!paths)
+
+  n_rules <- length(rules)
+  n_committees <- model$committees
+
+  ommittee_id <- rep(seq_len(n_committees), each = n_rules / n_committees)
+
+  committees <- purrr::map2(
+    split(rules, ommittee_id),
+    split(paths, ommittee_id),
+    make_committee
+  )
+
+  out <- adder(committees)
+  if (n_committees > 1) {
+    # Average the committes
+    out <- expr(!!out / !!n_committees)
+  }
 
   out
+}
+
+adder <- function(paths) {
+  reduce(paths, function(x, y) expr(!!x + !!y))
+}
+
+make_committee <- function(rules, paths) {
+  # cubist averages out rules if multiple apply
+  paths <- lapply(paths, function(x) x %||% TRUE)
+  paths <- adder(paths)
+  rules <- adder(rules)
+  expr(!!rules / !!paths)
 }
