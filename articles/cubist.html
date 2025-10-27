@@ -104,7 +104,7 @@
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>✔</td>
+<td>✗</td>
 </tr>
 <tr class="even">
 <td>
@@ -127,55 +127,71 @@
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://topepo.github.io/Cubist/" class="external-link">Cubist</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="st">"BostonHousing"</span>, package <span class="op">=</span> <span class="st">"mlbench"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">Cubist</span><span class="fu">::</span><span class="fu"><a href="http://topepo.github.io/Cubist/reference/cubist.default.html" class="external-link">cubist</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">[</span>, <span class="op">-</span><span class="fl">14</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">$</span><span class="va">medv</span>, committees <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">Cubist</span><span class="fu">::</span><span class="fu"><a href="http://topepo.github.io/Cubist/reference/cubist.default.html" class="external-link">cubist</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">[</span>, <span class="op">-</span><span class="fl">14</span><span class="op">]</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">BostonHousing</span><span class="op">$</span><span class="va">medv</span>,</span>
+<span>  committees <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (ifelse(nox &gt;= 0.668, -1.11 + crim * -0.02 + nox * 21.4 + rm * </span></span>
-<span><span class="co">#&gt;     0.1 + age * -0.003 + dis * 2.93 + ptratio * -0.13 + b * 0.008 + </span></span>
-<span><span class="co">#&gt;     lstat * -0.33, 0) + ifelse(lstat &gt;= 9.59 &amp; nox &lt; 0.668, 23.57 + </span></span>
-<span><span class="co">#&gt;     crim * 0.05 + nox * -5.2 + rm * 3.1 + age * -0.048 + dis * </span></span>
-<span><span class="co">#&gt;     -0.81 + rad * 0.02 + tax * -0.0041 + ptratio * -0.71 + b * </span></span>
-<span><span class="co">#&gt;     0.01 + lstat * -0.15, 0) + ifelse(lstat &lt; 9.59 &amp; rm &lt; 6.226, </span></span>
-<span><span class="co">#&gt;     1.18 + crim * 3.83 + rm * 4.3 + age * -0.06 + dis * -0.09 + </span></span>
-<span><span class="co">#&gt;         tax * -0.003 + ptratio * -0.08 + lstat * -0.11, 0) + </span></span>
-<span><span class="co">#&gt;     ifelse(lstat &lt; 9.59 &amp; rm &gt;= 6.226, -4.71 + crim * 2.22 + </span></span>
-<span><span class="co">#&gt;         zn * 0.008 + nox * -1.7 + rm * 9.2 + age * -0.04 + dis * </span></span>
-<span><span class="co">#&gt;         -0.71 + rad * 0.03 + tax * -0.0182 + ptratio * -0.72 + </span></span>
-<span><span class="co">#&gt;         lstat * -0.83, 0) + ifelse(dis &lt; 1.755 &amp; lstat &gt;= 5.12, </span></span>
-<span><span class="co">#&gt;     122.32 + crim * -0.29 + nox * -21.6 + rm * -3 + dis * -30.88 + </span></span>
-<span><span class="co">#&gt;         rad * 0.02 + tax * -0.001 + b * -0.023 + lstat * -0.73, </span></span>
-<span><span class="co">#&gt;     0) + ifelse(rm &lt; 6.545 &amp; lstat &gt;= 5.12, 27.8 + crim * -0.16 + </span></span>
-<span><span class="co">#&gt;     zn * 0.007 + nox * -3.9 + rm * 2 + age * -0.035 + dis * -0.7 + </span></span>
-<span><span class="co">#&gt;     rad * 0.28 + tax * -0.0135 + ptratio * -0.6 + b * 0.013 + </span></span>
-<span><span class="co">#&gt;     lstat * -0.25, 0) + ifelse(rm &gt;= 6.545 &amp; lstat &gt;= 5.12, 22.21 + </span></span>
-<span><span class="co">#&gt;     crim * -0.04 + zn * 0.01 + indus * -0.02 + nox * -4 + rm * </span></span>
-<span><span class="co">#&gt;     4.7 + dis * -0.34 + rad * 0.11 + tax * -0.0248 + ptratio * </span></span>
-<span><span class="co">#&gt;     -0.9 + b * 0.002 + lstat * -0.1, 0) + ifelse(lstat &lt; 5.12 &amp; </span></span>
-<span><span class="co">#&gt;     rm &lt; 8.034, -71.95 + rm * 17 + age * -0.06 + tax * -0.0112 + </span></span>
-<span><span class="co">#&gt;     ptratio * -0.48 + lstat * -0.03, 0) + ifelse(rm &gt;= 8.034 &amp; </span></span>
-<span><span class="co">#&gt;     dis &gt;= 3.199, -32.79 + crim * -0.01 + zn * 0.005 + nox * </span></span>
-<span><span class="co">#&gt;     -1.8 + rm * 12.9 + age * -0.117 + dis * -0.15 + rad * 0.04 + </span></span>
-<span><span class="co">#&gt;     tax * -0.0246 + ptratio * -1.05 + lstat * -0.04, 0) + ifelse(lstat &lt; </span></span>
-<span><span class="co">#&gt;     5.12 &amp; dis &lt; 3.199, 53.41 + rm * 1.6 + dis * -7.16 + tax * </span></span>
-<span><span class="co">#&gt;     0.0088 + lstat * -0.68, 0) + ifelse(nox &gt;= 0.668, -36.31 + </span></span>
-<span><span class="co">#&gt;     crim * 0.08 + nox * 48.4 + dis * 7.52 + b * 0.01 + lstat * </span></span>
-<span><span class="co">#&gt;     -0.24, 0) + ifelse(lstat &gt;= 9.53 &amp; nox &lt; 0.668, 28.04 + nox * </span></span>
-<span><span class="co">#&gt;     -4.8 + rm * 2.9 + age * -0.051 + dis * -0.86 + rad * 0.01 + </span></span>
-<span><span class="co">#&gt;     tax * -0.0019 + ptratio * -0.72 + lstat * -0.12, 0) + ifelse(lstat &lt; </span></span>
-<span><span class="co">#&gt;     9.53, -26.05 + crim * 0.89 + nox * -2.3 + rm * 9.6 + dis * </span></span>
-<span><span class="co">#&gt;     -0.17 + rad * 0.02 + tax * -0.0055 + ptratio * -0.12 + b * </span></span>
-<span><span class="co">#&gt;     0.001 + lstat * -0.74, 0) + ifelse(lstat &lt; 9.53 &amp; dis &lt; 2.64, </span></span>
-<span><span class="co">#&gt;     136.67 + crim * 7.2 + nox * -96.6 + rm * 1.1 + tax * -0.0033 + </span></span>
-<span><span class="co">#&gt;         ptratio * -3.31 + lstat * -0.1, 0))/3</span></span></code></pre></div>
+<span><span class="co">#&gt; ((ifelse(nox &gt; 0.66799998, -1.11 + crim * -0.02 + nox * 21.4 + </span></span>
+<span><span class="co">#&gt;     rm * 0.1 + age * -0.003 + dis * 2.93 + ptratio * -0.13 + </span></span>
+<span><span class="co">#&gt;     b * 0.008 + lstat * -0.33, 0) + ifelse(lstat &gt; 9.5900002 &amp; </span></span>
+<span><span class="co">#&gt;     nox &lt;= 0.66799998, 23.57 + crim * 0.05 + nox * -5.2 + rm * </span></span>
+<span><span class="co">#&gt;     3.1 + age * -0.048 + dis * -0.81 + rad * 0.02 + tax * -0.0041 + </span></span>
+<span><span class="co">#&gt;     ptratio * -0.71 + b * 0.01 + lstat * -0.15, 0) + ifelse(lstat &lt;= </span></span>
+<span><span class="co">#&gt;     9.5900002 &amp; rm &lt;= 6.2259998, 1.18 + crim * 3.83 + rm * 4.3 + </span></span>
+<span><span class="co">#&gt;     age * -0.06 + dis * -0.09 + tax * -0.003 + ptratio * -0.08 + </span></span>
+<span><span class="co">#&gt;     lstat * -0.11, 0) + ifelse(lstat &lt;= 9.5900002 &amp; rm &gt; 6.2259998, </span></span>
+<span><span class="co">#&gt;     -4.71 + crim * 2.22 + zn * 0.008 + nox * -1.7 + rm * 9.2 + </span></span>
+<span><span class="co">#&gt;         age * -0.04 + dis * -0.71 + rad * 0.03 + tax * -0.0182 + </span></span>
+<span><span class="co">#&gt;         ptratio * -0.72 + lstat * -0.83, 0))/((nox &gt; 0.66799998) + </span></span>
+<span><span class="co">#&gt;     (lstat &gt; 9.5900002 &amp; nox &lt;= 0.66799998) + (lstat &lt;= 9.5900002 &amp; </span></span>
+<span><span class="co">#&gt;     rm &lt;= 6.2259998) + (lstat &lt;= 9.5900002 &amp; rm &gt; 6.2259998)) + </span></span>
+<span><span class="co">#&gt;     (ifelse(dis &lt;= 1.7553999 &amp; lstat &gt; 5.1199999, 122.32 + crim * </span></span>
+<span><span class="co">#&gt;         -0.29 + nox * -21.6 + rm * -3 + dis * -30.88 + rad * </span></span>
+<span><span class="co">#&gt;         0.02 + tax * -0.001 + b * -0.023 + lstat * -0.73, 0) + </span></span>
+<span><span class="co">#&gt;         ifelse(rm &lt;= 6.5450001 &amp; lstat &gt; 5.1199999, 27.8 + crim * </span></span>
+<span><span class="co">#&gt;             -0.16 + zn * 0.007 + nox * -3.9 + rm * 2 + age * </span></span>
+<span><span class="co">#&gt;             -0.035 + dis * -0.7 + rad * 0.28 + tax * -0.0135 + </span></span>
+<span><span class="co">#&gt;             ptratio * -0.6 + b * 0.013 + lstat * -0.25, 0) + </span></span>
+<span><span class="co">#&gt;         ifelse(rm &gt; 6.5450001 &amp; lstat &gt; 5.1199999, 22.21 + crim * </span></span>
+<span><span class="co">#&gt;             -0.04 + zn * 0.01 + indus * -0.02 + nox * -4 + rm * </span></span>
+<span><span class="co">#&gt;             4.7 + dis * -0.34 + rad * 0.11 + tax * -0.0248 + </span></span>
+<span><span class="co">#&gt;             ptratio * -0.9 + b * 0.002 + lstat * -0.1, 0) + ifelse(lstat &lt;= </span></span>
+<span><span class="co">#&gt;         5.1199999 &amp; rm &lt;= 8.0340004, -71.95 + rm * 17 + age * </span></span>
+<span><span class="co">#&gt;         -0.06 + tax * -0.0112 + ptratio * -0.48 + lstat * -0.03, </span></span>
+<span><span class="co">#&gt;         0) + ifelse(rm &gt; 8.0340004 &amp; dis &gt; 3.1991999, -32.79 + </span></span>
+<span><span class="co">#&gt;         crim * -0.01 + zn * 0.005 + nox * -1.8 + rm * 12.9 + </span></span>
+<span><span class="co">#&gt;         age * -0.117 + dis * -0.15 + rad * 0.04 + tax * -0.0246 + </span></span>
+<span><span class="co">#&gt;         ptratio * -1.05 + lstat * -0.04, 0) + ifelse(lstat &lt;= </span></span>
+<span><span class="co">#&gt;         5.1199999 &amp; dis &lt;= 3.1991999, 53.41 + rm * 1.6 + dis * </span></span>
+<span><span class="co">#&gt;         -7.16 + tax * 0.0088 + lstat * -0.68, 0))/((dis &lt;= 1.7553999 &amp; </span></span>
+<span><span class="co">#&gt;         lstat &gt; 5.1199999) + (rm &lt;= 6.5450001 &amp; lstat &gt; 5.1199999) + </span></span>
+<span><span class="co">#&gt;         (rm &gt; 6.5450001 &amp; lstat &gt; 5.1199999) + (lstat &lt;= 5.1199999 &amp; </span></span>
+<span><span class="co">#&gt;         rm &lt;= 8.0340004) + (rm &gt; 8.0340004 &amp; dis &gt; 3.1991999) + </span></span>
+<span><span class="co">#&gt;         (lstat &lt;= 5.1199999 &amp; dis &lt;= 3.1991999)) + (ifelse(nox &gt; </span></span>
+<span><span class="co">#&gt;     0.66799998, -36.31 + crim * 0.08 + nox * 48.4 + dis * 7.52 + </span></span>
+<span><span class="co">#&gt;     b * 0.01 + lstat * -0.24, 0) + ifelse(lstat &gt; 9.5299997 &amp; </span></span>
+<span><span class="co">#&gt;     nox &lt;= 0.66799998, 28.04 + nox * -4.8 + rm * 2.9 + age * </span></span>
+<span><span class="co">#&gt;     -0.051 + dis * -0.86 + rad * 0.01 + tax * -0.0019 + ptratio * </span></span>
+<span><span class="co">#&gt;     -0.72 + lstat * -0.12, 0) + ifelse(lstat &lt;= 9.5299997, -26.05 + </span></span>
+<span><span class="co">#&gt;     crim * 0.89 + nox * -2.3 + rm * 9.6 + dis * -0.17 + rad * </span></span>
+<span><span class="co">#&gt;     0.02 + tax * -0.0055 + ptratio * -0.12 + b * 0.001 + lstat * </span></span>
+<span><span class="co">#&gt;     -0.74, 0) + ifelse(lstat &lt;= 9.5299997 &amp; dis &lt;= 2.6403, 136.67 + </span></span>
+<span><span class="co">#&gt;     crim * 7.2 + nox * -96.6 + rm * 1.1 + tax * -0.0033 + ptratio * </span></span>
+<span><span class="co">#&gt;     -3.31 + lstat * -0.1, 0))/((nox &gt; 0.66799998) + (lstat &gt; </span></span>
+<span><span class="co">#&gt;     9.5299997 &amp; nox &lt;= 0.66799998) + (lstat &lt;= 9.5299997) + (lstat &lt;= </span></span>
+<span><span class="co">#&gt;     9.5299997 &amp; dis &lt;= 2.6403)))/3</span></span></code></pre></div>
 </li>
 <li>
 <p>SQL output example</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; (((((((((((((CASE WHEN (`nox` &gt;= 0.668) THEN ((((((((-1.11 + `crim` * -0.02) + `nox` * 21.4) + `rm` * 0.1) + `age` * -0.003) + `dis` * 2.93) + `ptratio` * -0.13) + `b` * 0.008) + `lstat` * -0.33) WHEN NOT (`nox` &gt;= 0.668) THEN 0.0 END + CASE WHEN (`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN ((((((((((23.57 + `crim` * 0.05) + `nox` * -5.2) + `rm` * 3.1) + `age` * -0.048) + `dis` * -0.81) + `rad` * 0.02) + `tax` * -0.0041) + `ptratio` * -0.71) + `b` * 0.01) + `lstat` * -0.15) WHEN NOT (`lstat` &gt;= 9.59 AND `nox` &lt; 0.668) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN (((((((1.18 + `crim` * 3.83) + `rm` * 4.3) + `age` * -0.06) + `dis` * -0.09) + `tax` * -0.003) + `ptratio` * -0.08) + `lstat` * -0.11) WHEN NOT (`lstat` &lt; 9.59 AND `rm` &lt; 6.226) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN ((((((((((-4.71 + `crim` * 2.22) + `zn` * 0.008) + `nox` * -1.7) + `rm` * 9.2) + `age` * -0.04) + `dis` * -0.71) + `rad` * 0.03) + `tax` * -0.0182) + `ptratio` * -0.72) + `lstat` * -0.83) WHEN NOT (`lstat` &lt; 9.59 AND `rm` &gt;= 6.226) THEN 0.0 END) + CASE WHEN (`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN ((((((((122.32 + `crim` * -0.29) + `nox` * -21.6) + `rm` * -3.0) + `dis` * -30.88) + `rad` * 0.02) + `tax` * -0.001) + `b` * -0.023) + `lstat` * -0.73) WHEN NOT (`dis` &lt; 1.755 AND `lstat` &gt;= 5.12) THEN 0.0 END) + CASE WHEN (`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN (((((((((((27.8 + `crim` * -0.16) + `zn` * 0.007) + `nox` * -3.9) + `rm` * 2.0) + `age` * -0.035) + `dis` * -0.7) + `rad` * 0.28) + `tax` * -0.0135) + `ptratio` * -0.6) + `b` * 0.013) + `lstat` * -0.25) WHEN NOT (`rm` &lt; 6.545 AND `lstat` &gt;= 5.12) THEN 0.0 END) + CASE WHEN (`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN (((((((((((22.21 + `crim` * -0.04) + `zn` * 0.01) + `indus` * -0.02) + `nox` * -4.0) + `rm` * 4.7) + `dis` * -0.34) + `rad` * 0.11) + `tax` * -0.0248) + `ptratio` * -0.9) + `b` * 0.002) + `lstat` * -0.1) WHEN NOT (`rm` &gt;= 6.545 AND `lstat` &gt;= 5.12) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN (((((-71.95 + `rm` * 17.0) + `age` * -0.06) + `tax` * -0.0112) + `ptratio` * -0.48) + `lstat` * -0.03) WHEN NOT (`lstat` &lt; 5.12 AND `rm` &lt; 8.034) THEN 0.0 END) + CASE WHEN (`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN ((((((((((-32.79 + `crim` * -0.01) + `zn` * 0.005) + `nox` * -1.8) + `rm` * 12.9) + `age` * -0.117) + `dis` * -0.15) + `rad` * 0.04) + `tax` * -0.0246) + `ptratio` * -1.05) + `lstat` * -0.04) WHEN NOT (`rm` &gt;= 8.034 AND `dis` &gt;= 3.199) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN ((((53.41 + `rm` * 1.6) + `dis` * -7.16) + `tax` * 0.0088) + `lstat` * -0.68) WHEN NOT (`lstat` &lt; 5.12 AND `dis` &lt; 3.199) THEN 0.0 END) + CASE WHEN (`nox` &gt;= 0.668) THEN (((((-36.31 + `crim` * 0.08) + `nox` * 48.4) + `dis` * 7.52) + `b` * 0.01) + `lstat` * -0.24) WHEN NOT (`nox` &gt;= 0.668) THEN 0.0 END) + CASE WHEN (`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN ((((((((28.04 + `nox` * -4.8) + `rm` * 2.9) + `age` * -0.051) + `dis` * -0.86) + `rad` * 0.01) + `tax` * -0.0019) + `ptratio` * -0.72) + `lstat` * -0.12) WHEN NOT (`lstat` &gt;= 9.53 AND `nox` &lt; 0.668) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 9.53) THEN (((((((((-26.05 + `crim` * 0.89) + `nox` * -2.3) + `rm` * 9.6) + `dis` * -0.17) + `rad` * 0.02) + `tax` * -0.0055) + `ptratio` * -0.12) + `b` * 0.001) + `lstat` * -0.74) WHEN NOT (`lstat` &lt; 9.53) THEN 0.0 END) + CASE WHEN (`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN ((((((136.67 + `crim` * 7.2) + `nox` * -96.6) + `rm` * 1.1) + `tax` * -0.0033) + `ptratio` * -3.31) + `lstat` * -0.1) WHEN NOT (`lstat` &lt; 9.53 AND `dis` &lt; 2.64) THEN 0.0 END) / 3.0</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((((CASE WHEN (`nox` &gt; 0.66799998) THEN ((((((((-1.11 + `crim` * -0.02) + `nox` * 21.4) + `rm` * 0.1) + `age` * -0.003) + `dis` * 2.93) + `ptratio` * -0.13) + `b` * 0.008) + `lstat` * -0.33) WHEN NOT (`nox` &gt; 0.66799998) THEN 0.0 END + CASE WHEN (`lstat` &gt; 9.5900002 AND `nox` &lt;= 0.66799998) THEN ((((((((((23.57 + `crim` * 0.05) + `nox` * -5.2) + `rm` * 3.1) + `age` * -0.048) + `dis` * -0.81) + `rad` * 0.02) + `tax` * -0.0041) + `ptratio` * -0.71) + `b` * 0.01) + `lstat` * -0.15) WHEN NOT (`lstat` &gt; 9.5900002 AND `nox` &lt;= 0.66799998) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 9.5900002 AND `rm` &lt;= 6.2259998) THEN (((((((1.18 + `crim` * 3.83) + `rm` * 4.3) + `age` * -0.06) + `dis` * -0.09) + `tax` * -0.003) + `ptratio` * -0.08) + `lstat` * -0.11) WHEN NOT (`lstat` &lt;= 9.5900002 AND `rm` &lt;= 6.2259998) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 9.5900002 AND `rm` &gt; 6.2259998) THEN ((((((((((-4.71 + `crim` * 2.22) + `zn` * 0.008) + `nox` * -1.7) + `rm` * 9.2) + `age` * -0.04) + `dis` * -0.71) + `rad` * 0.03) + `tax` * -0.0182) + `ptratio` * -0.72) + `lstat` * -0.83) WHEN NOT (`lstat` &lt;= 9.5900002 AND `rm` &gt; 6.2259998) THEN 0.0 END) / (((`nox` &gt; 0.66799998 + `lstat` &gt; 9.5900002 AND `nox` &lt;= 0.66799998) + `lstat` &lt;= 9.5900002 AND `rm` &lt;= 6.2259998) + `lstat` &lt;= 9.5900002 AND `rm` &gt; 6.2259998)) + (((((CASE WHEN (`dis` &lt;= 1.7553999 AND `lstat` &gt; 5.1199999) THEN ((((((((122.32 + `crim` * -0.29) + `nox` * -21.6) + `rm` * -3.0) + `dis` * -30.88) + `rad` * 0.02) + `tax` * -0.001) + `b` * -0.023) + `lstat` * -0.73) WHEN NOT (`dis` &lt;= 1.7553999 AND `lstat` &gt; 5.1199999) THEN 0.0 END + CASE WHEN (`rm` &lt;= 6.5450001 AND `lstat` &gt; 5.1199999) THEN (((((((((((27.8 + `crim` * -0.16) + `zn` * 0.007) + `nox` * -3.9) + `rm` * 2.0) + `age` * -0.035) + `dis` * -0.7) + `rad` * 0.28) + `tax` * -0.0135) + `ptratio` * -0.6) + `b` * 0.013) + `lstat` * -0.25) WHEN NOT (`rm` &lt;= 6.5450001 AND `lstat` &gt; 5.1199999) THEN 0.0 END) + CASE WHEN (`rm` &gt; 6.5450001 AND `lstat` &gt; 5.1199999) THEN (((((((((((22.21 + `crim` * -0.04) + `zn` * 0.01) + `indus` * -0.02) + `nox` * -4.0) + `rm` * 4.7) + `dis` * -0.34) + `rad` * 0.11) + `tax` * -0.0248) + `ptratio` * -0.9) + `b` * 0.002) + `lstat` * -0.1) WHEN NOT (`rm` &gt; 6.5450001 AND `lstat` &gt; 5.1199999) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 5.1199999 AND `rm` &lt;= 8.0340004) THEN (((((-71.95 + `rm` * 17.0) + `age` * -0.06) + `tax` * -0.0112) + `ptratio` * -0.48) + `lstat` * -0.03) WHEN NOT (`lstat` &lt;= 5.1199999 AND `rm` &lt;= 8.0340004) THEN 0.0 END) + CASE WHEN (`rm` &gt; 8.0340004 AND `dis` &gt; 3.1991999) THEN ((((((((((-32.79 + `crim` * -0.01) + `zn` * 0.005) + `nox` * -1.8) + `rm` * 12.9) + `age` * -0.117) + `dis` * -0.15) + `rad` * 0.04) + `tax` * -0.0246) + `ptratio` * -1.05) + `lstat` * -0.04) WHEN NOT (`rm` &gt; 8.0340004 AND `dis` &gt; 3.1991999) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 5.1199999 AND `dis` &lt;= 3.1991999) THEN ((((53.41 + `rm` * 1.6) + `dis` * -7.16) + `tax` * 0.0088) + `lstat` * -0.68) WHEN NOT (`lstat` &lt;= 5.1199999 AND `dis` &lt;= 3.1991999) THEN 0.0 END) / (((((`dis` &lt;= 1.7553999 AND `lstat` &gt; 5.1199999 + `rm` &lt;= 6.5450001 AND `lstat` &gt; 5.1199999) + `rm` &gt; 6.5450001 AND `lstat` &gt; 5.1199999) + `lstat` &lt;= 5.1199999 AND `rm` &lt;= 8.0340004) + `rm` &gt; 8.0340004 AND `dis` &gt; 3.1991999) + `lstat` &lt;= 5.1199999 AND `dis` &lt;= 3.1991999)) + (((CASE WHEN (`nox` &gt; 0.66799998) THEN (((((-36.31 + `crim` * 0.08) + `nox` * 48.4) + `dis` * 7.52) + `b` * 0.01) + `lstat` * -0.24) WHEN NOT (`nox` &gt; 0.66799998) THEN 0.0 END + CASE WHEN (`lstat` &gt; 9.5299997 AND `nox` &lt;= 0.66799998) THEN ((((((((28.04 + `nox` * -4.8) + `rm` * 2.9) + `age` * -0.051) + `dis` * -0.86) + `rad` * 0.01) + `tax` * -0.0019) + `ptratio` * -0.72) + `lstat` * -0.12) WHEN NOT (`lstat` &gt; 9.5299997 AND `nox` &lt;= 0.66799998) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 9.5299997) THEN (((((((((-26.05 + `crim` * 0.89) + `nox` * -2.3) + `rm` * 9.6) + `dis` * -0.17) + `rad` * 0.02) + `tax` * -0.0055) + `ptratio` * -0.12) + `b` * 0.001) + `lstat` * -0.74) WHEN NOT (`lstat` &lt;= 9.5299997) THEN 0.0 END) + CASE WHEN (`lstat` &lt;= 9.5299997 AND `dis` &lt;= 2.6403) THEN ((((((136.67 + `crim` * 7.2) + `nox` * -96.6) + `rm` * 1.1) + `tax` * -0.0033) + `ptratio` * -3.31) + `lstat` * -0.1) WHEN NOT (`lstat` &lt;= 9.5299997 AND `dis` &lt;= 2.6403) THEN 0.0 END) / (((`nox` &gt; 0.66799998 + `lstat` &gt; 9.5299997 AND `nox` &lt;= 0.66799998) + `lstat` &lt;= 9.5299997) + `lstat` &lt;= 9.5299997 AND `dis` &lt;= 2.6403)) / 3.0</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -203,27 +219,15 @@
 <span><span class="co">#&gt; $ medv    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 24.0<span style="color: #949494;">, </span>21.6<span style="color: #949494;">, </span>34.7<span style="color: #949494;">, </span>33.4<span style="color: #949494;">, </span>36.2<span style="color: #949494;">, </span>28.7<span style="color: #949494;">, </span>22.9<span style="color: #949494;">, </span>27.1<span style="color: #949494;">, </span>16.5<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ fit     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 27.50665<span style="color: #949494;">, </span>22.71805<span style="color: #949494;">, </span>34.78128<span style="color: #949494;">, </span>33.19372<span style="color: #949494;">, </span>31.93653<span style="color: #949494;">, </span>25.…</span></span></code></pre></div>
 </li>
-<li>
-<p>Confirm that <code>tidypredict</code> results match to the
-model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">BostonHousing</span><span class="op">)</span></span>
-<span><span class="co">#&gt; tidypredict test results</span></span>
-<span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Fitted records above the threshold: 506</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Fit max  difference:</span></span>
-<span><span class="co">#&gt; Lower max difference:</span></span>
-<span><span class="co">#&gt; Upper max difference:2.62966510913086</span></span></code></pre></div>
-</li>
 </ul>
+<p>We are not able to give an exact match of the original predictions <a href="https://github.com/topepo/Cubist/issues/62" class="external-link">due to a minor bug</a>
+in Cubist.</p>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
@@ -236,7 +240,7 @@ model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 <span><span class="co">#&gt;  $ trees  :List of 1</span></span>
 <span><span class="co">#&gt;   ..$ :List of 14</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_tree" "list"</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  NULL</span></span></code></pre></div>
 </div>
