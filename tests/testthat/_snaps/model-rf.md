@@ -1,4 +1,4 @@
-# Returns expected case_when() dplyr formula
+# randomForest works
 
     Code
       tf
@@ -1453,7 +1453,7 @@
                   1.75 & Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ 
                   "virginica")
 
----
+# randomForest works - parsnip
 
     Code
       tf

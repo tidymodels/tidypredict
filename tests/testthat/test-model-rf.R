@@ -1,31 +1,25 @@
 skip_if_not_installed("randomForest")
 
-run_tests <- function(model) {
+test_that("randomForest works", {
+  set.seed(100)
+  model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
 
-  test_that("Returns the correct type and dimensions", {
-    expect_s3_class(pm, "list")
-    expect_equal(length(pm), 2)
-    expect_equal(length(pm$trees), 100)
-    expect_equal(pm$general$model, "randomForest")
-    expect_equal(pm$general$version, 2)
-  })
-  test_that("Returns expected case_when() dplyr formula", {
-    expect_snapshot(
-      tf
-    )
-  })
-}
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(length(pm$trees), 100)
+  expect_equal(pm$general$model, "randomForest")
+  expect_equal(pm$general$version, 2)
 
-set.seed(100)
-run_tests(
-  randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
-)
+  expect_snapshot(
+    tf
+  )
+})
 
-set.seed(100)
-run_tests(
-  parsnip::fit(
+test_that("randomForest works - parsnip", {
+  set.seed(100)
+  model <- parsnip::fit(
     parsnip::set_engine(
       parsnip::rand_forest(trees = 100, mode = "classification"),
       "randomForest"
@@ -33,7 +27,19 @@ run_tests(
     Species ~ .,
     data = iris
   )
-)
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(length(pm$trees), 100)
+  expect_equal(pm$general$model, "randomForest")
+  expect_equal(pm$general$version, 2)
+
+  expect_snapshot(
+    tf
+  )
+})
 
 test_that("Model can be saved and re-loaded", {
   model <- randomForest::randomForest(Species ~ ., data = iris, ntree = 100)
