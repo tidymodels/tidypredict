@@ -160,18 +160,7 @@ field.</p>
 becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="co">#&gt; [[1]]</span></span>
-<span><span class="co">#&gt; case_when(Petal.Length &lt; 2.5 ~ "setosa", Petal.Length &gt;= 5.05 &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Length &gt;= 2.5 ~ "virginica", Petal.Width &gt;= 1.9 &amp; Petal.Length &lt; </span></span>
-<span><span class="co">#&gt;     5.05 &amp; Petal.Length &gt;= 2.5 ~ "virginica", Sepal.Length &lt; </span></span>
-<span><span class="co">#&gt;     4.95 &amp; Petal.Width &lt; 1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= </span></span>
-<span><span class="co">#&gt;     2.5 ~ "virginica", Petal.Width &lt; 1.75 &amp; Sepal.Length &gt;= 4.95 &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Width &lt; 1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= </span></span>
-<span><span class="co">#&gt;     2.5 ~ "versicolor", Sepal.Width &lt; 3 &amp; Petal.Width &gt;= 1.75 &amp; </span></span>
-<span><span class="co">#&gt;     Sepal.Length &gt;= 4.95 &amp; Petal.Width &lt; 1.9 &amp; Petal.Length &lt; </span></span>
-<span><span class="co">#&gt;     5.05 &amp; Petal.Length &gt;= 2.5 ~ "virginica", Sepal.Width &gt;= </span></span>
-<span><span class="co">#&gt;     3 &amp; Petal.Width &gt;= 1.75 &amp; Sepal.Length &gt;= 4.95 &amp; Petal.Width &lt; </span></span>
-<span><span class="co">#&gt;     1.9 &amp; Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 2.5 ~ "versicolor")</span></span></code></pre></div>
+<span><span class="co">#&gt; `+`()</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -197,27 +186,7 @@ model objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; case_when(Petal.Length &lt; 2.45 &amp; Sepal.Length &lt; 5.45 ~ "setosa", </span></span>
-<span><span class="co">#&gt;     Petal.Width &lt; 1.6 &amp; Petal.Length &gt;= 2.45 &amp; Sepal.Length &lt; </span></span>
-<span><span class="co">#&gt;         5.45 ~ "versicolor", Petal.Width &gt;= 1.6 &amp; Petal.Length &gt;= </span></span>
-<span><span class="co">#&gt;         2.45 &amp; Sepal.Length &lt; 5.45 ~ "virginica", Petal.Length &gt;= </span></span>
-<span><span class="co">#&gt;         4.7 &amp; Sepal.Length &lt; 5.75 &amp; Sepal.Length &gt;= 5.45 ~ "virginica", </span></span>
-<span><span class="co">#&gt;     Petal.Width &lt; 0.65 &amp; Petal.Length &lt; 4.7 &amp; Sepal.Length &lt; </span></span>
-<span><span class="co">#&gt;         5.75 &amp; Sepal.Length &gt;= 5.45 ~ "setosa", Petal.Width &gt;= </span></span>
-<span><span class="co">#&gt;         0.65 &amp; Petal.Length &lt; 4.7 &amp; Sepal.Length &lt; 5.75 &amp; Sepal.Length &gt;= </span></span>
-<span><span class="co">#&gt;         5.45 ~ "versicolor", Petal.Length &lt; 2.55 &amp; Petal.Length &lt; </span></span>
-<span><span class="co">#&gt;         4.95 &amp; Sepal.Length &gt;= 5.75 &amp; Sepal.Length &gt;= 5.45 ~ </span></span>
-<span><span class="co">#&gt;         "setosa", Petal.Length &gt;= 5.05 &amp; Petal.Length &gt;= 4.95 &amp; </span></span>
-<span><span class="co">#&gt;         Sepal.Length &gt;= 5.75 &amp; Sepal.Length &gt;= 5.45 ~ "virginica", </span></span>
-<span><span class="co">#&gt;     Petal.Width &lt; 1.7 &amp; Petal.Length &gt;= 2.55 &amp; Petal.Length &lt; </span></span>
-<span><span class="co">#&gt;         4.95 &amp; Sepal.Length &gt;= 5.75 &amp; Sepal.Length &gt;= 5.45 ~ </span></span>
-<span><span class="co">#&gt;         "versicolor", Petal.Width &gt;= 1.7 &amp; Petal.Length &gt;= 2.55 &amp; </span></span>
-<span><span class="co">#&gt;         Petal.Length &lt; 4.95 &amp; Sepal.Length &gt;= 5.75 &amp; Sepal.Length &gt;= </span></span>
-<span><span class="co">#&gt;         5.45 ~ "virginica", Sepal.Length &lt; 6.5 &amp; Petal.Length &lt; </span></span>
-<span><span class="co">#&gt;         5.05 &amp; Petal.Length &gt;= 4.95 &amp; Sepal.Length &gt;= 5.75 &amp; </span></span>
-<span><span class="co">#&gt;         Sepal.Length &gt;= 5.45 ~ "virginica", Sepal.Length &gt;= 6.5 &amp; </span></span>
-<span><span class="co">#&gt;         Petal.Length &lt; 5.05 &amp; Petal.Length &gt;= 4.95 &amp; Sepal.Length &gt;= </span></span>
-<span><span class="co">#&gt;         5.75 &amp; Sepal.Length &gt;= 5.45 ~ "versicolor")</span></span></code></pre></div>
+<span><span class="co">#&gt; `+`</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
