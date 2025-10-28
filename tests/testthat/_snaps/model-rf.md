@@ -1,16 +1,2912 @@
 # Returns expected case_when() dplyr formula
 
     Code
-      rlang::expr_text(tf[[1]])
+      tf
     Output
-      [1] "case_when(Petal.Length < 2.5 ~ \"setosa\", Petal.Length >= 5.05 & \n    Petal.Length >= 2.5 ~ \"virginica\", Petal.Width >= 1.9 & Petal.Length < \n    5.05 & Petal.Length >= 2.5 ~ \"virginica\", Sepal.Length < \n    4.95 & Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= \n    2.5 ~ \"virginica\", Petal.Width < 1.75 & Sepal.Length >= 4.95 & \n    Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= \n    2.5 ~ \"versicolor\", Sepal.Width < 3 & Petal.Width >= 1.75 & \n    Sepal.Length >= 4.95 & Petal.Width < 1.9 & Petal.Length < \n    5.05 & Petal.Length >= 2.5 ~ \"virginica\", Sepal.Width >= \n    3 & Petal.Width >= 1.75 & Sepal.Length >= 4.95 & Petal.Width < \n    1.9 & Petal.Length < 5.05 & Petal.Length >= 2.5 ~ \"versicolor\")"
+      case_when(Petal.Length < 2.5 ~ "setosa", Petal.Length >= 5.05 & 
+          Petal.Length >= 2.5 ~ "virginica", Petal.Width >= 1.9 & Petal.Length < 
+          5.05 & Petal.Length >= 2.5 ~ "virginica", Sepal.Length < 
+          4.95 & Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= 
+          2.5 ~ "virginica", Petal.Width < 1.75 & Sepal.Length >= 4.95 & 
+          Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= 
+          2.5 ~ "versicolor", Sepal.Width < 3 & Petal.Width >= 1.75 & 
+          Sepal.Length >= 4.95 & Petal.Width < 1.9 & Petal.Length < 
+          5.05 & Petal.Length >= 2.5 ~ "virginica", Sepal.Width >= 
+          3 & Petal.Width >= 1.75 & Sepal.Length >= 4.95 & Petal.Width < 
+          1.9 & Petal.Length < 5.05 & Petal.Length >= 2.5 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.65 & Petal.Length < 4.95 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+              4.95 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Width < 1.6 & Petal.Length >= 4.95 & Petal.Width < 
+                  1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width >= 
+                  1.6 & Petal.Length >= 4.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width >= 1.75 & Sepal.Length >= 6.15 & 
+          Petal.Length >= 2.35 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+          1.65 & Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Sepal.Length < 
+              6.15 & Petal.Length >= 2.35 ~ "versicolor", Petal.Width < 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length < 4.5 & Sepal.Width < 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 4.5 & Sepal.Width < 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Length < 5.35 & Sepal.Width >= 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 5.35 & Sepal.Width >= 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Width < 1.65 & Petal.Width >= 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Width >= 1.65 & Petal.Width >= 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Length >= 
+          2.45 ~ "virginica", Sepal.Length >= 4.95 & Petal.Length < 
+          4.75 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+          5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Length < 6.35 & Petal.Width < 1.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+              "virginica", Sepal.Length >= 6.35 & Petal.Width < 1.75 & 
+              Petal.Length < 5.05 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+              1.75 & Petal.Length < 5.05 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.45 ~ "virginica", Sepal.Length < 5.95 & Petal.Length < 
+              4.85 & Petal.Width >= 1.75 & Petal.Length < 5.05 & Petal.Length >= 
+              4.75 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+              "virginica") + case_when(Petal.Length < 2.45 ~ "setosa", 
+          Sepal.Length >= 6 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Width < 1.35 & Sepal.Length < 
+              4.95 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.35 & Sepal.Length < 4.95 & Petal.Width < 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+              4.95 & Sepal.Length >= 4.95 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6 & Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6 & Petal.Width >= 1.75 & 
+              Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 1.55 & 
+              Petal.Length >= 4.95 & Sepal.Length >= 4.95 & Petal.Width < 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width >= 
+              1.55 & Petal.Length >= 4.95 & Sepal.Length >= 4.95 & 
+              Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "virginica", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Petal.Length < 5 & Petal.Length < 
+                  5.35 & Petal.Width < 1.65 & Petal.Length >= 2.6 ~ 
+                  "versicolor", Sepal.Length >= 5.95 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ 
+                  "virginica", Petal.Width < 1.55 & Petal.Length >= 
+                  5 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Petal.Width >= 1.55 & Petal.Length >= 
+                  5 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "versicolor", Petal.Length < 4.65 & Sepal.Length < 
+                  5.95 & Petal.Length < 4.85 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "virginica", Petal.Length >= 
+                  4.65 & Sepal.Length < 5.95 & Petal.Length < 4.85 & 
+                  Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Sepal.Length >= 
+              4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.75 & Petal.Length >= 4.8 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Width < 2.45 & Sepal.Length < 
+                  4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Sepal.Width >= 2.45 & Sepal.Length < 
+                  4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length >= 6.95 & Petal.Width < 
+                  1.75 & Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length < 6.15 & Petal.Length < 
+                  5.05 & Sepal.Length < 6.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.15 & Petal.Length < 5.05 & Sepal.Length < 
+                  6.95 & Petal.Width < 1.75 & Petal.Length >= 4.8 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 
+                  1.55 & Petal.Length >= 5.05 & Sepal.Length < 6.95 & 
+                  Petal.Width < 1.75 & Petal.Length >= 4.8 & Petal.Length >= 
+                  2.45 ~ "virginica", Petal.Width >= 1.55 & Petal.Length >= 
+                  5.05 & Sepal.Length < 6.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.35 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+              1.65 & Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "virginica", 
+              Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Sepal.Length < 
+                  6.15 & Petal.Length >= 2.35 ~ "versicolor", Petal.Length >= 
+                  4.95 & Sepal.Width < 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "virginica", Sepal.Width >= 
+                  3.25 & Sepal.Width >= 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "virginica", Sepal.Width >= 
+                  2.25 & Petal.Length < 5.35 & Petal.Width < 1.65 & 
+                  Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "versicolor", 
+              Sepal.Length < 6.25 & Petal.Length < 4.95 & Sepal.Width < 
+                  2.95 & Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length >= 6.25 & Petal.Length < 
+                  4.95 & Sepal.Width < 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "versicolor", Petal.Width < 
+                  1.55 & Sepal.Width < 3.25 & Sepal.Width >= 2.95 & 
+                  Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ "versicolor", 
+              Petal.Width >= 1.55 & Sepal.Width < 3.25 & Sepal.Width >= 
+                  2.95 & Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length < 5.5 & Sepal.Width < 2.25 & 
+                  Petal.Length < 5.35 & Petal.Width < 1.65 & Sepal.Length < 
+                  6.15 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Length >= 
+                  5.5 & Sepal.Width < 2.25 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+                  2.35 ~ "virginica") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Sepal.Width < 3.1 & Petal.Width < 
+              1.85 & Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.75 & Petal.Length >= 2.45 ~ 
+          "versicolor", Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Petal.Width < 1.65 & 
+          Petal.Length < 4.95 & Petal.Length >= 4.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+          4.95 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Sepal.Width >= 
+              2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+              "virginica", Sepal.Length >= 4.95 & Petal.Length < 4.75 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Length < 5.95 & Petal.Length >= 4.75 & Petal.Length < 
+                  4.85 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+                  6.05 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+                  3.9 & Sepal.Length < 4.95 & Petal.Length < 4.75 & 
+                  Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length >= 3.9 & Sepal.Length < 4.95 & Petal.Length < 
+                  4.75 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length < 6.5 & Sepal.Length >= 
+                  5.95 & Petal.Length >= 4.75 & Petal.Length < 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length >= 
+                  6.5 & Sepal.Length >= 5.95 & Petal.Length >= 4.75 & 
+                  Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width < 2.45 & Sepal.Length < 6.05 & Sepal.Width < 
+                  2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.75 & Sepal.Width >= 
+                  2.45 & Sepal.Length < 6.05 & Sepal.Width < 2.75 & 
+                  Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.75 & Sepal.Width >= 2.45 & Sepal.Length < 
+                  6.05 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.75 & Petal.Length >= 2.45 ~ 
+          "versicolor", Petal.Width >= 1.65 & Petal.Length >= 4.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 6.6 & 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Petal.Length >= 
+          2.45 ~ "virginica", Sepal.Length >= 6.6 & Petal.Width < 1.65 & 
+          Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Width >= 0.75 ~ "versicolor", 
+              Petal.Width >= 1.75 & Petal.Length >= 4.85 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 3 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width >= 3 & Petal.Width >= 1.7 & 
+                  Petal.Length < 4.85 & Petal.Width >= 0.75 ~ "versicolor", 
+              Sepal.Length < 6.2 & Petal.Width < 1.75 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length >= 
+                  6.2 & Petal.Width < 1.75 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.75 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length >= 4.85 & Petal.Width >= 1.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Petal.Length < 4.75 & 
+          Sepal.Width < 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length >= 4.75 & Sepal.Width < 
+          2.25 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width < 3.1 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length < 5.25 & Petal.Width < 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 5.25 & Petal.Width < 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Length < 5.45 & Petal.Width >= 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 5.45 & Petal.Width >= 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica") + case_when(Petal.Width < 0.7 ~ "setosa", 
+          Petal.Length < 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Sepal.Length >= 6.5 & Petal.Width < 1.75 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Sepal.Width < 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length < 4.95 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length < 6.1 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Length >= 6.1 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica") + case_when(Petal.Width >= 1.75 ~ 
+          "virginica", Petal.Width < 0.7 & Petal.Width < 1.75 ~ "setosa", 
+          Petal.Width < 1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ 
+              "versicolor", Petal.Length >= 5.35 & Petal.Width >= 1.35 & 
+              Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "virginica", 
+          Sepal.Length < 5.25 & Petal.Length < 5.35 & Petal.Width >= 
+              1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Length >= 5.25 & Petal.Length < 
+              5.35 & Petal.Width >= 1.35 & Petal.Width >= 0.7 & Petal.Width < 
+              1.75 ~ "versicolor", Sepal.Length < 6.15 & Petal.Length >= 
+              5.05 & Sepal.Length >= 5.25 & Petal.Length < 5.35 & Petal.Width >= 
+              1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "versicolor", 
+          Sepal.Length >= 6.15 & Petal.Length >= 5.05 & Sepal.Length >= 
+              5.25 & Petal.Length < 5.35 & Petal.Width >= 1.35 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width < 1.7 & Petal.Length < 4.85 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 3 & Petal.Width >= 1.7 & Petal.Length < 4.85 & 
+              Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 3 & 
+              Petal.Width >= 1.7 & Petal.Length < 4.85 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Width < 1.65 & Petal.Width < 
+              1.75 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.65 & Petal.Width < 1.75 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 & Petal.Width < 1.75 ~ "setosa", Petal.Length >= 2.45 & 
+          Petal.Width < 1.75 ~ "versicolor", Petal.Length >= 4.85 & 
+          Petal.Width >= 1.75 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+          4.85 & Petal.Width >= 1.75 ~ "virginica", Sepal.Width >= 
+          3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Length < 3.9 & Petal.Length >= 2.45 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Length >= 3.9 & Petal.Length >= 
+                  2.45 & Sepal.Length < 5.45 ~ "virginica", Petal.Length < 
+                  2.5 & Petal.Length < 4.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Petal.Length >= 2.5 & Petal.Length < 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width < 
+                  1.45 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "versicolor", Petal.Width >= 1.65 & Petal.Width >= 
+                  1.45 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Petal.Length < 4.95 & Petal.Width < 
+                  1.65 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length >= 
+                  4.95 & Petal.Width < 1.65 & Petal.Width >= 1.45 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.7 & Petal.Length < 4.85 & Petal.Length >= 
+                  2.45 ~ "versicolor", Sepal.Length >= 6.05 & Petal.Length >= 
+                  4.85 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+                  1.7 & Sepal.Length < 6.05 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+                  1.7 & Sepal.Length < 6.05 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.7 ~ "setosa", Sepal.Length >= 7.05 & Sepal.Length >= 6.05 & 
+          Petal.Width >= 0.7 ~ "virginica", Petal.Width < 1.6 & Petal.Length < 
+          4.65 & Sepal.Length < 6.05 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.6 & Petal.Length < 4.65 & Sepal.Length < 
+              6.05 & Petal.Width >= 0.7 ~ "virginica", Petal.Width >= 
+              1.75 & Sepal.Length < 7.05 & Sepal.Length >= 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length < 5.05 & Petal.Width < 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length >= 5.05 & Petal.Width < 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width < 3.1 & Petal.Width >= 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width >= 2.85 & Petal.Width < 
+              1.75 & Sepal.Length < 7.05 & Sepal.Length >= 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Petal.Length < 5 & Sepal.Width < 
+              2.85 & Petal.Width < 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.05 & Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 
+              5 & Sepal.Width < 2.85 & Petal.Width < 1.75 & Sepal.Length < 
+              7.05 & Sepal.Length >= 6.05 & Petal.Width >= 0.7 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.6 & Petal.Width >= 0.8 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.6 & Petal.Width >= 
+                  0.8 & Sepal.Length < 5.45 ~ "virginica", Sepal.Length >= 
+                  6.1 & Petal.Length >= 5.05 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Petal.Width < 0.65 & Petal.Width < 1.75 & 
+                  Petal.Length < 5.05 & Sepal.Length >= 5.45 ~ "setosa", 
+              Sepal.Length < 5.95 & Petal.Width >= 1.75 & Petal.Length < 
+                  5.05 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Length >= 
+                  5.95 & Petal.Width >= 1.75 & Petal.Length < 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Length < 
+                  5.9 & Sepal.Length < 6.1 & Petal.Length >= 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Length >= 
+                  5.9 & Sepal.Length < 6.1 & Petal.Length >= 5.05 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length < 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Petal.Length < 5.05 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Sepal.Width < 2.6 & Petal.Length >= 4.95 & Petal.Width >= 
+                  0.65 & Petal.Width < 1.75 & Petal.Length < 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+                  2.6 & Petal.Length >= 4.95 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Petal.Length < 5.05 & Sepal.Length >= 
+                  5.45 ~ "versicolor") + case_when(Petal.Length < 2.35 & 
+          Petal.Length < 4.75 ~ "setosa", Petal.Length >= 2.35 & Petal.Length < 
+          4.75 ~ "versicolor", Sepal.Width >= 3.15 & Petal.Length >= 
+          4.75 ~ "virginica", Petal.Length >= 5.05 & Sepal.Width < 
+          3.15 & Petal.Length >= 4.75 ~ "virginica", Sepal.Length < 
+          6.25 & Petal.Length < 5.05 & Sepal.Width < 3.15 & Petal.Length >= 
+          4.75 ~ "virginica", Sepal.Length >= 6.25 & Petal.Length < 
+          5.05 & Sepal.Width < 3.15 & Petal.Length >= 4.75 ~ "versicolor") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Sepal.Length < 5.75 & 
+              Petal.Width >= 0.8 ~ "versicolor", Petal.Length < 4.95 & 
+              Petal.Width < 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Length >= 5.95 & Petal.Width >= 
+              1.75 & Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width < 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+                  1.75 & Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ 
+                  "virginica", Sepal.Width < 3.1 & Sepal.Length < 5.95 & 
+                  Petal.Width >= 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+                  5.95 & Petal.Width >= 1.75 & Sepal.Length >= 5.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Sepal.Length < 
+                  6.95 & Petal.Width >= 1.55 & Petal.Length >= 4.95 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+                  0.8 ~ "versicolor", Sepal.Length >= 6.95 & Petal.Width >= 
+                  1.55 & Petal.Length >= 4.95 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Width < 1.45 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+                  5.05 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+                  4.95 & Petal.Length < 5.05 & Petal.Width >= 1.45 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Width < 2.75 & Petal.Length >= 4.95 & Petal.Length < 
+                  5.05 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+                  2.75 & Petal.Length >= 4.95 & Petal.Length < 5.05 & 
+                  Petal.Width >= 1.45 & Petal.Length >= 4.75 & Petal.Width >= 
+                  0.8 ~ "versicolor") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Sepal.Length >= 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+          0.75 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length >= 
+          4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Width < 2.45 & 
+          Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.45 & Sepal.Length < 
+          4.95 & Petal.Length < 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 5 & Petal.Width < 1.7 & Petal.Length >= 4.75 & 
+              Petal.Width >= 0.75 ~ "versicolor", Petal.Width < 1.55 & 
+              Petal.Length >= 5 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+              6.6 & Petal.Width >= 1.55 & Petal.Length >= 5 & Petal.Width < 
+              1.7 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length >= 6.6 & Petal.Width >= 1.55 & Petal.Length >= 
+              5 & Petal.Width < 1.7 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.75 ~ "virginica") + case_when(Sepal.Width < 2.8 & Sepal.Length < 
+          5.45 ~ "versicolor", Petal.Length < 3.2 & Sepal.Width >= 
+          2.8 & Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 3.2 & 
+          Sepal.Width >= 2.8 & Sepal.Length < 5.45 ~ "versicolor", 
+          Sepal.Length >= 7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Width < 0.7 & Petal.Length < 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "setosa", 
+          Petal.Width >= 0.7 & Petal.Length < 4.75 & Sepal.Length < 
+              6.15 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Length < 
+              5.9 & Petal.Length >= 4.75 & Sepal.Length < 6.15 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length < 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Length < 5.05 & Sepal.Length >= 5.9 & Petal.Length >= 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "virginica", 
+          Petal.Length >= 5.05 & Sepal.Length >= 5.9 & Petal.Length >= 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Width < 1.6 & Petal.Length >= 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Width >= 1.6 & Petal.Length >= 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Length < 
+              4.75 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+              5 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+                  5.95 & Sepal.Length < 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  5.75 & Sepal.Length < 5.95 & Sepal.Length < 6.55 & 
+                  Petal.Length < 5 & Petal.Length >= 4.75 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 5.75 & Sepal.Length < 
+                  5.95 & Sepal.Length < 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Sepal.Width >= 2.55 & Petal.Length < 4.75 & 
+          Petal.Length >= 2.6 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length >= 4.95 & Sepal.Width < 2.55 & Petal.Length < 
+              4.75 & Petal.Length >= 2.6 ~ "versicolor", Petal.Length < 
+              5.05 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Width < 2.45 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.55 & Petal.Length < 4.75 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width >= 2.45 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.55 & Petal.Length < 4.75 & Petal.Length >= 2.6 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.55 & Petal.Length >= 2.45 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.55 & Petal.Length >= 
+                  2.45 & Sepal.Length < 5.45 ~ "virginica", Petal.Width < 
+                  0.65 & Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Sepal.Length >= 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width < 
+                  3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+                  3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width < 
+                  1.25 & Sepal.Width < 2.25 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width >= 1.25 & Sepal.Width < 2.25 & Petal.Width >= 
+                  0.65 & Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Sepal.Length < 6.05 & Sepal.Width >= 
+                  2.25 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length < 
+                  5.3 & Sepal.Length >= 6.05 & Sepal.Width >= 2.25 & 
+                  Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.45 ~ "versicolor", Petal.Length >= 5.3 & Sepal.Length >= 
+                  6.05 & Sepal.Width >= 2.25 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Sepal.Width >= 2.55 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width < 1.6 & Sepal.Width < 2.55 & Petal.Length < 
+                  4.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+                  1.6 & Sepal.Width < 2.55 & Petal.Length < 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  6.55 & Petal.Length < 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+                  6.55 & Petal.Length < 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  5.95 & Sepal.Length < 6.05 & Petal.Length >= 4.95 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width < 1.55 & Sepal.Length >= 5.95 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Petal.Width >= 
+                  1.55 & Sepal.Length >= 5.95 & Sepal.Length < 6.05 & 
+                  Petal.Length >= 4.95 & Petal.Length >= 4.75 & Petal.Width >= 
+                  0.8 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Sepal.Length < 5.75 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Length < 4.65 & Sepal.Length >= 
+          5.75 & Sepal.Length < 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length < 4.95 & Sepal.Width < 3.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+              4.95 & Sepal.Width < 3.05 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width < 1.7 & Sepal.Width >= 
+              3.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.7 & Sepal.Width >= 3.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Petal.Length >= 
+              4.9 & Petal.Length >= 4.65 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width < 
+              3.1 & Petal.Length < 4.9 & Petal.Length >= 4.65 & Sepal.Length >= 
+              5.75 & Sepal.Length < 6.25 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Length < 4.9 & Petal.Length >= 
+              4.65 & Sepal.Length >= 5.75 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.8 ~ "versicolor") + case_when(Petal.Length < 2.45 & 
+          Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 2.45 & Sepal.Length < 
+          5.45 ~ "versicolor", Petal.Length < 2.5 & Petal.Width < 1.7 & 
+          Sepal.Length >= 5.45 ~ "setosa", Sepal.Length >= 5.95 & Petal.Width >= 
+          1.7 & Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+          5.25 & Petal.Length >= 2.5 & Petal.Width < 1.7 & Sepal.Length >= 
+          5.45 ~ "versicolor", Petal.Length >= 5.25 & Petal.Length >= 
+          2.5 & Petal.Width < 1.7 & Sepal.Length >= 5.45 ~ "virginica", 
+          Sepal.Width < 3.1 & Sepal.Length < 5.95 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.7 & Sepal.Length >= 
+              5.45 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Width < 1.7 & Petal.Length < 4.85 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length < 4.85 & 
+          Petal.Width >= 0.8 ~ "virginica", Petal.Length < 5.05 & Sepal.Length < 
+          6.05 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica", Petal.Width < 
+              1.7 & Petal.Length >= 5.05 & Sepal.Length < 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length >= 5.05 & Sepal.Length < 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Width < 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+              5.05 & Petal.Width < 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.8 ~ 
+          "virginica", Petal.Length >= 5.35 & Petal.Width < 1.65 & 
+          Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 2.25 & Petal.Length < 
+          5.35 & Petal.Width < 1.65 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.25 & Sepal.Width < 2.25 & Petal.Length < 
+              5.35 & Petal.Width < 1.65 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Length < 6.1 & Petal.Width >= 1.25 & Sepal.Width < 
+              2.25 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Length >= 6.1 & Petal.Width >= 
+              1.25 & Sepal.Width < 2.25 & Petal.Length < 5.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ 
+          "virginica", Petal.Width < 1.45 & Petal.Width < 1.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Sepal.Length >= 7.05 & Petal.Width >= 
+          1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.65 & Sepal.Width < 2.85 & Sepal.Length < 
+              7.05 & Petal.Width >= 1.45 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Length < 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width < 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Width >= 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "virginica", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.75 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.75 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width >= 3.1 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.75 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Petal.Length < 4.9 & Petal.Width < 
+                  1.65 & Petal.Length < 5.35 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.75 ~ "versicolor", Petal.Length < 
+                  4.75 & Petal.Width >= 1.65 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "virginica", 
+              Petal.Length >= 4.75 & Petal.Width >= 1.65 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Sepal.Length < 6.15 & Petal.Length >= 
+                  4.9 & Petal.Width < 1.65 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "versicolor", 
+              Sepal.Length >= 6.15 & Petal.Length >= 4.9 & Petal.Width < 
+                  1.65 & Petal.Length < 5.35 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.75 ~ "virginica") + case_when(Petal.Length < 
+          2.5 ~ "setosa", Petal.Length >= 4.95 & Petal.Length >= 2.5 ~ 
+          "virginica", Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+          2.5 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+          4.95 & Petal.Length >= 2.5 ~ "virginica") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.85 & Sepal.Length >= 6.25 & 
+          Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 4.7 & 
+          Sepal.Length < 5.75 & Sepal.Length < 6.25 & Petal.Length >= 
+          2.45 ~ "virginica", Petal.Width < 1.55 & Petal.Length >= 
+          4.85 & Sepal.Length >= 6.25 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.55 & Petal.Length >= 4.85 & Sepal.Length >= 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.6 & Petal.Length < 4.7 & Sepal.Length < 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.6 & Petal.Length < 4.7 & Sepal.Length < 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.7 & Petal.Length < 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length < 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length >= 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Width < 1.7 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.75 & Sepal.Length < 6.25 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Length >= 5.05 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.75 & Sepal.Length < 6.25 & Petal.Length >= 
+              2.45 ~ "versicolor") + case_when(Petal.Length < 2.5 ~ 
+          "setosa", Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+          2.5 ~ "versicolor", Sepal.Width < 3.1 & Petal.Width >= 1.65 & 
+          Petal.Length < 4.95 & Petal.Length >= 2.5 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Petal.Length < 
+              4.95 & Petal.Length >= 2.5 ~ "versicolor", Sepal.Length < 
+              6.35 & Petal.Length < 5.05 & Petal.Length >= 4.95 & Petal.Length >= 
+              2.5 ~ "virginica", Sepal.Length >= 6.35 & Petal.Length < 
+              5.05 & Petal.Length >= 4.95 & Petal.Length >= 2.5 ~ "versicolor", 
+          Petal.Width >= 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "virginica", Petal.Width < 
+              1.55 & Petal.Width < 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "virginica", Petal.Width >= 
+              1.55 & Petal.Width < 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "versicolor") + case_when(Petal.Length < 
+          2.15 & Sepal.Width < 2.8 & Sepal.Length < 5.45 ~ "setosa", 
+          Petal.Length >= 2.15 & Sepal.Width < 2.8 & Sepal.Length < 
+              5.45 ~ "versicolor", Petal.Length < 3.1 & Sepal.Width >= 
+              2.8 & Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 
+              3.1 & Sepal.Width >= 2.8 & Sepal.Length < 5.45 ~ "versicolor", 
+          Sepal.Width >= 3.45 & Petal.Width < 1.7 & Sepal.Length >= 
+              5.45 ~ "setosa", Sepal.Length >= 6.05 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+              5 & Sepal.Width < 3.45 & Petal.Width < 1.7 & Sepal.Length >= 
+              5.45 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6.05 & Petal.Width >= 1.7 & Sepal.Length >= 5.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6.05 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Width < 
+              2.75 & Petal.Length >= 5 & Sepal.Width < 3.45 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Width >= 
+              2.75 & Petal.Length >= 5 & Sepal.Width < 3.45 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica") + case_when(Petal.Length < 
+          2.45 & Sepal.Length < 5.55 ~ "setosa", Petal.Length >= 2.45 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Length < 2.6 & 
+          Petal.Length < 4.75 & Sepal.Length >= 5.55 ~ "setosa", Petal.Length >= 
+          2.6 & Petal.Length < 4.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length < 4.95 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width >= 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width < 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.55 & Sepal.Width < 
+              2.85 & Petal.Length >= 4.95 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Sepal.Length >= 5.55 ~ "virginica", Petal.Width >= 
+              1.55 & Sepal.Width < 2.85 & Petal.Length >= 4.95 & Petal.Width < 
+              1.7 & Petal.Length >= 4.75 & Sepal.Length >= 5.55 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.5 & 
+              Sepal.Length >= 6.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.5 & Sepal.Length >= 6.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 4.95 & Sepal.Length < 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width >= 1.75 & Sepal.Length >= 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Width < 2.45 & Sepal.Length < 
+                  4.95 & Sepal.Length < 5.75 & Sepal.Length < 6.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Sepal.Width >= 
+                  2.45 & Sepal.Length < 4.95 & Sepal.Length < 5.75 & 
+                  Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Length < 5.05 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 5.75 & Sepal.Length < 6.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.7 ~ "setosa", Sepal.Length >= 4.95 & Petal.Length < 4.75 & 
+          Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 5.15 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Petal.Width >= 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Sepal.Length >= 6.05 & Sepal.Length < 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width >= 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.5 & Petal.Length < 5.15 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Width < 2.45 & Petal.Width < 
+              1.7 & Sepal.Length < 6.05 & Sepal.Length < 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Sepal.Width >= 2.45 & Petal.Width < 1.7 & Sepal.Length < 
+              6.05 & Sepal.Length < 6.5 & Petal.Length < 5.15 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width >= 1.75 & Petal.Length >= 4.95 & 
+          Petal.Width >= 0.8 ~ "virginica", Petal.Width < 1.65 & Petal.Length < 
+          4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Width < 2.65 & Petal.Length >= 4.85 & Petal.Length < 
+              4.95 & Petal.Width >= 0.8 ~ "versicolor", Sepal.Width >= 
+              2.65 & Petal.Length >= 4.85 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Length >= 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length < 
+              4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.75 & Petal.Width >= 1.65 & Petal.Length < 
+              4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.55 & Petal.Length < 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.55 & Petal.Length < 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "versicolor") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Length >= 5.35 & 
+              Petal.Width < 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Length >= 5.95 & Petal.Width >= 1.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Length < 4.95 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Sepal.Width < 3 & Sepal.Length < 5.95 & 
+                  Petal.Width >= 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Width >= 3 & Sepal.Length < 5.95 & Petal.Width >= 
+                  1.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width < 
+                  1.55 & Petal.Length >= 4.95 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width >= 1.55 & Petal.Length >= 4.95 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.8 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Width < 1.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Length >= 6 & Petal.Width >= 
+              1.65 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Width >= 1.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6 & Petal.Width >= 1.65 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6 & Petal.Width >= 1.65 & 
+              Petal.Width >= 0.8 ~ "versicolor", Sepal.Length < 6.15 & 
+              Sepal.Width < 2.65 & Petal.Width >= 1.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+              6.15 & Sepal.Width < 2.65 & Petal.Width >= 1.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Sepal.Width < 
+          2.8 & Sepal.Length < 5.55 ~ "versicolor", Petal.Width < 0.95 & 
+          Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "setosa", Petal.Width >= 
+          0.95 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length < 2.7 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "setosa", Sepal.Width < 2.95 & Petal.Length >= 
+              2.7 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Width >= 
+              1.65 & Petal.Length < 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Width >= 1.7 & Petal.Length >= 
+              4.95 & Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Width < 1.7 & Sepal.Width >= 2.95 & 
+              Petal.Length >= 2.7 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Width < 2.45 & Petal.Width < 
+              1.7 & Petal.Length >= 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Length < 5.95 & Petal.Width >= 
+              1.7 & Sepal.Width >= 2.95 & Petal.Length >= 2.7 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.7 & Sepal.Width >= 2.95 & Petal.Length >= 
+              2.7 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Length < 5.45 & Sepal.Width >= 2.45 & Petal.Width < 
+              1.7 & Petal.Length >= 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Length >= 5.45 & Sepal.Width >= 
+              2.45 & Petal.Width < 1.7 & Petal.Length >= 4.95 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width < 1.45 & Petal.Width < 1.65 & 
+          Petal.Length >= 2.35 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Width >= 1.65 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 2.85 & Petal.Width >= 1.45 & Petal.Width < 
+              1.65 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Length < 
+              5.8 & Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Length >= 5.8 & Petal.Width < 
+              1.75 & Petal.Width >= 1.65 & Petal.Length >= 2.35 ~ "versicolor", 
+          Petal.Length < 4.75 & Sepal.Width < 2.85 & Petal.Width >= 
+              1.45 & Petal.Width < 1.65 & Petal.Length >= 2.35 ~ "versicolor", 
+          Petal.Length >= 4.75 & Sepal.Width < 2.85 & Petal.Width >= 
+              1.45 & Petal.Width < 1.65 & Petal.Length >= 2.35 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.65 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.35 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length < 5 & Petal.Width >= 1.35 & Petal.Width < 
+                  1.65 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Width >= 
+                  2.75 & Petal.Length >= 5 & Petal.Width >= 1.35 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Length < 5.35 & Sepal.Width < 2.75 & Petal.Length >= 
+                  5 & Petal.Width >= 1.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Length >= 5.35 & Sepal.Width < 
+                  2.75 & Petal.Length >= 5 & Petal.Width >= 1.35 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Length >= 4.95 & Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.7 & Sepal.Width < 3.1 & 
+                  Sepal.Length < 6.05 & Petal.Length >= 4.75 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Width >= 1.7 & Sepal.Width < 
+                  3.1 & Sepal.Length < 6.05 & Petal.Length >= 4.75 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  6.6 & Petal.Length < 4.95 & Sepal.Length >= 6.05 & 
+                  Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.6 & Petal.Length < 4.95 & Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.7 ~ "setosa", 
+          Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 4.95 & Petal.Length < 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Sepal.Length >= 
+              6.05 & Sepal.Length < 6.6 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Length >= 5.05 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 & Petal.Width < 1.55 ~ "setosa", Petal.Width >= 1.65 & 
+          Petal.Width >= 1.55 ~ "virginica", Petal.Length < 4.95 & 
+          Petal.Length >= 2.45 & Petal.Width < 1.55 ~ "versicolor", 
+          Petal.Length >= 4.95 & Petal.Length >= 2.45 & Petal.Width < 
+              1.55 ~ "virginica", Sepal.Width < 2.85 & Petal.Width < 
+              1.65 & Petal.Width >= 1.55 ~ "versicolor", Sepal.Length < 
+              6.75 & Sepal.Width >= 2.85 & Petal.Width < 1.65 & Petal.Width >= 
+              1.55 ~ "versicolor", Sepal.Length >= 6.75 & Sepal.Width >= 
+              2.85 & Petal.Width < 1.65 & Petal.Width >= 1.55 ~ "virginica") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.7 ~ "virginica", Petal.Length >= 5.05 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.7 ~ "virginica", Sepal.Length >= 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.7 ~ "versicolor", Sepal.Width < 
+                  3.1 & Sepal.Length < 6.5 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+              Sepal.Width >= 3.1 & Sepal.Length < 6.5 & Petal.Length < 
+                  5.05 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.7 & Sepal.Length < 
+          5.55 ~ "setosa", Petal.Length < 4.25 & Petal.Width >= 0.7 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Width < 0.65 & 
+          Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "setosa", Petal.Length < 
+          4.85 & Petal.Width >= 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Length >= 4.85 & Petal.Width >= 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width < 2.75 & Petal.Length >= 
+              4.25 & Petal.Width >= 0.7 & Sepal.Length < 5.55 ~ "virginica", 
+          Sepal.Width >= 2.75 & Petal.Length >= 4.25 & Petal.Width >= 
+              0.7 & Sepal.Length < 5.55 ~ "versicolor", Petal.Length < 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.6 & Petal.Length >= 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Width >= 1.6 & Petal.Length >= 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.45 & Petal.Width < 1.55 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+          1.55 & Petal.Length >= 2.45 ~ "virginica", Sepal.Width >= 
+          2.9 & Petal.Width >= 1.45 & Petal.Width < 1.55 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length < 4.6 & Petal.Length < 
+          4.85 & Petal.Width >= 1.55 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Length >= 4.6 & Petal.Length < 4.85 & Petal.Width >= 
+              1.55 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length < 
+              5 & Sepal.Width < 2.9 & Petal.Width >= 1.45 & Petal.Width < 
+              1.55 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+              5 & Sepal.Width < 2.9 & Petal.Width >= 1.45 & Petal.Width < 
+              1.55 & Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.75 ~ 
+          "virginica", Sepal.Length < 6.25 & Petal.Width < 1.65 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Length >= 6.35 & Sepal.Length >= 
+          6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length < 5 & Sepal.Length < 6.35 & Sepal.Length >= 
+              6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 5 & Sepal.Length < 6.35 & Sepal.Length >= 
+              6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Width >= 1.75 & 
+              Petal.Width >= 0.7 ~ "virginica", Sepal.Length >= 4.95 & 
+              Petal.Length < 5.05 & Petal.Width < 1.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width >= 2.75 & Petal.Length >= 
+              5.05 & Petal.Width < 1.75 & Petal.Width >= 0.7 ~ "virginica", 
+              Petal.Width < 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+                  5.05 & Petal.Width < 1.75 & Petal.Width >= 0.7 ~ 
+                  "versicolor", Petal.Width >= 1.35 & Sepal.Length < 
+                  4.95 & Petal.Length < 5.05 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.7 ~ "virginica", Petal.Width < 1.5 & 
+                  Sepal.Width < 2.75 & Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Petal.Width >= 0.7 ~ "virginica", Petal.Width >= 
+                  1.5 & Sepal.Width < 2.75 & Petal.Length >= 5.05 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.7 ~ "versicolor") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Length < 4.95 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "versicolor", 
+              Petal.Length >= 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Sepal.Length < 6.6 & Petal.Width >= 
+                  1.65 & Petal.Length >= 2.6 ~ "virginica", Petal.Width < 
+                  1.75 & Sepal.Length >= 6.6 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "versicolor", Petal.Width >= 
+                  1.75 & Sepal.Length >= 6.6 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Sepal.Length >= 7.05 & Sepal.Length >= 6.75 & 
+          Petal.Length >= 2.6 ~ "virginica", Sepal.Width >= 2.65 & 
+          Petal.Width < 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+          2.6 ~ "versicolor", Sepal.Width < 3.15 & Petal.Width >= 1.65 & 
+          Sepal.Length < 6.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.75 & Petal.Length >= 2.6 ~ "versicolor", Petal.Length >= 
+              5.05 & Sepal.Length < 7.05 & Sepal.Length >= 6.75 & Petal.Length >= 
+              2.6 ~ "virginica", Petal.Width < 1.35 & Sepal.Width < 
+              2.65 & Petal.Width < 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width < 3.25 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width >= 3.25 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "virginica", Sepal.Length < 6.15 & Petal.Width >= 
+              1.35 & Sepal.Width < 2.65 & Petal.Width < 1.65 & Sepal.Length < 
+              6.75 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              6.15 & Petal.Width >= 1.35 & Sepal.Width < 2.65 & Petal.Width < 
+              1.65 & Sepal.Length < 6.75 & Petal.Length >= 2.6 ~ "versicolor") + 
+          case_when(Petal.Length < 2.5 ~ "setosa", Petal.Width < 1.45 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.5 ~ "versicolor", 
+              Sepal.Length >= 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "virginica", Sepal.Width >= 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length < 4.65 & Sepal.Length < 
+                  6 & Petal.Width >= 1.65 & Petal.Length >= 2.5 ~ "virginica", 
+              Petal.Width >= 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Sepal.Width < 2.95 & Petal.Length >= 
+                  4.65 & Sepal.Length < 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "virginica", Sepal.Width >= 2.95 & Petal.Length >= 
+                  4.65 & Sepal.Length < 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "versicolor", Sepal.Length < 6.1 & Sepal.Width < 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "virginica", Sepal.Length >= 6.1 & Sepal.Width < 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length < 5 & Sepal.Width >= 2.35 & 
+                  Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length >= 5 & Sepal.Width >= 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "virginica") + case_when(Sepal.Width >= 2.8 & Sepal.Length < 
+          5.55 ~ "setosa", Petal.Width < 1.55 & Sepal.Width < 2.8 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Width >= 1.55 & 
+          Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "virginica", Sepal.Length >= 
+          7.1 & Petal.Width < 1.7 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Width >= 1.85 & Petal.Width >= 1.7 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Length < 4.85 & Petal.Width < 
+              1.85 & Petal.Width >= 1.7 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length >= 4.85 & Petal.Width < 1.85 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Width < 
+              3.7 & Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Width >= 
+              3.7 & Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "setosa", Sepal.Width < 
+              2.65 & Petal.Length >= 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Length >= 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "versicolor") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Length < 4.75 & Petal.Width >= 0.8 ~ 
+          "versicolor", Petal.Length < 4.95 & Petal.Width < 1.55 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 4.95 & Petal.Width < 1.55 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Length < 4.9 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Length >= 4.9 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica") + case_when(Petal.Length < 2.6 ~ "setosa", 
+          Petal.Width >= 1.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Petal.Length < 5.45 & Petal.Width < 1.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length >= 5.45 & Petal.Width < 
+              1.75 & Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Length < 4.75 & Petal.Width >= 0.8 ~ 
+          "versicolor", Petal.Width < 1.45 & Petal.Length >= 4.75 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.45 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Length < 2.6 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.55 & Petal.Length >= 2.6 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.55 & Petal.Length >= 
+                  2.6 & Sepal.Length < 5.45 ~ "virginica", Petal.Width < 
+                  0.7 & Petal.Length < 4.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Petal.Width >= 0.7 & Petal.Length < 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width >= 
+                  1.7 & Petal.Length >= 5.05 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width < 1.75 & Sepal.Width >= 2.9 & Petal.Length < 
+                  5.05 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "versicolor", Petal.Width >= 1.75 & Sepal.Width >= 
+                  2.9 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+                  5.35 & Petal.Width < 1.7 & Petal.Length >= 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Length >= 5.35 & Petal.Width < 1.7 & Petal.Length >= 
+                  5.05 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Sepal.Length < 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica", 
+              Petal.Width < 1.65 & Sepal.Length >= 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width >= 1.65 & Sepal.Length >= 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Length < 4.95 & 
+              Petal.Width < 1.7 & Petal.Width >= 0.75 ~ "versicolor", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.7 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 2.65 & Petal.Length >= 
+                  4.95 & Petal.Width < 1.7 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Length < 6.05 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.7 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Sepal.Length >= 6.05 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.7 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width < 2.75 & Sepal.Width >= 
+                  2.65 & Petal.Length >= 4.95 & Petal.Width < 1.7 & 
+                  Petal.Width >= 0.75 ~ "versicolor", Sepal.Width >= 
+                  2.75 & Sepal.Width >= 2.65 & Petal.Length >= 4.95 & 
+                  Petal.Width < 1.7 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.7 & Petal.Length >= 4.85 & Petal.Width >= 
+                  0.8 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.8 ~ 
+                  "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Petal.Width >= 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Petal.Length < 4.95 & Petal.Width < 
+                  1.55 & Petal.Width < 1.7 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+                  4.95 & Petal.Width < 1.55 & Petal.Width < 1.7 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width < 1.65 & Petal.Length < 4.75 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.65 & 
+          Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+          4.95 & Sepal.Width < 2.55 & Petal.Length >= 4.75 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Width < 
+          2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 4.85 & Sepal.Length < 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 4.85 & Sepal.Length < 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.5 & Sepal.Length >= 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 2.7 & Petal.Width < 1.5 & Sepal.Length >= 5.95 & 
+              Sepal.Width >= 2.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Width >= 2.7 & Petal.Width < 
+              1.5 & Sepal.Length >= 5.95 & Sepal.Width >= 2.55 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Length < 4.95 & Petal.Width < 1.55 & 
+          Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 4.95 & 
+          Petal.Width < 1.55 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+          5.95 & Petal.Length < 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.75 & Petal.Length >= 
+          5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.95 & Sepal.Length >= 5.95 & Petal.Length < 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.35 & Sepal.Width < 2.75 & Petal.Length >= 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Width < 2.75 & Petal.Length >= 4.95 & Sepal.Length >= 
+              5.95 & Petal.Length < 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+              0.75 ~ "virginica", Sepal.Width >= 2.75 & Petal.Length >= 
+              4.95 & Sepal.Length >= 5.95 & Petal.Length < 5.05 & Petal.Width >= 
+              1.55 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Length < 
+              5.9 & Sepal.Length < 6.35 & Sepal.Width < 2.75 & Petal.Length >= 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 5.9 & Sepal.Length < 6.35 & Sepal.Width < 
+              2.75 & Petal.Length >= 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+              0.75 ~ "versicolor") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Petal.Length >= 5.05 & Sepal.Length >= 6.25 & Petal.Width >= 
+          0.75 ~ "virginica", Sepal.Length < 5.95 & Petal.Length >= 
+          4.85 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.35 & Petal.Length < 5.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Width < 
+              2.45 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Width >= 
+              2.45 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+              5.95 & Sepal.Length >= 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 
+              5.25 & Sepal.Length >= 5.95 & Petal.Length >= 4.85 & 
+              Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.65 & Sepal.Length < 6.35 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 4.65 & Sepal.Length < 6.35 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.75 & Sepal.Length >= 5.95 & Sepal.Length >= 
+              4.95 & Petal.Length < 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 4.75 & Sepal.Length >= 
+              5.95 & Sepal.Length >= 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Length < 5.25 & Sepal.Length >= 5.95 & Petal.Length >= 
+              4.85 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length >= 5.05 & Petal.Length < 5.25 & Sepal.Length >= 
+              5.95 & Petal.Length >= 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Width >= 1.7 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ 
+              "versicolor", Petal.Width < 1.55 & Petal.Length >= 4.9 & 
+              Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 5.45 & Petal.Width >= 1.55 & Petal.Length >= 
+              4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 5.45 & Petal.Width >= 1.55 & Petal.Length >= 
+              4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.9 & Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Width >= 1.7 & Petal.Length >= 4.95 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length < 6.25 & Petal.Width < 
+                  1.9 & Petal.Length < 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width < 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width >= 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Sepal.Length >= 6.35 & Sepal.Length >= 
+                  6.25 & Petal.Width < 1.9 & Petal.Length < 4.95 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 
+                  1.7 & Sepal.Length < 6.35 & Sepal.Length >= 6.25 & 
+                  Petal.Width < 1.9 & Petal.Length < 4.95 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Width >= 1.7 & Sepal.Length < 
+                  6.35 & Sepal.Length >= 6.25 & Petal.Width < 1.9 & 
+                  Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Width >= 1.65 & 
+              Petal.Length >= 2.6 ~ "virginica", Petal.Length < 4.95 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "versicolor", 
+              Petal.Length >= 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica") + case_when(Petal.Length < 2.6 & 
+          Sepal.Length < 5.45 ~ "setosa", Sepal.Length >= 6.75 & Sepal.Length >= 
+          5.45 ~ "virginica", Petal.Width < 1.55 & Petal.Length >= 
+          2.6 & Sepal.Length < 5.45 ~ "versicolor", Petal.Width >= 
+          1.55 & Petal.Length >= 2.6 & Sepal.Length < 5.45 ~ "virginica", 
+          Petal.Width < 0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & 
+              Sepal.Length >= 5.45 ~ "setosa", Petal.Width >= 1.85 & 
+              Petal.Width >= 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length < 5.05 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "versicolor", Petal.Length >= 5.05 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length >= 4.85 & Petal.Width < 
+              1.85 & Petal.Width >= 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+              4.85 & Petal.Width < 1.85 & Petal.Width >= 1.75 & Sepal.Length < 
+              6.75 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Petal.Length < 4.85 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Sepal.Length < 6.75 & Sepal.Length >= 5.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.6 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width >= 2.75 & Petal.Length >= 4.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length < 5.4 & Petal.Width >= 
+                  1.6 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length >= 5.4 & Petal.Width >= 
+                  1.6 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width >= 1.7 & Sepal.Width < 
+                  2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.5 & Petal.Width < 1.7 & 
+                  Sepal.Width < 2.75 & Petal.Length >= 4.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Petal.Width >= 1.5 & Petal.Width < 
+                  1.7 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Sepal.Length >= 7.1 & Petal.Width < 1.75 & 
+          Petal.Length >= 2.35 ~ "virginica", Petal.Length >= 4.85 & 
+          Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Width < 
+              3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Petal.Length < 
+              4.85 & Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "versicolor", 
+          Sepal.Width < 2.8 & Petal.Length >= 4.95 & Sepal.Length < 
+              7.1 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 2.8 & Petal.Length >= 4.95 & Sepal.Length < 
+              7.1 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.65 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+              6.05 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width >= 2.85 & Sepal.Length >= 6.05 & Petal.Width < 
+                  1.65 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length < 
+                  4.95 & Sepal.Width < 2.85 & Sepal.Length >= 6.05 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length >= 4.95 & Sepal.Width < 2.85 & Sepal.Length >= 
+                  6.05 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ 
+                  "virginica") + case_when(Sepal.Width >= 2.85 & Sepal.Length < 
+          5.45 ~ "setosa", Sepal.Width < 2.4 & Sepal.Width < 2.85 & 
+          Sepal.Length < 5.45 ~ "setosa", Sepal.Width >= 2.4 & Sepal.Width < 
+          2.85 & Sepal.Length < 5.45 ~ "versicolor", Sepal.Width < 
+          3.45 & Petal.Length < 4.8 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Sepal.Width >= 3.45 & Petal.Length < 4.8 & Sepal.Length >= 
+              5.45 ~ "setosa", Petal.Length >= 5.15 & Petal.Length >= 
+              4.8 & Sepal.Length >= 5.45 ~ "virginica", Petal.Width >= 
+              1.7 & Petal.Length < 5.15 & Petal.Length >= 4.8 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Width >= 1.55 & Petal.Width < 
+              1.7 & Petal.Length < 5.15 & Petal.Length >= 4.8 & Sepal.Length >= 
+              5.45 ~ "versicolor", Sepal.Width < 2.95 & Petal.Width < 
+              1.55 & Petal.Width < 1.7 & Petal.Length < 5.15 & Petal.Length >= 
+              4.8 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              2.95 & Petal.Width < 1.55 & Petal.Width < 1.7 & Petal.Length < 
+              5.15 & Petal.Length >= 4.8 & Sepal.Length >= 5.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.35 ~ "setosa", Petal.Width >= 
+              1.7 & Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ "virginica", 
+              Petal.Width >= 1.75 & Sepal.Length >= 6.25 & Petal.Length >= 
+                  2.35 ~ "virginica", Sepal.Length < 6.05 & Petal.Width < 
+                  1.7 & Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ 
+                  "versicolor", Petal.Length < 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 6.25 & Petal.Length >= 2.35 ~ 
+                  "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 6.25 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length >= 6.15 & Sepal.Length >= 
+                  6.05 & Petal.Width < 1.7 & Sepal.Length < 6.25 & 
+                  Petal.Length >= 2.35 ~ "versicolor", Petal.Length < 
+                  5.1 & Sepal.Length < 6.15 & Sepal.Length >= 6.05 & 
+                  Petal.Width < 1.7 & Sepal.Length < 6.25 & Petal.Length >= 
+                  2.35 ~ "versicolor", Petal.Length >= 5.1 & Sepal.Length < 
+                  6.15 & Sepal.Length >= 6.05 & Petal.Width < 1.7 & 
+                  Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.6 & 
+              Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.6 & Petal.Length < 4.95 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 6.05 & Petal.Length >= 
+                  4.95 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+                  1.55 & Sepal.Length < 6.05 & Petal.Length >= 4.95 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  5.95 & Petal.Width >= 1.55 & Sepal.Length < 6.05 & 
+                  Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 5.95 & Petal.Width >= 1.55 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.75 ~ "setosa", 
+          Petal.Width < 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+              4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length < 6.2 & Sepal.Width < 2.65 & Petal.Width < 1.75 & 
+              Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.2 & Sepal.Width < 2.65 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length < 5.95 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length >= 5.95 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 & Sepal.Length < 5.55 ~ "setosa", 
+              Petal.Width >= 0.8 & Sepal.Length < 5.55 ~ "versicolor", 
+              Petal.Width < 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.55 ~ "setosa", Sepal.Length >= 5.95 & Petal.Width >= 
+                  1.75 & Sepal.Length >= 5.55 ~ "virginica", Petal.Length < 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+                  4.85 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Petal.Length >= 
+                  4.85 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.55 ~ "virginica", Sepal.Width < 
+                  2.9 & Petal.Length >= 4.95 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+              Sepal.Length < 6.95 & Sepal.Width >= 2.9 & Petal.Length >= 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+                  6.95 & Sepal.Width >= 2.9 & Petal.Length >= 4.95 & 
+                  Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.55 ~ "virginica") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Petal.Length < 4.75 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.75 ~ "versicolor", Petal.Length < 4.85 & Petal.Length >= 
+          4.75 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 4.85 & Petal.Length >= 4.75 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Petal.Length < 
+              5 & Petal.Width < 1.55 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 5 & Petal.Width < 
+              1.55 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.8 & Petal.Width >= 1.55 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 
+              4.8 & Petal.Width >= 1.55 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.75 ~ "virginica") + case_when(Petal.Length < 2.6 ~ 
+          "setosa", Petal.Length < 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+          2.6 ~ "versicolor", Petal.Length >= 4.95 & Petal.Width < 
+          1.65 & Petal.Length >= 2.6 ~ "virginica", Petal.Width >= 
+          1.75 & Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length < 5.8 & Petal.Width < 1.75 & Petal.Width >= 
+              1.65 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              5.8 & Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length >= 
+              2.6 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.65 & Petal.Length < 4.85 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length >= 
+          4.85 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+          4.65 & Petal.Width >= 1.65 & Petal.Length < 4.85 & Petal.Length >= 
+          2.45 ~ "virginica", Petal.Length >= 4.65 & Petal.Width >= 
+          1.65 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+          Sepal.Width < 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+              6.75 & Sepal.Width >= 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+              6.75 & Sepal.Width >= 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width < 1.35 & Petal.Width < 1.75 & 
+          Petal.Length >= 2.35 ~ "versicolor", Sepal.Length >= 5.95 & 
+          Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Length < 5.05 & Petal.Width >= 1.35 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "virginica", Sepal.Width < 
+              3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "versicolor", 
+          Sepal.Width < 2.65 & Sepal.Length >= 5.05 & Petal.Width >= 
+              1.35 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Width >= 2.65 & Sepal.Length >= 
+              5.05 & Petal.Width >= 1.35 & Petal.Width < 1.75 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 5.05 & Sepal.Width >= 
+              2.65 & Sepal.Length >= 5.05 & Petal.Width >= 1.35 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "virginica") + case_when(Petal.Width < 
+          0.8 & Sepal.Length < 5.55 ~ "setosa", Petal.Width >= 0.8 & 
+          Sepal.Length < 5.55 ~ "versicolor", Sepal.Length >= 5.95 & 
+          Petal.Width >= 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+          Sepal.Length < 6.15 & Sepal.Width < 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Length >= 
+              6.15 & Sepal.Width < 2.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length < 4.95 & Sepal.Length < 5.95 & Petal.Width >= 
+              1.75 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length >= 
+              4.95 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Length < 4.85 & Sepal.Width < 
+              2.85 & Petal.Width >= 1.45 & Sepal.Width >= 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+              5.4 & Sepal.Width >= 2.85 & Petal.Width >= 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length >= 5.4 & Sepal.Width >= 2.85 & Petal.Width >= 
+              1.45 & Sepal.Width >= 2.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Length < 6.15 & Petal.Length >= 
+              4.85 & Sepal.Width < 2.85 & Petal.Width >= 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Sepal.Length >= 6.15 & Petal.Length >= 4.85 & Sepal.Width < 
+              2.85 & Petal.Width >= 1.45 & Sepal.Width >= 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Length < 4.75 & Petal.Length < 4.95 & 
+          Petal.Length >= 2.35 ~ "versicolor", Petal.Length >= 5.05 & 
+          Petal.Length >= 4.95 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Petal.Length < 
+              4.95 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Width < 
+              2.75 & Petal.Length < 5.05 & Petal.Length >= 4.95 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 2.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.95 & Petal.Length >= 2.35 ~ 
+              "versicolor", Sepal.Width < 3.1 & Petal.Width >= 1.65 & 
+              Petal.Length >= 4.75 & Petal.Length < 4.95 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.65 & Petal.Length >= 4.75 & Petal.Length < 4.95 & Petal.Length >= 
+              2.35 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Length >= 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "virginica", Petal.Length >= 4.95 & Sepal.Length >= 
+          6.25 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+          4.95 & Petal.Length < 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Width < 1.7 & Petal.Length < 4.95 & 
+          Sepal.Length >= 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.7 & Petal.Length < 4.95 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Petal.Width < 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Petal.Length < 4.85 & Sepal.Length < 6.05 & 
+          Petal.Length >= 2.6 ~ "versicolor", Petal.Length >= 5.05 & 
+          Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length < 5.95 & Petal.Length >= 4.85 & Sepal.Length < 
+              6.05 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              5.95 & Petal.Length >= 4.85 & Sepal.Length < 6.05 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length < 4.75 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width >= 2.9 & Petal.Length >= 4.75 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width < 2.6 & Sepal.Width < 2.9 & Petal.Length >= 4.75 & 
+              Petal.Length < 5.05 & Sepal.Length >= 6.05 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width >= 2.6 & Sepal.Width < 
+              2.9 & Petal.Length >= 4.75 & Petal.Length < 5.05 & Sepal.Length >= 
+              6.05 & Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Length < 
+          2.45 & Petal.Length < 4.75 ~ "setosa", Petal.Length >= 2.45 & 
+          Petal.Length < 4.75 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.75 ~ "virginica", Petal.Width >= 1.55 & 
+          Petal.Width < 1.75 & Petal.Length >= 4.75 ~ "versicolor", 
+          Petal.Length < 4.95 & Petal.Width < 1.55 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 ~ "versicolor", Petal.Length >= 
+              4.95 & Petal.Width < 1.55 & Petal.Width < 1.75 & Petal.Length >= 
+              4.75 ~ "virginica") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Length < 5.35 & Petal.Width < 1.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Length >= 5.35 & Petal.Width < 
+              1.75 & Petal.Width >= 0.8 ~ "virginica", Petal.Width >= 
+              1.85 & Petal.Width >= 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 3.15 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+              3.15 & Petal.Width < 1.85 & Petal.Width >= 1.75 & Petal.Width >= 
+              0.8 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Length >= 5.15 & Petal.Length >= 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width < 1.35 & Sepal.Length < 
+              4.95 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+              4.95 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+              4.75 & Sepal.Length >= 4.95 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Width >= 1.75 & Petal.Length < 
+              5.15 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Sepal.Length >= 
+              4.95 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Length >= 6.5 & Petal.Width < 1.75 & Petal.Length < 
+              5.15 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Width < 3.1 & Petal.Width >= 1.65 & Petal.Length >= 
+              4.75 & Sepal.Length >= 4.95 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.65 & Petal.Length >= 4.75 & Sepal.Length >= 4.95 & 
+              Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.55 & Sepal.Length < 6.5 & Petal.Width < 1.75 & 
+              Petal.Length < 5.15 & Petal.Length >= 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width >= 1.55 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length < 5.15 & Petal.Length >= 
+              4.95 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.7 & Sepal.Length < 5.55 ~ "setosa", Sepal.Length < 4.95 & 
+          Petal.Length >= 2.7 & Sepal.Length < 5.55 ~ "virginica", 
+          Sepal.Length >= 4.95 & Petal.Length >= 2.7 & Sepal.Length < 
+              5.55 ~ "versicolor", Sepal.Width >= 3.55 & Petal.Length < 
+              4.95 & Sepal.Length >= 5.55 ~ "setosa", Petal.Width >= 
+              1.75 & Petal.Length >= 4.95 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Width < 1.7 & Sepal.Width < 3.55 & 
+              Petal.Length < 4.95 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Width < 1.75 & Petal.Length >= 
+              4.95 & Sepal.Length >= 5.55 ~ "virginica", Petal.Width >= 
+              1.65 & Petal.Width < 1.75 & Petal.Length >= 4.95 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Length < 6 & Petal.Width >= 
+              1.7 & Sepal.Width < 3.55 & Petal.Length < 4.95 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Length >= 6 & Petal.Width >= 
+              1.7 & Sepal.Width < 3.55 & Petal.Length < 4.95 & Sepal.Length >= 
+              5.55 ~ "virginica") + case_when(Petal.Width < 0.8 & Petal.Width < 
+          1.75 ~ "setosa", Petal.Length >= 4.85 & Petal.Width >= 1.75 ~ 
+          "virginica", Petal.Length >= 5.05 & Petal.Width >= 0.8 & 
+          Petal.Width < 1.75 ~ "virginica", Sepal.Width < 3 & Petal.Length < 
+          4.85 & Petal.Width >= 1.75 ~ "virginica", Sepal.Width >= 
+          3 & Petal.Length < 4.85 & Petal.Width >= 1.75 ~ "versicolor", 
+          Sepal.Length < 4.95 & Petal.Length < 5.05 & Petal.Width >= 
+              0.8 & Petal.Width < 1.75 ~ "virginica", Sepal.Length >= 
+              4.95 & Petal.Length < 5.05 & Petal.Width >= 0.8 & Petal.Width < 
+              1.75 ~ "versicolor") + case_when(Sepal.Length >= 4.95 & 
+          Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "versicolor", Sepal.Length < 
+          5.3 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "setosa", 
+          Petal.Width < 0.65 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "setosa", Petal.Length < 3.9 & Sepal.Length < 
+              4.95 & Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length >= 3.9 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.8 & Sepal.Length < 5.55 ~ "virginica", Petal.Width < 
+              0.95 & Sepal.Length >= 5.3 & Sepal.Width >= 2.8 & Sepal.Length < 
+              5.55 ~ "setosa", Petal.Width >= 0.95 & Sepal.Length >= 
+              5.3 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length < 4.75 & Petal.Width >= 0.65 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+              4.95 & Sepal.Width < 2.55 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Width < 
+              2.55 & Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Length >= 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.65 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Length < 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width >= 1.65 & Petal.Length < 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Width < 1.6 & Sepal.Width < 3.1 & Petal.Length >= 4.75 & 
+              Petal.Width >= 0.65 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width >= 1.6 & Sepal.Width < 
+              3.1 & Petal.Length >= 4.75 & Petal.Width >= 0.65 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.75 ~ 
+          "virginica", Petal.Length < 4.95 & Petal.Width < 1.65 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.85 & Petal.Length >= 
+          4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Width < 1.55 & Sepal.Width < 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Width >= 1.55 & Sepal.Width < 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Length < 4.85 & 
+              Petal.Width >= 0.7 ~ "versicolor", Petal.Width >= 1.75 & 
+              Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ "virginica", 
+              Sepal.Length < 6.2 & Petal.Width < 1.75 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.7 ~ "virginica", Sepal.Width >= 
+                  2.9 & Sepal.Length >= 6.2 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ "versicolor", 
+              Petal.Length < 5 & Sepal.Width < 2.9 & Sepal.Length >= 
+                  6.2 & Petal.Width < 1.75 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 
+                  5 & Sepal.Width < 2.9 & Sepal.Length >= 6.2 & Petal.Width < 
+                  1.75 & Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ 
+                  "virginica")
 
 ---
 
     Code
-      rlang::expr_text(tf[[1]])
+      tf
     Output
-      [1] "case_when(Petal.Length < 2.5 ~ \"setosa\", Petal.Length >= 5.05 & \n    Petal.Length >= 2.5 ~ \"virginica\", Petal.Width >= 1.9 & Petal.Length < \n    5.05 & Petal.Length >= 2.5 ~ \"virginica\", Sepal.Length < \n    4.95 & Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= \n    2.5 ~ \"virginica\", Petal.Width < 1.75 & Sepal.Length >= 4.95 & \n    Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= \n    2.5 ~ \"versicolor\", Sepal.Width < 3 & Petal.Width >= 1.75 & \n    Sepal.Length >= 4.95 & Petal.Width < 1.9 & Petal.Length < \n    5.05 & Petal.Length >= 2.5 ~ \"virginica\", Sepal.Width >= \n    3 & Petal.Width >= 1.75 & Sepal.Length >= 4.95 & Petal.Width < \n    1.9 & Petal.Length < 5.05 & Petal.Length >= 2.5 ~ \"versicolor\")"
+      case_when(Petal.Length < 2.5 ~ "setosa", Petal.Length >= 5.05 & 
+          Petal.Length >= 2.5 ~ "virginica", Petal.Width >= 1.9 & Petal.Length < 
+          5.05 & Petal.Length >= 2.5 ~ "virginica", Sepal.Length < 
+          4.95 & Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= 
+          2.5 ~ "virginica", Petal.Width < 1.75 & Sepal.Length >= 4.95 & 
+          Petal.Width < 1.9 & Petal.Length < 5.05 & Petal.Length >= 
+          2.5 ~ "versicolor", Sepal.Width < 3 & Petal.Width >= 1.75 & 
+          Sepal.Length >= 4.95 & Petal.Width < 1.9 & Petal.Length < 
+          5.05 & Petal.Length >= 2.5 ~ "virginica", Sepal.Width >= 
+          3 & Petal.Width >= 1.75 & Sepal.Length >= 4.95 & Petal.Width < 
+          1.9 & Petal.Length < 5.05 & Petal.Length >= 2.5 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.65 & Petal.Length < 4.95 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+              4.95 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Width < 1.6 & Petal.Length >= 4.95 & Petal.Width < 
+                  1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width >= 
+                  1.6 & Petal.Length >= 4.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width >= 1.75 & Sepal.Length >= 6.15 & 
+          Petal.Length >= 2.35 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+          1.65 & Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Sepal.Length < 
+              6.15 & Petal.Length >= 2.35 ~ "versicolor", Petal.Width < 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length < 4.5 & Sepal.Width < 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 4.5 & Sepal.Width < 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Length < 5.35 & Sepal.Width >= 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 5.35 & Sepal.Width >= 
+              2.3 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Width < 1.65 & Petal.Width >= 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Petal.Width >= 1.65 & Petal.Width >= 
+              1.55 & Petal.Width < 1.75 & Sepal.Length >= 6.15 & Petal.Length >= 
+              2.35 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Length >= 
+          2.45 ~ "virginica", Sepal.Length >= 4.95 & Petal.Length < 
+          4.75 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+          5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Length < 6.35 & Petal.Width < 1.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+              "virginica", Sepal.Length >= 6.35 & Petal.Width < 1.75 & 
+              Petal.Length < 5.05 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+              1.75 & Petal.Length < 5.05 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.45 ~ "virginica", Sepal.Length < 5.95 & Petal.Length < 
+              4.85 & Petal.Width >= 1.75 & Petal.Length < 5.05 & Petal.Length >= 
+              4.75 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+              "virginica") + case_when(Petal.Length < 2.45 ~ "setosa", 
+          Sepal.Length >= 6 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Width < 1.35 & Sepal.Length < 
+              4.95 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.35 & Sepal.Length < 4.95 & Petal.Width < 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+              4.95 & Sepal.Length >= 4.95 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6 & Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6 & Petal.Width >= 1.75 & 
+              Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 1.55 & 
+              Petal.Length >= 4.95 & Sepal.Length >= 4.95 & Petal.Width < 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Petal.Width >= 
+              1.55 & Petal.Length >= 4.95 & Sepal.Length >= 4.95 & 
+              Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "virginica", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Petal.Length < 5 & Petal.Length < 
+                  5.35 & Petal.Width < 1.65 & Petal.Length >= 2.6 ~ 
+                  "versicolor", Sepal.Length >= 5.95 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ 
+                  "virginica", Petal.Width < 1.55 & Petal.Length >= 
+                  5 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Petal.Width >= 1.55 & Petal.Length >= 
+                  5 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "versicolor", Petal.Length < 4.65 & Sepal.Length < 
+                  5.95 & Petal.Length < 4.85 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "virginica", Petal.Length >= 
+                  4.65 & Sepal.Length < 5.95 & Petal.Length < 4.85 & 
+                  Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Sepal.Length >= 
+              4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.75 & Petal.Length >= 4.8 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Width < 2.45 & Sepal.Length < 
+                  4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Sepal.Width >= 2.45 & Sepal.Length < 
+                  4.95 & Petal.Length < 4.8 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length >= 6.95 & Petal.Width < 
+                  1.75 & Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length < 6.15 & Petal.Length < 
+                  5.05 & Sepal.Length < 6.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.15 & Petal.Length < 5.05 & Sepal.Length < 
+                  6.95 & Petal.Width < 1.75 & Petal.Length >= 4.8 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 
+                  1.55 & Petal.Length >= 5.05 & Sepal.Length < 6.95 & 
+                  Petal.Width < 1.75 & Petal.Length >= 4.8 & Petal.Length >= 
+                  2.45 ~ "virginica", Petal.Width >= 1.55 & Petal.Length >= 
+                  5.05 & Sepal.Length < 6.95 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.8 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.35 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+              1.65 & Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "virginica", 
+              Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Sepal.Length < 
+                  6.15 & Petal.Length >= 2.35 ~ "versicolor", Petal.Length >= 
+                  4.95 & Sepal.Width < 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "virginica", Sepal.Width >= 
+                  3.25 & Sepal.Width >= 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "virginica", Sepal.Width >= 
+                  2.25 & Petal.Length < 5.35 & Petal.Width < 1.65 & 
+                  Sepal.Length < 6.15 & Petal.Length >= 2.35 ~ "versicolor", 
+              Sepal.Length < 6.25 & Petal.Length < 4.95 & Sepal.Width < 
+                  2.95 & Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length >= 6.25 & Petal.Length < 
+                  4.95 & Sepal.Width < 2.95 & Sepal.Length >= 6.15 & 
+                  Petal.Length >= 2.35 ~ "versicolor", Petal.Width < 
+                  1.55 & Sepal.Width < 3.25 & Sepal.Width >= 2.95 & 
+                  Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ "versicolor", 
+              Petal.Width >= 1.55 & Sepal.Width < 3.25 & Sepal.Width >= 
+                  2.95 & Sepal.Length >= 6.15 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length < 5.5 & Sepal.Width < 2.25 & 
+                  Petal.Length < 5.35 & Petal.Width < 1.65 & Sepal.Length < 
+                  6.15 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Length >= 
+                  5.5 & Sepal.Width < 2.25 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.65 & Sepal.Length < 6.15 & Petal.Length >= 
+                  2.35 ~ "virginica") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Sepal.Width < 3.1 & Petal.Width < 
+              1.85 & Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.75 & Petal.Length >= 2.45 ~ 
+          "versicolor", Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Petal.Width < 1.65 & 
+          Petal.Length < 4.95 & Petal.Length >= 4.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+          4.95 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Sepal.Width >= 
+              2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+              "virginica", Sepal.Length >= 4.95 & Petal.Length < 4.75 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Length < 5.95 & Petal.Length >= 4.75 & Petal.Length < 
+                  4.85 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+                  6.05 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+                  3.9 & Sepal.Length < 4.95 & Petal.Length < 4.75 & 
+                  Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length >= 3.9 & Sepal.Length < 4.95 & Petal.Length < 
+                  4.75 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length < 6.5 & Sepal.Length >= 
+                  5.95 & Petal.Length >= 4.75 & Petal.Length < 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length >= 
+                  6.5 & Sepal.Length >= 5.95 & Petal.Length >= 4.75 & 
+                  Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width < 2.45 & Sepal.Length < 6.05 & Sepal.Width < 
+                  2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.75 & Sepal.Width >= 
+                  2.45 & Sepal.Length < 6.05 & Sepal.Width < 2.75 & 
+                  Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.75 & Sepal.Width >= 2.45 & Sepal.Length < 
+                  6.05 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.75 & Petal.Length >= 2.45 ~ 
+          "versicolor", Petal.Width >= 1.65 & Petal.Length >= 4.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 6.6 & 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Petal.Length >= 
+          2.45 ~ "virginica", Sepal.Length >= 6.6 & Petal.Width < 1.65 & 
+          Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Width >= 0.75 ~ "versicolor", 
+              Petal.Width >= 1.75 & Petal.Length >= 4.85 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 3 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width >= 3 & Petal.Width >= 1.7 & 
+                  Petal.Length < 4.85 & Petal.Width >= 0.75 ~ "versicolor", 
+              Sepal.Length < 6.2 & Petal.Width < 1.75 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length >= 
+                  6.2 & Petal.Width < 1.75 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.75 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length >= 4.85 & Petal.Width >= 1.75 & 
+          Petal.Length >= 2.45 ~ "virginica", Petal.Length < 4.75 & 
+          Sepal.Width < 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length >= 4.75 & Sepal.Width < 
+          2.25 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width < 3.1 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 2.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length < 5.25 & Petal.Width < 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 5.25 & Petal.Width < 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Length < 5.45 & Petal.Width >= 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "versicolor", Petal.Length >= 5.45 & Petal.Width >= 
+              1.55 & Sepal.Width >= 2.25 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica") + case_when(Petal.Width < 0.7 ~ "setosa", 
+          Petal.Length < 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Sepal.Length >= 6.5 & Petal.Width < 1.75 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Sepal.Width < 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length < 4.95 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length < 6.1 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Length >= 6.1 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica") + case_when(Petal.Width >= 1.75 ~ 
+          "virginica", Petal.Width < 0.7 & Petal.Width < 1.75 ~ "setosa", 
+          Petal.Width < 1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ 
+              "versicolor", Petal.Length >= 5.35 & Petal.Width >= 1.35 & 
+              Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "virginica", 
+          Sepal.Length < 5.25 & Petal.Length < 5.35 & Petal.Width >= 
+              1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Length >= 5.25 & Petal.Length < 
+              5.35 & Petal.Width >= 1.35 & Petal.Width >= 0.7 & Petal.Width < 
+              1.75 ~ "versicolor", Sepal.Length < 6.15 & Petal.Length >= 
+              5.05 & Sepal.Length >= 5.25 & Petal.Length < 5.35 & Petal.Width >= 
+              1.35 & Petal.Width >= 0.7 & Petal.Width < 1.75 ~ "versicolor", 
+          Sepal.Length >= 6.15 & Petal.Length >= 5.05 & Sepal.Length >= 
+              5.25 & Petal.Length < 5.35 & Petal.Width >= 1.35 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width < 1.7 & Petal.Length < 4.85 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 3 & Petal.Width >= 1.7 & Petal.Length < 4.85 & 
+              Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 3 & 
+              Petal.Width >= 1.7 & Petal.Length < 4.85 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Width < 1.65 & Petal.Width < 
+              1.75 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.65 & Petal.Width < 1.75 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 & Petal.Width < 1.75 ~ "setosa", Petal.Length >= 2.45 & 
+          Petal.Width < 1.75 ~ "versicolor", Petal.Length >= 4.85 & 
+          Petal.Width >= 1.75 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+          4.85 & Petal.Width >= 1.75 ~ "virginica", Sepal.Width >= 
+          3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Length < 3.9 & Petal.Length >= 2.45 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Length >= 3.9 & Petal.Length >= 
+                  2.45 & Sepal.Length < 5.45 ~ "virginica", Petal.Length < 
+                  2.5 & Petal.Length < 4.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Petal.Length >= 2.5 & Petal.Length < 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width < 
+                  1.45 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "versicolor", Petal.Width >= 1.65 & Petal.Width >= 
+                  1.45 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Petal.Length < 4.95 & Petal.Width < 
+                  1.65 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length >= 
+                  4.95 & Petal.Width < 1.65 & Petal.Width >= 1.45 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.7 & Petal.Length < 4.85 & Petal.Length >= 
+                  2.45 ~ "versicolor", Sepal.Length >= 6.05 & Petal.Length >= 
+                  4.85 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+                  1.7 & Sepal.Length < 6.05 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+                  1.7 & Sepal.Length < 6.05 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.7 ~ "setosa", Sepal.Length >= 7.05 & Sepal.Length >= 6.05 & 
+          Petal.Width >= 0.7 ~ "virginica", Petal.Width < 1.6 & Petal.Length < 
+          4.65 & Sepal.Length < 6.05 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.6 & Petal.Length < 4.65 & Sepal.Length < 
+              6.05 & Petal.Width >= 0.7 ~ "virginica", Petal.Width >= 
+              1.75 & Sepal.Length < 7.05 & Sepal.Length >= 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length < 5.05 & Petal.Width < 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Petal.Length >= 5.05 & Petal.Width < 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width < 3.1 & Petal.Width >= 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.7 & Petal.Length >= 4.65 & Sepal.Length < 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width >= 2.85 & Petal.Width < 
+              1.75 & Sepal.Length < 7.05 & Sepal.Length >= 6.05 & Petal.Width >= 
+              0.7 ~ "versicolor", Petal.Length < 5 & Sepal.Width < 
+              2.85 & Petal.Width < 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.05 & Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 
+              5 & Sepal.Width < 2.85 & Petal.Width < 1.75 & Sepal.Length < 
+              7.05 & Sepal.Length >= 6.05 & Petal.Width >= 0.7 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.6 & Petal.Width >= 0.8 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.6 & Petal.Width >= 
+                  0.8 & Sepal.Length < 5.45 ~ "virginica", Sepal.Length >= 
+                  6.1 & Petal.Length >= 5.05 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Petal.Width < 0.65 & Petal.Width < 1.75 & 
+                  Petal.Length < 5.05 & Sepal.Length >= 5.45 ~ "setosa", 
+              Sepal.Length < 5.95 & Petal.Width >= 1.75 & Petal.Length < 
+                  5.05 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Length >= 
+                  5.95 & Petal.Width >= 1.75 & Petal.Length < 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Length < 
+                  5.9 & Sepal.Length < 6.1 & Petal.Length >= 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Length >= 
+                  5.9 & Sepal.Length < 6.1 & Petal.Length >= 5.05 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length < 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Petal.Length < 5.05 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Sepal.Width < 2.6 & Petal.Length >= 4.95 & Petal.Width >= 
+                  0.65 & Petal.Width < 1.75 & Petal.Length < 5.05 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+                  2.6 & Petal.Length >= 4.95 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Petal.Length < 5.05 & Sepal.Length >= 
+                  5.45 ~ "versicolor") + case_when(Petal.Length < 2.35 & 
+          Petal.Length < 4.75 ~ "setosa", Petal.Length >= 2.35 & Petal.Length < 
+          4.75 ~ "versicolor", Sepal.Width >= 3.15 & Petal.Length >= 
+          4.75 ~ "virginica", Petal.Length >= 5.05 & Sepal.Width < 
+          3.15 & Petal.Length >= 4.75 ~ "virginica", Sepal.Length < 
+          6.25 & Petal.Length < 5.05 & Sepal.Width < 3.15 & Petal.Length >= 
+          4.75 ~ "virginica", Sepal.Length >= 6.25 & Petal.Length < 
+          5.05 & Sepal.Width < 3.15 & Petal.Length >= 4.75 ~ "versicolor") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Sepal.Length < 5.75 & 
+              Petal.Width >= 0.8 ~ "versicolor", Petal.Length < 4.95 & 
+              Petal.Width < 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Length >= 5.95 & Petal.Width >= 
+              1.75 & Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width < 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+                  1.75 & Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ 
+                  "virginica", Sepal.Width < 3.1 & Sepal.Length < 5.95 & 
+                  Petal.Width >= 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+                  5.95 & Petal.Width >= 1.75 & Sepal.Length >= 5.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Sepal.Length < 
+                  6.95 & Petal.Width >= 1.55 & Petal.Length >= 4.95 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.75 & Petal.Width >= 
+                  0.8 ~ "versicolor", Sepal.Length >= 6.95 & Petal.Width >= 
+                  1.55 & Petal.Length >= 4.95 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.75 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Width < 1.45 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+                  5.05 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+                  4.95 & Petal.Length < 5.05 & Petal.Width >= 1.45 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Width < 2.75 & Petal.Length >= 4.95 & Petal.Length < 
+                  5.05 & Petal.Width >= 1.45 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+                  2.75 & Petal.Length >= 4.95 & Petal.Length < 5.05 & 
+                  Petal.Width >= 1.45 & Petal.Length >= 4.75 & Petal.Width >= 
+                  0.8 ~ "versicolor") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Sepal.Length >= 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+          0.75 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length >= 
+          4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Width < 2.45 & 
+          Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.45 & Sepal.Length < 
+          4.95 & Petal.Length < 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 5 & Petal.Width < 1.7 & Petal.Length >= 4.75 & 
+              Petal.Width >= 0.75 ~ "versicolor", Petal.Width < 1.55 & 
+              Petal.Length >= 5 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+              6.6 & Petal.Width >= 1.55 & Petal.Length >= 5 & Petal.Width < 
+              1.7 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length >= 6.6 & Petal.Width >= 1.55 & Petal.Length >= 
+              5 & Petal.Width < 1.7 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.75 ~ "virginica") + case_when(Sepal.Width < 2.8 & Sepal.Length < 
+          5.45 ~ "versicolor", Petal.Length < 3.2 & Sepal.Width >= 
+          2.8 & Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 3.2 & 
+          Sepal.Width >= 2.8 & Sepal.Length < 5.45 ~ "versicolor", 
+          Sepal.Length >= 7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Width < 0.7 & Petal.Length < 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "setosa", 
+          Petal.Width >= 0.7 & Petal.Length < 4.75 & Sepal.Length < 
+              6.15 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Length < 
+              5.9 & Petal.Length >= 4.75 & Sepal.Length < 6.15 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length < 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Length < 5.05 & Sepal.Length >= 5.9 & Petal.Length >= 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "virginica", 
+          Petal.Length >= 5.05 & Sepal.Length >= 5.9 & Petal.Length >= 
+              4.75 & Sepal.Length < 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Width < 1.6 & Petal.Length >= 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Petal.Width >= 1.6 & Petal.Length >= 4.75 & Sepal.Length < 
+              7.1 & Sepal.Length >= 6.15 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Length < 
+              4.75 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+              5 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+                  5.95 & Sepal.Length < 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  5.75 & Sepal.Length < 5.95 & Sepal.Length < 6.55 & 
+                  Petal.Length < 5 & Petal.Length >= 4.75 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 5.75 & Sepal.Length < 
+                  5.95 & Sepal.Length < 6.55 & Petal.Length < 5 & Petal.Length >= 
+                  4.75 & Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Sepal.Width >= 2.55 & Petal.Length < 4.75 & 
+          Petal.Length >= 2.6 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length >= 4.95 & Sepal.Width < 2.55 & Petal.Length < 
+              4.75 & Petal.Length >= 2.6 ~ "versicolor", Petal.Length < 
+              5.05 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Width < 2.45 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.55 & Petal.Length < 4.75 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width >= 2.45 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.55 & Petal.Length < 4.75 & Petal.Length >= 2.6 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.55 & Petal.Length >= 2.45 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.55 & Petal.Length >= 
+                  2.45 & Sepal.Length < 5.45 ~ "virginica", Petal.Width < 
+                  0.65 & Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Sepal.Length >= 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width < 
+                  3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+                  3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width < 
+                  1.25 & Sepal.Width < 2.25 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width >= 1.25 & Sepal.Width < 2.25 & Petal.Width >= 
+                  0.65 & Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Sepal.Length < 6.05 & Sepal.Width >= 
+                  2.25 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Length < 
+                  5.3 & Sepal.Length >= 6.05 & Sepal.Width >= 2.25 & 
+                  Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.45 ~ "versicolor", Petal.Length >= 5.3 & Sepal.Length >= 
+                  6.05 & Sepal.Width >= 2.25 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Sepal.Width >= 2.55 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width < 1.6 & Sepal.Width < 2.55 & Petal.Length < 
+                  4.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+                  1.6 & Sepal.Width < 2.55 & Petal.Length < 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  6.55 & Petal.Length < 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+                  6.55 & Petal.Length < 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  5.95 & Sepal.Length < 6.05 & Petal.Length >= 4.95 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width < 1.55 & Sepal.Length >= 5.95 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Petal.Width >= 
+                  1.55 & Sepal.Length >= 5.95 & Sepal.Length < 6.05 & 
+                  Petal.Length >= 4.95 & Petal.Length >= 4.75 & Petal.Width >= 
+                  0.8 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Sepal.Length < 5.75 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Length < 4.65 & Sepal.Length >= 
+          5.75 & Sepal.Length < 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length < 4.95 & Sepal.Width < 3.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+              4.95 & Sepal.Width < 3.05 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width < 1.7 & Sepal.Width >= 
+              3.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.7 & Sepal.Width >= 3.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Petal.Length >= 
+              4.9 & Petal.Length >= 4.65 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width < 
+              3.1 & Petal.Length < 4.9 & Petal.Length >= 4.65 & Sepal.Length >= 
+              5.75 & Sepal.Length < 6.25 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Length < 4.9 & Petal.Length >= 
+              4.65 & Sepal.Length >= 5.75 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.8 ~ "versicolor") + case_when(Petal.Length < 2.45 & 
+          Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 2.45 & Sepal.Length < 
+          5.45 ~ "versicolor", Petal.Length < 2.5 & Petal.Width < 1.7 & 
+          Sepal.Length >= 5.45 ~ "setosa", Sepal.Length >= 5.95 & Petal.Width >= 
+          1.7 & Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+          5.25 & Petal.Length >= 2.5 & Petal.Width < 1.7 & Sepal.Length >= 
+          5.45 ~ "versicolor", Petal.Length >= 5.25 & Petal.Length >= 
+          2.5 & Petal.Width < 1.7 & Sepal.Length >= 5.45 ~ "virginica", 
+          Sepal.Width < 3.1 & Sepal.Length < 5.95 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.7 & Sepal.Length >= 
+              5.45 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Width < 1.7 & Petal.Length < 4.85 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length < 4.85 & 
+          Petal.Width >= 0.8 ~ "virginica", Petal.Length < 5.05 & Sepal.Length < 
+          6.05 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica", Petal.Width < 
+              1.7 & Petal.Length >= 5.05 & Sepal.Length < 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length >= 5.05 & Sepal.Length < 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Width < 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+              5.05 & Petal.Width < 1.75 & Sepal.Length >= 6.05 & Petal.Length >= 
+              4.85 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.8 ~ 
+          "virginica", Petal.Length >= 5.35 & Petal.Width < 1.65 & 
+          Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 2.25 & Petal.Length < 
+          5.35 & Petal.Width < 1.65 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.25 & Sepal.Width < 2.25 & Petal.Length < 
+              5.35 & Petal.Width < 1.65 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Length < 6.1 & Petal.Width >= 1.25 & Sepal.Width < 
+              2.25 & Petal.Length < 5.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Length >= 6.1 & Petal.Width >= 
+              1.25 & Sepal.Width < 2.25 & Petal.Length < 5.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Width >= 1.75 & Petal.Length >= 2.45 ~ 
+          "virginica", Petal.Width < 1.45 & Petal.Width < 1.75 & Petal.Length >= 
+          2.45 ~ "versicolor", Sepal.Length >= 7.05 & Petal.Width >= 
+          1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Sepal.Width >= 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.65 & Sepal.Width < 2.85 & Sepal.Length < 
+              7.05 & Petal.Width >= 1.45 & Petal.Width < 1.75 & Petal.Length >= 
+              2.45 ~ "virginica", Petal.Length < 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width < 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Width >= 1.55 & Petal.Length >= 4.95 & Petal.Width < 
+              1.65 & Sepal.Width < 2.85 & Sepal.Length < 7.05 & Petal.Width >= 
+              1.45 & Petal.Width < 1.75 & Petal.Length >= 2.45 ~ "versicolor") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Length >= 
+              5.35 & Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "virginica", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.75 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.75 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width >= 3.1 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.75 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Petal.Length < 4.9 & Petal.Width < 
+                  1.65 & Petal.Length < 5.35 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.75 ~ "versicolor", Petal.Length < 
+                  4.75 & Petal.Width >= 1.65 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "virginica", 
+              Petal.Length >= 4.75 & Petal.Width >= 1.65 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Sepal.Length < 6.15 & Petal.Length >= 
+                  4.9 & Petal.Width < 1.65 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.75 ~ "versicolor", 
+              Sepal.Length >= 6.15 & Petal.Length >= 4.9 & Petal.Width < 
+                  1.65 & Petal.Length < 5.35 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.75 ~ "virginica") + case_when(Petal.Length < 
+          2.5 ~ "setosa", Petal.Length >= 4.95 & Petal.Length >= 2.5 ~ 
+          "virginica", Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+          2.5 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+          4.95 & Petal.Length >= 2.5 ~ "virginica") + case_when(Petal.Length < 
+          2.45 ~ "setosa", Petal.Length < 4.85 & Sepal.Length >= 6.25 & 
+          Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 4.7 & 
+          Sepal.Length < 5.75 & Sepal.Length < 6.25 & Petal.Length >= 
+          2.45 ~ "virginica", Petal.Width < 1.55 & Petal.Length >= 
+          4.85 & Sepal.Length >= 6.25 & Petal.Length >= 2.45 ~ "versicolor", 
+          Petal.Width >= 1.55 & Petal.Length >= 4.85 & Sepal.Length >= 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.6 & Petal.Length < 4.7 & Sepal.Length < 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.6 & Petal.Length < 4.7 & Sepal.Length < 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.7 & Petal.Length < 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length < 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "versicolor", Petal.Width >= 
+              1.7 & Petal.Length >= 4.85 & Sepal.Length >= 5.75 & Sepal.Length < 
+              6.25 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Width < 1.7 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.75 & Sepal.Length < 6.25 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Length >= 5.05 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.75 & Sepal.Length < 6.25 & Petal.Length >= 
+              2.45 ~ "versicolor") + case_when(Petal.Length < 2.5 ~ 
+          "setosa", Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+          2.5 ~ "versicolor", Sepal.Width < 3.1 & Petal.Width >= 1.65 & 
+          Petal.Length < 4.95 & Petal.Length >= 2.5 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Width >= 1.65 & Petal.Length < 
+              4.95 & Petal.Length >= 2.5 ~ "versicolor", Sepal.Length < 
+              6.35 & Petal.Length < 5.05 & Petal.Length >= 4.95 & Petal.Length >= 
+              2.5 ~ "virginica", Sepal.Length >= 6.35 & Petal.Length < 
+              5.05 & Petal.Length >= 4.95 & Petal.Length >= 2.5 ~ "versicolor", 
+          Petal.Width >= 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "virginica", Petal.Width < 
+              1.55 & Petal.Width < 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "virginica", Petal.Width >= 
+              1.55 & Petal.Width < 1.7 & Petal.Length >= 5.05 & Petal.Length >= 
+              4.95 & Petal.Length >= 2.5 ~ "versicolor") + case_when(Petal.Length < 
+          2.15 & Sepal.Width < 2.8 & Sepal.Length < 5.45 ~ "setosa", 
+          Petal.Length >= 2.15 & Sepal.Width < 2.8 & Sepal.Length < 
+              5.45 ~ "versicolor", Petal.Length < 3.1 & Sepal.Width >= 
+              2.8 & Sepal.Length < 5.45 ~ "setosa", Petal.Length >= 
+              3.1 & Sepal.Width >= 2.8 & Sepal.Length < 5.45 ~ "versicolor", 
+          Sepal.Width >= 3.45 & Petal.Width < 1.7 & Sepal.Length >= 
+              5.45 ~ "setosa", Sepal.Length >= 6.05 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+              5 & Sepal.Width < 3.45 & Petal.Width < 1.7 & Sepal.Length >= 
+              5.45 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6.05 & Petal.Width >= 1.7 & Sepal.Length >= 5.45 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6.05 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Width < 
+              2.75 & Petal.Length >= 5 & Sepal.Width < 3.45 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.45 ~ "versicolor", Sepal.Width >= 
+              2.75 & Petal.Length >= 5 & Sepal.Width < 3.45 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.45 ~ "virginica") + case_when(Petal.Length < 
+          2.45 & Sepal.Length < 5.55 ~ "setosa", Petal.Length >= 2.45 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Length < 2.6 & 
+          Petal.Length < 4.75 & Sepal.Length >= 5.55 ~ "setosa", Petal.Length >= 
+          2.6 & Petal.Length < 4.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length < 4.95 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width >= 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width < 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.7 & Petal.Length >= 4.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.55 & Sepal.Width < 
+              2.85 & Petal.Length >= 4.95 & Petal.Width < 1.7 & Petal.Length >= 
+              4.75 & Sepal.Length >= 5.55 ~ "virginica", Petal.Width >= 
+              1.55 & Sepal.Width < 2.85 & Petal.Length >= 4.95 & Petal.Width < 
+              1.7 & Petal.Length >= 4.75 & Sepal.Length >= 5.55 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.5 & 
+              Sepal.Length >= 6.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.5 & Sepal.Length >= 6.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 4.95 & Sepal.Length < 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width >= 1.75 & Sepal.Length >= 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Width < 2.45 & Sepal.Length < 
+                  4.95 & Sepal.Length < 5.75 & Sepal.Length < 6.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Sepal.Width >= 
+                  2.45 & Sepal.Length < 4.95 & Sepal.Length < 5.75 & 
+                  Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Length < 5.05 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.75 & Sepal.Length < 6.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 5.75 & Sepal.Length < 6.85 & 
+                  Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.7 ~ "setosa", Sepal.Length >= 4.95 & Petal.Length < 4.75 & 
+          Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 5.15 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Petal.Width >= 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Sepal.Length >= 6.05 & Sepal.Length < 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width >= 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.5 & Petal.Length < 5.15 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Width < 2.45 & Petal.Width < 
+              1.7 & Sepal.Length < 6.05 & Sepal.Length < 6.5 & Petal.Length < 
+              5.15 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Sepal.Width >= 2.45 & Petal.Width < 1.7 & Sepal.Length < 
+              6.05 & Sepal.Length < 6.5 & Petal.Length < 5.15 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width >= 1.75 & Petal.Length >= 4.95 & 
+          Petal.Width >= 0.8 ~ "virginica", Petal.Width < 1.65 & Petal.Length < 
+          4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Width < 2.65 & Petal.Length >= 4.85 & Petal.Length < 
+              4.95 & Petal.Width >= 0.8 ~ "versicolor", Sepal.Width >= 
+              2.65 & Petal.Length >= 4.85 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Length >= 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length < 
+              4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.75 & Petal.Width >= 1.65 & Petal.Length < 
+              4.85 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.55 & Petal.Length < 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.55 & Petal.Length < 5.35 & Petal.Width < 
+              1.75 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "versicolor") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Length >= 5.35 & 
+              Petal.Width < 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Length >= 5.95 & Petal.Width >= 1.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Length < 4.95 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Sepal.Width < 3 & Sepal.Length < 5.95 & 
+                  Petal.Width >= 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Sepal.Width >= 3 & Sepal.Length < 5.95 & Petal.Width >= 
+                  1.75 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width < 
+                  1.55 & Petal.Length >= 4.95 & Petal.Length < 5.35 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+              Petal.Width >= 1.55 & Petal.Length >= 4.95 & Petal.Length < 
+                  5.35 & Petal.Width < 1.75 & Petal.Width >= 0.8 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Width < 1.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Length >= 6 & Petal.Width >= 
+              1.65 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Width >= 1.35 & Petal.Width < 1.65 & Petal.Width >= 
+              0.8 ~ "versicolor", Sepal.Width < 3.1 & Sepal.Length < 
+              6 & Petal.Width >= 1.65 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width >= 3.1 & Sepal.Length < 6 & Petal.Width >= 1.65 & 
+              Petal.Width >= 0.8 ~ "versicolor", Sepal.Length < 6.15 & 
+              Sepal.Width < 2.65 & Petal.Width >= 1.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+              6.15 & Sepal.Width < 2.65 & Petal.Width >= 1.35 & Petal.Width < 
+              1.65 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Sepal.Width < 
+          2.8 & Sepal.Length < 5.55 ~ "versicolor", Petal.Width < 0.95 & 
+          Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "setosa", Petal.Width >= 
+          0.95 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length < 2.7 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "setosa", Sepal.Width < 2.95 & Petal.Length >= 
+              2.7 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Length < 4.95 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Width >= 
+              1.65 & Petal.Length < 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Width >= 1.7 & Petal.Length >= 
+              4.95 & Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Width < 1.7 & Sepal.Width >= 2.95 & 
+              Petal.Length >= 2.7 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Width < 2.45 & Petal.Width < 
+              1.7 & Petal.Length >= 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Length < 5.95 & Petal.Width >= 
+              1.7 & Sepal.Width >= 2.95 & Petal.Length >= 2.7 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.7 & Sepal.Width >= 2.95 & Petal.Length >= 
+              2.7 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Length < 5.45 & Sepal.Width >= 2.45 & Petal.Width < 
+              1.7 & Petal.Length >= 4.95 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Length >= 5.45 & Sepal.Width >= 
+              2.45 & Petal.Width < 1.7 & Petal.Length >= 4.95 & Petal.Length >= 
+              4.85 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width < 1.45 & Petal.Width < 1.65 & 
+          Petal.Length >= 2.35 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Width >= 1.65 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 2.85 & Petal.Width >= 1.45 & Petal.Width < 
+              1.65 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Length < 
+              5.8 & Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Length >= 5.8 & Petal.Width < 
+              1.75 & Petal.Width >= 1.65 & Petal.Length >= 2.35 ~ "versicolor", 
+          Petal.Length < 4.75 & Sepal.Width < 2.85 & Petal.Width >= 
+              1.45 & Petal.Width < 1.65 & Petal.Length >= 2.35 ~ "versicolor", 
+          Petal.Length >= 4.75 & Sepal.Width < 2.85 & Petal.Width >= 
+              1.45 & Petal.Width < 1.65 & Petal.Length >= 2.35 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.65 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+              1.35 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length < 5 & Petal.Width >= 1.35 & Petal.Width < 
+                  1.65 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Width >= 
+                  2.75 & Petal.Length >= 5 & Petal.Width >= 1.35 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Length < 5.35 & Sepal.Width < 2.75 & Petal.Length >= 
+                  5 & Petal.Width >= 1.35 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Length >= 5.35 & Sepal.Width < 
+                  2.75 & Petal.Length >= 5 & Petal.Width >= 1.35 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Length >= 4.95 & Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.7 & Sepal.Width < 3.1 & 
+                  Sepal.Length < 6.05 & Petal.Length >= 4.75 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Width >= 1.7 & Sepal.Width < 
+                  3.1 & Sepal.Length < 6.05 & Petal.Length >= 4.75 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  6.6 & Petal.Length < 4.95 & Sepal.Length >= 6.05 & 
+                  Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 6.6 & Petal.Length < 4.95 & Sepal.Length >= 
+                  6.05 & Petal.Length >= 4.75 & Petal.Length >= 2.45 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.7 ~ "setosa", 
+          Sepal.Length < 4.95 & Petal.Length < 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 4.95 & Petal.Length < 
+              4.75 & Petal.Width >= 0.7 ~ "versicolor", Sepal.Length >= 
+              6.05 & Sepal.Length < 6.6 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.7 ~ "virginica", Sepal.Length >= 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.7 & Sepal.Length < 6.05 & Sepal.Length < 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+          Petal.Width < 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+          Petal.Width >= 1.75 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.6 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.8 ~ "virginica", Petal.Length >= 5.05 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length < 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.45 & Petal.Width < 1.55 ~ "setosa", Petal.Width >= 1.65 & 
+          Petal.Width >= 1.55 ~ "virginica", Petal.Length < 4.95 & 
+          Petal.Length >= 2.45 & Petal.Width < 1.55 ~ "versicolor", 
+          Petal.Length >= 4.95 & Petal.Length >= 2.45 & Petal.Width < 
+              1.55 ~ "virginica", Sepal.Width < 2.85 & Petal.Width < 
+              1.65 & Petal.Width >= 1.55 ~ "versicolor", Sepal.Length < 
+              6.75 & Sepal.Width >= 2.85 & Petal.Width < 1.65 & Petal.Width >= 
+              1.55 ~ "versicolor", Sepal.Length >= 6.75 & Sepal.Width >= 
+              2.85 & Petal.Width < 1.65 & Petal.Width >= 1.55 ~ "virginica") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Width < 1.65 & 
+              Petal.Length < 4.75 & Petal.Width >= 0.7 ~ "versicolor", 
+              Petal.Width >= 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+                  0.7 ~ "virginica", Petal.Length >= 5.05 & Petal.Length >= 
+                  4.75 & Petal.Width >= 0.7 ~ "virginica", Sepal.Length >= 
+                  6.5 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Petal.Width >= 0.7 ~ "versicolor", Sepal.Width < 
+                  3.1 & Sepal.Length < 6.5 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ "virginica", 
+              Sepal.Width >= 3.1 & Sepal.Length < 6.5 & Petal.Length < 
+                  5.05 & Petal.Length >= 4.75 & Petal.Width >= 0.7 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.7 & Sepal.Length < 
+          5.55 ~ "setosa", Petal.Length < 4.25 & Petal.Width >= 0.7 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Width < 0.65 & 
+          Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "setosa", Petal.Length < 
+          4.85 & Petal.Width >= 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Length >= 4.85 & Petal.Width >= 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Width < 2.75 & Petal.Length >= 
+              4.25 & Petal.Width >= 0.7 & Sepal.Length < 5.55 ~ "virginica", 
+          Sepal.Width >= 2.75 & Petal.Length >= 4.25 & Petal.Width >= 
+              0.7 & Sepal.Length < 5.55 ~ "versicolor", Petal.Length < 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.6 & Petal.Length >= 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Width >= 1.6 & Petal.Length >= 
+              4.9 & Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.45 & Petal.Width < 1.55 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+          1.55 & Petal.Length >= 2.45 ~ "virginica", Sepal.Width >= 
+          2.9 & Petal.Width >= 1.45 & Petal.Width < 1.55 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Length < 4.6 & Petal.Length < 
+          4.85 & Petal.Width >= 1.55 & Petal.Length >= 2.45 ~ "virginica", 
+          Petal.Length >= 4.6 & Petal.Length < 4.85 & Petal.Width >= 
+              1.55 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length < 
+              5 & Sepal.Width < 2.9 & Petal.Width >= 1.45 & Petal.Width < 
+              1.55 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length >= 
+              5 & Sepal.Width < 2.9 & Petal.Width >= 1.45 & Petal.Width < 
+              1.55 & Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.75 ~ 
+          "virginica", Sepal.Length < 6.25 & Petal.Width < 1.65 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Length >= 6.35 & Sepal.Length >= 
+          6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length < 5 & Sepal.Length < 6.35 & Sepal.Length >= 
+              6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 5 & Sepal.Length < 6.35 & Sepal.Length >= 
+              6.25 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Width >= 1.75 & 
+              Petal.Width >= 0.7 ~ "virginica", Sepal.Length >= 4.95 & 
+              Petal.Length < 5.05 & Petal.Width < 1.75 & Petal.Width >= 
+              0.7 ~ "versicolor", Sepal.Width >= 2.75 & Petal.Length >= 
+              5.05 & Petal.Width < 1.75 & Petal.Width >= 0.7 ~ "virginica", 
+              Petal.Width < 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+                  5.05 & Petal.Width < 1.75 & Petal.Width >= 0.7 ~ 
+                  "versicolor", Petal.Width >= 1.35 & Sepal.Length < 
+                  4.95 & Petal.Length < 5.05 & Petal.Width < 1.75 & 
+                  Petal.Width >= 0.7 ~ "virginica", Petal.Width < 1.5 & 
+                  Sepal.Width < 2.75 & Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Petal.Width >= 0.7 ~ "virginica", Petal.Width >= 
+                  1.5 & Sepal.Width < 2.75 & Petal.Length >= 5.05 & 
+                  Petal.Width < 1.75 & Petal.Width >= 0.7 ~ "versicolor") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Length < 4.95 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "versicolor", 
+              Petal.Length >= 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica", Sepal.Length < 6.6 & Petal.Width >= 
+                  1.65 & Petal.Length >= 2.6 ~ "virginica", Petal.Width < 
+                  1.75 & Sepal.Length >= 6.6 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "versicolor", Petal.Width >= 
+                  1.75 & Sepal.Length >= 6.6 & Petal.Width >= 1.65 & 
+                  Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Sepal.Length >= 7.05 & Sepal.Length >= 6.75 & 
+          Petal.Length >= 2.6 ~ "virginica", Sepal.Width >= 2.65 & 
+          Petal.Width < 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+          2.6 ~ "versicolor", Sepal.Width < 3.15 & Petal.Width >= 1.65 & 
+          Sepal.Length < 6.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Length < 7.05 & Sepal.Length >= 
+              6.75 & Petal.Length >= 2.6 ~ "versicolor", Petal.Length >= 
+              5.05 & Sepal.Length < 7.05 & Sepal.Length >= 6.75 & Petal.Length >= 
+              2.6 ~ "virginica", Petal.Width < 1.35 & Sepal.Width < 
+              2.65 & Petal.Width < 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width < 3.25 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width >= 3.25 & Sepal.Width >= 
+              3.15 & Petal.Width >= 1.65 & Sepal.Length < 6.75 & Petal.Length >= 
+              2.6 ~ "virginica", Sepal.Length < 6.15 & Petal.Width >= 
+              1.35 & Sepal.Width < 2.65 & Petal.Width < 1.65 & Sepal.Length < 
+              6.75 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              6.15 & Petal.Width >= 1.35 & Sepal.Width < 2.65 & Petal.Width < 
+              1.65 & Sepal.Length < 6.75 & Petal.Length >= 2.6 ~ "versicolor") + 
+          case_when(Petal.Length < 2.5 ~ "setosa", Petal.Width < 1.45 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.5 ~ "versicolor", 
+              Sepal.Length >= 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "virginica", Sepal.Width >= 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length < 4.65 & Sepal.Length < 
+                  6 & Petal.Width >= 1.65 & Petal.Length >= 2.5 ~ "virginica", 
+              Petal.Width >= 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Sepal.Width < 2.95 & Petal.Length >= 
+                  4.65 & Sepal.Length < 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "virginica", Sepal.Width >= 2.95 & Petal.Length >= 
+                  4.65 & Sepal.Length < 6 & Petal.Width >= 1.65 & Petal.Length >= 
+                  2.5 ~ "versicolor", Sepal.Length < 6.1 & Sepal.Width < 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "virginica", Sepal.Length >= 6.1 & Sepal.Width < 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length < 5 & Sepal.Width >= 2.35 & 
+                  Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "versicolor", Petal.Length >= 5 & Sepal.Width >= 
+                  2.35 & Petal.Width < 1.55 & Sepal.Width < 2.9 & Petal.Width >= 
+                  1.45 & Petal.Width < 1.65 & Petal.Length >= 2.5 ~ 
+                  "virginica") + case_when(Sepal.Width >= 2.8 & Sepal.Length < 
+          5.55 ~ "setosa", Petal.Width < 1.55 & Sepal.Width < 2.8 & 
+          Sepal.Length < 5.55 ~ "versicolor", Petal.Width >= 1.55 & 
+          Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "virginica", Sepal.Length >= 
+          7.1 & Petal.Width < 1.7 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Width >= 1.85 & Petal.Width >= 1.7 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Length < 4.85 & Petal.Width < 
+              1.85 & Petal.Width >= 1.7 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length >= 4.85 & Petal.Width < 1.85 & Petal.Width >= 
+              1.7 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Width < 
+              3.7 & Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "versicolor", Sepal.Width >= 
+              3.7 & Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "setosa", Sepal.Width < 
+              2.65 & Petal.Length >= 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Length >= 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.7 & Sepal.Length >= 5.55 ~ "versicolor") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Length < 4.75 & Petal.Width >= 0.8 ~ 
+          "versicolor", Petal.Length < 4.95 & Petal.Width < 1.55 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 4.95 & Petal.Width < 1.55 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Length < 4.9 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Length >= 4.9 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica") + case_when(Petal.Length < 2.6 ~ "setosa", 
+          Petal.Width >= 1.75 & Petal.Length >= 2.6 ~ "virginica", 
+          Petal.Length < 5.45 & Petal.Width < 1.75 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length >= 5.45 & Petal.Width < 
+              1.75 & Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Length < 4.75 & Petal.Width >= 0.8 ~ 
+          "versicolor", Petal.Width < 1.45 & Petal.Length >= 4.75 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.45 & 
+          Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Length < 2.6 & Sepal.Length < 5.45 ~ "setosa", 
+              Petal.Width < 1.55 & Petal.Length >= 2.6 & Sepal.Length < 
+                  5.45 ~ "versicolor", Petal.Width >= 1.55 & Petal.Length >= 
+                  2.6 & Sepal.Length < 5.45 ~ "virginica", Petal.Width < 
+                  0.7 & Petal.Length < 4.75 & Sepal.Length >= 5.45 ~ 
+                  "setosa", Petal.Width >= 0.7 & Petal.Length < 4.75 & 
+                  Sepal.Length >= 5.45 ~ "versicolor", Petal.Width >= 
+                  1.7 & Petal.Length >= 5.05 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width < 1.75 & Sepal.Width >= 2.9 & Petal.Length < 
+                  5.05 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "versicolor", Petal.Width >= 1.75 & Sepal.Width >= 
+                  2.9 & Petal.Length < 5.05 & Petal.Length >= 4.75 & 
+                  Sepal.Length >= 5.45 ~ "virginica", Petal.Length < 
+                  5.35 & Petal.Width < 1.7 & Petal.Length >= 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Length >= 5.35 & Petal.Width < 1.7 & Petal.Length >= 
+                  5.05 & Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ 
+                  "virginica", Sepal.Length < 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica", 
+              Petal.Width < 1.65 & Sepal.Length >= 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "versicolor", 
+              Petal.Width >= 1.65 & Sepal.Length >= 6.15 & Petal.Length >= 
+                  4.85 & Sepal.Width < 2.9 & Petal.Length < 5.05 & 
+                  Petal.Length >= 4.75 & Sepal.Length >= 5.45 ~ "virginica") + 
+          case_when(Petal.Width < 0.75 ~ "setosa", Petal.Length < 4.95 & 
+              Petal.Width < 1.7 & Petal.Width >= 0.75 ~ "versicolor", 
+              Petal.Length >= 4.85 & Petal.Width >= 1.7 & Petal.Width >= 
+                  0.75 ~ "virginica", Sepal.Width < 2.65 & Petal.Length >= 
+                  4.95 & Petal.Width < 1.7 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Length < 6.05 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.7 & Petal.Width >= 0.75 ~ 
+                  "versicolor", Sepal.Length >= 6.05 & Petal.Length < 
+                  4.85 & Petal.Width >= 1.7 & Petal.Width >= 0.75 ~ 
+                  "virginica", Sepal.Width < 2.75 & Sepal.Width >= 
+                  2.65 & Petal.Length >= 4.95 & Petal.Width < 1.7 & 
+                  Petal.Width >= 0.75 ~ "versicolor", Sepal.Width >= 
+                  2.75 & Sepal.Width >= 2.65 & Petal.Length >= 4.95 & 
+                  Petal.Width < 1.7 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 ~ "setosa", Petal.Width < 1.7 & 
+              Petal.Length < 4.85 & Petal.Width >= 0.8 ~ "versicolor", 
+              Petal.Width >= 1.7 & Petal.Length >= 4.85 & Petal.Width >= 
+                  0.8 ~ "virginica", Sepal.Width < 3.1 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.8 ~ 
+                  "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+                  1.7 & Petal.Length < 4.85 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Petal.Width >= 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.85 & Petal.Width >= 0.8 ~ 
+                  "versicolor", Petal.Length < 4.95 & Petal.Width < 
+                  1.55 & Petal.Width < 1.7 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.8 ~ "versicolor", Petal.Length >= 
+                  4.95 & Petal.Width < 1.55 & Petal.Width < 1.7 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Width < 
+          0.8 ~ "setosa", Petal.Width < 1.65 & Petal.Length < 4.75 & 
+          Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 1.65 & 
+          Petal.Length < 4.75 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+          4.95 & Sepal.Width < 2.55 & Petal.Length >= 4.75 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Width < 
+          2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 4.85 & Sepal.Length < 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 4.85 & Sepal.Length < 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width >= 1.5 & Sepal.Length >= 5.95 & Sepal.Width >= 
+              2.55 & Petal.Length >= 4.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 2.7 & Petal.Width < 1.5 & Sepal.Length >= 5.95 & 
+              Sepal.Width >= 2.55 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Width >= 2.7 & Petal.Width < 
+              1.5 & Sepal.Length >= 5.95 & Sepal.Width >= 2.55 & Petal.Length >= 
+              4.75 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Length < 4.95 & Petal.Width < 1.55 & 
+          Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 4.95 & 
+          Petal.Width < 1.55 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+          5.95 & Petal.Length < 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.75 & Petal.Length >= 
+          5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.95 & Sepal.Length >= 5.95 & Petal.Length < 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.35 & Sepal.Width < 2.75 & Petal.Length >= 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Width < 2.75 & Petal.Length >= 4.95 & Sepal.Length >= 
+              5.95 & Petal.Length < 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+              0.75 ~ "virginica", Sepal.Width >= 2.75 & Petal.Length >= 
+              4.95 & Sepal.Length >= 5.95 & Petal.Length < 5.05 & Petal.Width >= 
+              1.55 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Length < 
+              5.9 & Sepal.Length < 6.35 & Sepal.Width < 2.75 & Petal.Length >= 
+              5.05 & Petal.Width >= 1.55 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 5.9 & Sepal.Length < 6.35 & Sepal.Width < 
+              2.75 & Petal.Length >= 5.05 & Petal.Width >= 1.55 & Petal.Width >= 
+              0.75 ~ "versicolor") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Petal.Length >= 5.05 & Sepal.Length >= 6.25 & Petal.Width >= 
+          0.75 ~ "virginica", Sepal.Length < 5.95 & Petal.Length >= 
+          4.85 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.35 & Petal.Length < 5.05 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Width < 
+              2.45 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Sepal.Width >= 
+              2.45 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Sepal.Length < 
+              5.95 & Sepal.Length >= 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 
+              5.25 & Sepal.Length >= 5.95 & Petal.Length >= 4.85 & 
+              Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.65 & Sepal.Length < 6.35 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 4.65 & Sepal.Length < 6.35 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.75 & Sepal.Length >= 5.95 & Sepal.Length >= 
+              4.95 & Petal.Length < 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 4.75 & Sepal.Length >= 
+              5.95 & Sepal.Length >= 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Petal.Length < 
+              5.05 & Petal.Length < 5.25 & Sepal.Length >= 5.95 & Petal.Length >= 
+              4.85 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length >= 5.05 & Petal.Length < 5.25 & Sepal.Length >= 
+              5.95 & Petal.Length >= 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Width >= 1.7 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ 
+              "versicolor", Petal.Width < 1.55 & Petal.Length >= 4.9 & 
+              Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Length < 5.45 & Petal.Width >= 1.55 & Petal.Length >= 
+              4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Length >= 5.45 & Petal.Width >= 1.55 & Petal.Length >= 
+              4.9 & Petal.Width < 1.7 & Petal.Width >= 0.8 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.9 & Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "virginica", 
+              Petal.Width >= 1.7 & Petal.Length >= 4.95 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length < 6.25 & Petal.Width < 
+                  1.9 & Petal.Length < 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width < 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width >= 1.55 & Petal.Width < 
+                  1.7 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Sepal.Length >= 6.35 & Sepal.Length >= 
+                  6.25 & Petal.Width < 1.9 & Petal.Length < 4.95 & 
+                  Petal.Length >= 2.45 ~ "versicolor", Petal.Width < 
+                  1.7 & Sepal.Length < 6.35 & Sepal.Length >= 6.25 & 
+                  Petal.Width < 1.9 & Petal.Length < 4.95 & Petal.Length >= 
+                  2.45 ~ "versicolor", Petal.Width >= 1.7 & Sepal.Length < 
+                  6.35 & Sepal.Length >= 6.25 & Petal.Width < 1.9 & 
+                  Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "virginica") + 
+          case_when(Petal.Length < 2.6 ~ "setosa", Petal.Width >= 1.65 & 
+              Petal.Length >= 2.6 ~ "virginica", Petal.Length < 4.95 & 
+              Petal.Width < 1.65 & Petal.Length >= 2.6 ~ "versicolor", 
+              Petal.Length >= 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+                  2.6 ~ "virginica") + case_when(Petal.Length < 2.6 & 
+          Sepal.Length < 5.45 ~ "setosa", Sepal.Length >= 6.75 & Sepal.Length >= 
+          5.45 ~ "virginica", Petal.Width < 1.55 & Petal.Length >= 
+          2.6 & Sepal.Length < 5.45 ~ "versicolor", Petal.Width >= 
+          1.55 & Petal.Length >= 2.6 & Sepal.Length < 5.45 ~ "virginica", 
+          Petal.Width < 0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & 
+              Sepal.Length >= 5.45 ~ "setosa", Petal.Width >= 1.85 & 
+              Petal.Width >= 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length < 5.05 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "versicolor", Petal.Length >= 5.05 & Petal.Width >= 
+              0.7 & Petal.Width < 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Length >= 4.85 & Petal.Width < 
+              1.85 & Petal.Width >= 1.75 & Sepal.Length < 6.75 & Sepal.Length >= 
+              5.45 ~ "virginica", Sepal.Width < 3.1 & Petal.Length < 
+              4.85 & Petal.Width < 1.85 & Petal.Width >= 1.75 & Sepal.Length < 
+              6.75 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              3.1 & Petal.Length < 4.85 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Sepal.Length < 6.75 & Sepal.Length >= 5.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.6 & 
+              Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width >= 2.75 & Petal.Length >= 4.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length < 5.4 & Petal.Width >= 
+                  1.6 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Sepal.Length >= 5.4 & Petal.Width >= 
+                  1.6 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ 
+                  "versicolor", Petal.Width >= 1.7 & Sepal.Width < 
+                  2.75 & Petal.Length >= 4.85 & Petal.Length >= 2.45 ~ 
+                  "virginica", Petal.Width < 1.5 & Petal.Width < 1.7 & 
+                  Sepal.Width < 2.75 & Petal.Length >= 4.85 & Petal.Length >= 
+                  2.45 ~ "virginica", Petal.Width >= 1.5 & Petal.Width < 
+                  1.7 & Sepal.Width < 2.75 & Petal.Length >= 4.85 & 
+                  Petal.Length >= 2.45 ~ "versicolor") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Sepal.Length >= 7.1 & Petal.Width < 1.75 & 
+          Petal.Length >= 2.35 ~ "virginica", Petal.Length >= 4.85 & 
+          Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Length < 4.95 & Sepal.Length < 7.1 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Width < 
+              3.1 & Petal.Length < 4.85 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Petal.Length < 
+              4.85 & Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "versicolor", 
+          Sepal.Width < 2.8 & Petal.Length >= 4.95 & Sepal.Length < 
+              7.1 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Width >= 2.8 & Petal.Length >= 4.95 & Sepal.Length < 
+              7.1 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "versicolor") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width >= 
+              1.65 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+              6.05 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Sepal.Width >= 2.85 & Sepal.Length >= 6.05 & Petal.Width < 
+                  1.65 & Petal.Length >= 2.45 ~ "versicolor", Petal.Length < 
+                  4.95 & Sepal.Width < 2.85 & Sepal.Length >= 6.05 & 
+                  Petal.Width < 1.65 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Length >= 4.95 & Sepal.Width < 2.85 & Sepal.Length >= 
+                  6.05 & Petal.Width < 1.65 & Petal.Length >= 2.45 ~ 
+                  "virginica") + case_when(Sepal.Width >= 2.85 & Sepal.Length < 
+          5.45 ~ "setosa", Sepal.Width < 2.4 & Sepal.Width < 2.85 & 
+          Sepal.Length < 5.45 ~ "setosa", Sepal.Width >= 2.4 & Sepal.Width < 
+          2.85 & Sepal.Length < 5.45 ~ "versicolor", Sepal.Width < 
+          3.45 & Petal.Length < 4.8 & Sepal.Length >= 5.45 ~ "versicolor", 
+          Sepal.Width >= 3.45 & Petal.Length < 4.8 & Sepal.Length >= 
+              5.45 ~ "setosa", Petal.Length >= 5.15 & Petal.Length >= 
+              4.8 & Sepal.Length >= 5.45 ~ "virginica", Petal.Width >= 
+              1.7 & Petal.Length < 5.15 & Petal.Length >= 4.8 & Sepal.Length >= 
+              5.45 ~ "virginica", Petal.Width >= 1.55 & Petal.Width < 
+              1.7 & Petal.Length < 5.15 & Petal.Length >= 4.8 & Sepal.Length >= 
+              5.45 ~ "versicolor", Sepal.Width < 2.95 & Petal.Width < 
+              1.55 & Petal.Width < 1.7 & Petal.Length < 5.15 & Petal.Length >= 
+              4.8 & Sepal.Length >= 5.45 ~ "virginica", Sepal.Width >= 
+              2.95 & Petal.Width < 1.55 & Petal.Width < 1.7 & Petal.Length < 
+              5.15 & Petal.Length >= 4.8 & Sepal.Length >= 5.45 ~ "versicolor") + 
+          case_when(Petal.Length < 2.35 ~ "setosa", Petal.Width >= 
+              1.7 & Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ "virginica", 
+              Petal.Width >= 1.75 & Sepal.Length >= 6.25 & Petal.Length >= 
+                  2.35 ~ "virginica", Sepal.Length < 6.05 & Petal.Width < 
+                  1.7 & Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ 
+                  "versicolor", Petal.Length < 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 6.25 & Petal.Length >= 2.35 ~ 
+                  "versicolor", Petal.Length >= 5.05 & Petal.Width < 
+                  1.75 & Sepal.Length >= 6.25 & Petal.Length >= 2.35 ~ 
+                  "virginica", Sepal.Length >= 6.15 & Sepal.Length >= 
+                  6.05 & Petal.Width < 1.7 & Sepal.Length < 6.25 & 
+                  Petal.Length >= 2.35 ~ "versicolor", Petal.Length < 
+                  5.1 & Sepal.Length < 6.15 & Sepal.Length >= 6.05 & 
+                  Petal.Width < 1.7 & Sepal.Length < 6.25 & Petal.Length >= 
+                  2.35 ~ "versicolor", Petal.Length >= 5.1 & Sepal.Length < 
+                  6.15 & Sepal.Length >= 6.05 & Petal.Width < 1.7 & 
+                  Sepal.Length < 6.25 & Petal.Length >= 2.35 ~ "virginica") + 
+          case_when(Petal.Length < 2.45 ~ "setosa", Petal.Width < 1.6 & 
+              Petal.Length < 4.95 & Petal.Length >= 2.45 ~ "versicolor", 
+              Petal.Width >= 1.6 & Petal.Length < 4.95 & Petal.Length >= 
+                  2.45 ~ "virginica", Sepal.Length >= 6.05 & Petal.Length >= 
+                  4.95 & Petal.Length >= 2.45 ~ "virginica", Petal.Width < 
+                  1.55 & Sepal.Length < 6.05 & Petal.Length >= 4.95 & 
+                  Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+                  5.95 & Petal.Width >= 1.55 & Sepal.Length < 6.05 & 
+                  Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ "virginica", 
+              Sepal.Length >= 5.95 & Petal.Width >= 1.55 & Sepal.Length < 
+                  6.05 & Petal.Length >= 4.95 & Petal.Length >= 2.45 ~ 
+                  "versicolor") + case_when(Petal.Width < 0.75 ~ "setosa", 
+          Petal.Width < 1.65 & Petal.Length < 4.75 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Width >= 1.65 & Petal.Length < 
+              4.75 & Petal.Width >= 0.75 ~ "virginica", Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length < 6.2 & Sepal.Width < 2.65 & Petal.Width < 1.75 & 
+              Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica", 
+          Sepal.Length >= 6.2 & Sepal.Width < 2.65 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length < 5.95 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "versicolor", 
+          Sepal.Length >= 5.95 & Petal.Length < 4.85 & Petal.Width >= 
+              1.75 & Petal.Length >= 4.75 & Petal.Width >= 0.75 ~ "virginica") + 
+          case_when(Petal.Width < 0.8 & Sepal.Length < 5.55 ~ "setosa", 
+              Petal.Width >= 0.8 & Sepal.Length < 5.55 ~ "versicolor", 
+              Petal.Width < 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.55 ~ "setosa", Sepal.Length >= 5.95 & Petal.Width >= 
+                  1.75 & Sepal.Length >= 5.55 ~ "virginica", Petal.Length < 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+                  4.85 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Petal.Length >= 
+                  4.85 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & 
+                  Sepal.Length >= 5.55 ~ "virginica", Sepal.Width < 
+                  2.9 & Petal.Length >= 4.95 & Petal.Width >= 0.65 & 
+                  Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+              Sepal.Length < 6.95 & Sepal.Width >= 2.9 & Petal.Length >= 
+                  4.95 & Petal.Width >= 0.65 & Petal.Width < 1.75 & 
+                  Sepal.Length >= 5.55 ~ "versicolor", Sepal.Length >= 
+                  6.95 & Sepal.Width >= 2.9 & Petal.Length >= 4.95 & 
+                  Petal.Width >= 0.65 & Petal.Width < 1.75 & Sepal.Length >= 
+                  5.55 ~ "virginica") + case_when(Petal.Width < 0.75 ~ 
+          "setosa", Petal.Length < 4.75 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.75 ~ "versicolor", Petal.Length < 4.85 & Petal.Length >= 
+          4.75 & Sepal.Length < 6.25 & Petal.Width >= 0.75 ~ "versicolor", 
+          Petal.Length >= 4.85 & Petal.Length >= 4.75 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.75 ~ "virginica", Petal.Length < 
+              5 & Petal.Width < 1.55 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.75 ~ "versicolor", Petal.Length >= 5 & Petal.Width < 
+              1.55 & Sepal.Length >= 6.25 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Length < 4.8 & Petal.Width >= 1.55 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.75 ~ "versicolor", Petal.Length >= 
+              4.8 & Petal.Width >= 1.55 & Sepal.Length >= 6.25 & Petal.Width >= 
+              0.75 ~ "virginica") + case_when(Petal.Length < 2.6 ~ 
+          "setosa", Petal.Length < 4.95 & Petal.Width < 1.65 & Petal.Length >= 
+          2.6 ~ "versicolor", Petal.Length >= 4.95 & Petal.Width < 
+          1.65 & Petal.Length >= 2.6 ~ "virginica", Petal.Width >= 
+          1.75 & Petal.Width >= 1.65 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length < 5.8 & Petal.Width < 1.75 & Petal.Width >= 
+              1.65 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              5.8 & Petal.Width < 1.75 & Petal.Width >= 1.65 & Petal.Length >= 
+              2.6 ~ "versicolor") + case_when(Petal.Length < 2.45 ~ 
+          "setosa", Petal.Width < 1.65 & Petal.Length < 4.85 & Petal.Length >= 
+          2.45 ~ "versicolor", Petal.Width >= 1.7 & Petal.Length >= 
+          4.85 & Petal.Length >= 2.45 ~ "virginica", Petal.Length < 
+          4.65 & Petal.Width >= 1.65 & Petal.Length < 4.85 & Petal.Length >= 
+          2.45 ~ "virginica", Petal.Length >= 4.65 & Petal.Width >= 
+          1.65 & Petal.Length < 4.85 & Petal.Length >= 2.45 ~ "versicolor", 
+          Sepal.Width < 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "virginica", Sepal.Length < 
+              6.75 & Sepal.Width >= 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "versicolor", Sepal.Length >= 
+              6.75 & Sepal.Width >= 2.35 & Petal.Width < 1.7 & Petal.Length >= 
+              4.85 & Petal.Length >= 2.45 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Width < 1.35 & Petal.Width < 1.75 & 
+          Petal.Length >= 2.35 ~ "versicolor", Sepal.Length >= 5.95 & 
+          Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Sepal.Length < 5.05 & Petal.Width >= 1.35 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "virginica", Sepal.Width < 
+              3.1 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Sepal.Length < 
+              5.95 & Petal.Width >= 1.75 & Petal.Length >= 2.35 ~ "versicolor", 
+          Sepal.Width < 2.65 & Sepal.Length >= 5.05 & Petal.Width >= 
+              1.35 & Petal.Width < 1.75 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Length < 5.05 & Sepal.Width >= 2.65 & Sepal.Length >= 
+              5.05 & Petal.Width >= 1.35 & Petal.Width < 1.75 & Petal.Length >= 
+              2.35 ~ "versicolor", Petal.Length >= 5.05 & Sepal.Width >= 
+              2.65 & Sepal.Length >= 5.05 & Petal.Width >= 1.35 & Petal.Width < 
+              1.75 & Petal.Length >= 2.35 ~ "virginica") + case_when(Petal.Width < 
+          0.8 & Sepal.Length < 5.55 ~ "setosa", Petal.Width >= 0.8 & 
+          Sepal.Length < 5.55 ~ "versicolor", Sepal.Length >= 5.95 & 
+          Petal.Width >= 1.75 & Sepal.Length >= 5.55 ~ "virginica", 
+          Sepal.Length < 6.15 & Sepal.Width < 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "virginica", Sepal.Length >= 
+              6.15 & Sepal.Width < 2.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width < 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length < 4.95 & Sepal.Length < 5.95 & Petal.Width >= 
+              1.75 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length >= 
+              4.95 & Sepal.Length < 5.95 & Petal.Width >= 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Petal.Length < 4.85 & Sepal.Width < 
+              2.85 & Petal.Width >= 1.45 & Sepal.Width >= 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+              5.4 & Sepal.Width >= 2.85 & Petal.Width >= 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Length >= 5.4 & Sepal.Width >= 2.85 & Petal.Width >= 
+              1.45 & Sepal.Width >= 2.65 & Petal.Width < 1.75 & Sepal.Length >= 
+              5.55 ~ "virginica", Sepal.Length < 6.15 & Petal.Length >= 
+              4.85 & Sepal.Width < 2.85 & Petal.Width >= 1.45 & Sepal.Width >= 
+              2.65 & Petal.Width < 1.75 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Sepal.Length >= 6.15 & Petal.Length >= 4.85 & Sepal.Width < 
+              2.85 & Petal.Width >= 1.45 & Sepal.Width >= 2.65 & Petal.Width < 
+              1.75 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Length < 
+          2.35 ~ "setosa", Petal.Length < 4.75 & Petal.Length < 4.95 & 
+          Petal.Length >= 2.35 ~ "versicolor", Petal.Length >= 5.05 & 
+          Petal.Length >= 4.95 & Petal.Length >= 2.35 ~ "virginica", 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Petal.Length < 
+              4.95 & Petal.Length >= 2.35 ~ "versicolor", Sepal.Width < 
+              2.75 & Petal.Length < 5.05 & Petal.Length >= 4.95 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 2.75 & Petal.Length < 
+              5.05 & Petal.Length >= 4.95 & Petal.Length >= 2.35 ~ 
+              "versicolor", Sepal.Width < 3.1 & Petal.Width >= 1.65 & 
+              Petal.Length >= 4.75 & Petal.Length < 4.95 & Petal.Length >= 
+              2.35 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.65 & Petal.Length >= 4.75 & Petal.Length < 4.95 & Petal.Length >= 
+              2.35 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ 
+          "setosa", Petal.Length >= 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "virginica", Petal.Length >= 4.95 & Sepal.Length >= 
+          6.25 & Petal.Width >= 0.8 ~ "virginica", Sepal.Length >= 
+          4.95 & Petal.Length < 4.85 & Sepal.Length < 6.25 & Petal.Width >= 
+          0.8 ~ "versicolor", Petal.Width < 1.7 & Petal.Length < 4.95 & 
+          Sepal.Length >= 6.25 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.7 & Petal.Length < 4.95 & Sepal.Length >= 
+              6.25 & Petal.Width >= 0.8 ~ "virginica", Petal.Width < 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "versicolor", Petal.Width >= 
+              1.35 & Sepal.Length < 4.95 & Petal.Length < 4.85 & Sepal.Length < 
+              6.25 & Petal.Width >= 0.8 ~ "virginica") + case_when(Petal.Length < 
+          2.6 ~ "setosa", Petal.Length < 4.85 & Sepal.Length < 6.05 & 
+          Petal.Length >= 2.6 ~ "versicolor", Petal.Length >= 5.05 & 
+          Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "virginica", 
+          Sepal.Length < 5.95 & Petal.Length >= 4.85 & Sepal.Length < 
+              6.05 & Petal.Length >= 2.6 ~ "virginica", Sepal.Length >= 
+              5.95 & Petal.Length >= 4.85 & Sepal.Length < 6.05 & Petal.Length >= 
+              2.6 ~ "versicolor", Petal.Length < 4.75 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width >= 2.9 & Petal.Length >= 4.75 & Petal.Length < 
+              5.05 & Sepal.Length >= 6.05 & Petal.Length >= 2.6 ~ "versicolor", 
+          Sepal.Width < 2.6 & Sepal.Width < 2.9 & Petal.Length >= 4.75 & 
+              Petal.Length < 5.05 & Sepal.Length >= 6.05 & Petal.Length >= 
+              2.6 ~ "versicolor", Sepal.Width >= 2.6 & Sepal.Width < 
+              2.9 & Petal.Length >= 4.75 & Petal.Length < 5.05 & Sepal.Length >= 
+              6.05 & Petal.Length >= 2.6 ~ "virginica") + case_when(Petal.Length < 
+          2.45 & Petal.Length < 4.75 ~ "setosa", Petal.Length >= 2.45 & 
+          Petal.Length < 4.75 ~ "versicolor", Petal.Width >= 1.75 & 
+          Petal.Length >= 4.75 ~ "virginica", Petal.Width >= 1.55 & 
+          Petal.Width < 1.75 & Petal.Length >= 4.75 ~ "versicolor", 
+          Petal.Length < 4.95 & Petal.Width < 1.55 & Petal.Width < 
+              1.75 & Petal.Length >= 4.75 ~ "versicolor", Petal.Length >= 
+              4.95 & Petal.Width < 1.55 & Petal.Width < 1.75 & Petal.Length >= 
+              4.75 ~ "virginica") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Length < 5.35 & Petal.Width < 1.75 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Length >= 5.35 & Petal.Width < 
+              1.75 & Petal.Width >= 0.8 ~ "virginica", Petal.Width >= 
+              1.85 & Petal.Width >= 1.75 & Petal.Width >= 0.8 ~ "virginica", 
+          Sepal.Width < 3.15 & Petal.Width < 1.85 & Petal.Width >= 
+              1.75 & Petal.Width >= 0.8 ~ "virginica", Sepal.Width >= 
+              3.15 & Petal.Width < 1.85 & Petal.Width >= 1.75 & Petal.Width >= 
+              0.8 ~ "versicolor") + case_when(Petal.Width < 0.8 ~ "setosa", 
+          Petal.Length >= 5.15 & Petal.Length >= 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width < 1.35 & Sepal.Length < 
+              4.95 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width >= 1.35 & Sepal.Length < 4.95 & Petal.Length < 
+              4.95 & Petal.Width >= 0.8 ~ "virginica", Petal.Length < 
+              4.75 & Sepal.Length >= 4.95 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "versicolor", Petal.Width >= 1.75 & Petal.Length < 
+              5.15 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "virginica", 
+          Petal.Width < 1.65 & Petal.Length >= 4.75 & Sepal.Length >= 
+              4.95 & Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Length >= 6.5 & Petal.Width < 1.75 & Petal.Length < 
+              5.15 & Petal.Length >= 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Sepal.Width < 3.1 & Petal.Width >= 1.65 & Petal.Length >= 
+              4.75 & Sepal.Length >= 4.95 & Petal.Length < 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Sepal.Width >= 3.1 & Petal.Width >= 
+              1.65 & Petal.Length >= 4.75 & Sepal.Length >= 4.95 & 
+              Petal.Length < 4.95 & Petal.Width >= 0.8 ~ "versicolor", 
+          Petal.Width < 1.55 & Sepal.Length < 6.5 & Petal.Width < 1.75 & 
+              Petal.Length < 5.15 & Petal.Length >= 4.95 & Petal.Width >= 
+              0.8 ~ "virginica", Petal.Width >= 1.55 & Sepal.Length < 
+              6.5 & Petal.Width < 1.75 & Petal.Length < 5.15 & Petal.Length >= 
+              4.95 & Petal.Width >= 0.8 ~ "versicolor") + case_when(Petal.Length < 
+          2.7 & Sepal.Length < 5.55 ~ "setosa", Sepal.Length < 4.95 & 
+          Petal.Length >= 2.7 & Sepal.Length < 5.55 ~ "virginica", 
+          Sepal.Length >= 4.95 & Petal.Length >= 2.7 & Sepal.Length < 
+              5.55 ~ "versicolor", Sepal.Width >= 3.55 & Petal.Length < 
+              4.95 & Sepal.Length >= 5.55 ~ "setosa", Petal.Width >= 
+              1.75 & Petal.Length >= 4.95 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Width < 1.7 & Sepal.Width < 3.55 & 
+              Petal.Length < 4.95 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Width < 1.75 & Petal.Length >= 
+              4.95 & Sepal.Length >= 5.55 ~ "virginica", Petal.Width >= 
+              1.65 & Petal.Width < 1.75 & Petal.Length >= 4.95 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Length < 6 & Petal.Width >= 
+              1.7 & Sepal.Width < 3.55 & Petal.Length < 4.95 & Sepal.Length >= 
+              5.55 ~ "versicolor", Sepal.Length >= 6 & Petal.Width >= 
+              1.7 & Sepal.Width < 3.55 & Petal.Length < 4.95 & Sepal.Length >= 
+              5.55 ~ "virginica") + case_when(Petal.Width < 0.8 & Petal.Width < 
+          1.75 ~ "setosa", Petal.Length >= 4.85 & Petal.Width >= 1.75 ~ 
+          "virginica", Petal.Length >= 5.05 & Petal.Width >= 0.8 & 
+          Petal.Width < 1.75 ~ "virginica", Sepal.Width < 3 & Petal.Length < 
+          4.85 & Petal.Width >= 1.75 ~ "virginica", Sepal.Width >= 
+          3 & Petal.Length < 4.85 & Petal.Width >= 1.75 ~ "versicolor", 
+          Sepal.Length < 4.95 & Petal.Length < 5.05 & Petal.Width >= 
+              0.8 & Petal.Width < 1.75 ~ "virginica", Sepal.Length >= 
+              4.95 & Petal.Length < 5.05 & Petal.Width >= 0.8 & Petal.Width < 
+              1.75 ~ "versicolor") + case_when(Sepal.Length >= 4.95 & 
+          Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "versicolor", Sepal.Length < 
+          5.3 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "setosa", 
+          Petal.Width < 0.65 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "setosa", Petal.Length < 3.9 & Sepal.Length < 
+              4.95 & Sepal.Width < 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length >= 3.9 & Sepal.Length < 4.95 & Sepal.Width < 
+              2.8 & Sepal.Length < 5.55 ~ "virginica", Petal.Width < 
+              0.95 & Sepal.Length >= 5.3 & Sepal.Width >= 2.8 & Sepal.Length < 
+              5.55 ~ "setosa", Petal.Width >= 0.95 & Sepal.Length >= 
+              5.3 & Sepal.Width >= 2.8 & Sepal.Length < 5.55 ~ "versicolor", 
+          Petal.Length < 4.75 & Petal.Width >= 0.65 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "versicolor", Petal.Length < 
+              4.95 & Sepal.Width < 2.55 & Petal.Length >= 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Length >= 4.95 & Sepal.Width < 
+              2.55 & Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ 
+              "virginica", Petal.Length >= 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Sepal.Width >= 3.1 & Petal.Length >= 4.75 & Petal.Width >= 
+              0.65 & Petal.Length < 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width < 1.65 & Petal.Length < 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "versicolor", 
+          Petal.Width >= 1.65 & Petal.Length < 5 & Sepal.Width >= 2.55 & 
+              Petal.Length >= 4.85 & Sepal.Length >= 5.55 ~ "virginica", 
+          Petal.Width < 1.6 & Sepal.Width < 3.1 & Petal.Length >= 4.75 & 
+              Petal.Width >= 0.65 & Petal.Length < 4.85 & Sepal.Length >= 
+              5.55 ~ "versicolor", Petal.Width >= 1.6 & Sepal.Width < 
+              3.1 & Petal.Length >= 4.75 & Petal.Width >= 0.65 & Petal.Length < 
+              4.85 & Sepal.Length >= 5.55 ~ "virginica") + case_when(Petal.Width < 
+          0.75 ~ "setosa", Petal.Width >= 1.65 & Petal.Width >= 0.75 ~ 
+          "virginica", Petal.Length < 4.95 & Petal.Width < 1.65 & Petal.Width >= 
+          0.75 ~ "versicolor", Sepal.Width >= 2.85 & Petal.Length >= 
+          4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Width < 1.55 & Sepal.Width < 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "virginica", 
+          Petal.Width >= 1.55 & Sepal.Width < 2.85 & Petal.Length >= 
+              4.95 & Petal.Width < 1.65 & Petal.Width >= 0.75 ~ "versicolor") + 
+          case_when(Petal.Width < 0.7 ~ "setosa", Petal.Length < 4.85 & 
+              Petal.Width >= 0.7 ~ "versicolor", Petal.Width >= 1.75 & 
+              Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ "virginica", 
+              Sepal.Length < 6.2 & Petal.Width < 1.75 & Petal.Length >= 
+                  4.85 & Petal.Width >= 0.7 ~ "virginica", Sepal.Width >= 
+                  2.9 & Sepal.Length >= 6.2 & Petal.Width < 1.75 & 
+                  Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ "versicolor", 
+              Petal.Length < 5 & Sepal.Width < 2.9 & Sepal.Length >= 
+                  6.2 & Petal.Width < 1.75 & Petal.Length >= 4.85 & 
+                  Petal.Width >= 0.7 ~ "versicolor", Petal.Length >= 
+                  5 & Sepal.Width < 2.9 & Sepal.Length >= 6.2 & Petal.Width < 
+                  1.75 & Petal.Length >= 4.85 & Petal.Width >= 0.7 ~ 
+                  "virginica")
 
 # Model can be saved and re-loaded
 

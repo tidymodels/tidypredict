@@ -13,7 +13,7 @@ run_tests <- function(model) {
   })
   test_that("Returns expected case_when() dplyr formula", {
     expect_snapshot(
-      rlang::expr_text(tf[[1]])
+      tf
     )
   })
 }
