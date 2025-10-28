@@ -10,6 +10,8 @@
 
 - Fixed bug where Cubst models incorrectly combined rules and committees. (#134)
 
+- randomForest models now support regression outcomes. (#77)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
