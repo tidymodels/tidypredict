@@ -57,3 +57,14 @@ test_that("tidy() works", {
     "tbl_df"
   )
 })
+
+test_that("we get better error from QR decomposition issues (#124)", {
+  mtcars$vs2 <- mtcars$disp - mtcars$vs
+
+  lm_fit <- lm(mpg ~ ., mtcars)
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict::tidypredict_fit(lm_fit)
+  )
+})

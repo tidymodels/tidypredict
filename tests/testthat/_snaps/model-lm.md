@@ -10,3 +10,12 @@
           ifelse(cyl == "cyl6", 1, 0) * 0.1416155) + (disp * ifelse(cyl == 
           "cyl8", 1, 0) * 0.1199615)
 
+# we get better error from QR decomposition issues (#124)
+
+    Code
+      tidypredict::tidypredict_fit(lm_fit)
+    Condition
+      Error in `parse_model()`:
+      x Unable to calculate inverse of QR decomposition.
+      i This is likely happening because the predictors contain a linear combination of predictors. Please remove and try again.
+
