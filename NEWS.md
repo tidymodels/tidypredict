@@ -12,6 +12,8 @@
 
 - Random forest implementations (ranger and randomForest) will now produce a single formula instead of a list of formulas. (#84)
 
+- randomForest models now support regression outcomes. (#77)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package

@@ -44,8 +44,15 @@ get_rf_tree <- function(tree_no, model) {
   purrr::map(
     paths,
     ~ {
+      if (is.null(predictions)) {
+        # Classification
+        prediction <- tree[.x, "prediction"]
+      } else {
+        # Regression
+        prediction <- predictions[tree[.x, "prediction"]]
+      }
       list(
-        prediction = predictions[tree[.x, "prediction"]],
+        prediction = prediction,
         path = get_rf_path(.x, tree, term_labels)
       )
     }
