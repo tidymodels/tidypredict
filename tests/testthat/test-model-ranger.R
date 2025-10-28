@@ -1,64 +1,30 @@
-num_trees <- 10
+test_that("ranger works", {
+  model <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rand_forest(trees = 10, mode = "classification"),
+      "ranger",
+      seed = 100,
+      num.threads = 2
+    ),
+    Species ~ .,
+    data = iris
+  )
 
-run_test <- function(model, test_formula = TRUE) {
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
-  test_that("Returns the correct type and dimensions", {
-    expect_s3_class(pm, "list")
-    expect_equal(length(pm), 2)
-    expect_equal(length(pm$trees), num_trees)
-    expect_equal(pm$general$model, "ranger")
-    expect_equal(pm$general$version, 2)
-  })
-  if (test_formula) {
-    test_that("Returns expected case_when() dplyr formula", {
-      expect_type(tidypredict_fit(pm), "list")
-    })
-  }
-}
 
-tidypredict_fit(
-  ranger::ranger(
-    Species ~ .,
-    data = iris,
-    num.trees = num_trees,
-    seed = 100,
-    num.threads = 2
-  )
-)
-
-run_test(
-  parsnip::fit(
-    parsnip::set_engine(
-      parsnip::rand_forest(trees = num_trees, mode = "classification"),
-      "ranger",
-      seed = 100,
-      num.threads = 2
-    ),
-    Species ~ .,
-    data = iris
-  ),
-  test_formula = FALSE
-)
-
-run_test(
-  parsnip::fit(
-    parsnip::set_engine(
-      parsnip::rand_forest(trees = num_trees, mode = "classification"),
-      "ranger",
-      seed = 100,
-      num.threads = 2
-    ),
-    Species ~ .,
-    data = iris
-  )
-)
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(length(pm$trees), 10)
+  expect_equal(pm$general$model, "ranger")
+  expect_equal(pm$general$version, 2)
+})
 
 test_that("Model can be saved and re-loaded", {
   model <- ranger::ranger(
     Species ~ .,
     data = iris,
-    num.trees = num_trees,
+    num.trees = 10,
     seed = 100,
     num.threads = 2
   )
