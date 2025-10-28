@@ -79,7 +79,7 @@ build_fit_formula <- function(parsedmodel) {
 #' @export
 parse_model.lm <- function(model) parse_model_lm(model)
 
-parse_model_lm <- function(model) {
+parse_model_lm <- function(model, call = rlang::caller_env()) {
   acceptable_formula(model)
 
   coefs <- as.numeric(model$coefficients)
@@ -87,7 +87,22 @@ parse_model_lm <- function(model) {
   vars <- names(attr(model$terms, "dataClasses"))
   qr <- NULL
   if (!is.null(model$qr)) {
-    qr <- qr.solve(qr.R(model$qr))
+    qr <- tryCatch(
+      qr.solve(qr.R(model$qr)),
+      error = function(cnd) {
+        if (grepl("singular matrix", cnd$message)) {
+          cli::cli_abort(
+            c(
+              x = "Unable to calculate inverse of QR decomposition.",
+              i = "This is likely happening because the predictors contain a 
+              linear combination of predictors. Please remove and try again."
+            ),
+            call = call
+          )
+        }
+        stop(cnd)
+      }
+    )
   }
 
   pm <- list()
