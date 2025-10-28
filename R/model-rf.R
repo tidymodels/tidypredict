@@ -185,5 +185,6 @@ build_fit_formula_rf <- function(parsedmodel) {
 #' @export
 tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_rf(parsedmodel)
+  res <- build_fit_formula_rf(parsedmodel)
+  adder(res)
 }
