@@ -1,22 +1,20 @@
-set.seed(100)
-data("BostonHousing", package = "mlbench")
-model <- Cubist::cubist(
-  x = BostonHousing[, -14],
-  y = BostonHousing$medv,
-  committees = 3
-)
-tf <- tidypredict_fit(model)
-pm <- parse_model(model)
+test_that("returns the right output", {
+  model <- Cubist::cubist(
+    x = mtcars[, -1],
+    y = mtcars$mpg,
+    committees = 3
+  )
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
 
-test_that("Returns the correct type and dimensions", {
+  expect_type(tf, "language")
+
   expect_s3_class(pm, "list")
   expect_equal(length(pm), 2)
   expect_equal(length(pm$trees), 1)
   expect_equal(pm$general$model, "cubist")
   expect_equal(pm$general$version, 2)
-})
 
-test_that("Returns expected dplyr formula", {
   expect_snapshot(
     rlang::expr_text(tf)
   )
@@ -30,16 +28,26 @@ test_that("Model can be saved and re-loaded", {
   expect_snapshot(tidypredict_fit(pm))
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("predictions are the same", {
   model <- Cubist::cubist(
-    x = BostonHousing[, -14],
-    y = BostonHousing$medv,
-    committees = 2,
-    control = Cubist::cubistControl(rules = 1)
+    x = mtcars[, -1],
+    y = mtcars$mpg,
+    committees = 3
   )
   tf <- tidypredict_fit(model)
-  expect_no_error(
-    parse_model(model)
+
+  splits <- dplyr::distinct(model$splits, variable, value)
+  splits <- map2(splits$variable, splits$value, function(x, y) {
+    str2lang(paste(x, "!=", y))
+  })
+
+  non_split_data <- mtcars |>
+    dplyr::filter(!!!splits)
+
+  expect_equal(
+    with(non_split_data, eval(tf)),
+    predict(model, non_split_data),
+    tolerance = 0.0001
   )
 })
 
