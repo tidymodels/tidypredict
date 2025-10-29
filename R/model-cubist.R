@@ -127,5 +127,10 @@ make_committee <- function(rules, paths) {
   paths <- lapply(paths, function(x) x %||% TRUE)
   paths <- adder(paths)
   rules <- adder(rules)
-  expr(!!rules / !!paths)
+  if (identical(paths, TRUE)) {
+    res <- rules
+  } else {
+    res <- expr(!!rules / !!paths)
+  }
+  res
 }
