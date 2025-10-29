@@ -65,3 +65,21 @@ test_that("intercept is done correctly (#58)", {
   res <- tidypredict_fit(mod)
   expect_false(any(grepl("list", res)))
 })
+
+test_that("doesn't divide by TRUE (#143)", {
+  rules <- list(quote(37.2 + hp * -0.0318 + wt * -3.88))
+  paths <- list(TRUE)
+
+  expect_identical(
+    expr_text(make_committee(rules, paths)),
+    "37.2 + hp * -0.0318 + wt * -3.88"
+  )
+
+  rules <- list(quote(37.2 + hp * -0.0318 + wt * -3.88))
+  paths <- list(quote(disp > 95.099998))
+
+  expect_identical(
+    expr_text(make_committee(rules, paths)),
+    "(37.2 + hp * -0.0318 + wt * -3.88)/(disp > 95.099998)"
+  )
+})

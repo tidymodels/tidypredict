@@ -142,7 +142,7 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
     pl <- prediction
   }
   f <- NULL
-  if (is.null(rcl)) {
+  if (is.null(rcl) || isTRUE(rcl)) {
     f <- pl
   }
   if (is.null(f) & calc_mode == "ifelse") {
