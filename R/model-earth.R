@@ -147,9 +147,6 @@ operation_list <- function(direction, column, split) {
 collapse_lists <- function(label, coef, lst) {
   label <- unique(label)
   coef <- unique(coef)
-  if (length(label) > 1) {
-    browser()
-  }
   list(
     list(
       label = label,
