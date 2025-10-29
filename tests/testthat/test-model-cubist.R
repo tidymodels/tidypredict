@@ -42,18 +42,19 @@ test_that("predictions are the same", {
   )
   tf <- tidypredict_fit(model)
 
+  # Cubist doesn't work near splits
+  # https://github.com/topepo/Cubist/issues/62
   splits <- dplyr::distinct(model$splits, variable, value)
   splits <- map2(splits$variable, splits$value, function(x, y) {
-    str2lang(paste(x, "!=", y))
+    str2lang(paste("abs(", x, "-", y, ") > 0.0001"))
   })
-
   non_split_data <- mtcars |>
     dplyr::filter(!!!splits)
 
   expect_equal(
-    with(non_split_data, eval(tf)),
+    eval_tidy(tf, non_split_data),
     predict(model, non_split_data),
-    tolerance = 0.0001
+    tolerance = 0.0000001
   )
 })
 
