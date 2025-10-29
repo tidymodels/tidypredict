@@ -21,6 +21,12 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
+  model <- Cubist::cubist(
+    x = mtcars[, -1],
+    y = mtcars$mpg,
+    committees = 3
+  )
+  pm <- parse_model(model)
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
