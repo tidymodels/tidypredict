@@ -1,4 +1,8 @@
 test_that("returns the right output", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
   model <- ranger::ranger(
     Species ~ .,
     data = iris,
@@ -25,6 +29,10 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
   model <- ranger::ranger(
     Species ~ .,
     data = iris,
@@ -39,11 +47,14 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  # Not OS stable
-  expect_silent(tidypredict_fit(pm))
+  expect_snapshot(tidypredict_fit(pm))
 })
 
 test_that("formulas produces correct predictions", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
   # regression
   expect_snapshot(
     tidypredict_test(
