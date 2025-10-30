@@ -1,54 +1,85 @@
-df <- mtcars
-df$cyl <- paste0("cyl", df$cyl)
+test_that("returns the right output", {
+  model <- lm(am ~ wt + cyl, data = mtcars)
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
 
-has_alert <- function(model) {
-  tidypredict_test(model, df = df, include_intervals = TRUE)$alert
-}
+  expect_type(tf, "language")
 
-test_that("Predictions within threshold and parsed model results are equal", {
-  expect_false(has_alert(lm(mpg ~ wt, offset = am, data = df)))
-  expect_false(has_alert(lm(mpg ~ wt + am + cyl, data = df)))
-  expect_false(has_alert(lm(mpg ~ wt + disp * am, data = df)))
-  expect_false(has_alert(lm(mpg ~ wt + disp * cyl, data = df)))
-  expect_false(has_alert(lm(mpg ~ (wt + disp) * cyl, data = df)))
-})
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "lm")
+  expect_equal(pm$general$version, 2)
 
-test_that("tidypredict works when variable names are subset of other variables", {
-  df2 <- df
-  df2$wt_sq <- df2$wt^2
-  df2$char_cyl <- as.character(df2$cyl)
-  df2$char_cyl_2 <- sample(letters[1:3], size = nrow(df2), replace = TRUE)
-  model4 <- lm(
-    am ~ wt + wt_sq + char_cyl + char_cyl_2,
-    data = df2
+  expect_snapshot(
+    rlang::expr_text(tf)
   )
-
-  expect_silent(tidypredict_fit(model4))
-  expect_false(tidypredict_test(model4)$alert)
-})
-
-lm_parsnip <- function(...) {
-  parsnip::fit(
-    parsnip::set_engine(parsnip::linear_reg(), "lm"),
-    ...
-  )
-}
-
-test_that("Predictions within threshold and parsed model results are equal", {
-  expect_false(has_alert(lm_parsnip(mpg ~ wt, offset = am, data = df)))
-  expect_false(has_alert(lm_parsnip(mpg ~ wt + am + cyl, data = df)))
-  expect_false(has_alert(lm_parsnip(mpg ~ wt + disp * am, data = df)))
-  expect_false(has_alert(lm_parsnip(mpg ~ wt + disp * cyl, data = df)))
-  expect_false(has_alert(lm_parsnip(mpg ~ (wt + disp) * cyl, data = df)))
 })
 
 test_that("Model can be saved and re-loaded", {
-  model <- lm(mpg ~ (wt + disp) * cyl, data = df)
+  model <- lm(am ~ wt + cyl, data = mtcars)
+
+  pm <- parse_model(model)
   mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(parse_model(model), mp)
+  yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
   expect_snapshot(tidypredict_fit(pm))
+})
+
+test_that("formulas produces correct predictions", {
+  mtcars$cyl <- paste0("cyl", mtcars$cyl)
+
+  # normal
+  expect_snapshot(
+    tidypredict_test(
+      lm(mpg ~ wt + am + cyl, data = mtcars),
+      mtcars
+    )
+  )
+
+  # offset
+  expect_snapshot(
+    tidypredict_test(
+      lm(mpg ~ wt, offset = am, data = mtcars),
+      mtcars
+    )
+  )
+
+  # interaction
+  expect_snapshot(
+    tidypredict_test(
+      lm(mpg ~ wt + disp * cyl, data = mtcars),
+      mtcars
+    )
+  )
+
+  # interactions
+  expect_snapshot(
+    tidypredict_test(
+      lm(mpg ~ (wt + disp) * cyl, data = mtcars),
+      mtcars
+    )
+  )
+})
+
+test_that("tidypredict works when variable names are subset of other variables", {
+  mtcars$cyl <- paste0("cyl", mtcars$cyl)
+  mtcars$wt_sq <- mtcars$wt^2
+  mtcars$char_cyl <- as.character(mtcars$cyl)
+  set.seed(22)
+  mtcars$char_cyl_2 <- sample(letters[1:3], size = nrow(mtcars), replace = TRUE)
+
+  model <- lm(
+    am ~ wt + wt_sq + char_cyl + char_cyl_2,
+    data = mtcars
+  )
+
+  expect_snapshot(
+    tidypredict_test(
+      model,
+      mtcars
+    )
+  )
 })
 
 test_that("tidy() works", {
