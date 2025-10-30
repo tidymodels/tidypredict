@@ -34,13 +34,12 @@ test_that("Model can be saved and re-loaded", {
   expect_snapshot(tidypredict_fit(pm))
 })
 
-test_that("predictions are the same", {
+test_that("formulas produces correct predictions", {
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,
     committees = 3
   )
-  tf <- tidypredict_fit(model)
 
   # Cubist doesn't work near splits
   # https://github.com/topepo/Cubist/issues/62
@@ -51,10 +50,12 @@ test_that("predictions are the same", {
   non_split_data <- mtcars |>
     dplyr::filter(!!!splits)
 
-  expect_equal(
-    eval_tidy(tf, non_split_data),
-    predict(model, non_split_data),
-    tolerance = 0.0000001
+  expect_snapshot(
+    tidypredict_test(
+      model,
+      non_split_data,
+      threshold = 0.00001
+    )
   )
 })
 

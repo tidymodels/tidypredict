@@ -14,3 +14,13 @@
           14.89 + hp * -0.0406 + drat * 2.4, 0) + ifelse(disp <= 95.099998, 
           33.06, 0) + (37.26 + wt * -5.28))/3
 
+# formulas produces correct predictions
+
+    Code
+      tidypredict_test(model, non_split_data, threshold = 1e-05)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-05
+      
+       All results are within the difference threshold
+
