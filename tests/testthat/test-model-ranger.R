@@ -42,7 +42,6 @@ test_that("Model can be saved and re-loaded", {
   expect_snapshot(tidypredict_fit(pm))
 })
 
-
 test_that("formulas produces correct predictions", {
   # regression
   expect_snapshot(
