@@ -1,5 +1,9 @@
 test_that("returns the right output", {
   model <- lm(am ~ wt + cyl, data = mtcars)
+
+  #Don't have stable numbers at the tails across OS
+  model$coefficients <- round(model$coefficients, 12)
+
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
 

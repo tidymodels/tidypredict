@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "1.5203311478662 + (wt * -0.3729886164835) + (cyl * 0.0138854914772272)"
+      [1] "1.520331147866 + (wt * -0.372988616484) + (cyl * 0.013885491477)"
 
 # Model can be saved and re-loaded
 
