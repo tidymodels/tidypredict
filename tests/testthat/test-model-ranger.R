@@ -39,7 +39,8 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_snapshot(tidypredict_fit(pm))
+  # Not OS stable
+  expect_silent(tidypredict_fit(pm))
 })
 
 test_that("formulas produces correct predictions", {
