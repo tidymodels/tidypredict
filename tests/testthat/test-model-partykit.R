@@ -1,30 +1,71 @@
-df <- mtcars
-df$am1 <- df$am
-df$am <- ifelse(df$am == 1, "auto", "man")
-df$am <- as.factor(df$am)
+test_that("returns the right output", {
+  model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
 
-df$cyl <- ifelse(df$cyl == 4, "four", df$cyl)
-df$cyl <- ifelse(df$cyl == 6, "six", df$cyl)
-df$cyl <- ifelse(df$cyl == 8, "eight", df$cyl)
-df$cyl <- as.factor(df$cyl)
+  expect_type(tf, "language")
 
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "party")
+  expect_equal(pm$general$version, 2)
 
-has_alert <- function(model) tidypredict_test(model, df = df)$alert
-
-test_that("Predictions within threshold and parsed model results are equal", {
-  expect_false(has_alert(partykit::ctree(mpg ~ am + cyl, data = df)))
-  expect_false(has_alert(partykit::ctree(mpg ~ wt, offset = am1, data = df)))
-  expect_false(has_alert(partykit::ctree(mpg ~ wt + am + cyl, data = df)))
-  expect_false(has_alert(partykit::ctree(mpg ~ wt + disp * am, data = df)))
-  expect_false(has_alert(partykit::ctree(mpg ~ wt + disp * cyl, data = df)))
-  expect_false(has_alert(partykit::ctree(mpg ~ (wt + disp) * cyl, data = df)))
+  expect_snapshot(
+    rlang::expr_text(tf)
+  )
 })
 
 test_that("Model can be saved and re-loaded", {
-  model <- partykit::ctree(mpg ~ wt, offset = am, data = df)
+  model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
+
+  pm <- parse_model(model)
   mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(parse_model(model), mp)
+  yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
   expect_snapshot(tidypredict_fit(pm))
+})
+
+test_that("formulas produces correct predictions", {
+  mtcars <- mtcars
+  mtcars$am1 <- mtcars$am
+  mtcars$am <- ifelse(mtcars$am == 1, "auto", "man")
+  mtcars$am <- as.factor(mtcars$am)
+
+  mtcars$cyl <- ifelse(mtcars$cyl == 4, "four", mtcars$cyl)
+  mtcars$cyl <- ifelse(mtcars$cyl == 6, "six", mtcars$cyl)
+  mtcars$cyl <- ifelse(mtcars$cyl == 8, "eight", mtcars$cyl)
+  mtcars$cyl <- as.factor(mtcars$cyl)
+
+  # normal
+  expect_snapshot(
+    tidypredict_test(
+      partykit::ctree(mpg ~ am + cyl, data = mtcars),
+      mtcars
+    )
+  )
+
+  # offset
+  expect_snapshot(
+    tidypredict_test(
+      partykit::ctree(mpg ~ wt, offset = am1, data = mtcars),
+      mtcars
+    )
+  )
+
+  # interaction
+  expect_snapshot(
+    tidypredict_test(
+      partykit::ctree(mpg ~ wt + disp * cyl, data = mtcars),
+      mtcars
+    )
+  )
+
+  # interactions
+  expect_snapshot(
+    tidypredict_test(
+      partykit::ctree(mpg ~ (wt + disp) * cyl, data = mtcars),
+      mtcars
+    )
+  )
 })
