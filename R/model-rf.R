@@ -193,5 +193,7 @@ build_fit_formula_rf <- function(parsedmodel) {
 tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
   res <- build_fit_formula_rf(parsedmodel)
-  adder(res)
+  res <- adder(res)
+  n_trees <- length(parsedmodel$trees)
+  expr(!!res / !!n_trees)
 }
