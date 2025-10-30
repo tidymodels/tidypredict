@@ -318,18 +318,6 @@ tidypredict_test.model_fit <- function(
   )
 }
 
-#' @export
-tidypredict_test.randomForest <- function(
-  model,
-  df = NULL,
-  threshold = 0,
-  include_intervals = FALSE,
-  max_rows = NULL,
-  xg_df = NULL
-) {
-  cli::cli_abort("tidypredict_test does not support randomForest models")
-}
-
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results
