@@ -330,17 +330,6 @@ tidypredict_test.randomForest <- function(
   cli::cli_abort("tidypredict_test does not support randomForest models")
 }
 
-#' @export
-tidypredict_test.ranger <- function(
-  model,
-  df = NULL,
-  threshold = 0,
-  include_intervals = FALSE,
-  max_rows = NULL,
-  xg_df = NULL
-) {
-  cli::cli_abort("tidypredict_test does not support ranger models")
-}
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results

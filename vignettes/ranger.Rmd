@@ -24,7 +24,7 @@ set.seed(100)
 |---------------------------------------------------------------|-----|
 |`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
 |`tidypredict_to_column()`                                      |  ✗  |
-|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_test()`                                           |  ✔  |
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
 |`parsnip`                                                      |  ✔  |
 

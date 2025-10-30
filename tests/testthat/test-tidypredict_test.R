@@ -23,8 +23,4 @@ test_that("Error is returned for tree based models", {
     ),
     "tidypredict_test does not support"
   )
-  expect_error(
-    tidypredict_test(ranger::ranger(Species ~ ., data = iris), df = iris),
-    "tidypredict_test does not support"
-  )
 })
