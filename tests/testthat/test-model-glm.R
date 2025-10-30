@@ -1,50 +1,80 @@
-df <- mtcars
-df$cyl <- paste0("cyl", df$cyl)
+test_that("returns the right output", {
+  model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
 
-has_alert <- function(...) tidypredict_test(...)$alert
+  expect_type(tf, "language")
 
-test_that("Individual prediction difference is never above 1e-12", {
-  expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "gaussian")))
-  expect_false(has_alert(glm(am ~ wt + disp, data = df, family = "gaussian")))
-  expect_false(has_alert(glm(am ~ wt + cyl, data = df, family = "binomial")))
-  expect_false(has_alert(glm(
-    am ~ wt + disp + cyl,
-    data = df,
-    family = "binomial"
-  )))
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "glm")
+  expect_equal(pm$general$version, 2)
+
+  expect_snapshot(
+    rlang::expr_text(tf)
+  )
 })
 
-test_that("Intervals return a call", {
-  expect_equal(
-    class(tidypredict_interval(glm(
-      am ~ cyl * wt + mpg,
-      data = mtcars,
-      family = "gaussian"
-    )))[1],
-    "call"
+test_that("Model can be saved and re-loaded", {
+  model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
+
+  pm <- parse_model(model)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, mp)
+  l <- yaml::read_yaml(mp)
+  pm <- as_parsed_model(l)
+  expect_snapshot(tidypredict_fit(pm))
+})
+
+test_that("formulas produces correct predictions", {
+  mtcars$cyl <- paste0("cyl", mtcars$cyl)
+  # family = gaussian
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt + cyl + disp, data = mtcars, family = "gaussian"),
+      mtcars
+    )
+  )
+  # family = binomial
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt + cyl + disp, data = mtcars, family = "binomial"),
+      mtcars
+    )
+  )
+  # family = gaussian, with interactions
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt * cyl + disp, data = mtcars, family = "gaussian"),
+      mtcars
+    )
+  )
+  # family = binomial, with interactions
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt * cyl + disp, data = mtcars, family = "binomial"),
+      mtcars
+    )
   )
 })
 
 test_that("tidypredict works when variable names are subset of other variables", {
-  df2 <- df
-  df2$wt_sq <- df2$wt^2
-  df2$char_cyl <- as.character(df2$cyl)
+  mtcars$cyl <- paste0("cyl", mtcars$cyl)
+  mtcars$wt_sq <- mtcars$wt^2
+  mtcars$char_cyl <- as.character(mtcars$cyl)
   set.seed(22)
-  df2$char_cyl_2 <- sample(letters[1:3], size = nrow(df2), replace = TRUE)
-  model4 <- suppressWarnings(glm(
+  mtcars$char_cyl_2 <- sample(letters[1:3], size = nrow(mtcars), replace = TRUE)
+
+  model <- suppressWarnings(glm(
     am ~ wt + wt_sq + char_cyl + char_cyl_2,
-    data = df2,
+    data = mtcars,
     family = "binomial"
   ))
-  expect_silent(tidypredict_fit(model4))
-  expect_false(tidypredict_test(model4)$alert)
-})
 
-test_that("Model can be saved and re-loaded", {
-  model <- glm(am ~ wt + disp + cyl, data = df, family = "binomial")
-  mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(parse_model(model), mp)
-  l <- yaml::read_yaml(mp)
-  pm <- as_parsed_model(l)
-  expect_snapshot(tidypredict_fit(pm))
+  expect_snapshot(
+    tidypredict_test(
+      model,
+      mtcars
+    )
+  )
 })
