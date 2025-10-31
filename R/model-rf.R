@@ -79,42 +79,10 @@ parse_model.randomForest <- function(model) {
 
 # Fit model -----------------------------------------------
 
-build_fit_formula_rf <- function(parsedmodel) {
-  calc_mode <- parsedmodel$general$mode
-  if (is.null(calc_mode)) {
-    calc_mode <- ""
-  }
-  divisor <- parsedmodel$general$divisor
-  if (is.null(divisor)) {
-    divisor <- 1
-  }
-
-  f <- NULL
-
-  if (calc_mode == "ifelse") {
-    f <- reduce_addition(generate_cases(
-      parsedmodel$trees[[1]],
-      parsedmodel$general$mode
-    ))
-    if (divisor > 1) {
-      f <- expr_division(f, divisor)
-    }
-  }
-
-  if (is.null(f)) {
-    f <- map(
-      parsedmodel$trees,
-      generate_case_when_tree,
-      mode = parsedmodel$general$mode
-    )
-  }
-  f
-}
-
 #' @export
 tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
-  res <- build_fit_formula_rf(parsedmodel)
+  res <- generate_case_when_trees(parsedmodel)
   res <- reduce_addition(res)
   n_trees <- length(parsedmodel$trees)
   expr_division(res, n_trees)

@@ -151,6 +151,6 @@ parse_model.ranger <- function(model) {
 #' @export
 tidypredict_fit.ranger <- function(model) {
   parsedmodel <- parse_model(model)
-  res <- build_fit_formula_rf(parsedmodel)
+  res <- generate_case_when_trees(parsedmodel)
   reduce_addition(res)
 }

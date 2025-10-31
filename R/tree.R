@@ -1,3 +1,11 @@
+generate_case_when_trees <- function(parsedmodel) {
+  map(
+    parsedmodel$trees,
+    generate_case_when_tree,
+    mode = parsedmodel$general$mode
+  )
+}
+
 generate_case_when_tree <- function(tree, mode) {
   expr(case_when(!!!generate_cases(tree, mode)))
 }
