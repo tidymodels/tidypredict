@@ -1,7 +1,7 @@
-generate_cases <- function(tree_no, parsedmodel) {
+generate_cases <- function(tree, mode) {
   map(
-    parsedmodel$trees[[tree_no]],
-    ~ generate_single_case(.x$path, .x$prediction, parsedmodel$general$mode)
+    tree,
+    ~ generate_single_case(.x$path, .x$prediction, mode)
   )
 }
 

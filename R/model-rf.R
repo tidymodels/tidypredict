@@ -92,7 +92,10 @@ build_fit_formula_rf <- function(parsedmodel) {
   f <- NULL
 
   if (calc_mode == "ifelse") {
-    f <- reduce_addition(generate_cases(1, parsedmodel))
+    f <- reduce_addition(generate_cases(
+      parsedmodel$trees[[1]],
+      parsedmodel$general$mode
+    ))
     if (divisor > 1) {
       f <- expr_division(f, divisor)
     }
@@ -100,8 +103,8 @@ build_fit_formula_rf <- function(parsedmodel) {
 
   if (is.null(f)) {
     f <- map(
-      seq_len(length(parsedmodel$trees)),
-      ~ expr(case_when(!!!generate_cases(.x, parsedmodel)))
+      parsedmodel$trees,
+      ~ expr(case_when(!!!generate_cases(.x, parsedmodel$general$mode)))
     )
   }
   f

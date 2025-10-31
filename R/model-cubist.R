@@ -80,7 +80,7 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
-  rules <- generate_cases(1, parsedmodel)
+  rules <- generate_cases(parsedmodel$trees[[1]], parsedmodel$general$mode)
   paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
 
   n_committees <- model$committees
