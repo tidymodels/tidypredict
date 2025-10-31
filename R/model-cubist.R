@@ -118,10 +118,6 @@ tidypredict_fit.cubist <- function(model) {
   out
 }
 
-adder <- function(paths) {
-  reduce(paths, function(x, y) expr(!!x + !!y))
-}
-
 make_committee <- function(rules, paths) {
   # cubist averages out rules if multiple apply
   paths <- lapply(paths, function(x) x %||% TRUE)
