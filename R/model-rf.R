@@ -19,12 +19,16 @@ parse_rf_path <- function(row_id, tree, columns, default_op = TRUE) {
         if (rb["left daughter"] == .x) {
           op <- "less"
         }
-        if (rb["right daughter"] == .x) op <- "more-equal"
+        if (rb["right daughter"] == .x) {
+          op <- "more-equal"
+        }
       } else {
         if (rb["left daughter"] == .x) {
           op <- "less-equal"
         }
-        if (rb["right daughter"] == .x) op <- "more"
+        if (rb["right daughter"] == .x) {
+          op <- "more"
+        }
       }
       list(
         type = "conditional",

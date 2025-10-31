@@ -46,12 +46,16 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
           if (lc) {
             op <- "less"
           }
-          if (lr) op <- "more-equal"
+          if (lr) {
+            op <- "more-equal"
+          }
         } else {
           if (lc) {
             op <- "less-equal"
           }
-          if (lr) op <- "more"
+          if (lr) {
+            op <- "more"
+          }
         }
         list(
           type = "conditional",
