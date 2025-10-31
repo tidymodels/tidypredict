@@ -94,7 +94,7 @@ build_fit_formula_rf <- function(parsedmodel) {
   if (calc_mode == "ifelse") {
     f <- reduce_addition(get_rf_case_tree(1, parsedmodel))
     if (divisor > 1) {
-      f <- expr(!!f / !!divisor)
+      f <- expr_division(f, divisor)
     }
   }
 
@@ -113,5 +113,5 @@ tidypredict_fit.randomForest <- function(model) {
   res <- build_fit_formula_rf(parsedmodel)
   res <- reduce_addition(res)
   n_trees <- length(parsedmodel$trees)
-  expr(!!res / !!n_trees)
+  expr_division(res, n_trees)
 }

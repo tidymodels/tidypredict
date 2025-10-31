@@ -112,7 +112,7 @@ tidypredict_fit.cubist <- function(model) {
   out <- reduce_addition(committees)
   if (n_committees > 1) {
     # Average the committes
-    out <- expr(!!out / !!n_committees)
+    out <- expr_division(out, n_committees)
   }
 
   out
@@ -126,7 +126,7 @@ make_committee <- function(rules, paths) {
   if (identical(paths, TRUE)) {
     res <- rules
   } else {
-    res <- expr(!!rules / !!paths)
+    res <- expr_division(rules, paths)
   }
   res
 }

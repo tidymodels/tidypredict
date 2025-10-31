@@ -50,7 +50,7 @@ build_fit_formula <- function(parsedmodel) {
   f <- reduce_addition(parsed_f)
 
   if (!is.null(parsedmodel$general$offset)) {
-    f <- expr(!!f + !!parsedmodel$general$offset)
+    f <- expr_addition(f, parsedmodel$general$offset)
   }
 
   if (parsedmodel$general$is_glm == 1) {
@@ -224,7 +224,7 @@ get_qr_lm <- function(qr_name, parsedmodel) {
           }
         )
         cols <- reduce_multiplication(cols)
-        if (cqr != 0) expr(!!cols * !!cqr)
+        if (cqr != 0) expr_multiplication(cols, cqr)
       } else {
         expr(!!cqr)
       }

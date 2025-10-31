@@ -17,7 +17,7 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
           i <- expr(!!.x$val)
         }
         if (.x$op == "multiply") {
-          i <- expr(!!sym(.x$col) * !!.x$val)
+          i <- expr_multiplication(sym(.x$col), .x$val)
         }
         i
       }
