@@ -5,7 +5,7 @@ parse_rf_path <- function(row_id, tree, columns, default_op = TRUE) {
   path <- row_id
   for (j in row_id:1) {
     dir <- NULL
-    if (tree[j, "left daughter"] == find | tree[j, "right daughter"] == find) {
+    if (tree[j, "left daughter"] == find || tree[j, "right daughter"] == find) {
       find <- j
       path <- c(path, j)
     }

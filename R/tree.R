@@ -44,7 +44,7 @@ generate_case <- function(path, prediction, calc_mode = "") {
   if (is.null(rcl) || isTRUE(rcl)) {
     f <- pl
   }
-  if (is.null(f) & calc_mode == "ifelse") {
+  if (is.null(f) && calc_mode == "ifelse") {
     f <- expr(ifelse(!!rcl, !!pl, 0))
   }
   if (is.null(f)) {
@@ -58,7 +58,7 @@ path_formulas <- function(path) {
     return(TRUE)
   }
 
-  if (length(path) == 1 & path[[1]]$type == "all") {
+  if (length(path) == 1 && path[[1]]$type == "all") {
     rcl <- NULL
   } else {
     cl <- map(
