@@ -152,5 +152,5 @@ parse_model.ranger <- function(model) {
 tidypredict_fit.ranger <- function(model) {
   parsedmodel <- parse_model(model)
   res <- build_fit_formula_rf(parsedmodel)
-  adder(res)
+  reduce_addition(res)
 }

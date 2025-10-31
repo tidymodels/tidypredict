@@ -130,7 +130,7 @@ get_xgb_case <- function(path, prediction) {
   } else if (cl_length == 2) {
     cl <- expr(!!cl[[1]] & !!cl[[2]])
   } else {
-    cl <- reduce(cl, function(x, y) expr(!!x & !!y))
+    cl <- reduce_and(cl)
   }
 
   expr(!!cl ~ !!prediction)
@@ -166,8 +166,10 @@ build_fit_formula_xgb <- function(parsedmodel) {
     ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
   )
 
+  f <- c(0, f)
+
   # additive model
-  f <- purrr::reduce(f, ~ expr(!!.x + !!.y), .init = expr(0))
+  f <- reduce_addition(f)
 
   base_score <- parsedmodel$general$params$base_score
   if (is.null(base_score)) {

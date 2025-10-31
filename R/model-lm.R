@@ -40,14 +40,14 @@ build_fit_formula <- function(parsedmodel) {
             f
           }
         )
-        cols <- reduce(cols, function(l, r) expr(!!l * !!r))
+        cols <- reduce_multiplication(cols)
         expr((!!cols * !!.x$coef))
       } else {
         expr(!!.x$coef)
       }
     }
   )
-  f <- reduce(parsed_f, function(l, r) expr(!!l + !!r))
+  f <- reduce_addition(parsed_f)
 
   if (!is.null(parsedmodel$general$offset)) {
     f <- expr(!!f + !!parsedmodel$general$offset)
@@ -223,17 +223,15 @@ get_qr_lm <- function(qr_name, parsedmodel) {
             f
           }
         )
-        cols <- reduce(cols, function(l, r) expr(!!l * !!r))
+        cols <- reduce_multiplication(cols)
         if (cqr != 0) expr(!!cols * !!cqr)
       } else {
         expr(!!cqr)
       }
     }
   )
-  f <- reduce(
-    q[!map_lgl(q, is.null)],
-    function(x, y) expr(!!x + !!y)
-  )
+  f <- reduce_addition(q[!map_lgl(q, is.null)])
+
   expr(((!!f)) * ((!!f)) * !!parsedmodel$general$sigma2)
 }
 
@@ -243,7 +241,7 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
     qr_names,
     ~ get_qr_lm(.x, parsedmodel)
   )
-  qrs <- reduce(qrs_map, function(x, y) expr(!!x + (!!y)))
+  qrs <- reduce_addition(qrs_map)
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
 }

@@ -1,3 +1,15 @@
-adder <- function(paths) {
-  reduce(paths, function(x, y) expr(!!x + !!y))
+reduce_addition <- function(x) {
+  reduce(x, function(left, right) expr(!!left + !!right))
+}
+
+reduce_subtraction <- function(x) {
+  reduce(x, function(left, right) expr(!!left - !!right))
+}
+
+reduce_multiplication <- function(x) {
+  reduce(x, function(left, right) expr(!!left * !!right))
+}
+
+reduce_and <- function(x) {
+  reduce(x, function(left, right) expr(!!left & !!right))
 }

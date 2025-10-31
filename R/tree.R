@@ -22,7 +22,7 @@ get_rf_case <- function(path, prediction, calc_mode = "") {
         i
       }
     )
-    pl <- reduce(pl, function(x, y) expr(!!x + !!y))
+    pl <- reduce_addition(pl)
   } else {
     if (is.list(prediction) && prediction[[1]]$is_intercept) {
       prediction <- prediction[[1]]$val
@@ -76,7 +76,7 @@ path_formulas <- function(path) {
         i
       }
     )
-    rcl <- reduce(cl, function(x, y) expr(!!x & !!y))
+    rcl <- reduce_and(cl)
   }
   rcl
 }
