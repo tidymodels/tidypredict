@@ -11,35 +11,7 @@ build_fit_formula <- function(parsedmodel) {
     parsedmodel$terms,
     ~ {
       if (.x$is_intercept == 0) {
-        cols <- map(
-          .x$fields,
-          ~ {
-            f <- NULL
-            if (.x$type == "ordinary") {
-              f <- expr(!!sym(.x$col))
-            }
-            if (.x$type == "conditional") {
-              f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
-            }
-            if (.x$type == "operation") {
-              if (.x$op == "morethan") {
-                f <- expr(ifelse(
-                  !!sym(.x$col) > !!.x$val,
-                  !!sym(.x$col) - !!.x$val,
-                  0
-                ))
-              }
-              if (.x$op == "lessthan") {
-                f <- expr(ifelse(
-                  !!sym(.x$col) < !!.x$val,
-                  !!.x$val - !!sym(.x$col),
-                  0
-                ))
-              }
-            }
-            f
-          }
-        )
+        cols <- map(.x$fields, lm_constructor)
         cols <- reduce_multiplication(cols)
         expr((!!cols * !!.x$coef))
       } else {
@@ -194,37 +166,11 @@ get_qr_lm <- function(qr_name, parsedmodel) {
       cqr <- .x$qr[qr_name][[1]]
 
       if (.x$is_intercept == 0) {
-        cols <- map(
-          .x$fields,
-          ~ {
-            f <- NULL
-            if (.x$type == "ordinary") {
-              f <- expr(!!sym(.x$col))
-            }
-            if (.x$type == "conditional") {
-              f <- expr(ifelse(!!sym(.x$col) == !!.x$val, 1, 0))
-            }
-            if (.x$type == "operation") {
-              if (.x$op == "morethan") {
-                f <- expr(ifelse(
-                  !!sym(.x$col) > !!.x$val,
-                  !!sym(.x$col) - !!.x$val,
-                  0
-                ))
-              }
-              if (.x$op == "lessthan") {
-                f <- expr(ifelse(
-                  !!sym(.x$col) < !!.x$val,
-                  !!.x$val - !!sym(.x$col),
-                  0
-                ))
-              }
-            }
-            f
-          }
-        )
+        cols <- map(.x$fields, lm_constructor)
         cols <- reduce_multiplication(cols)
-        if (cqr != 0) expr_multiplication(cols, cqr)
+        if (cqr != 0) {
+          expr_multiplication(cols, cqr)
+        }
       } else {
         expr(!!cqr)
       }
@@ -244,4 +190,33 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
   qrs <- reduce_addition(qrs_map)
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
+}
+
+# Helpers -------------------------------------------------
+
+lm_constructor <- function(x) {
+  f <- NULL
+  if (x$type == "ordinary") {
+    f <- expr(!!sym(x$col))
+  }
+  if (x$type == "conditional") {
+    f <- expr(ifelse(!!sym(x$col) == !!x$val, 1, 0))
+  }
+  if (x$type == "operation") {
+    if (x$op == "morethan") {
+      f <- expr(ifelse(
+        !!sym(x$col) > !!x$val,
+        !!sym(x$col) - !!x$val,
+        0
+      ))
+    }
+    if (x$op == "lessthan") {
+      f <- expr(ifelse(
+        !!sym(x$col) < !!x$val,
+        !!x$val - !!sym(x$col),
+        0
+      ))
+    }
+  }
+  f
 }
