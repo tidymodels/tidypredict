@@ -7,12 +7,12 @@ test_that("get_rf_case() avoids ifelse if path is always TRUE (#143)", {
   )
 
   expect_identical(
-    expr_text(get_rf_case(path, prediction, calc_mode = "ifelse")),
+    expr_text(generate_single_case(path, prediction, calc_mode = "ifelse")),
     "37.2 + hp * -0.0318 + wt * -3.88"
   )
 
   expect_identical(
-    expr_text(get_rf_case(path, prediction, calc_mode = "")),
+    expr_text(generate_single_case(path, prediction, calc_mode = "")),
     "37.2 + hp * -0.0318 + wt * -3.88"
   )
 })

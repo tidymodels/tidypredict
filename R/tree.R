@@ -1,12 +1,11 @@
-get_rf_case_tree <- function(tree_no, parsedmodel) {
+generate_cases <- function(tree_no, parsedmodel) {
   map(
     parsedmodel$trees[[tree_no]],
-    ~ get_rf_case(.x$path, .x$prediction, parsedmodel$general$mode)
+    ~ generate_single_case(.x$path, .x$prediction, parsedmodel$general$mode)
   )
 }
 
-
-get_rf_case <- function(path, prediction, calc_mode = "") {
+generate_single_case <- function(path, prediction, calc_mode = "") {
   rcl <- path_formulas(path)
 
   if (length(prediction) > 1) {
