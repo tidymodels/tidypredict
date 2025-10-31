@@ -6,13 +6,6 @@ tidypredict_fit.earth <- function(model) {
 
 #' @export
 parse_model.earth <- function(model) {
-  if (any(names(model) == "terms")) {
-    vars <- attr(model$terms, "dataClasses")
-    vars_names <- names(vars)
-  } else {
-    vars_names <- rownames(model$modvars)
-  }
-
   is_glm <- !is.null(model$glm.list)
 
   pm <- list()
