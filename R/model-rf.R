@@ -104,7 +104,8 @@ build_fit_formula_rf <- function(parsedmodel) {
   if (is.null(f)) {
     f <- map(
       parsedmodel$trees,
-      ~ expr(case_when(!!!generate_cases(.x, parsedmodel$general$mode)))
+      generate_case_when_tree,
+      mode = parsedmodel$general$mode
     )
   }
   f

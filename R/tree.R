@@ -1,3 +1,7 @@
+generate_case_when_tree <- function(tree, mode) {
+  expr(case_when(!!!generate_cases(tree, mode)))
+}
+
 generate_cases <- function(tree, mode) {
   map(
     tree,
