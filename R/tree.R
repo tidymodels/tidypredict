@@ -13,11 +13,11 @@ generate_case_when_tree <- function(tree, mode) {
 generate_cases <- function(tree, mode) {
   map(
     tree,
-    ~ generate_single_case(.x$path, .x$prediction, mode)
+    ~ generate_case(.x$path, .x$prediction, mode)
   )
 }
 
-generate_single_case <- function(path, prediction, calc_mode = "") {
+generate_case <- function(path, prediction, calc_mode = "") {
   rcl <- path_formulas(path)
 
   if (length(prediction) > 1) {
@@ -75,14 +75,18 @@ path_formulas <- function(path) {
           if (.x$op == "less") {
             i <- expr(!!sym(.x$col) < !!.x$val)
           }
-          if (.x$op == "less-equal") i <- expr(!!sym(.x$col) <= !!.x$val)
+          if (.x$op == "less-equal") {
+            i <- expr(!!sym(.x$col) <= !!.x$val)
+          }
         }
         if (.x$type == "set") {
           sets <- reduce(.x$vals, c)
           if (.x$op == "in") {
             i <- expr(!!sym(.x$col) %in% !!sets)
           }
-          if (.x$op == "not-in") i <- expr((!!sym(.x$col) %in% !!sets) == FALSE)
+          if (.x$op == "not-in") {
+            i <- expr((!!sym(.x$col) %in% !!sets) == FALSE)
+          }
         }
         i
       }
