@@ -41,7 +41,7 @@ generate_case <- function(path, prediction, calc_mode = "") {
     pl <- prediction
   }
   f <- NULL
-  if (is.null(rcl) || isTRUE(rcl)) {
+  if (isTRUE(rcl)) {
     f <- pl
   }
   if (is.null(f) && calc_mode == "ifelse") {
@@ -59,39 +59,32 @@ path_formulas <- function(path) {
   }
 
   if (length(path) == 1 && path[[1]]$type == "all") {
-    rcl <- NULL
-  } else {
-    cl <- map(
-      path,
-      ~ {
-        i <- NULL
-        if (.x$type == "conditional") {
-          if (.x$op == "more") {
-            i <- expr(!!sym(.x$col) > !!.x$val)
-          }
-          if (.x$op == "more-equal") {
-            i <- expr(!!sym(.x$col) >= !!.x$val)
-          }
-          if (.x$op == "less") {
-            i <- expr(!!sym(.x$col) < !!.x$val)
-          }
-          if (.x$op == "less-equal") {
-            i <- expr(!!sym(.x$col) <= !!.x$val)
-          }
-        }
-        if (.x$type == "set") {
-          sets <- reduce(.x$vals, c)
-          if (.x$op == "in") {
-            i <- expr(!!sym(.x$col) %in% !!sets)
-          }
-          if (.x$op == "not-in") {
-            i <- expr((!!sym(.x$col) %in% !!sets) == FALSE)
-          }
-        }
-        i
-      }
-    )
-    rcl <- reduce_and(cl)
+    return(TRUE)
   }
-  rcl
+
+  cl <- map(path, path_formula)
+  res <- reduce_and(cl)
+  res
+}
+
+path_formula <- function(x) {
+  if (x$type == "conditional") {
+    if (x$op == "more") {
+      i <- expr(!!sym(x$col) > !!x$val)
+    } else if (x$op == "more-equal") {
+      i <- expr(!!sym(x$col) >= !!x$val)
+    } else if (x$op == "less") {
+      i <- expr(!!sym(x$col) < !!x$val)
+    } else if (x$op == "less-equal") {
+      i <- expr(!!sym(x$col) <= !!x$val)
+    }
+  } else if (x$type == "set") {
+    sets <- reduce(x$vals, c)
+    if (x$op == "in") {
+      i <- expr(!!sym(x$col) %in% !!sets)
+    } else if (x$op == "not-in") {
+      i <- expr((!!sym(x$col) %in% !!sets) == FALSE)
+    }
+  }
+  i
 }
