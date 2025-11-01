@@ -67,6 +67,21 @@ path_formulas <- function(path) {
   res
 }
 
+#' Turn a path object into an expression
+#'
+#' @param x a list.
+#'
+#' The input of this function is a list with 4 values.
+#'
+#' - `type` character, must be `"conditional"` or `"set"`.
+#' - `op` character.
+#'   if `type == "conditional"` must be `"more"`, `"more-equal"`, `"less"`, or
+#'   `"less-equal"`.
+#'   if `type == "set"` must be `"in"` on `not-in`.
+#' - `col` character.
+#' - `val` if `type == "conditional"` and `vals` if `type == "set"`.
+#'   Can be character or numeric.
+#'  @keywords internal
 path_formula <- function(x) {
   if (x$type == "conditional") {
     if (x$op == "more") {
@@ -77,6 +92,11 @@ path_formula <- function(x) {
       i <- expr(!!sym(x$col) < !!x$val)
     } else if (x$op == "less-equal") {
       i <- expr(!!sym(x$col) <= !!x$val)
+    } else {
+      cli::cli_abort(
+        "{.field op} has unsupported value of {.value {x$op}}.",
+        .internal = TRUE
+      )
     }
   } else if (x$type == "set") {
     sets <- reduce(x$vals, c)
@@ -84,7 +104,17 @@ path_formula <- function(x) {
       i <- expr(!!sym(x$col) %in% !!sets)
     } else if (x$op == "not-in") {
       i <- expr((!!sym(x$col) %in% !!sets) == FALSE)
+    } else {
+      cli::cli_abort(
+        "{.field op} has unsupported value of {.value {x$op}}.",
+        .internal = TRUE
+      )
     }
+  } else {
+    cli::cli_abort(
+      "{.field type} has unsupported value of {.value {x$type}}.",
+      .internal = TRUE
+    )
   }
   i
 }
