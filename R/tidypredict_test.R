@@ -89,7 +89,10 @@ tidypredict_test_default <- function(
     colnames(df) <- replace(colnames(df), index, as.character(offset))
   }
 
-  interval <- if (include_intervals) "prediction" else "none"
+  interval <- "none"
+  if (include_intervals) {
+    interval <- "prediction"
+  }
 
   if (is.numeric(max_rows)) {
     df <- head(df, max_rows)

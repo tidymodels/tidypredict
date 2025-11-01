@@ -21,6 +21,7 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
+  skip("https://github.com/tidymodels/tidypredict/issues/148")
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,

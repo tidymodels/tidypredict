@@ -46,12 +46,16 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
           if (lc) {
             op <- "less"
           }
-          if (lr) op <- "more-equal"
+          if (lr) {
+            op <- "more-equal"
+          }
         } else {
           if (lc) {
             op <- "less-equal"
           }
-          if (lr) op <- "more"
+          if (lr) {
+            op <- "more"
+          }
         }
         list(
           type = "conditional",
@@ -151,6 +155,6 @@ parse_model.ranger <- function(model) {
 #' @export
 tidypredict_fit.ranger <- function(model) {
   parsedmodel <- parse_model(model)
-  res <- build_fit_formula_rf(parsedmodel)
-  adder(res)
+  res <- generate_case_when_trees(parsedmodel)
+  reduce_addition(res)
 }

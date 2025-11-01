@@ -120,7 +120,9 @@ parse_model.party <- function(model) {
 #' @export
 tidypredict_fit.party <- function(model) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_rf(parsedmodel)[[1]]
+  tree <- parsedmodel$trees[[1]]
+  mode <- parsedmodel$general$mode
+  generate_case_when_tree(tree, mode)
 }
 
 # For {orbital}
@@ -181,7 +183,9 @@ tidypredict_fit.party <- function(model) {
     pm$trees <- list(paths)
     parsedmodel <- as_parsed_model(pm)
 
-    build_fit_formula_rf(parsedmodel)[[1]]
+    tree <- parsedmodel$trees[[1]]
+    mode <- parsedmodel$general$mode
+    generate_case_when_tree(tree, mode)
   }
 
   tree_info <- partykit_tree_info(model)

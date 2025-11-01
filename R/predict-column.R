@@ -34,8 +34,8 @@ tidypredict_to_column <- function(
 
   if (add_interval) {
     formulas <- c(sym(fit), tidypredict_interval(model, interval = interval))
-    upper_formula <- reduce(formulas, function(l, r) expr((!!l) + (!!r)))
-    lower_formula <- reduce(formulas, function(l, r) expr((!!l) - (!!r)))
+    upper_formula <- reduce_addition(formulas)
+    lower_formula <- reduce_subtraction(formulas)
 
     df <- mutate(
       df,
