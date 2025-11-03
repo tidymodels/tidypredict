@@ -49,8 +49,8 @@ acceptable_lm <- function(model) {
     contr <- contr[!("contr.treatment" %in% contr)]
     if (length(contr) > 0) {
       cli::cli_abort(
-        "The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: ",
-        paste0("`", names(contr), "`", collapse = ","),
+        "The treatment contrast is the only one supported at this time.
+        Field(s) with an invalid contrast are: {.val {contr}}.",
         call. = FALSE
       )
     }
@@ -65,21 +65,20 @@ acceptable_lm <- function(model) {
   if (length(funs) > 0) {
     contains_offset <- any(funs == "offset")
     contains_other <- funs[funs != "offset"]
-    cli::cli_abort(
-      paste0(
-        "Functions inside the formula are not supported.",
-        if (contains_offset) {
-          "\n- Offset detected.  Try using offset as an argument instead."
-        },
-        if (length(contains_other) > 0) {
-          paste0(
-            "\n- Functions detected: ",
-            paste0("`", contains_other, "`", collapse = ","),
-            ". Use `dplyr` transformations to prepare the data."
-          )
-        }
-      ),
-      call. = FALSE
-    )
+    msg <- c(x = "Functions inside the formula are not supported.")
+    if (contains_offset) {
+      msg <- c(
+        msg,
+        i = "Offset detected, try using offset as an argument instead."
+      )
+    }
+    if (length(contains_other) > 0) {
+      msg <- c(
+        msg,
+        i = "Functions detected: {.val {contains_other}}. 
+            Use `dplyr` transformations to prepare the data."
+      )
+    }
+    cli::cli_abort(msg, call. = FALSE)
   }
 }
