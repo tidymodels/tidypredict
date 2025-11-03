@@ -197,23 +197,23 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
 lm_constructor <- function(x) {
   f <- NULL
   if (x$type == "ordinary") {
-    f <- expr(!!sym(x$col))
+    f <- expr(!!as.name(x$col))
   }
   if (x$type == "conditional") {
-    f <- expr(ifelse(!!sym(x$col) == !!x$val, 1, 0))
+    f <- expr(ifelse(!!as.name(x$col) == !!x$val, 1, 0))
   }
   if (x$type == "operation") {
     if (x$op == "morethan") {
       f <- expr(ifelse(
-        !!sym(x$col) > !!x$val,
-        !!sym(x$col) - !!x$val,
+        !!as.name(x$col) > !!x$val,
+        !!as.name(x$col) - !!x$val,
         0
       ))
     }
     if (x$op == "lessthan") {
       f <- expr(ifelse(
-        !!sym(x$col) < !!x$val,
-        !!x$val - !!sym(x$col),
+        !!as.name(x$col) < !!x$val,
+        !!x$val - !!as.name(x$col),
         0
       ))
     }
