@@ -19,6 +19,50 @@ test_that("get_rf_case() avoids ifelse if path is always TRUE (#143)", {
   )
 })
 
+test_that("generate_tree_nodes() works", {
+  node <- list(
+    path = list(
+      list(type = "conditional", col = "disp", val = 100, op = "more")
+    ),
+    prediction = list(
+      list(col = "(Intercept)", val = 14, op = "none", is_intercept = 1),
+      list(col = "hp", val = 4, op = "multiply", is_intercept = 0),
+      list(col = "drat", val = 2, op = "multiply", is_intercept = 0)
+    )
+  )
+
+  nodes <- list(node)
+
+  expect_identical(
+    generate_tree_nodes(nodes, mode = ""),
+    list(
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
+    )
+  )
+  expect_identical(
+    generate_tree_nodes(nodes, mode = "ifelse"),
+    list(
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
+    )
+  )
+  nodes <- list(node, node)
+
+  expect_identical(
+    generate_tree_nodes(nodes, mode = ""),
+    list(
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2),
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
+    )
+  )
+  expect_identical(
+    generate_tree_nodes(nodes, mode = "ifelse"),
+    list(
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)),
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
+    )
+  )
+})
+
 test_that("generate_tree_node() works", {
   node <- list(
     path = list(
