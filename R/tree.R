@@ -112,7 +112,7 @@ generate_tree_node <- function(node, calc_mode = "") {
         if (.x$is_intercept) {
           return(expr(!!.x$val))
         } else if (.x$op == "multiply") {
-          return(expr_multiplication(sym(.x$col), .x$val))
+          return(expr_multiplication(as.name(.x$col), .x$val))
         }
       }
     )
@@ -183,13 +183,13 @@ path_formulas <- function(path) {
 path_formula <- function(x) {
   if (x$type == "conditional") {
     if (x$op == "more") {
-      i <- expr(!!sym(x$col) > !!x$val)
+      i <- expr(!!as.name(x$col) > !!x$val)
     } else if (x$op == "more-equal") {
-      i <- expr(!!sym(x$col) >= !!x$val)
+      i <- expr(!!as.name(x$col) >= !!x$val)
     } else if (x$op == "less") {
-      i <- expr(!!sym(x$col) < !!x$val)
+      i <- expr(!!as.name(x$col) < !!x$val)
     } else if (x$op == "less-equal") {
-      i <- expr(!!sym(x$col) <= !!x$val)
+      i <- expr(!!as.name(x$col) <= !!x$val)
     } else {
       cli::cli_abort(
         "{.field op} has unsupported value of {.value {x$op}}.",
@@ -199,9 +199,9 @@ path_formula <- function(x) {
   } else if (x$type == "set") {
     sets <- reduce(x$vals, c)
     if (x$op == "in") {
-      i <- expr(!!sym(x$col) %in% !!sets)
+      i <- expr(!!as.name(x$col) %in% !!sets)
     } else if (x$op == "not-in") {
-      i <- expr((!!sym(x$col) %in% !!sets) == FALSE)
+      i <- expr((!!as.name(x$col) %in% !!sets) == FALSE)
     } else {
       cli::cli_abort(
         "{.field op} has unsupported value of {.value {x$op}}.",

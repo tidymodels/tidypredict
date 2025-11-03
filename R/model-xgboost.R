@@ -139,15 +139,19 @@ get_xgb_case <- function(path, prediction) {
 get_xgb_case_fun <- function(.x) {
   if (.x$op == "less") {
     if (.x$missing) {
-      i <- expr((!!sym(.x$col) >= !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
+      i <- expr(
+        (!!as.name(.x$col) >= !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
+      )
     } else {
-      i <- expr(!!sym(.x$col) >= !!as.numeric(.x$val))
+      i <- expr(!!as.name(.x$col) >= !!as.numeric(.x$val))
     }
   } else if (.x$op == "more-equal") {
     if (.x$missing) {
-      i <- expr((!!sym(.x$col) < !!as.numeric(.x$val) | is.na(!!sym(.x$col))))
+      i <- expr(
+        (!!as.name(.x$col) < !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
+      )
     } else {
-      i <- expr(!!sym(.x$col) < !!as.numeric(.x$val))
+      i <- expr(!!as.name(.x$col) < !!as.numeric(.x$val))
     }
   }
   i
