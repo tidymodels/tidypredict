@@ -2,7 +2,7 @@
 title: "Random Forest, using Ranger"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{ranger}
+  %\VignetteIndexEntry{Random Forest, using Ranger}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -24,7 +24,7 @@ set.seed(100)
 |---------------------------------------------------------------|-----|
 |`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
 |`tidypredict_to_column()`                                      |  ✗  |
-|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_test()`                                           |  ✔  |
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
 |`parsnip`                                                      |  ✔  |
 
@@ -36,7 +36,7 @@ library(dplyr)
 library(tidypredict)
 library(ranger)
 
-model <- ranger(Species ~ .,data = iris, num.trees =  100)
+model <- ranger(Species ~ ., data = iris, num.trees = 100)
 ```
 
 ## Under the hood

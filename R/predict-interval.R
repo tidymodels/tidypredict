@@ -1,10 +1,10 @@
-#' Returns a Tidy Eval formula to calculate prediction interval
+#' Returns a Tidy Eval formula to calculate prediction interval.
 #'
 #' It parses a model or uses an already parsed model to return a
 #' Tidy Eval formula that can then be used inside a dplyr command.
 #'
-#' The result still has to be added to the fit to obtain the upper bound, and
-#' subtracted from fit to obtain the lower bound.
+#' The result still has to be added to and subtracted from the fit to obtain the upper and
+#' lower bound respectively.
 #'
 #' @param model An R model or a list with a parsed model
 #' @param interval The prediction interval, defaults to 0.95
@@ -20,15 +20,21 @@ tidypredict_interval <- function(model, interval = 0.95) {
 
 #' @export
 `tidypredict_interval.data.frame` <- function(model, interval = 0.95) {
-  stop("data.frame based parsed models are no longer supported")
+  cli::cli_abort("data.frame based parsed models are no longer supported.")
 }
 
 #' @export
 tidypredict_interval.list <- function(model, interval = 0.95) {
   mt <- model$general$model
   fit <- NULL
-  if (mt == "lm") fit <- te_interval_lm(model)
-  if (mt == "glm") fit <- te_interval_glm(model)
-  if (is.null(fit)) stop("Model type not supported")
+  if (mt == "lm") {
+    fit <- te_interval_lm(model)
+  }
+  if (mt == "glm") {
+    fit <- te_interval_glm(model)
+  }
+  if (is.null(fit)) {
+    cli::cli_abort("Model type not supported.")
+  }
   fit
 }

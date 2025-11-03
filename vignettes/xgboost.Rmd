@@ -2,13 +2,12 @@
 title: "XGBoost models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{xgboost}
+  %\VignetteIndexEntry{XGBoost models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
-
 if (requireNamespace("xgboost", quietly = TRUE)) {
   library(tidypredict)
   library(xgboost)
@@ -22,7 +21,6 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = eval_code
 )
-
 ```
 
 | Function                                                      |Works|
@@ -46,31 +44,38 @@ logregobj <- function(preds, dtrain) {
   return(list(grad = grad, hess = hess))
 }
 
-xgb_bin_data <- xgboost::xgb.DMatrix(as.matrix(mtcars[, -9]), label = mtcars$am)
+xgb_bin_data <- xgboost::xgb.DMatrix(
+  as.matrix(mtcars[, -9]),
+  label = mtcars$am
+)
+
 model <- xgboost::xgb.train(
-  params = list(max_depth = 2, silent = 1, objective = "binary:logistic", base_score = 0.5),
-  data = xgb_bin_data, nrounds = 50
+  params = list(max_depth = 2, objective = "binary:logistic", base_score = 0.5),
+  data = xgb_bin_data,
+  nrounds = 50
 )
 ```
 
 - Create the R formula
     ```{r}
-    tidypredict_fit(model)
+tidypredict_fit(model)
     ```
 
 - Add the prediction to the original table
     ```{r}
-    library(dplyr)
-    
-    mtcars %>%
-      tidypredict_to_column(model) %>%
-      glimpse()
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the `xgb.DMatrix` data set.
     ```{r}
-    tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
+tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
     ```
+
+Please be aware that xgboost converts data into 32-bit floats internally. This could possibly lead to splits being done incorrectly. Always verify that the predictions match up with model predictions. [See this issue](https://github.com/tidymodels/tidypredict/issues/45) for more information.
 
 ## parsnip
 

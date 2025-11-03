@@ -2,7 +2,7 @@
 title: "Create a tree spec - version 2"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{tree}
+  %\VignetteIndexEntry{Create a tree spec - version 2}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

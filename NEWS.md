@@ -1,3 +1,59 @@
+# tidypredict (development version)
+
+- Speed up `tidypredict_fit()` for partykit and ranger packages. (#125)
+
+- Fixed bug where tidypredict would error on Cubist models without conditions. (#127)
+
+- Speed up `tidypredict_fit()` for xxgboost models. (#130)
+
+- Fixed a bug where the intercept was added incorrectly to the result for cubist models. (#58)
+
+- Fixed bug where Cubst models incorrectly combined rules and committees. (#134)
+
+- Random forest implementations (ranger and randomForest) will now produce a single formula instead of a list of formulas. (#84)
+
+- randomForest models now support regression outcomes. (#77)
+
+- An informative error will now be thrown if a lm model cannot be processed due to having linear combinations of predictors. (#124)
+
+# tidypredict 0.5.1
+
+- Exported a number of internal functions to be used in {orbital} package
+
+# tidypredict 0.5
+
+- Changes maintainer to Edgar Ruiz
+
+- Updates author's email addresses.
+
+- Removes dependency with `stringr`
+
+- Fixes issue with `earth` parsed_models (#108)
+
+- Addresses issues with XGBoost models
+
+- Improvements to XGBoosts tests
+
+# tidypredict 0.4.9
+
+- Fixes issue handling GLM Binomial earth models (#97)
+
+- Adds capability to handle single simple Cubist models (#57)
+
+- Fixed parenthesis issue in the creation of the interval formula (#76)
+
+- Fixed bug in SQL query generation for XGBoost models with objective `binary:logistic`.
+
+- Re-licensed package from GPL-3 to MIT. See [consent from copyright holders here](https://github.com/tidymodels/tidypredict/issues/95).
+
+# tidypredict 0.4.8
+
+- CRAN submission for a broken test case. 
+
+# tidypredict 0.4.7
+
+- Change to with with version 5.1.2 and above of the `earth` package. As a result, `tidypredict` will only parse objects created by this and later versions of `earth`. 
+
 # tidypredict 0.4.6
 
 - Small release for `xgboost` changes. 

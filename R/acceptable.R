@@ -2,7 +2,7 @@
 #'
 #' Uses an S3 method to check that a given formula can be parsed based on its class.
 #' It currently scans for contrasts that are not supported and in-line functions.
-#' (e.g: lm(wt ~ as.factor(am))). Sine this function is meant for function interaction,
+#' (e.g: lm(wt ~ as.factor(am))). Since this function is meant for function interaction,
 #' as opposed to human interaction, a successful check is silent.
 #'
 #' @param model An R model object
@@ -28,7 +28,7 @@ acceptable_formula.glm <- function(model) {
 }
 
 ## As suggested by @topepo, brought in from the `pryr` package
-## via the `recepies` package
+## via the `recipes` package
 fun_calls <- function(f) {
   if (is.function(f)) {
     fun_calls(body(f))
@@ -48,9 +48,9 @@ acceptable_lm <- function(model) {
     contr <- model$contrasts
     contr <- contr[!("contr.treatment" %in% contr)]
     if (length(contr) > 0) {
-      stop(
-        "The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: ",
-        paste0("`", names(contr), "`", collapse = ","),
+      cli::cli_abort(
+        "The treatment contrast is the only one supported at this time.
+        Field(s) with an invalid contrast are: {.val {contr}}.",
         call. = FALSE
       )
     }
@@ -58,23 +58,27 @@ acceptable_lm <- function(model) {
 
   # Check for in-line formulas
   funs <- fun_calls(model$call)
-  funs <- funs[!(funs %in% c("~", "+", "-", "*", "(", ")", "::", "lm", "glm", "factor", "stats"))]
+  funs <- funs[
+    !(funs %in%
+      c("~", "+", "-", "*", "(", ")", "::", "lm", "glm", "factor", "stats"))
+  ]
   if (length(funs) > 0) {
     contains_offset <- any(funs == "offset")
     contains_other <- funs[funs != "offset"]
-    stop(
-      paste0(
-        "Functions inside the formula are not supported.",
-        if (contains_offset) "\n- Offset detected.  Try using offset as an argument instead.",
-        if (length(contains_other) > 0) {
-          paste0(
-            "\n- Functions detected: ",
-            paste0("`", contains_other, "`", collapse = ","),
-            ". Use `dplyr` transformations to prepare the data."
-          )
-        }
-      ),
-      call. = FALSE
-    )
+    msg <- c(x = "Functions inside the formula are not supported.")
+    if (contains_offset) {
+      msg <- c(
+        msg,
+        i = "Offset detected, try using offset as an argument instead."
+      )
+    }
+    if (length(contains_other) > 0) {
+      msg <- c(
+        msg,
+        i = "Functions detected: {.val {contains_other}}. 
+            Use `dplyr` transformations to prepare the data."
+      )
+    }
+    cli::cli_abort(msg, call. = FALSE)
   }
 }
