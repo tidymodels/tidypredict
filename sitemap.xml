@@ -23,9 +23,13 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/generate_tree_node.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/knit_print.tidypredict_test.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/parse_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/path_formula.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/path_formulas.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/print.tidypredict_test.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/reexports.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidy.pm_regression.html</loc></url>
