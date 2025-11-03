@@ -486,6 +486,6 @@ test_that("path_formula() errors with unsupported values", {
   )
   expect_snapshot(
     error = TRUE,
-    path_formula(list(type = "set", op = "unknown", col = "x", val = 0))
+    path_formula(list(type = "set", op = "unknown", col = "x", vals = 0))
   )
 })
