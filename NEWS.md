@@ -16,6 +16,8 @@
 
 - An informative error will now be thrown if a lm model cannot be processed due to having linear combinations of predictors. (#124)
 
+- xgboost models with objectives `"reg:tweedie"` and `"count:poisson"` are now supported. (#72, @SimonCoulombe)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package

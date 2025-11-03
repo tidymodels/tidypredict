@@ -131,6 +131,42 @@ test_that("formulas produces correct predictions", {
     )
   )
 
+  # objective = "reg:tweedie"
+  expect_snapshot(
+    tidypredict_test(
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          objective = "reg:tweedie",
+          base_score = 0.5
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      ),
+      mtcars,
+      xg_df = xgb_bin_data,
+      threshold = 0.0000001
+    )
+  )
+
+  # objective = "count:poisson"
+  expect_snapshot(
+    tidypredict_test(
+      xgboost::xgb.train(
+        params = list(
+          max_depth = 2,
+          objective = "count:poisson",
+          base_score = 0.5
+        ),
+        data = xgb_bin_data,
+        nrounds = 4
+      ),
+      mtcars,
+      xg_df = xgb_bin_data,
+      threshold = 0.0000001
+    )
+  )
+
   # objective = "reg:logistic", base_score
   expect_snapshot(
     tidypredict_test(

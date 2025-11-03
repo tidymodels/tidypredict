@@ -195,6 +195,12 @@ build_fit_formula_xgb <- function(parsedmodel) {
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
+  } else if (objective %in% c("count:poisson")) {
+    assigned <- 1
+    f <- expr(exp(!!f))
+  } else if (objective %in% c("reg:tweedie")) {
+    assigned <- 1
+    f <- expr(0.5 * exp(!!f)) ## I'm not sure why one has to multiply by 0.5, but it works.
   }
   if (assigned == 0) {
     cli::cli_abort(
