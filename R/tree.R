@@ -58,7 +58,7 @@ generate_case_when_trees <- function(parsedmodel) {
 }
 
 generate_case_when_tree <- function(tree, mode) {
-  res <- expr(case_when(!!!generate_tree_nodes(tree, mode)))
+  expr(case_when(!!!generate_tree_nodes(tree, mode)))
 }
 
 generate_tree_nodes <- function(tree, mode) {
