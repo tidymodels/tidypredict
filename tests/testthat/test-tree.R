@@ -34,6 +34,59 @@ test_that("generate_tree_node() works", {
     generate_tree_node(node, calc_mode = "ifelse"),
     quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
   )
+  expect_identical(
+    generate_tree_node(node, calc_mode = ""),
+    quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
+  )
+
+  node <- list(
+    path = list(),
+    prediction = list(
+      list(col = "(Intercept)", val = 14, op = "none", is_intercept = 1),
+      list(col = "hp", val = 4, op = "multiply", is_intercept = 0),
+      list(col = "drat", val = 2, op = "multiply", is_intercept = 0)
+    )
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = "ifelse"),
+    quote(14 + hp * 4 + drat * 2)
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = ""),
+    quote(14 + hp * 4 + drat * 2)
+  )
+
+  node <- list(
+    path = list(
+      list(type = "conditional", col = "disp", val = 100, op = "more")
+    ),
+    prediction = 3
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = "ifelse"),
+    quote(ifelse(disp > 100, 3, 0))
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = ""),
+    quote(disp > 100 ~ 3)
+  )
+
+  node <- list(
+    path = list(
+      list(type = "conditional", col = "disp", val = 100, op = "more")
+    ),
+    prediction = list(
+      list(col = "(Intercept)", val = 14, op = "none", is_intercept = 1)
+    )
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = "ifelse"),
+    quote(ifelse(disp > 100, 14, 0))
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = ""),
+    quote(disp > 100 ~ 14)
+  )
 })
 
 test_that("path_formulas() works", {
