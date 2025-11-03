@@ -53,6 +53,22 @@ generate_case <- function(path, prediction, calc_mode = "") {
   f
 }
 
+#' Turn a path object into a combined expression
+#'
+#' @param path a list of lists.
+#'
+#' This list can contain 0 or more elemements. The elements but each be of the
+#' following format:
+#'
+#' - `type` character, must be `"conditional"`, `"set"`, or `"all"`.
+#' - `op` character.
+#'   if `type == "conditional"` must be `"more"`, `"more-equal"`, `"less"`, or
+#'   `"less-equal"`.
+#'   if `type == "set"` must be `"in"` on `not-in`.
+#' - `col` character.
+#' - `val` if `type == "conditional"` and `vals` if `type == "set"`.
+#'   Can be character or numeric.
+#'  @keywords internal
 path_formulas <- function(path) {
   if (length(path) == 0) {
     return(TRUE)

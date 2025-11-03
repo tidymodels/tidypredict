@@ -17,6 +17,54 @@ test_that("get_rf_case() avoids ifelse if path is always TRUE (#143)", {
   )
 })
 
+test_that("path_formulas() works", {
+  expect_identical(
+    path_formulas(
+      list()
+    ),
+    quote(TRUE)
+  )
+
+  expect_identical(
+    path_formulas(
+      list(
+        list(type = "all", op = "more", col = "x", val = 0)
+      )
+    ),
+    quote(TRUE)
+  )
+
+  expect_identical(
+    path_formulas(
+      list(
+        list(type = "conditional", op = "more", col = "x", val = 0)
+      )
+    ),
+    quote(x > 0)
+  )
+
+  expect_identical(
+    path_formulas(
+      list(
+        list(type = "conditional", op = "more", col = "x", val = 0),
+        list(type = "conditional", op = "less", col = "y", val = 0)
+      )
+    ),
+    quote(x > 0 & y < 0)
+  )
+
+  expect_identical(
+    path_formulas(
+      list(
+        list(type = "conditional", op = "more", col = "x", val = 0),
+        list(type = "conditional", op = "less", col = "y", val = 0),
+        list(type = "conditional", op = "less", col = "z", val = 0)
+      )
+    ),
+    quote(x > 0 & y < 0 & z < 0)
+  )
+})
+
 test_that("path_formula() works", {
   expect_identical(
     path_formula(list(
