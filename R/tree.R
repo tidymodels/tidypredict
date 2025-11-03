@@ -7,17 +7,16 @@ generate_case_when_trees <- function(parsedmodel) {
 }
 
 generate_case_when_tree <- function(tree, mode) {
-  expr(case_when(!!!generate_cases(tree, mode)))
+  res <- expr(case_when(!!!generate_tree_notes(tree, mode)))
 }
 
-generate_cases <- function(tree, mode) {
-  map(
-    tree,
-    ~ generate_case(.x$path, .x$prediction, mode)
-  )
+generate_tree_notes <- function(tree, mode) {
+  map(tree, generate_tree_node, mode)
 }
 
-generate_case <- function(path, prediction, calc_mode = "") {
+generate_tree_node <- function(node, calc_mode = "") {
+  path <- node$path
+  prediction <- node$prediction
   rcl <- path_formulas(path)
 
   if (length(prediction) > 1) {

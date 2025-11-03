@@ -1,19 +1,38 @@
 test_that("get_rf_case() avoids ifelse if path is always TRUE (#143)", {
-  path <- list()
-  prediction <- list(
-    list(col = "(Intercept)", val = 37.2, op = "none", is_intercept = 1),
-    list(col = "hp", val = -0.0318, op = "multiply", is_intercept = 0),
-    list(col = "wt", val = -3.88, op = "multiply", is_intercept = 0)
+  node <- list(
+    path = list(),
+    prediction = list(
+      list(col = "(Intercept)", val = 37.2, op = "none", is_intercept = 1),
+      list(col = "hp", val = -0.0318, op = "multiply", is_intercept = 0),
+      list(col = "wt", val = -3.88, op = "multiply", is_intercept = 0)
+    )
   )
 
   expect_identical(
-    expr_text(generate_case(path, prediction, calc_mode = "ifelse")),
+    expr_text(generate_tree_node(node, calc_mode = "ifelse")),
     "37.2 + hp * -0.0318 + wt * -3.88"
   )
 
   expect_identical(
-    expr_text(generate_case(path, prediction, calc_mode = "")),
+    expr_text(generate_tree_node(node, calc_mode = "")),
     "37.2 + hp * -0.0318 + wt * -3.88"
+  )
+})
+
+test_that("generate_tree_node() works", {
+  node <- list(
+    path = list(
+      list(type = "conditional", col = "disp", val = 100, op = "more")
+    ),
+    prediction = list(
+      list(col = "(Intercept)", val = 14, op = "none", is_intercept = 1),
+      list(col = "hp", val = 4, op = "multiply", is_intercept = 0),
+      list(col = "drat", val = 2, op = "multiply", is_intercept = 0)
+    )
+  )
+  expect_identical(
+    generate_tree_node(node, calc_mode = "ifelse"),
+    quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
   )
 })
 
