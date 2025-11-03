@@ -141,7 +141,8 @@
 <span></span>
 <span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">xgboost</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.train.html" class="external-link">xgb.train</a></span><span class="op">(</span></span>
 <span>  params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>max_depth <span class="op">=</span> <span class="fl">2</span>, objective <span class="op">=</span> <span class="st">"binary:logistic"</span>, base_score <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span>,</span>
-<span>  data <span class="op">=</span> <span class="va">xgb_bin_data</span>, nrounds <span class="op">=</span> <span class="fl">50</span></span>
+<span>  data <span class="op">=</span> <span class="va">xgb_bin_data</span>,</span>
+<span>  nrounds <span class="op">=</span> <span class="fl">50</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
@@ -261,6 +262,10 @@ expects the <code>xgb.DMatrix</code> data set.</p>
 <span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
 </li>
 </ul>
+<p>Please be aware that xgboost converts data into 32-bit floats
+internally. This could possibly lead to splits being done incorrectly.
+Always verify that the predictions match up with model predictions. <a href="https://github.com/tidymodels/tidypredict/issues/45" class="external-link">See this
+issue</a> for more information.</p>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
