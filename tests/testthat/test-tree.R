@@ -1,3 +1,84 @@
+test_that("generate_case_when_trees() works", {
+  node <- list(
+    path = list(
+      list(type = "conditional", col = "disp", val = 100, op = "more")
+    ),
+    prediction = list(
+      list(col = "(Intercept)", val = 14, op = "none", is_intercept = 1),
+      list(col = "hp", val = 4, op = "multiply", is_intercept = 0),
+      list(col = "drat", val = 2, op = "multiply", is_intercept = 0)
+    )
+  )
+
+  tree <- list(node)
+
+  parsedmodel <- list(
+    trees = list(tree),
+    general = list(mode = "")
+  )
+
+  expect_identical(
+    generate_case_when_trees(parsedmodel),
+    list(
+      quote(case_when(disp > 100 ~ 14 + hp * 4 + drat * 2))
+    )
+  )
+
+  parsedmodel <- list(
+    trees = list(tree),
+    general = list(mode = "ifelse")
+  )
+
+  expect_identical(
+    generate_case_when_trees(parsedmodel),
+    list(
+      quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
+    )
+  )
+
+  parsedmodel <- list(
+    trees = list(tree, tree),
+    general = list(mode = "")
+  )
+
+  expect_identical(
+    generate_case_when_trees(parsedmodel),
+    list(
+      quote(
+        case_when(
+          disp > 100 ~ 14 + hp * 4 + drat * 2
+        )
+      ),
+      quote(
+        case_when(
+          disp > 100 ~ 14 + hp * 4 + drat * 2
+        )
+      )
+    )
+  )
+
+  parsedmodel <- list(
+    trees = list(tree, tree),
+    general = list(mode = "ifelse")
+  )
+
+  expect_identical(
+    generate_case_when_trees(parsedmodel),
+    list(
+      quote(
+        case_when(
+          ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)
+        )
+      ),
+      quote(
+        case_when(
+          ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)
+        )
+      )
+    )
+  )
+})
+
 test_that("generate_case_when_tree() works", {
   node <- list(
     path = list(
@@ -20,6 +101,7 @@ test_that("generate_case_when_tree() works", {
     generate_case_when_tree(nodes, mode = "ifelse"),
     quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
   )
+
   nodes <- list(node, node)
 
   expect_identical(
@@ -68,6 +150,7 @@ test_that("generate_tree_nodes() works", {
       quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
     )
   )
+
   nodes <- list(node, node)
 
   expect_identical(
