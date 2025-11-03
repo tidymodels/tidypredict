@@ -45,6 +45,16 @@
 ---
 
     Code
+      tidypredict_test(lm(mpg ~ wt + disp:cyl, data = mtcars), mtcars)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
+---
+
+    Code
       tidypredict_test(lm(mpg ~ (wt + disp) * cyl, data = mtcars), mtcars)
     Output
       tidypredict test results
