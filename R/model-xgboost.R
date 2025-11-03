@@ -128,9 +128,9 @@ get_xgb_case <- function(path, prediction) {
   } else if (cl_length == 1) {
     cl <- cl[[1]]
   } else if (cl_length == 2) {
-    cl <- expr(!!cl[[1]] & !!cl[[2]])
+    cl <- expr_and(cl[[1]], cl[[2]])
   } else {
-    cl <- reduce(cl, function(x, y) expr(!!x & !!y))
+    cl <- reduce_and(cl)
   }
 
   expr(!!cl ~ !!prediction)
@@ -166,8 +166,10 @@ build_fit_formula_xgb <- function(parsedmodel) {
     ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
   )
 
+  f <- c(0, f)
+
   # additive model
-  f <- purrr::reduce(f, ~ expr(!!.x + !!.y), .init = expr(0))
+  f <- reduce_addition(f)
 
   base_score <- parsedmodel$general$params$base_score
   if (is.null(base_score)) {
@@ -178,7 +180,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
   assigned <- 0
   if (is.null(objective)) {
     assigned <- 1
-    f <- expr(!!f + !!base_score)
+    f <- expr_addition(f, base_score)
     cli::cli_warn(
       paste(
         "If the objective is a custom function, please",
@@ -187,7 +189,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
     )
   } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
     assigned <- 1
-    f <- expr(!!f + !!base_score)
+    f <- expr_addition(f, base_score)
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))

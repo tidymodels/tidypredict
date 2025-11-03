@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "20.5348175358207 + (ifelse(disp < 145, 145 - disp, 0) * 0.148589866311056) + \n    (ifelse(disp > 145, disp - 145, 0) * -0.0250128546779719)"
+      [1] "20.534817535821 + (ifelse(disp < 145, 145 - disp, 0) * 0.148589866311) + \n    (ifelse(disp > 145, disp - 145, 0) * -0.025012854678)"
 
 # Model can be saved and re-loaded
 

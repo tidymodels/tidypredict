@@ -1,5 +1,6 @@
 test_that("returns the right output", {
   model <- earth::earth(mpg ~ ., data = mtcars)
+  model$coefficients <- round(model$coefficients, 12)
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
 
@@ -17,6 +18,7 @@ test_that("returns the right output", {
 
 test_that("Model can be saved and re-loaded", {
   model <- earth::earth(mpg ~ ., data = mtcars)
+  model$coefficients <- round(model$coefficients, 12)
 
   pm <- parse_model(model)
   mp <- tempfile(fileext = ".yml")
