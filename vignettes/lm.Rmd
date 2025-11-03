@@ -25,8 +25,10 @@ library(parsnip)
 - Only *treatment* contrast (`contr.treatment`) are supported.
 - `offset` is supported
 - Categorical variables are supported
+- Interactions with `:` and `*` are supported
 - In-line functions in the formulas are **not supported**:  
      - OK - `wt ~ mpg + am` 
+     - OK - `wt ~ mpg * am + vs:disp` 
      - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
      - Not OK - `wt ~ mpg + as.factor(am)`
      - Not OK - `wt ~ mpg + as.character(am)`
