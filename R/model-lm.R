@@ -40,7 +40,7 @@ build_fit_formula <- function(parsedmodel) {
       f <- expr(exp(!!f))
     }
     if (assigned == 0) {
-      cli::cli_abort("Combination of family and link are not supported")
+      cli::cli_abort("Combination of family and link are not supported.")
     }
   }
   f

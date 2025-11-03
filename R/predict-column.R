@@ -23,7 +23,9 @@ tidypredict_to_column <- function(
   fit_model <- tidypredict_fit(model)
 
   if (inherits(fit_model, "list")) {
-    cli::cli_abort("tidypredict_to_column does not support tree based models")
+    cli::cli_abort(
+      "{.fn tidypredict_to_column} does not support tree based models."
+    )
   }
 
   fit <- vars[1]
