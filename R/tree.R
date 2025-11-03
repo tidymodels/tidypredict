@@ -110,12 +110,10 @@ generate_tree_node <- function(node, calc_mode = "") {
       prediction,
       ~ {
         if (.x$is_intercept) {
-          i <- expr(!!.x$val)
+          return(expr(!!.x$val))
+        } else if (.x$op == "multiply") {
+          return(expr_multiplication(sym(.x$col), .x$val))
         }
-        if (.x$op == "multiply") {
-          i <- expr_multiplication(sym(.x$col), .x$val)
-        }
-        i
       }
     )
     pl <- reduce_addition(pl)
@@ -125,17 +123,16 @@ generate_tree_node <- function(node, calc_mode = "") {
     }
     pl <- prediction
   }
-  f <- NULL
+
   if (isTRUE(rcl)) {
-    f <- pl
+    return(pl)
   }
-  if (is.null(f) && calc_mode == "ifelse") {
-    f <- expr(ifelse(!!rcl, !!pl, 0))
+
+  if (calc_mode == "ifelse") {
+    return(expr(ifelse(!!rcl, !!pl, 0)))
   }
-  if (is.null(f)) {
-    f <- expr(!!rcl ~ !!pl)
-  }
-  f
+
+  expr(!!rcl ~ !!pl)
 }
 
 #' Turn a path object into a combined expression
