@@ -45,7 +45,7 @@
 #' `generate_case_when_trees()` being a convinience wrapper for multiple trees.
 #'
 #' `generate_tree_node()` generates the expressions for each a single ndoe in
-#' the tree, where `generate_tree_notes()` is a convinience wrapper for
+#' the tree, where `generate_tree_nodes()` is a convinience wrapper for
 #' calculating all notes.
 #'
 #' @keywords internal
@@ -58,10 +58,10 @@ generate_case_when_trees <- function(parsedmodel) {
 }
 
 generate_case_when_tree <- function(tree, mode) {
-  res <- expr(case_when(!!!generate_tree_notes(tree, mode)))
+  res <- expr(case_when(!!!generate_tree_nodes(tree, mode)))
 }
 
-generate_tree_notes <- function(tree, mode) {
+generate_tree_nodes <- function(tree, mode) {
   map(tree, generate_tree_node, mode)
 }
 

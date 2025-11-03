@@ -53,7 +53,7 @@ The functions in this file generates these tree.
 \code{generate_case_when_trees()} being a convinience wrapper for multiple trees.
 
 \code{generate_tree_node()} generates the expressions for each a single ndoe in
-the tree, where \code{generate_tree_notes()} is a convinience wrapper for
+the tree, where \code{generate_tree_nodes()} is a convinience wrapper for
 calculating all notes.
 }
 \keyword{internal}
