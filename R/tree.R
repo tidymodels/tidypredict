@@ -110,12 +110,24 @@ generate_tree_node <- function(node, calc_mode = "") {
       prediction,
       ~ {
         if (.x$is_intercept) {
+          if (.x$val == 0) {
+            return(NULL)
+          }
           return(expr(!!.x$val))
         } else if (.x$op == "multiply") {
+          if (.x$val == 0) {
+            return(NULL)
+          }
+
+          if (.x$val == 1) {
+            return(expr(!!as.name(.x$col)))
+          }
+
           return(expr_multiplication(as.name(.x$col), .x$val))
         }
       }
     )
+    pl <- purrr::discard(pl, is.null)
     pl <- reduce_addition(pl)
   } else {
     if (is.list(prediction) && prediction[[1]]$is_intercept) {
