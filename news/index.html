@@ -64,6 +64,7 @@
 <li><p>xgboost models with objectives <code>"reg:tweedie"</code> and <code>"count:poisson"</code> are now supported. (<a href="https://github.com/tidymodels/tidypredict/issues/72" class="external-link">#72</a>, <a href="https://github.com/SimonCoulombe" class="external-link">@SimonCoulombe</a>)</p></li>
 <li><p>linear models such as <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> and <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> now work with interactions created with <code>*</code> and <code>:</code>. (<a href="https://github.com/tidymodels/tidypredict/issues/74" class="external-link">#74</a>)</p></li>
 <li><p>Cubist rules will return simplified rules whenever possible to avoid multiplying by 0 and 1. (<a href="https://github.com/tidymodels/tidypredict/issues/152" class="external-link">#152</a>)</p></li>
+<li><p>tree based models now uses <code>.default</code> argument in produced <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when()</a></code> code when applicable. (<a href="https://github.com/tidymodels/tidypredict/issues/153" class="external-link">#153</a>)</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.5.1" id="tidypredict-051">tidypredict 0.5.1<a class="anchor" aria-label="anchor" href="#tidypredict-051"></a></h2><p class="text-muted">CRAN release: 2024-12-19</p>
