@@ -20,6 +20,8 @@
 
 - linear models such as `lm()` and `glm()` now work with interactions created with `*` and `:`. (#74) 
 
+- Cubist rules will return simplified rules whenever possible to avoid multiplying by 0 and 1. (#152)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
