@@ -170,8 +170,6 @@ build_fit_formula_xgb <- function(parsedmodel) {
     ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
   )
 
-  f <- c(0, f)
-
   # additive model
   f <- reduce_addition(f)
 
