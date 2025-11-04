@@ -182,14 +182,18 @@ build_fit_formula_xgb <- function(parsedmodel) {
   assigned <- 0
   if (is.null(objective)) {
     assigned <- 1
-    f <- expr_addition(f, base_score)
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
     cli::cli_warn(
       "If the objective is a custom function, 
       please explicitly apply it to the output."
     )
   } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
     assigned <- 1
-    f <- expr_addition(f, base_score)
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
   } else if (objective %in% c("binary:logistic", "reg:logistic")) {
     assigned <- 1
     f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
