@@ -79,7 +79,7 @@ Tidy Eval formula that can then be used inside a dplyr command.</p>
 <span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">*</span> <span class="va">disp</span>, offset <span class="op">=</span> <span class="va">am</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">tidypredict_fit</span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 46.9691423291322 + (wt * -2.43434983315996) + (cyl * -2.86061920499755) + </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     (disp * -0.0765223074908513) + (cyl * disp * 0.00981028601947223) + </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     (disp * -0.0765223074908514) + (cyl * disp * 0.00981028601947223) + </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     am</span>
 </code></pre></div>
     </div>

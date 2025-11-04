@@ -99,10 +99,14 @@ supported.</li>
 <li>
 <code>offset</code> is supported</li>
 <li>Categorical variables are supported</li>
+<li>Interactions with <code>:</code> and <code>*</code> are
+supported</li>
 <li>In-line functions in the formulas are <strong>not
 supported</strong>:
 <ul>
 <li>OK - <code>wt ~ mpg + am</code>
+</li>
+<li>OK - <code>wt ~ mpg * am + vs:disp</code>
 </li>
 <li>OK - <code>mutate(mtcars, newam = paste0(am))</code> and then
 <code>wt ~ mpg + newam</code>
