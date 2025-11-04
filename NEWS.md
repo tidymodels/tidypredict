@@ -22,6 +22,8 @@
 
 - Cubist rules will return simplified rules whenever possible to avoid multiplying by 0 and 1. (#152)
 
+- tree based models now uses `.default` argument in produced `case_when()` code when applicable. (#153)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
