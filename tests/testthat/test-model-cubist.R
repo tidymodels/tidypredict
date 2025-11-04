@@ -13,7 +13,7 @@ test_that("returns the right output", {
   expect_equal(length(pm), 2)
   expect_equal(length(pm$trees), 1)
   expect_equal(pm$general$model, "cubist")
-  expect_equal(pm$general$version, 2)
+  expect_equal(pm$general$version, 3)
 
   expect_snapshot(
     rlang::expr_text(tf)
@@ -21,7 +21,6 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
-  skip("https://github.com/tidymodels/tidypredict/issues/148")
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,
@@ -32,7 +31,11 @@ test_that("Model can be saved and re-loaded", {
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_snapshot(tidypredict_fit(pm))
+
+  expect_identical(
+    tidypredict_fit(model),
+    tidypredict_fit(pm)
+  )
 })
 
 test_that("formulas produces correct predictions", {

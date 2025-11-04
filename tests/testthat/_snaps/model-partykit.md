@@ -5,16 +5,6 @@
     Output
       [1] "case_when(cyl <= 4 ~ 26.6636363636364, cyl <= 6 & cyl > 4 ~ 19.7428571428571, \n    cyl > 6 & cyl > 4 ~ 15.1)"
 
-# Model can be saved and re-loaded
-
-    Code
-      tidypredict_fit(pm)
-    Output
-      [[1]]
-      case_when(cyl <= 4 ~ 26.6636364, cyl <= 6 & cyl > 4 ~ 19.7428571, 
-          cyl > 6 & cyl > 4 ~ 15.1)
-      
-
 # formulas produces correct predictions
 
     Code

@@ -22,12 +22,18 @@ test_that("returns the right output", {
 test_that("Model can be saved and re-loaded", {
   model <- lm(am ~ wt + cyl, data = mtcars)
 
+  model$coefficients <- round(model$coefficients, 7)
+
   pm <- parse_model(model)
   mp <- tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
-  expect_snapshot(tidypredict_fit(pm))
+
+  expect_identical(
+    tidypredict_fit(model),
+    tidypredict_fit(pm)
+  )
 })
 
 test_that("formulas produces correct predictions", {
