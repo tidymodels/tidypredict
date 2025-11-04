@@ -100,6 +100,10 @@ parse_model.cubist <- function(model) {
 #' @export
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
+  tidypredict_fit_cubist(parsedmodel)
+}
+
+tidypredict_fit_cubist <- function(parsedmodel) {
   rules <- generate_tree_nodes(parsedmodel$trees[[1]], parsedmodel$general$mode)
   paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
 

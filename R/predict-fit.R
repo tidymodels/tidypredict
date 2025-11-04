@@ -21,7 +21,16 @@ tidypredict_fit.pm_regression <- function(model) {
 
 #' @export
 tidypredict_fit.pm_tree <- function(model) {
-  generate_case_when_trees(model)
+  if (model$general$model == "cubist") {
+    return(tidypredict_fit_cubist(model))
+  }
+  if (model$general$model == "randomForest") {
+    return(tidypredict_fit_randomForest(model))
+  }
+
+  res <- generate_case_when_trees(model)
+
+  reduce_addition(res)
 }
 
 #' @export
