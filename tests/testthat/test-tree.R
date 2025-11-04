@@ -18,7 +18,7 @@ test_that("generate_case_when_trees() works", {
   )
 
   expect_identical(
-    generate_case_when_trees(parsedmodel),
+    generate_case_when_trees(parsedmodel, default = FALSE),
     list(
       quote(case_when(disp > 100 ~ 14 + hp * 4 + drat * 2))
     )
@@ -30,7 +30,7 @@ test_that("generate_case_when_trees() works", {
   )
 
   expect_identical(
-    generate_case_when_trees(parsedmodel),
+    generate_case_when_trees(parsedmodel, default = FALSE),
     list(
       quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
     )
@@ -42,7 +42,7 @@ test_that("generate_case_when_trees() works", {
   )
 
   expect_identical(
-    generate_case_when_trees(parsedmodel),
+    generate_case_when_trees(parsedmodel, default = FALSE),
     list(
       quote(
         case_when(
@@ -63,7 +63,7 @@ test_that("generate_case_when_trees() works", {
   )
 
   expect_identical(
-    generate_case_when_trees(parsedmodel),
+    generate_case_when_trees(parsedmodel, default = FALSE),
     list(
       quote(
         case_when(
@@ -94,18 +94,18 @@ test_that("generate_case_when_tree() works", {
   nodes <- list(node)
 
   expect_identical(
-    generate_case_when_tree(nodes, mode = ""),
+    generate_case_when_tree(nodes, mode = "", default = FALSE),
     quote(case_when(disp > 100 ~ 14 + hp * 4 + drat * 2))
   )
   expect_identical(
-    generate_case_when_tree(nodes, mode = "ifelse"),
+    generate_case_when_tree(nodes, mode = "ifelse", default = FALSE),
     quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
   )
 
   nodes <- list(node, node)
 
   expect_identical(
-    generate_case_when_tree(nodes, mode = ""),
+    generate_case_when_tree(nodes, mode = "", default = FALSE),
     quote(
       case_when(
         disp > 100 ~ 14 + hp * 4 + drat * 2,
@@ -114,7 +114,7 @@ test_that("generate_case_when_tree() works", {
     )
   )
   expect_identical(
-    generate_case_when_tree(nodes, mode = "ifelse"),
+    generate_case_when_tree(nodes, mode = "ifelse", default = FALSE),
     quote(
       case_when(
         ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0),
