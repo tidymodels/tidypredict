@@ -277,6 +277,11 @@ test_that("formulas produces correct predictions", {
 })
 
 test_that("base_score isn't included when 0 (#147)", {
+  xgb_bin_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
   model <- xgboost::xgb.train(
     params = list(
       max_depth = 1,
