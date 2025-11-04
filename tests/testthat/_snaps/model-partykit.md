@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "case_when(cyl <= 4 ~ 26.6636363636364, cyl <= 6 & cyl > 4 ~ 19.7428571428571, \n    cyl > 6 & cyl > 4 ~ 15.1)"
+      [1] "case_when(cyl <= 4 ~ 26.6636363636364, cyl <= 6 & cyl > 4 ~ 19.7428571428571, \n    .default = 15.1)"
 
 # formulas produces correct predictions
 

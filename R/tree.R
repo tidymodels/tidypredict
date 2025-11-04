@@ -49,16 +49,26 @@
 #' calculating all notes.
 #'
 #' @keywords internal
-generate_case_when_trees <- function(parsedmodel) {
+generate_case_when_trees <- function(parsedmodel, default = TRUE) {
   map(
     parsedmodel$trees,
     generate_case_when_tree,
-    mode = parsedmodel$general$mode
+    mode = parsedmodel$general$mode,
+    default = default
   )
 }
 
-generate_case_when_tree <- function(tree, mode) {
-  expr(case_when(!!!generate_tree_nodes(tree, mode)))
+generate_case_when_tree <- function(tree, mode, default = TRUE) {
+  nodes <- generate_tree_nodes(tree, mode)
+
+  if (default) {
+    default <- nodes[[length(nodes)]]
+    default <- rlang::f_rhs(default)
+    nodes[[length(nodes)]] <- NULL
+    nodes <- c(nodes, .default = default)
+  }
+
+  expr(case_when(!!!nodes))
 }
 
 generate_tree_nodes <- function(tree, mode) {

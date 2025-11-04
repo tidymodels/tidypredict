@@ -4,7 +4,7 @@
 \alias{generate_case_when_trees}
 \title{Generate trees}
 \usage{
-generate_case_when_trees(parsedmodel)
+generate_case_when_trees(parsedmodel, default = TRUE)
 }
 \description{
 Each tree is generated as a flat tree with each node being a seperate part of
