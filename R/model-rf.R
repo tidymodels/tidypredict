@@ -86,6 +86,10 @@ parse_model.randomForest <- function(model) {
 #' @export
 tidypredict_fit.randomForest <- function(model) {
   parsedmodel <- parse_model(model)
+  tidypredict_fit_randomForest(parsedmodel)
+}
+
+tidypredict_fit_randomForest <- function(parsedmodel) {
   res <- generate_case_when_trees(parsedmodel)
   res <- reduce_addition(res)
   n_trees <- length(parsedmodel$trees)

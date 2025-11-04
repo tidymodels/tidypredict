@@ -5,15 +5,6 @@
     Output
       [1] "(37.2 + hp * -0.0318 + wt * -3.88 + (ifelse(disp > 95.099998, \n    14.89 + hp * -0.0406 + drat * 2.4, 0) + ifelse(disp <= 95.099998, \n    33.06, 0))/((disp > 95.099998) + (disp <= 95.099998)) + (37.26 + \n    wt * -5.28))/3"
 
-# Model can be saved and re-loaded
-
-    Code
-      tidypredict_fit(pm)
-    Output
-      (37.2 + hp * -0.0318 + wt * -3.88 + ifelse(disp > 95.099998, 
-          14.89 + hp * -0.0406 + drat * 2.4, 0) + ifelse(disp <= 95.099998, 
-          33.06, 0) + (37.26 + wt * -5.28))/3
-
 # formulas produces correct predictions
 
     Code

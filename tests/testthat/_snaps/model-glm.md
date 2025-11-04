@@ -5,13 +5,6 @@
     Output
       [1] "1.520331147866 + (wt * -0.372988616484) + (cyl * 0.013885491477)"
 
-# Model can be saved and re-loaded
-
-    Code
-      tidypredict_fit(pm)
-    Output
-      1.5203311 + (wt * -0.3729886) + (cyl * 0.0138855)
-
 # formulas produces correct predictions
 
     Code
