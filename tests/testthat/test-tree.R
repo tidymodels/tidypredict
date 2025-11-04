@@ -122,6 +122,37 @@ test_that("generate_case_when_tree() works", {
       )
     )
   )
+
+  nodes <- list(
+    list(
+      prediction = 25,
+      path = list(list(
+        type = "conditional",
+        col = "cyl",
+        val = 4,
+        op = "less-equal"
+      ))
+    ),
+    list(
+      prediction = 20,
+      path = list(
+        list(type = "conditional", col = "cyl", val = 6, op = "less-equal"),
+        list(type = "conditional", col = "cyl", val = 4, op = "more")
+      )
+    ),
+    list(
+      prediction = 15,
+      path = list(
+        list(type = "conditional", col = "cyl", val = 6, op = "more"),
+        list(type = "conditional", col = "cyl", val = 4, op = "more")
+      )
+    )
+  )
+
+  expect_identical(
+    generate_case_when_tree(nodes, mode = "", default = TRUE),
+    quote(case_when(cyl <= 4 ~ 25, cyl <= 6 & cyl > 4 ~ 20, .default = 15))
+  )
 })
 
 test_that("generate_tree_nodes() works", {
