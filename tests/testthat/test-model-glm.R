@@ -60,6 +60,20 @@ test_that("formulas produces correct predictions", {
       mtcars
     )
   )
+  # family = gaussian, with interactions
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt:cyl + disp, data = mtcars, family = "gaussian"),
+      mtcars
+    )
+  )
+  # family = binomial, with interactions
+  expect_snapshot(
+    tidypredict_test(
+      glm(am ~ wt:cyl + disp, data = mtcars, family = "binomial"),
+      mtcars
+    )
+  )
 })
 
 test_that("tidypredict works when variable names are subset of other variables", {

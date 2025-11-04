@@ -18,6 +18,8 @@
 
 - xgboost models with objectives `"reg:tweedie"` and `"count:poisson"` are now supported. (#72, @SimonCoulombe)
 
+- linear models such as `lm()` and `glm()` now work with interactions created with `*` and `:`. (#74) 
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package

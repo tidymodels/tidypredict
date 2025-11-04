@@ -57,6 +57,14 @@ test_that("formulas produces correct predictions", {
     )
   )
 
+  # interaction
+  expect_snapshot(
+    tidypredict_test(
+      lm(mpg ~ wt + disp:cyl, data = mtcars),
+      mtcars
+    )
+  )
+
   # interactions
   expect_snapshot(
     tidypredict_test(

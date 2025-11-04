@@ -59,6 +59,28 @@
       
        All results are within the difference threshold
 
+---
+
+    Code
+      tidypredict_test(glm(am ~ wt:cyl + disp, data = mtcars, family = "gaussian"),
+      mtcars)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
+---
+
+    Code
+      tidypredict_test(glm(am ~ wt:cyl + disp, data = mtcars, family = "binomial"),
+      mtcars)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
 # tidypredict works when variable names are subset of other variables
 
     Code
