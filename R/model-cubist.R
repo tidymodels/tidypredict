@@ -64,29 +64,9 @@ parse_model.cubist <- function(model) {
     }
   )
   comm <- purrr::list_flatten(committees2)
-  pm <- list(
-    general = list(
-      model = "cubist",
-      type = "tree",
-      version = 2,
-      mode = "ifelse",
-      divisor = model$committees
-    ),
-    trees = list(comm)
-  )
-  as_parsed_model(pm)
-}
 
-#' @export
-tidypredict_fit.cubist <- function(model) {
-  parsedmodel <- parse_model(model)
-  rules <- generate_tree_nodes(parsedmodel$trees[[1]], parsedmodel$general$mode)
-  paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
-
-  n_committees <- model$committees
-
-  if (n_committees == 1) {
-    ommittee_id <- rep(1, length(rules))
+  if (model$committees == 1) {
+    ommittee_id <- rep(1, length(comm))
   } else {
     model_print <- utils::capture.output(print(model))
     model_print <- model_print[grep(
@@ -102,6 +82,29 @@ tidypredict_fit.cubist <- function(model) {
     ommittee_id <- as.integer(model_print)
     ommittee_id <- rep(seq_along(ommittee_id), times = ommittee_id)
   }
+
+  pm <- list(
+    general = list(
+      model = "cubist",
+      type = "tree",
+      version = 3,
+      mode = "ifelse",
+      n_committees = model$committees,
+      ommittee_id = ommittee_id
+    ),
+    trees = list(comm)
+  )
+  as_parsed_model(pm)
+}
+
+#' @export
+tidypredict_fit.cubist <- function(model) {
+  parsedmodel <- parse_model(model)
+  rules <- generate_tree_nodes(parsedmodel$trees[[1]], parsedmodel$general$mode)
+  paths <- lapply(parsedmodel$trees[[1]], function(x) path_formulas(x$path))
+
+  n_committees <- parsedmodel$general$n_committees
+  ommittee_id <- parsedmodel$general$ommittee_id
 
   committees <- purrr::map2(
     split(rules, ommittee_id),
