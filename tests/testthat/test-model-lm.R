@@ -111,3 +111,14 @@ test_that("we get better error from QR decomposition issues (#124)", {
     tidypredict::tidypredict_fit(lm_fit)
   )
 })
+
+test_that("don't add with 0 (#147)", {
+  model <- lm(am ~ wt + cyl, data = mtcars)
+
+  model$coefficients <- setNames(c(0, 1.5, 2.2), names(model$coefficients))
+
+  expect_identical(
+    tidypredict_fit(model),
+    quote((wt * 1.5) + (cyl * 2.2))
+  )
+})

@@ -15,10 +15,16 @@ build_fit_formula <- function(parsedmodel) {
         cols <- reduce_multiplication(cols)
         expr((!!cols * !!.x$coef))
       } else {
-        expr(!!.x$coef)
+        if (.x$coef == 0) {
+          NULL
+        } else {
+          expr(!!.x$coef)
+        }
       }
     }
   )
+  parsed_f <- purrr::discard(parsed_f, is.null)
+
   f <- reduce_addition(parsed_f)
 
   if (!is.null(parsedmodel$general$offset)) {

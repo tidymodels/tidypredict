@@ -275,3 +275,38 @@ test_that("formulas produces correct predictions", {
     )
   )
 })
+
+test_that("base_score isn't included when 0 (#147)", {
+  xgb_bin_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 1,
+      objective = "reg:squarederror",
+      base_score = 0.5
+    ),
+    data = xgb_bin_data,
+    nrounds = 1
+  )
+
+  res <- tidypredict_fit(model)
+  res <- expr_text(res)
+  expect_true(grepl("+ 0.5$", res))
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 1,
+      objective = "reg:squarederror",
+      base_score = 0
+    ),
+    data = xgb_bin_data,
+    nrounds = 1
+  )
+
+  res <- tidypredict_fit(model)
+  res <- expr_text(res)
+  expect_false(grepl("+ 0$", res))
+})
