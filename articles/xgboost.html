@@ -149,28 +149,27 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 1 - 1/(1 + exp(0 + case_when(wt &gt;= 3.18000007 ~ -0.436363667, </span></span>
-<span><span class="co">#&gt;     (qsec &lt; 19.1849995 | is.na(qsec)) &amp; (wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;         0.428571463, qsec &gt;= 19.1849995 &amp; (wt &lt; 3.18000007 | </span></span>
-<span><span class="co">#&gt;         is.na(wt)) ~ 0) + case_when((wt &lt; 3.01250005 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.311573088, (hp &lt; 222.5 | is.na(hp)) &amp; wt &gt;= 3.01250005 ~ </span></span>
-<span><span class="co">#&gt;     -0.392053694, hp &gt;= 222.5 &amp; wt &gt;= 3.01250005 ~ -0.0240745768) + </span></span>
-<span><span class="co">#&gt;     case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.355945677, (wt &lt; </span></span>
-<span><span class="co">#&gt;         3.01250005 | is.na(wt)) &amp; gear &gt;= 3.5 ~ 0.325712085, </span></span>
-<span><span class="co">#&gt;         wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ -0.0384863913) + case_when((gear &lt; </span></span>
-<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.309683114, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.283893973, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.032039877) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.275577009, </span></span>
-<span><span class="co">#&gt;     (wt &lt; 3.01250005 | is.na(wt)) &amp; gear &gt;= 3.5 ~ 0.252453178, </span></span>
-<span><span class="co">#&gt;     wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ -0.0266750772) + case_when((gear &lt; </span></span>
-<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.248323873, (qsec &lt; 17.6599998 | is.na(qsec)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.261978835, qsec &gt;= 17.6599998 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.00959526002) + case_when((gear &lt; 3.5 | is.na(gear)) ~ </span></span>
-<span><span class="co">#&gt;     -0.225384533, (wt &lt; 3.01250005 | is.na(wt)) &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     0.218285918, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ -0.0373593047) + </span></span>
-<span><span class="co">#&gt;     case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.205454513, (qsec &lt; </span></span>
-<span><span class="co">#&gt;         18.7550011 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.196076646, </span></span>
-<span><span class="co">#&gt;         qsec &gt;= 18.7550011 &amp; gear &gt;= 3.5 ~ -0.0544253439) + case_when((wt &lt; </span></span>
+<span><span class="co">#&gt; 1 - 1/(1 + exp(case_when(wt &gt;= 3.18000007 ~ -0.436363667, (qsec &lt; </span></span>
+<span><span class="co">#&gt;     19.1849995 | is.na(qsec)) &amp; (wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
+<span><span class="co">#&gt;     0.428571463, qsec &gt;= 19.1849995 &amp; (wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
+<span><span class="co">#&gt;     0) + case_when((wt &lt; 3.01250005 | is.na(wt)) ~ 0.311573088, </span></span>
+<span><span class="co">#&gt;     (hp &lt; 222.5 | is.na(hp)) &amp; wt &gt;= 3.01250005 ~ -0.392053694, </span></span>
+<span><span class="co">#&gt;     hp &gt;= 222.5 &amp; wt &gt;= 3.01250005 ~ -0.0240745768) + case_when((gear &lt; </span></span>
+<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.355945677, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
+<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.325712085, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
+<span><span class="co">#&gt;     -0.0384863913) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.309683114, </span></span>
+<span><span class="co">#&gt;     (wt &lt; 3.01250005 | is.na(wt)) &amp; gear &gt;= 3.5 ~ 0.283893973, </span></span>
+<span><span class="co">#&gt;     wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ -0.032039877) + case_when((gear &lt; </span></span>
+<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.275577009, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
+<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.252453178, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
+<span><span class="co">#&gt;     -0.0266750772) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.248323873, </span></span>
+<span><span class="co">#&gt;     (qsec &lt; 17.6599998 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.261978835, </span></span>
+<span><span class="co">#&gt;     qsec &gt;= 17.6599998 &amp; gear &gt;= 3.5 ~ -0.00959526002) + case_when((gear &lt; </span></span>
+<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.225384533, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
+<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.218285918, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
+<span><span class="co">#&gt;     -0.0373593047) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.205454513, </span></span>
+<span><span class="co">#&gt;     (qsec &lt; 18.7550011 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.196076646, </span></span>
+<span><span class="co">#&gt;     qsec &gt;= 18.7550011 &amp; gear &gt;= 3.5 ~ -0.0544253439) + case_when((wt &lt; </span></span>
 <span><span class="co">#&gt;     3.01250005 | is.na(wt)) ~ 0.149246693, (qsec &lt; 17.4099998 | </span></span>
 <span><span class="co">#&gt;     is.na(qsec)) &amp; wt &gt;= 3.01250005 ~ 0.0354709327, qsec &gt;= 17.4099998 &amp; </span></span>
 <span><span class="co">#&gt;     wt &gt;= 3.01250005 ~ -0.226075932) + case_when((gear &lt; 3.5 | </span></span>
