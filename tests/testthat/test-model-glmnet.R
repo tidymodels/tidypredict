@@ -72,3 +72,23 @@ test_that("errors if more than 1 penalty is selected", {
     tidypredict_fit(model)
   )
 })
+
+test_that("glmnet are handeld neatly with parsnip", {
+  spec <- parsnip::linear_reg(engine = "glmnet", penalty = 1)
+
+  model <- parsnip::fit(spec, mpg ~ ., mtcars)
+
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_type(tf, "language")
+
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "glmnet")
+  expect_equal(pm$general$version, 1)
+
+  expect_snapshot(
+    rlang::expr_text(tf)
+  )
+})

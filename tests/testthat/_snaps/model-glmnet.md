@@ -54,3 +54,10 @@
       Error in `parse_model()`:
       ! `tidypredict_fit()` requires that there are only 1 penalty selected, 2 were provided.
 
+# glmnet are handeld neatly with parsnip
+
+    Code
+      rlang::expr_text(tf)
+    Output
+      [1] "35.3140536966127 + (cyl * -0.871623418095165) + (hp * -0.0101157918502673) + \n    (wt * -2.59426484734253)"
+

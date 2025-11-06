@@ -21,10 +21,12 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
       call = call
     )
   }
+  if (inherits(model$beta, "dgCMatrix")) {
+    model$beta <- setNames(as.numeric(model$beta), rownames(model$beta))
+  }
+  coefs <- c("(Intercept)" = unname(model$a0), model$beta)
 
-  coefs <- glmnet::coef.glmnet(model)
-
-  names <- rownames(coefs)
+  names <- names(coefs)
   values <- as.vector(coefs)
 
   terms <- map2(values, names, \(value, name) {
