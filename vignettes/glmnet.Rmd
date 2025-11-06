@@ -2,7 +2,7 @@
 title: "glmnet models"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{lgmnet models}
+  %\VignetteIndexEntry{glmnet models}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
