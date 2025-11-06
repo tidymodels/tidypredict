@@ -27,6 +27,17 @@
       
        All results are within the difference threshold
 
+---
+
+    Code
+      tidypredict_test(glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "poisson",
+      lambda = 1), mtcars[, -1])
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
 # errors if more than 1 penalty is selected
 
     Code

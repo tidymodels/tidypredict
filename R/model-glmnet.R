@@ -48,12 +48,19 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   pm$general$is_glm <- 1
   pm$terms <- terms
 
-  pm$general$family <- "gaussian"
-  pm$general$link <- "identity"
-
-  if (inherits(model, "lognet")) {
+  if (inherits(model, "elnet")) {
+    pm$general$family <- "gaussian"
+    pm$general$link <- "identity"
+  } else if (inherits(model, "lognet")) {
     pm$general$family <- "binomial"
     pm$general$link <- "logit"
+  } else if (inherits(model, "fishnet")) {
+    pm$general$family <- "poisson"
+    pm$general$link <- "log"
+  } else {
+    cli::cli_abort(
+      "Model fit with this {.arg family} is not supported."
+    )
   }
 
   as_parsed_model(pm)

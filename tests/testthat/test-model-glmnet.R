@@ -39,10 +39,19 @@ test_that("formulas produces correct predictions", {
       mtcars[, -1]
     )
   )
+
   # binomial
   expect_snapshot(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "binomial", lambda = 1),
+      mtcars[, -1]
+    )
+  )
+
+  # poisson
+  expect_snapshot(
+    tidypredict_test(
+      glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "poisson", lambda = 1),
       mtcars[, -1]
     )
   )
