@@ -16,7 +16,7 @@ parse_model.glmnet <- function(model) {
 parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   if (length(model$lambda) != 1) {
     cli::cli_abort(
-      "{.fn tidypredict_fit} requires that there are only 1 penalty seleted."
+      "{.fn tidypredict_fit} requires that there are only 1 penalty selected."
     )
   }
 
