@@ -8,11 +8,27 @@
 # formulas produces correct predictions
 
     Code
-      tidypredict_test(glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1), mtcars[,
-        -1])
+      tidypredict_test(glmnet::glmnet(mtcars[, -1], mtcars$mpg, family = "gaussian",
+      lambda = 1), mtcars[, -1])
     Output
       tidypredict test results
       Difference threshold: 1e-12
       
        All results are within the difference threshold
+
+# errors if more than 1 penalty is selected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` requires that there are only 1 penalty selected, 79 were provided.
+
+---
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` requires that there are only 1 penalty selected, 2 were provided.
 

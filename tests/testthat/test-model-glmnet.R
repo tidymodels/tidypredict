@@ -32,11 +32,27 @@ test_that("Model can be saved and re-loaded", {
 })
 
 test_that("formulas produces correct predictions", {
-  # normal
+  # gaussian
   expect_snapshot(
     tidypredict_test(
-      glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1),
+      glmnet::glmnet(mtcars[, -1], mtcars$mpg, family = "gaussian", lambda = 1),
       mtcars[, -1]
     )
+  )
+})
+
+test_that("errors if more than 1 penalty is selected", {
+  model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg)
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_fit(model)
+  )
+
+  model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = c(1, 5))
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_fit(model)
   )
 })
