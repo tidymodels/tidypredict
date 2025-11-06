@@ -45,7 +45,16 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   pm$general$model <- class(model)[[2]]
   pm$general$version <- 1
   pm$general$type <- "regression"
-  pm$general$is_glm <- 0
+  pm$general$is_glm <- 1
   pm$terms <- terms
+
+  pm$general$family <- "gaussian"
+  pm$general$link <- "identity"
+
+  if (inherits(model, "lognet")) {
+    pm$general$family <- "binomial"
+    pm$general$link <- "logit"
+  }
+
   as_parsed_model(pm)
 }

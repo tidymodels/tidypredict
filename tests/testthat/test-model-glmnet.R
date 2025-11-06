@@ -39,6 +39,13 @@ test_that("formulas produces correct predictions", {
       mtcars[, -1]
     )
   )
+  # binomial
+  expect_snapshot(
+    tidypredict_test(
+      glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "binomial", lambda = 1),
+      mtcars[, -1]
+    )
+  )
 })
 
 test_that("errors if more than 1 penalty is selected", {
