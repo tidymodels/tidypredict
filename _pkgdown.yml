@@ -21,6 +21,8 @@ navbar:
       href: articles/lm.html 
     - text: Generalized Regression - glm()
       href: articles/glm.html
+    - text: Regularized Regression - glmnet()
+      href: articles/glmnet.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()

@@ -1,0 +1,87 @@
+---
+title: "glmnet models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{glmnet models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("glmnet", quietly = TRUE)) {
+  library(tidypredict)
+  library(glmnet)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+## `tidypredict_` functions
+
+```{r}
+library(glmnet)
+
+model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the prediction to the original table
+    ```{r}
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that `tidypredict` results match to the model's `predict()` results.
+    ```{r}
+tidypredict_test(model, mtcars[, -1])
+    ```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+
+p_model <- linear_reg(penalty = 1) %>%
+  set_engine("glmnet") %>%
+  fit(mpg ~ ., data = mtcars)
+```
+
+```{r}
+tidypredict_fit(p_model)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+```{r}
+str(pm$trees[1])
+```
+

@@ -24,6 +24,8 @@
 
 - tree based models now uses `.default` argument in produced `case_when()` code when applicable. (#153)
 
+- Added support for glmnet models. (#165)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
