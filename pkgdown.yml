@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   cubist: cubist.html
   glm: glm.html
+  glmnet: glmnet.html
   lm: lm.html
   mars: mars.html
   non-r: non-r.html
@@ -14,7 +15,7 @@ articles:
   sql: sql.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2025-11-04T19:32Z
+last_built: 2025-11-07T00:46Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles
