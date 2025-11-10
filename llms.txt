@@ -1,0 +1,229 @@
+# tidypredict
+
+[![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
+[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
+[![Codecov test
+coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict?branch=main)
+
+The main goal of `tidypredict` is to enable running predictions inside
+databases. It reads the model, extracts the components needed to
+calculate the prediction, and then creates an R formula that can be
+translated into SQL. In other words, it is able to parse a model such as
+this one:
+
+``` r
+model <- lm(mpg ~ wt + cyl, data = mtcars)
+```
+
+`tidypredict` can return a SQL statement that is ready to run inside the
+database. Because it uses `dplyr`’s database interface, it works with
+several databases back-ends, such as MS SQL:
+
+``` r
+tidypredict_sql(model, dbplyr::simulate_mssql())
+```
+
+``` R
+## <SQL> (39.686261480253 + (`wt` * -3.19097213898374)) + (`cyl` * -1.5077949682598)
+```
+
+## Installation
+
+Install `tidypredict` from CRAN using:
+
+``` r
+install.packages("tidypredict")
+```
+
+Or install the **development version** using `devtools` as follows:
+
+``` r
+install.packages("remotes")
+remotes::install_github("tidymodels/tidypredict")
+```
+
+## Functions
+
+`tidypredict` has only a few functions, and it is not expected that
+number to grow much. The main focus at this time is to add more models
+to support.
+
+| Function                                                                                                 | Description                                                                                                                                       |
+|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   | Returns an R formula that calculates the prediction                                                                                               |
+| [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)                   | Returns a SQL query based on the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)              |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)       | Adds a new column using the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                 | Tests `tidyverse` predictions against the model’s native [`predict()`](https://rdrr.io/r/stats/predict.html) function                             |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)         | Same as [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) but for intervals (only works with `lm` and `glm`) |
+| [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | Same as [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) but for intervals (only works with `lm` and `glm`) |
+| [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)                           | Creates a list spec based on the R model                                                                                                          |
+| [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)                   | Prepares an object to be recognized as a parsed model                                                                                             |
+
+## How it works
+
+![](reference/figures/howitworks.png)
+
+Instead of translating directly to a SQL statement, `tidypredict`
+creates an R formula. That formula can then be used inside `dplyr`. The
+overall workflow would be as illustrated in the image above, and
+described here:
+
+1.  Fit the model using a base R model, or one from the packages listed
+    in [Supported Models](#supported-models)
+2.  `tidypredict` reads model, and creates a list object with the
+    necessary components to run predictions
+3.  `tidypredict` builds an R formula based on the list object
+4.  `dplyr` evaluates the formula created by `tidypredict`
+5.  `dplyr` translates the formula into a SQL statement, or any other
+    interfaces.
+6.  The database executes the SQL statement(s) created by `dplyr`
+
+### Parsed model spec
+
+`tidypredict` writes and reads a spec based on a model. Instead of
+simply writing the R formula directly, splitting the spec from the
+formula adds the following capabilities:
+
+1.  No more saving models as `.rds` - Specifically for cases when the
+    model needs to be used for predictions in a Shiny app.
+2.  Beyond R models - Technically, anything that can write a proper
+    spec, can be read into `tidypredict`. It also means, that the parsed
+    model spec can become a good alternative to using *PMML.*
+
+## Supported models
+
+The following models are supported by `tidypredict`:
+
+- Linear Regression - [`lm()`](https://rdrr.io/r/stats/lm.html)
+- Generalized Linear model - [`glm()`](https://rdrr.io/r/stats/glm.html)
+- Random Forest models -
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+- Random Forest models, via `ranger` -
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+- MARS models -
+  [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html)
+- XGBoost models -
+  [`xgboost::xgb.Booster.complete()`](https://rdrr.io/pkg/xgboost/man/xgb.Booster.complete.html)
+- Cubist models -
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+- Tree models, via `partykit` -
+  [`partykit::ctree()`](https://rdrr.io/pkg/partykit/man/ctree.html)
+
+### `parsnip`
+
+`tidypredict` supports models fitted via the `parsnip` interface. The
+ones confirmed currently work in `tidypredict` are:
+
+- [`lm()`](https://rdrr.io/r/stats/lm.html) - `parsnip`: `linear_reg()`
+  with *“lm”* as the engine.
+- [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html) -
+  `parsnip`: `rand_forest()` with *“randomForest”* as the engine.
+- [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md) -
+  `parsnip`: `rand_forest()` with *“ranger”* as the engine.
+- [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html) -
+  `parsnip`: `mars()` with *“earth”* as the engine.
+
+### `broom`
+
+The [`tidy()`](https://generics.r-lib.org/reference/tidy.html) function
+from broom works with linear models parsed via `tidypredict`
+
+``` r
+pm <- parse_model(lm(wt ~ ., mtcars))
+tidy(pm)
+```
+
+``` R
+## # A tibble: 11 × 2
+##    term        estimate
+##    <chr>          <dbl>
+##  1 (Intercept) -0.231  
+##  2 mpg         -0.0417 
+##  3 cyl         -0.0573 
+##  4 disp         0.00669
+##  5 hp          -0.00323
+##  6 drat        -0.0901 
+##  7 qsec         0.200  
+##  8 vs          -0.0664 
+##  9 am           0.0184 
+## 10 gear        -0.0935 
+## 11 carb         0.249
+```
+
+## Contributing
+
+This project is released with a [Contributor Code of
+Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
+
+- For questions and discussions about tidymodels packages, modeling, and
+  machine learning, please [post on Posit
+  Community](https://forum.posit.co/new-topic?category_id=15&tags=tidymodels,question).
+
+- If you think you have encountered a bug, please [submit an
+  issue](https://github.com/tidymodels/tidypredict/issues).
+
+- Either way, learn how to create and share a
+  [reprex](https://reprex.tidyverse.org/articles/articles/learn-reprex.html)
+  (a minimal, reproducible example), to clearly communicate about your
+  code.
+
+- Check out further details on [contributing guidelines for tidymodels
+  packages](https://www.tidymodels.org/contribute/) and [how to get
+  help](https://www.tidymodels.org/help/).
+
+# Package index
+
+## All functions
+
+- [`acceptable_formula()`](https://tidypredict.tidymodels.org/reference/acceptable_formula.md)
+  : Checks that the formula can be parsed
+- [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)
+  : Prepares parsed model object
+- [`generate_tree_node()`](https://tidypredict.tidymodels.org/reference/generate_tree_node.md)
+  : Construct a single node of a tree
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  : Converts an R model object into a table.
+- [`path_formula()`](https://tidypredict.tidymodels.org/reference/path_formula.md)
+  : Turn a path object into an expression
+- [`path_formulas()`](https://tidypredict.tidymodels.org/reference/path_formulas.md)
+  : Turn a path object into a combined expression
+- [`tidy(`*`<pm_regression>`*`)`](https://tidypredict.tidymodels.org/reference/tidy.pm_regression.md)
+  : Tidy the parsed model results
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  : Returns a Tidy Eval formula to calculate fitted values
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  : Returns a Tidy Eval formula to calculate prediction interval.
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  : Tests base predict function against tidypredict
+- [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
+  : Adds the prediction columns to a piped command set.
+
+# Articles
+
+### All vignettes
+
+- [Cubist
+  models](https://tidypredict.tidymodels.org/articles/cubist.md):
+- [Generalized Linear
+  Regression](https://tidypredict.tidymodels.org/articles/glm.md):
+- [glmnet
+  models](https://tidypredict.tidymodels.org/articles/glmnet.md):
+- [Linear
+  Regression](https://tidypredict.tidymodels.org/articles/lm.md):
+- [MARS models via the \`earth\`
+  package](https://tidypredict.tidymodels.org/articles/mars.md):
+- [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
+- [Random Forest, using
+  Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
+- [Create a regression spec - version
+  2](https://tidypredict.tidymodels.org/articles/regression.md):
+- [Random Forest](https://tidypredict.tidymodels.org/articles/rf.md):
+- [Save and re-load
+  models](https://tidypredict.tidymodels.org/articles/save.md):
+- [Database
+  write-back](https://tidypredict.tidymodels.org/articles/sql.md):
+- [Create a tree spec - version
+  2](https://tidypredict.tidymodels.org/articles/tree.md):
+- [XGBoost
+  models](https://tidypredict.tidymodels.org/articles/xgboost.md):
