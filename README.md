@@ -1,5 +1,5 @@
 
-# tidypredict <img src="man/figures/logo.png" align="right" width = "120px"/>
+# tidypredict <a href="https://tidypredict.tidymodels.org"><img src="man/figures/logo.png" align="right" height="138" alt="tidypredict website" /></a>
 
 [![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
 [![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
