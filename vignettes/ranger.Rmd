@@ -30,13 +30,13 @@ set.seed(100)
 
 ## How it works
 
-Here is a simple `ranger()` model using the `iris` dataset:
+Here is a simple `ranger()` model using the `mtcars` dataset:
 ```{r}
 library(dplyr)
 library(tidypredict)
 library(ranger)
 
-model <- ranger(Species ~ ., data = iris, num.trees = 100)
+model <- ranger(mpg ~ ., data = mtcars, num.trees = 5, max.depth = 2)
 ```
 
 ## Under the hood
@@ -48,9 +48,10 @@ treeInfo(model) %>%
 ```
 
 
-The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  The entire decision tree becomes one `dplyr::case_when()` statement
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula. Each decision tree becomes one `dplyr::case_when()` statement, which are then combined.
+
 ```{r}
-tidypredict_fit(model)[1]
+tidypredict_fit(model)
 ```
 
 From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
@@ -67,9 +68,9 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 ```{r}
 library(parsnip)
 
-parsnip_model <- rand_forest(mode = "classification") %>%
-  set_engine("ranger") %>%
-  fit(Species ~ ., data = iris)
+parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%
+  set_engine("ranger", max.depth = 2) %>%
+  fit(mpg ~ ., data = mtcars)
 
-tidypredict_fit(parsnip_model)[[1]]
+tidypredict_fit(parsnip_model)
 ```
