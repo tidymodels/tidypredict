@@ -26,6 +26,8 @@
 
 - Added support for glmnet models. (#165)
 
+- Make work with xgboost version > 2.0.0.0. (#169)
+
 # tidypredict 0.5.1
 
 - Exported a number of internal functions to be used in {orbital} package
