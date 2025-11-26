@@ -54,7 +54,7 @@ get_xgb_tree <- function(tree) {
     paths,
     ~ {
       list(
-        prediction = tree$Quality[[.x]],
+        prediction = tree$Gain[[.x]] %||% tree$Quality[[.x]],
         path = get_xgb_path(.x, tree)
       )
     }
@@ -68,20 +68,40 @@ get_xgb_trees <- function(model, filter_trees = TRUE) {
     dump_format = "text",
     with_stats = TRUE
   )
-  feature_names <- model$feature_names
-  get_xgb_trees_character(xd, feature_names, filter_trees)
+  if (is.null(attr(model, "param"))) {
+    xd <- xgboost::xgb.dump(
+      model = model,
+      dump_format = "text",
+      with_stats = TRUE
+    )
+    feature_names <- model$feature_names
+    get_xgb_trees_character(xd, feature_names, filter_trees)
+  } else {
+    feature_names <- xgboost::getinfo(model, "feature_name")
+    get_xgb_trees_character(model, feature_names, filter_trees)
+  }
 }
 
-get_xgb_trees_character <- function(xd, feature_names, filter_trees) {
-  feature_names_tbl <- data.frame(
-    Feature = as.character(0:(length(feature_names) - 1)),
-    feature_name = feature_names,
-    stringsAsFactors = FALSE
-  )
-  trees <- xgboost::xgb.model.dt.tree(text = xd)
+get_xgb_trees_character <- function(x, feature_names, filter_trees) {
+  # To deal with new agboost version
+  if (is.character(x)) {
+    trees <- xgboost::xgb.model.dt.tree(text = x)
+  } else {
+    trees <- xgboost::xgb.model.dt.tree(model = x)
+  }
   trees <- as.data.frame(trees)
   trees$original_order <- 1:nrow(trees)
-  trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
+
+  if (is.character(x)) {
+    feature_names_tbl <- data.frame(
+      Feature = as.character(0:(length(feature_names) - 1)),
+      feature_name = feature_names,
+      stringsAsFactors = FALSE
+    )
+    trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
+  } else {
+    trees$feature_name <- ifelse(trees$Feature == "Leaf", NA, trees$Feature)
+  }
   trees <- trees[
     order(trees$original_order),
     !names(trees) %in% "original_order"
@@ -102,17 +122,27 @@ get_xgb_trees_character <- function(xd, feature_names, filter_trees) {
 
 #' @export
 parse_model.xgb.Booster <- function(model) {
-  params <- model$params
+  old <- is.null(attr(model, "param"))
+
+  params <- attr(model, "param") %||% model$params
   wosilent <- params[names(params) != "silent"]
   wosilent$silent <- params$silent
 
   pm <- list()
   pm$general$model <- "xgb.Booster"
   pm$general$type <- "xgb"
-  pm$general$niter <- model$niter
   pm$general$params <- wosilent
-  pm$general$feature_names <- model$feature_names
-  pm$general$nfeatures <- model$nfeatures
+
+  if (old) {
+    pm$general$feature_names <- model$feature_names
+    pm$general$niter <- model$niter
+    pm$general$nfeatures <- model$nfeatures
+  } else {
+    pm$general$feature_names <- xgboost::getinfo(model, "feature_name")
+    pm$general$niter <- xgboost::xgb.get.num.boosted.rounds(model)
+    pm$general$nfeatures <- length(pm$general$feature_names)
+  }
+
   pm$general$version <- 1
   pm$trees <- get_xgb_trees(model)
   as_parsed_model(pm)
