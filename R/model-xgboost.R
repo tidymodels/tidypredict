@@ -139,7 +139,10 @@ parse_model.xgb.Booster <- function(model) {
     pm$general$nfeatures <- model$nfeatures
   } else {
     pm$general$feature_names <- xgboost::getinfo(model, "feature_name")
-    pm$general$niter <- xgboost::xgb.get.num.boosted.rounds(model)
+    pm$general$niter <- getFromNamespace(
+      "xgb.get.num.boosted.rounds",
+      ns = "xgboost"
+    )(model)
     pm$general$nfeatures <- length(pm$general$feature_names)
   }
 
