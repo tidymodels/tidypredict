@@ -124,13 +124,13 @@
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
 <p>Here is a simple <code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest()</a></code> model using the
-<code>iris</code> dataset:</p>
+<code>mtcars</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://www.stat.berkeley.edu/~breiman/RandomForests/" class="external-link">randomForest</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span>, ntree <span class="op">=</span> <span class="fl">100</span>, proximity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span>, ntree <span class="op">=</span> <span class="fl">5</span>, proximity <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="under-the-hood">Under the hood<a class="anchor" aria-label="anchor" href="#under-the-hood"></a>
@@ -142,26 +142,62 @@ field.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/randomForest/man/getTree.html" class="external-link">getTree</a></span><span class="op">(</span><span class="va">model</span>, labelVar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt;   left daughter right daughter    split var split point status</span></span>
-<span><span class="co">#&gt; 1             2              3 Petal.Length        2.50      1</span></span>
-<span><span class="co">#&gt; 2             0              0         &lt;NA&gt;        0.00     -1</span></span>
-<span><span class="co">#&gt; 3             4              5 Petal.Length        5.05      1</span></span>
-<span><span class="co">#&gt; 4             6              7  Petal.Width        1.90      1</span></span>
-<span><span class="co">#&gt; 5             0              0         &lt;NA&gt;        0.00     -1</span></span>
-<span><span class="co">#&gt; 6             8              9 Sepal.Length        4.95      1</span></span>
-<span><span class="co">#&gt;   prediction</span></span>
-<span><span class="co">#&gt; 1       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2     setosa</span></span>
-<span><span class="co">#&gt; 3       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 5  virginica</span></span>
-<span><span class="co">#&gt; 6       &lt;NA&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   left daughter right daughter split var split point status prediction</span></span>
+<span><span class="co">#&gt; 1             2              3      carb       1.500     -3   20.12813</span></span>
+<span><span class="co">#&gt; 2             4              5      gear       3.500     -3   28.82222</span></span>
+<span><span class="co">#&gt; 3             6              7      disp     221.700     -3   16.72609</span></span>
+<span><span class="co">#&gt; 4             0              0      &lt;NA&gt;       0.000     -1   18.10000</span></span>
+<span><span class="co">#&gt; 5             8              9        hp      65.500     -3   31.88571</span></span>
+<span><span class="co">#&gt; 6            10             11        wt       3.295     -3   21.38333</span></span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a
-<code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree
-becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
+<code>dplyr</code>, a.k.a Tidy Eval, formula. Each decision tree becomes
+one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement, which are then
+combined.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="co">#&gt; `/`()</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (case_when(gear &lt; 3.5 &amp; carb &lt; 1.5 ~ 18.1, hp &lt; 65.5 &amp; gear &gt;= </span></span>
+<span><span class="co">#&gt;     3.5 &amp; carb &lt; 1.5 ~ 33.9, wt &lt; 3.295 &amp; disp &lt; 221.7 &amp; carb &gt;= </span></span>
+<span><span class="co">#&gt;     1.5 ~ 21.82, wt &gt;= 3.295 &amp; disp &lt; 221.7 &amp; carb &gt;= 1.5 ~ 19.2, </span></span>
+<span><span class="co">#&gt;     wt &gt;= 4.66 &amp; disp &gt;= 221.7 &amp; carb &gt;= 1.5 ~ 10.4, qsec &lt; 19.185 &amp; </span></span>
+<span><span class="co">#&gt;         hp &gt;= 65.5 &amp; gear &gt;= 3.5 &amp; carb &lt; 1.5 ~ 27.3, qsec &gt;= </span></span>
+<span><span class="co">#&gt;         19.185 &amp; hp &gt;= 65.5 &amp; gear &gt;= 3.5 &amp; carb &lt; 1.5 ~ 32.4, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 16.96 &amp; wt &lt; 4.66 &amp; disp &gt;= 221.7 &amp; carb &gt;= 1.5 ~ </span></span>
+<span><span class="co">#&gt;         14.94, hp &lt; 162.5 &amp; qsec &gt;= 16.96 &amp; wt &lt; 4.66 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;         221.7 &amp; carb &gt;= 1.5 ~ 15.2, carb &lt; 2.5 &amp; hp &gt;= 162.5 &amp; </span></span>
+<span><span class="co">#&gt;         qsec &gt;= 16.96 &amp; wt &lt; 4.66 &amp; disp &gt;= 221.7 &amp; carb &gt;= 1.5 ~ </span></span>
+<span><span class="co">#&gt;         19.2, .default = 16.34) + case_when(hp &lt; 65.5 &amp; hp &lt; </span></span>
+<span><span class="co">#&gt;     95 ~ 31.5666666666667, wt &lt; 2.23 &amp; hp &gt;= 65.5 &amp; hp &lt; 95 ~ </span></span>
+<span><span class="co">#&gt;     26.325, wt &gt;= 2.23 &amp; hp &gt;= 65.5 &amp; hp &lt; 95 ~ 22.8, qsec &lt; </span></span>
+<span><span class="co">#&gt;     17.62 &amp; hp &gt;= 190 &amp; hp &gt;= 95 ~ 14.325, qsec &gt;= 17.62 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;     190 &amp; hp &gt;= 95 ~ 10.4, hp &lt; 130 &amp; drat &lt; 3.385 &amp; hp &lt; 190 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 95 ~ 19.2, hp &gt;= 130 &amp; drat &lt; 3.385 &amp; hp &lt; 190 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;     95 ~ 17.025, gear &gt;= 4.5 &amp; drat &gt;= 3.385 &amp; hp &lt; 190 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;     95 ~ 19.7, vs &lt; 0.5 &amp; gear &lt; 4.5 &amp; drat &gt;= 3.385 &amp; hp &lt; 190 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 95 ~ 21, .default = 21.5) + case_when(qsec &lt; 18.755 &amp; </span></span>
+<span><span class="co">#&gt;     disp &lt; 142.9 ~ 22.8, qsec &gt;= 18.755 &amp; disp &lt; 142.9 ~ 28.74, </span></span>
+<span><span class="co">#&gt;     disp &lt; 163.8 &amp; wt &lt; 3.49 &amp; disp &gt;= 142.9 ~ 20.1333333333333, </span></span>
+<span><span class="co">#&gt;     qsec &gt;= 17.71 &amp; wt &gt;= 3.49 &amp; disp &gt;= 142.9 ~ 10.4, gear &lt; </span></span>
+<span><span class="co">#&gt;         3.5 &amp; disp &gt;= 163.8 &amp; wt &lt; 3.49 &amp; disp &gt;= 142.9 ~ 19.2, </span></span>
+<span><span class="co">#&gt;     gear &gt;= 3.5 &amp; disp &gt;= 163.8 &amp; wt &lt; 3.49 &amp; disp &gt;= 142.9 ~ </span></span>
+<span><span class="co">#&gt;         17.4, drat &lt; 2.915 &amp; hp &lt; 212.5 &amp; qsec &lt; 17.71 &amp; wt &gt;= </span></span>
+<span><span class="co">#&gt;         3.49 &amp; disp &gt;= 142.9 ~ 15.5, drat &gt;= 2.915 &amp; hp &lt; 212.5 &amp; </span></span>
+<span><span class="co">#&gt;         qsec &lt; 17.71 &amp; wt &gt;= 3.49 &amp; disp &gt;= 142.9 ~ 18.25, carb &lt; </span></span>
+<span><span class="co">#&gt;         6 &amp; hp &gt;= 212.5 &amp; qsec &lt; 17.71 &amp; wt &gt;= 3.49 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;         142.9 ~ 13.7, .default = 15) + case_when(cyl &lt; 5 &amp; am &lt; </span></span>
+<span><span class="co">#&gt;     0.5 ~ 22.55, wt &lt; 2.2775 &amp; am &gt;= 0.5 ~ 29.78, wt &gt;= 2.2775 &amp; </span></span>
+<span><span class="co">#&gt;     am &gt;= 0.5 ~ 18.42, hp &gt;= 192.5 &amp; cyl &gt;= 5 &amp; am &lt; 0.5 ~ 13.84, </span></span>
+<span><span class="co">#&gt;     hp &lt; 136.5 &amp; hp &lt; 192.5 &amp; cyl &gt;= 5 &amp; am &lt; 0.5 ~ 18.5, drat &lt; </span></span>
+<span><span class="co">#&gt;         3.11 &amp; hp &gt;= 136.5 &amp; hp &lt; 192.5 &amp; cyl &gt;= 5 &amp; am &lt; 0.5 ~ </span></span>
+<span><span class="co">#&gt;         17.075, .default = 17.3) + case_when(cyl &gt;= 5 &amp; hp &lt; </span></span>
+<span><span class="co">#&gt;     116.5 ~ 21.1, qsec &gt;= 18.14 &amp; hp &gt;= 116.5 ~ 18.2666666666667, </span></span>
+<span><span class="co">#&gt;     drat &gt;= 4.165 &amp; cyl &lt; 5 &amp; hp &lt; 116.5 ~ 32.15, hp &lt; 77.5 &amp; </span></span>
+<span><span class="co">#&gt;         drat &lt; 4.165 &amp; cyl &lt; 5 &amp; hp &lt; 116.5 ~ 24.4, disp &lt; 337.9 &amp; </span></span>
+<span><span class="co">#&gt;         hp &lt; 192.5 &amp; qsec &lt; 18.14 &amp; hp &gt;= 116.5 ~ 16.76, disp &gt;= </span></span>
+<span><span class="co">#&gt;         337.9 &amp; hp &lt; 192.5 &amp; qsec &lt; 18.14 &amp; hp &gt;= 116.5 ~ 19.2, </span></span>
+<span><span class="co">#&gt;     drat &lt; 3.105 &amp; hp &gt;= 192.5 &amp; qsec &lt; 18.14 &amp; hp &gt;= 116.5 ~ </span></span>
+<span><span class="co">#&gt;         10.4, drat &gt;= 3.105 &amp; hp &gt;= 192.5 &amp; qsec &lt; 18.14 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;         116.5 ~ 13.975, disp &lt; 114.05 &amp; hp &gt;= 77.5 &amp; drat &lt; 4.165 &amp; </span></span>
+<span><span class="co">#&gt;         cyl &lt; 5 &amp; hp &lt; 116.5 ~ 22.8, .default = 21.7))/5L</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -182,12 +218,63 @@ model objects fitted via the <code>parsnip</code> package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, trees <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"randomForest"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; `/`</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (case_when(wt &lt; 2.0675 &amp; disp &lt; 107.6 ~ 30.5, wt &gt;= 2.0675 &amp; </span></span>
+<span><span class="co">#&gt;     disp &lt; 107.6 ~ 32.4, drat &gt;= 4.175 &amp; wt &lt; 3.16 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;     107.6 ~ 26, hp &lt; 96 &amp; drat &lt; 4.175 &amp; wt &lt; 3.16 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;     107.6 ~ 22.8, hp &gt;= 96 &amp; drat &lt; 4.175 &amp; wt &lt; 3.16 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;     107.6 ~ 20.925, qsec &lt; 18.6 &amp; cyl &lt; 7 &amp; wt &gt;= 3.16 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;     107.6 ~ 19.2, qsec &gt;= 18.6 &amp; cyl &lt; 7 &amp; wt &gt;= 3.16 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;     107.6 ~ 17.9, wt &lt; 3.4375 &amp; hp &lt; 177.5 &amp; cyl &gt;= 7 &amp; wt &gt;= </span></span>
+<span><span class="co">#&gt;     3.16 &amp; disp &gt;= 107.6 ~ 15.2, drat &lt; 3.14 &amp; hp &gt;= 177.5 &amp; </span></span>
+<span><span class="co">#&gt;     cyl &gt;= 7 &amp; wt &gt;= 3.16 &amp; disp &gt;= 107.6 ~ 16.55, drat &gt;= 3.14 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 177.5 &amp; cyl &gt;= 7 &amp; wt &gt;= 3.16 &amp; disp &gt;= 107.6 ~ 15.05, </span></span>
+<span><span class="co">#&gt;     drat &lt; 2.92 &amp; wt &gt;= 3.4375 &amp; hp &lt; 177.5 &amp; cyl &gt;= 7 &amp; wt &gt;= </span></span>
+<span><span class="co">#&gt;         3.16 &amp; disp &gt;= 107.6 ~ 15.5, .default = 18.8) + case_when(hp &lt; </span></span>
+<span><span class="co">#&gt;     79.5 ~ 29.8, disp &lt; 142.9 &amp; cyl &lt; 7 &amp; hp &gt;= 79.5 ~ 22.125, </span></span>
+<span><span class="co">#&gt;     disp &gt;= 456 &amp; cyl &gt;= 7 &amp; hp &gt;= 79.5 ~ 10.4, hp &lt; 116.5 &amp; </span></span>
+<span><span class="co">#&gt;         disp &gt;= 142.9 &amp; cyl &lt; 7 &amp; hp &gt;= 79.5 ~ 21.1333333333333, </span></span>
+<span><span class="co">#&gt;     drat &gt;= 3.115 &amp; disp &lt; 456 &amp; cyl &gt;= 7 &amp; hp &gt;= 79.5 ~ 15.34, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 18.6 &amp; hp &gt;= 116.5 &amp; disp &gt;= 142.9 &amp; cyl &lt; 7 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;         79.5 ~ 19.5, qsec &gt;= 18.6 &amp; hp &gt;= 116.5 &amp; disp &gt;= 142.9 &amp; </span></span>
+<span><span class="co">#&gt;         cyl &lt; 7 &amp; hp &gt;= 79.5 ~ 17.8, drat &lt; 3.075 &amp; drat &lt; 3.115 &amp; </span></span>
+<span><span class="co">#&gt;         disp &lt; 456 &amp; cyl &gt;= 7 &amp; hp &gt;= 79.5 ~ 15.725, .default = 19.2) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.3125 &amp; drat &lt; 3.75 ~ 22.05, wt &lt; 2.23 &amp; </span></span>
+<span><span class="co">#&gt;         drat &gt;= 3.75 ~ 29.6, drat &lt; 3.035 &amp; wt &gt;= 3.3125 &amp; drat &lt; </span></span>
+<span><span class="co">#&gt;         3.75 ~ 10.4, gear &gt;= 4.5 &amp; wt &gt;= 2.23 &amp; drat &gt;= 3.75 ~ </span></span>
+<span><span class="co">#&gt;         15.8, carb &lt; 2.5 &amp; drat &gt;= 3.035 &amp; wt &gt;= 3.3125 &amp; drat &lt; </span></span>
+<span><span class="co">#&gt;         3.75 ~ 16.3666666666667, vs &lt; 0.5 &amp; gear &lt; 4.5 &amp; wt &gt;= </span></span>
+<span><span class="co">#&gt;         2.23 &amp; drat &gt;= 3.75 ~ 21, hp &gt;= 290 &amp; carb &gt;= 2.5 &amp; drat &gt;= </span></span>
+<span><span class="co">#&gt;         3.035 &amp; wt &gt;= 3.3125 &amp; drat &lt; 3.75 ~ 15, qsec &lt; 0 &amp; vs &gt;= </span></span>
+<span><span class="co">#&gt;         0.5 &amp; gear &lt; 4.5 &amp; wt &gt;= 2.23 &amp; drat &gt;= 3.75 ~ 24.4, </span></span>
+<span><span class="co">#&gt;         qsec &gt;= 0 &amp; vs &gt;= 0.5 &amp; gear &lt; 4.5 &amp; wt &gt;= 2.23 &amp; drat &gt;= </span></span>
+<span><span class="co">#&gt;             3.75 ~ 22.8, disp &lt; 395 &amp; hp &lt; 290 &amp; carb &gt;= 2.5 &amp; </span></span>
+<span><span class="co">#&gt;             drat &gt;= 3.035 &amp; wt &gt;= 3.3125 &amp; drat &lt; 3.75 ~ 13.68, </span></span>
+<span><span class="co">#&gt;         .default = 14.7) + case_when(wt &gt;= 2.26 &amp; cyl &lt; 5 ~ 22.56, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 16.8 &amp; wt &lt; 2.26 &amp; cyl &lt; 5 ~ 26, qsec &gt;= 16.8 &amp; wt &lt; </span></span>
+<span><span class="co">#&gt;         2.26 &amp; cyl &lt; 5 ~ 31.5, qsec &gt;= 19.83 &amp; disp &lt; 266.9 &amp; </span></span>
+<span><span class="co">#&gt;         cyl &gt;= 5 ~ 18.1, qsec &gt;= 17.71 &amp; disp &gt;= 266.9 &amp; cyl &gt;= </span></span>
+<span><span class="co">#&gt;         5 ~ 12.8, hp &lt; 116.5 &amp; qsec &lt; 19.83 &amp; disp &lt; 266.9 &amp; </span></span>
+<span><span class="co">#&gt;         cyl &gt;= 5 ~ 21.08, hp &gt;= 116.5 &amp; qsec &lt; 19.83 &amp; disp &lt; </span></span>
+<span><span class="co">#&gt;         266.9 &amp; cyl &gt;= 5 ~ 19.2, drat &gt;= 3.19 &amp; qsec &lt; 17.71 &amp; </span></span>
+<span><span class="co">#&gt;         disp &gt;= 266.9 &amp; cyl &gt;= 5 ~ 15.25, drat &lt; 3.075 &amp; drat &lt; </span></span>
+<span><span class="co">#&gt;         3.19 &amp; qsec &lt; 17.71 &amp; disp &gt;= 266.9 &amp; cyl &gt;= 5 ~ 16.4, </span></span>
+<span><span class="co">#&gt;     .default = 18.95) + case_when(hp &lt; 80.5 ~ 29.9, gear &gt;= 4.5 &amp; </span></span>
+<span><span class="co">#&gt;     carb &lt; 2.5 &amp; hp &gt;= 80.5 ~ 30.4, hp &lt; 192.5 &amp; carb &gt;= 2.5 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 80.5 ~ 15.725, disp &lt; 182.9 &amp; gear &lt; 4.5 &amp; carb &lt; 2.5 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 80.5 ~ 21.7, hp &lt; 222.5 &amp; hp &gt;= 192.5 &amp; carb &gt;= 2.5 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 80.5 ~ 10.4, wt &lt; 3.3275 &amp; disp &gt;= 182.9 &amp; gear &lt; 4.5 &amp; </span></span>
+<span><span class="co">#&gt;     carb &lt; 2.5 &amp; hp &gt;= 80.5 ~ 21.4, drat &lt; 3.88 &amp; hp &gt;= 222.5 &amp; </span></span>
+<span><span class="co">#&gt;     hp &gt;= 192.5 &amp; carb &gt;= 2.5 &amp; hp &gt;= 80.5 ~ 14.925, drat &gt;= </span></span>
+<span><span class="co">#&gt;     3.88 &amp; hp &gt;= 222.5 &amp; hp &gt;= 192.5 &amp; carb &gt;= 2.5 &amp; hp &gt;= 80.5 ~ </span></span>
+<span><span class="co">#&gt;     15.8, cyl &lt; 7 &amp; wt &gt;= 3.3275 &amp; disp &gt;= 182.9 &amp; gear &lt; 4.5 &amp; </span></span>
+<span><span class="co">#&gt;     carb &lt; 2.5 &amp; hp &gt;= 80.5 ~ 18.1, disp &lt; 380 &amp; cyl &gt;= 7 &amp; wt &gt;= </span></span>
+<span><span class="co">#&gt;     3.3275 &amp; disp &gt;= 182.9 &amp; gear &lt; 4.5 &amp; carb &lt; 2.5 &amp; hp &gt;= </span></span>
+<span><span class="co">#&gt;     80.5 ~ 18.7, .default = 19.2))/5L</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

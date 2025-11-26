@@ -124,13 +124,13 @@
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
 <p>Here is a simple <code><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger()</a></code> model using the
-<code>iris</code> dataset:</p>
+<code>mtcars</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span>, num.trees <span class="op">=</span> <span class="fl">100</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span>, num.trees <span class="op">=</span> <span class="fl">5</span>, max.depth <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="under-the-hood">Under the hood<a class="anchor" aria-label="anchor" href="#under-the-hood"></a>
@@ -143,25 +143,37 @@ field.</p>
 <code class="sourceCode R"><span><span class="fu"><a href="http://imbs-hl.github.io/ranger/reference/treeInfo.html" class="external-link">treeInfo</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   nodeID leftChild rightChild splitvarID splitvarName splitval</span></span>
-<span><span class="co">#&gt; 1      0         1          2          3  Petal.Width     1.75</span></span>
-<span><span class="co">#&gt; 2      1         3          4          2 Petal.Length     2.45</span></span>
-<span><span class="co">#&gt; 3      2         5          6          2 Petal.Length     4.85</span></span>
+<span><span class="co">#&gt; 1      0         1          2          8         gear     3.50</span></span>
+<span><span class="co">#&gt; 2      1         3          4          2           hp   192.50</span></span>
+<span><span class="co">#&gt; 3      2         5          6          4           wt     2.26</span></span>
 <span><span class="co">#&gt; 4      3        NA         NA         NA         &lt;NA&gt;       NA</span></span>
-<span><span class="co">#&gt; 5      4         7          8          2 Petal.Length     5.40</span></span>
+<span><span class="co">#&gt; 5      4        NA         NA         NA         &lt;NA&gt;       NA</span></span>
 <span><span class="co">#&gt; 6      5        NA         NA         NA         &lt;NA&gt;       NA</span></span>
 <span><span class="co">#&gt;   terminal prediction</span></span>
-<span><span class="co">#&gt; 1    FALSE       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 2    FALSE       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 3    FALSE       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 4     TRUE     setosa</span></span>
-<span><span class="co">#&gt; 5    FALSE       &lt;NA&gt;</span></span>
-<span><span class="co">#&gt; 6     TRUE  virginica</span></span></code></pre></div>
+<span><span class="co">#&gt; 1    FALSE         NA</span></span>
+<span><span class="co">#&gt; 2    FALSE         NA</span></span>
+<span><span class="co">#&gt; 3    FALSE         NA</span></span>
+<span><span class="co">#&gt; 4     TRUE    17.4000</span></span>
+<span><span class="co">#&gt; 5     TRUE    12.9000</span></span>
+<span><span class="co">#&gt; 6     TRUE    29.4375</span></span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a
-<code>dplyr</code>, a.k.a Tidy Eval, formula. The entire decision tree
-becomes one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement</p>
+<code>dplyr</code>, a.k.a Tidy Eval, formula. Each decision tree becomes
+one <code><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">dplyr::case_when()</a></code> statement, which are then
+combined.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="co">#&gt; `+`()</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; case_when(hp &lt; 192.5 &amp; gear &lt; 3.5 ~ 17.4, hp &gt;= 192.5 &amp; gear &lt; </span></span>
+<span><span class="co">#&gt;     3.5 ~ 12.9, wt &lt; 2.26 &amp; gear &gt;= 3.5 ~ 29.4375, .default = 21.3625) + </span></span>
+<span><span class="co">#&gt;     case_when(vs &lt; 0.5 &amp; wt &lt; 2.455 ~ 26, vs &gt;= 0.5 &amp; wt &lt; 2.455 ~ </span></span>
+<span><span class="co">#&gt;         31.8, gear &lt; 3.5 &amp; wt &gt;= 2.455 ~ 14.25, .default = 19.0666666666667) + </span></span>
+<span><span class="co">#&gt;     case_when(hp &lt; 65.5 &amp; disp &lt; 120.65 ~ 31.275, hp &gt;= 65.5 &amp; </span></span>
+<span><span class="co">#&gt;         disp &lt; 120.65 ~ 26.6333333333333, wt &lt; 3.505 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;         120.65 ~ 19.9533333333333, .default = 14.6857142857143) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt; 93.5 &amp; cyl &lt; 5 ~ 30.625, disp &gt;= 93.5 &amp; </span></span>
+<span><span class="co">#&gt;         cyl &lt; 5 ~ 22.32, cyl &lt; 7 &amp; cyl &gt;= 5 ~ 18.78, .default = 15.7769230769231) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt; 107.6 &amp; cyl &lt; 5 ~ 31.1333333333333, disp &gt;= </span></span>
+<span><span class="co">#&gt;         107.6 &amp; cyl &lt; 5 ~ 23.6625, hp &lt; 192.5 &amp; cyl &gt;= 5 ~ 18.65, </span></span>
+<span><span class="co">#&gt;         .default = 12.8625)</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -182,12 +194,23 @@ objects fitted via the <code>parsnip</code> package.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, trees <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"ranger"</span>, max.depth <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; `+`</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; case_when(disp &lt; 450 &amp; vs &lt; 0.5 ~ 16.9684210526316, disp &gt;= 450 &amp; </span></span>
+<span><span class="co">#&gt;     vs &lt; 0.5 ~ 10.4, drat &lt; 4 &amp; vs &gt;= 0.5 ~ 24.2, .default = 30.6857142857143) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 2.3325 &amp; hp &lt; 131.5 ~ 31.6666666666667, wt &gt;= </span></span>
+<span><span class="co">#&gt;         2.3325 &amp; hp &lt; 131.5 ~ 21.7571428571429, drat &lt; 3.035 &amp; </span></span>
+<span><span class="co">#&gt;         hp &gt;= 131.5 ~ 12.1, .default = 16.3153846153846) + case_when(hp &lt; </span></span>
+<span><span class="co">#&gt;     78.5 &amp; cyl &lt; 5 ~ 31.28, hp &gt;= 78.5 &amp; cyl &lt; 5 ~ 24.4, wt &lt; </span></span>
+<span><span class="co">#&gt;     4.747 &amp; cyl &gt;= 5 ~ 17.52, .default = 10.4) + case_when(carb &lt; </span></span>
+<span><span class="co">#&gt;     2.5 &amp; drat &lt; 3.615 ~ 17.5875, carb &gt;= 2.5 &amp; drat &lt; 3.615 ~ </span></span>
+<span><span class="co">#&gt;     13.4, wt &lt; 2.23 &amp; drat &gt;= 3.615 ~ 28.8857142857143, .default = 20.4285714285714) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 2.2775 &amp; disp &lt; 266.9 ~ 31.375, wt &gt;= 2.2775 &amp; </span></span>
+<span><span class="co">#&gt;         disp &lt; 266.9 ~ 22.4133333333333, wt &lt; 4.747 &amp; disp &gt;= </span></span>
+<span><span class="co">#&gt;         266.9 ~ 16.5818181818182, .default = 10.4)</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
