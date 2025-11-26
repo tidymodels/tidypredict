@@ -38,13 +38,14 @@ set.seed(100)
 
 ## How it works
 
-Here is a simple `randomForest()` model using the `iris` dataset:
+Here is a simple `randomForest()` model using the `mtcars` dataset:
+
 ```{r}
 library(dplyr)
 library(tidypredict)
 library(randomForest)
 
-model <- randomForest(Species ~ ., data = iris, ntree = 100, proximity = TRUE)
+model <- randomForest(mpg ~ ., data = mtcars, ntree = 5, proximity = TRUE)
 ```
 
 ## Under the hood
@@ -56,9 +57,9 @@ getTree(model, labelVar = TRUE) %>%
 ```
 
 
-The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  The entire decision tree becomes one `dplyr::case_when()` statement
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula. Each decision tree becomes one `dplyr::case_when()` statement, which are then combined.
 ```{r}
-tidypredict_fit(model)[1]
+tidypredict_fit(model)
 ```
 
 From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
@@ -75,9 +76,9 @@ From there, the Tidy Eval formula can be used anywhere where it can be operated.
 ```{r}
 library(parsnip)
 
-parsnip_model <- rand_forest(mode = "classification") %>%
+parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%
   set_engine("randomForest") %>%
-  fit(Species ~ ., data = iris)
+  fit(mpg ~ ., data = mtcars)
 
-tidypredict_fit(parsnip_model)[[1]]
+tidypredict_fit(parsnip_model)
 ```
