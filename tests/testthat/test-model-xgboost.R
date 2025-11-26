@@ -25,7 +25,8 @@ test_that("returns the right output", {
   expect_equal(pm$general$version, 1)
 
   expect_snapshot(
-    rlang::expr_text(tf)
+    rlang::expr_text(tf),
+    variant = as.character(packageVersion("xgboost"))
   )
 })
 
