@@ -142,7 +142,7 @@ need to support the exponent function.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; 1.0 - 1.0 / (1.0 + EXP(((20.8527831345691 + (`wt` * -7.85934263583836)) + (IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 3.10462643177453)) + (IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 5.37942092366098)))</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; 1.0 - 1.0 / (1.0 + EXP(((20.8527831345691 + (`wt` * -7.85934263583836)) + (IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 3.10462643177453)) + (IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 5.37942092366097)))</span></span></code></pre></div>
 <p>Alternatively, use <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> if the
 results are the be used or previewed in <code>dplyr</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -196,7 +196,7 @@ are operated using <code><a href="https://dplyr.tidyverse.org/reference/if_else.
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 1 - 1/(1 + exp(20.8527831345691 + (wt * -7.85934263583836) + </span></span>
 <span><span class="co">#&gt;     (ifelse(char_cyl == "cyl6", 1, 0) * 3.10462643177453) + (ifelse(char_cyl == </span></span>
-<span><span class="co">#&gt;     "cyl8", 1, 0) * 5.37942092366098)))</span></span></code></pre></div>
+<span><span class="co">#&gt;     "cyl8", 1, 0) * 5.37942092366097)))</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>

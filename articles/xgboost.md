@@ -192,9 +192,9 @@ str(pm, 2)
 #>  $ general:List of 7
 #>   ..$ model        : chr "xgb.Booster"
 #>   ..$ type         : chr "xgb"
-#>   ..$ niter        : num 50
 #>   ..$ params       :List of 4
 #>   ..$ feature_names: chr [1:10] "mpg" "cyl" "disp" "hp" ...
+#>   ..$ niter        : num 50
 #>   ..$ nfeatures    : int 10
 #>   ..$ version      : num 1
 #>  $ trees  :List of 42

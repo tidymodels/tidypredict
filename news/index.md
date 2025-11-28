@@ -57,6 +57,9 @@
 - Added support for glmnet models.
   ([\#165](https://github.com/tidymodels/tidypredict/issues/165))
 
+- Make work with xgboost version \> 2.0.0.0.
+  ([\#169](https://github.com/tidymodels/tidypredict/issues/169))
+
 ## tidypredict 0.5.1
 
 CRAN release: 2024-12-19

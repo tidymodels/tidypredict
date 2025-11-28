@@ -93,7 +93,7 @@ library(dbplyr)
 update_statement <- build_sql("UPDATE flights_table SET current_score  = ", tidypredict_sql(model, con = con), con = con)
 
 update_statement
-#> <SQL> UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
+#> <SQL> UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
 ```
 
 This statement can be then passed on to the database team, via
@@ -104,7 +104,7 @@ to automate the scoring, the next line can be used:
 ``` r
 dbSendQuery(con, update_statement)
 #> <SQLiteResult>
-#>   SQL  UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
+#>   SQL  UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
 #>   ROWS Fetched: 0 [complete]
 #>        Changed: 336776
 ```
@@ -188,7 +188,7 @@ insert_scores
 #> FROM (
 #>   SELECT
 #>     `flight_id`,
-#>     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
+#>     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
 #>   FROM `flights_table`
 #>   WHERE (`month` = 12.0)
 #> ) AS `q01`
@@ -206,7 +206,7 @@ dbSendQuery(con, insert_scores)
 #> FROM (
 #>   SELECT
 #>     `flight_id`,
-#>     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
+#>     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
 #>   FROM `flights_table`
 #>   WHERE (`month` = 12.0)
 #> ) AS `q01`
