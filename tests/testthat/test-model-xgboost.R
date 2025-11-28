@@ -26,7 +26,11 @@ test_that("returns the right output", {
 
   expect_snapshot(
     rlang::expr_text(tf),
-    variant = as.character(packageVersion("xgboost"))
+    variant = paste(
+      as.character(packageVersion("xgboost")),
+      Sys.info()['sysname'],
+      sep = "-"
+    )
   )
 })
 
