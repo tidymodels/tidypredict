@@ -12,17 +12,17 @@ the case when.
 This means that the following tree:
 }
 \details{
-\if{html}{\out{<div class="sourceCode">}}\preformatted{        ┌──┴──┐
-   ┌────┤x > 0├───┐
-   │    └─────┘   │
-   ▼              ▼
+\if{html}{\out{<div class="sourceCode">}}\preformatted{        +-----+
+   +----|x > 0|----+
+   |    +-----+    |
+   v               v
 }\if{html}{\out{</div>}}
 
-┌──────┐        ┌───────┐
-┌──┤y < 20├─┐    ┌─┤z <= 10├─┐
-│  └──────┘ │    │ └───────┘ │
-▼           ▼    ▼           ▼
-a           b    c           d
++------+        +--------+
++--|y < 20|--+  +--|z <= 10 |--+
+|  +------+  |  |  +--------+  |
+v            v  v              v
+a            b  c              d
 
 will be turned into the following \code{case_when()} statement.
 
