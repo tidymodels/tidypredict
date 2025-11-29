@@ -1,11 +1,3 @@
-## Release summary
-
-- Exported a number of internal functions to be used in {orbital} package
-
-## Comments
-
-- Switches maintainer to Emil Hvitfeldt
-
 ## R CMD check results
 
 * 0 errors | 0 warnings | 0 notes
