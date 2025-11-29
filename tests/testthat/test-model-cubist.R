@@ -51,7 +51,7 @@ test_that("formulas produces correct predictions", {
   splits <- map2(splits$variable, splits$value, function(x, y) {
     str2lang(paste("abs(", x, "-", y, ") > 0.0001"))
   })
-  non_split_data <- mtcars |>
+  non_split_data <- mtcars %>%
     dplyr::filter(!!!splits)
 
   expect_snapshot(

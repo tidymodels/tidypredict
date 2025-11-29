@@ -29,7 +29,7 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   names <- names(coefs)
   values <- as.vector(coefs)
 
-  terms <- map2(values, names, \(value, name) {
+  terms <- map2(values, names, function(value, name) {
     if (value == 0) {
       return(NULL)
     }
