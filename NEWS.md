@@ -1,32 +1,42 @@
 # tidypredict (development version)
 
+# tidypredict 1.0.0
+
+## Breaking Changes
+
+- Random forest implementations (ranger and randomForest) will now produce a single formula instead of a list of expressions. (#84)
+
+## New Model Supports
+
+- Added support for glmnet models. (#165)
+
+## Improvements
+
+- xgboost models with objectives `"reg:tweedie"` and `"count:poisson"` are now supported. (#72, @SimonCoulombe)
+
+- tree based models now uses `.default` argument in produced `case_when()` code when applicable. (#153)
+
 - Speed up `tidypredict_fit()` for partykit and ranger packages. (#125)
 
-- Fixed bug where tidypredict would error on Cubist models without conditions. (#127)
-
-- Speed up `tidypredict_fit()` for xxgboost models. (#130)
-
-- Fixed a bug where the intercept was added incorrectly to the result for cubist models. (#58)
-
-- Fixed bug where Cubst models incorrectly combined rules and committees. (#134)
-
-- Random forest implementations (ranger and randomForest) will now produce a single formula instead of a list of formulas. (#84)
+- Speed up `tidypredict_fit()` for xgboost models. (#130)
 
 - randomForest models now support regression outcomes. (#77)
 
 - An informative error will now be thrown if a lm model cannot be processed due to having linear combinations of predictors. (#124)
 
-- xgboost models with objectives `"reg:tweedie"` and `"count:poisson"` are now supported. (#72, @SimonCoulombe)
-
 - linear models such as `lm()` and `glm()` now work with interactions created with `*` and `:`. (#74) 
 
 - Cubist rules will return simplified rules whenever possible to avoid multiplying by 0 and 1. (#152)
 
-- tree based models now uses `.default` argument in produced `case_when()` code when applicable. (#153)
-
-- Added support for glmnet models. (#165)
-
 - Make work with xgboost version > 2.0.0.0. (#169)
+
+## Bug Fixes
+
+- Fixed a bug where the intercept was added incorrectly to the result for cubist models. (#58)
+
+- Fixed bug where tidypredict would error on Cubist models without conditions. (#127)
+
+- Fixed bug where Cubst models incorrectly combined rules and committees. (#134)
 
 # tidypredict 0.5.1
 
