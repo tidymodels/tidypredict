@@ -11,13 +11,13 @@ generate_case_when_trees(parsedmodel, default = TRUE)
 
 ## Details
 
-            ┌──┴──┐
-       ┌────┤x > 0├───┐
-       │    └─────┘   │
-       ▼              ▼
+            +-----+
+       +----|x > 0|----+
+       |    +-----+    |
+       v               v
 
-┌──────┐ ┌───────┐ ┌──┤y \< 20├─┐ ┌─┤z \<= 10├─┐ │ └──────┘ │ │
-└───────┘ │ ▼ ▼ ▼ ▼ a b c d
++——+ +——–+ +–\|y \< 20\|–+ +–\|z \<= 10 \|–+ \| +——+ \| \| +——–+ \| v v
+v v a b c d
 
 will be turned into the following `case_when()` statement.
 

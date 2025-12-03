@@ -1,32 +1,41 @@
 # Changelog
 
-## tidypredict (development version)
+## tidypredict 1.0.0
+
+CRAN release: 2025-11-29
+
+### Breaking Changes
+
+- Random forest implementations (ranger and randomForest) will now
+  produce a single formula instead of a list of expressions.
+  ([\#84](https://github.com/tidymodels/tidypredict/issues/84))
+
+### New Model Supports
+
+- Added support for glmnet models.
+  ([\#165](https://github.com/tidymodels/tidypredict/issues/165))
+
+### Improvements
+
+- xgboost models with objectives `"reg:tweedie"` and `"count:poisson"`
+  are now supported.
+  ([\#72](https://github.com/tidymodels/tidypredict/issues/72),
+  [@SimonCoulombe](https://github.com/SimonCoulombe))
+
+- tree based models now uses `.default` argument in produced
+  [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+  code when applicable.
+  ([\#153](https://github.com/tidymodels/tidypredict/issues/153))
 
 - Speed up
   [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   for partykit and ranger packages.
   ([\#125](https://github.com/tidymodels/tidypredict/issues/125))
 
-- Fixed bug where tidypredict would error on Cubist models without
-  conditions.
-  ([\#127](https://github.com/tidymodels/tidypredict/issues/127))
-
 - Speed up
   [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  for xxgboost models.
+  for xgboost models.
   ([\#130](https://github.com/tidymodels/tidypredict/issues/130))
-
-- Fixed a bug where the intercept was added incorrectly to the result
-  for cubist models.
-  ([\#58](https://github.com/tidymodels/tidypredict/issues/58))
-
-- Fixed bug where Cubst models incorrectly combined rules and
-  committees.
-  ([\#134](https://github.com/tidymodels/tidypredict/issues/134))
-
-- Random forest implementations (ranger and randomForest) will now
-  produce a single formula instead of a list of formulas.
-  ([\#84](https://github.com/tidymodels/tidypredict/issues/84))
 
 - randomForest models now support regression outcomes.
   ([\#77](https://github.com/tidymodels/tidypredict/issues/77))
@@ -34,11 +43,6 @@
 - An informative error will now be thrown if a lm model cannot be
   processed due to having linear combinations of predictors.
   ([\#124](https://github.com/tidymodels/tidypredict/issues/124))
-
-- xgboost models with objectives `"reg:tweedie"` and `"count:poisson"`
-  are now supported.
-  ([\#72](https://github.com/tidymodels/tidypredict/issues/72),
-  [@SimonCoulombe](https://github.com/SimonCoulombe))
 
 - linear models such as [`lm()`](https://rdrr.io/r/stats/lm.html) and
   [`glm()`](https://rdrr.io/r/stats/glm.html) now work with interactions
@@ -49,16 +53,22 @@
   multiplying by 0 and 1.
   ([\#152](https://github.com/tidymodels/tidypredict/issues/152))
 
-- tree based models now uses `.default` argument in produced
-  [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
-  code when applicable.
-  ([\#153](https://github.com/tidymodels/tidypredict/issues/153))
-
-- Added support for glmnet models.
-  ([\#165](https://github.com/tidymodels/tidypredict/issues/165))
-
 - Make work with xgboost version \> 2.0.0.0.
   ([\#169](https://github.com/tidymodels/tidypredict/issues/169))
+
+### Bug Fixes
+
+- Fixed a bug where the intercept was added incorrectly to the result
+  for cubist models.
+  ([\#58](https://github.com/tidymodels/tidypredict/issues/58))
+
+- Fixed bug where tidypredict would error on Cubist models without
+  conditions.
+  ([\#127](https://github.com/tidymodels/tidypredict/issues/127))
+
+- Fixed bug where Cubst models incorrectly combined rules and
+  committees.
+  ([\#134](https://github.com/tidymodels/tidypredict/issues/134))
 
 ## tidypredict 0.5.1
 
