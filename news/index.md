@@ -1,5 +1,7 @@
 # Changelog
 
+## tidypredict (development version)
+
 ## tidypredict 1.0.0
 
 CRAN release: 2025-11-29
