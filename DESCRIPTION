@@ -22,6 +22,7 @@ Imports:
     cli,
     dplyr (>= 0.7),
     generics,
+    jsonlite,
     knitr,
     purrr,
     rlang (>= 1.1.1),

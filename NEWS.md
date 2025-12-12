@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Fixed bug where `base_score` wasn't extracted correctly for 
+
 # tidypredict 1.0.0
 
 ## Breaking Changes
