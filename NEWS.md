@@ -1,6 +1,6 @@
 # tidypredict (development version)
 
-- Fixed bug where `base_score` wasn't extracted correctly for 
+- Fixed bug where `base_score` wasn't extracted correctly xgboost for version 3 or higher. (#173)
 
 # tidypredict 1.0.0
 
