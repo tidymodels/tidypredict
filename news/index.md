@@ -2,6 +2,10 @@
 
 ## tidypredict (development version)
 
+- Fixed bug where `base_score` wasn’t extracted correctly xgboost for
+  version 3 or higher.
+  ([\#173](https://github.com/tidymodels/tidypredict/issues/173))
+
 ## tidypredict 1.0.0
 
 CRAN release: 2025-11-29

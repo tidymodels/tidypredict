@@ -150,82 +150,84 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 1 - 1/(1 + exp(case_when(wt &gt;= 3.18000007 ~ -0.436363667, (qsec &lt; </span></span>
-<span><span class="co">#&gt;     19.1849995 | is.na(qsec)) &amp; (wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.428571463, qsec &gt;= 19.1849995 &amp; (wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0) + case_when((wt &lt; 3.01250005 | is.na(wt)) ~ 0.311573088, </span></span>
-<span><span class="co">#&gt;     (hp &lt; 222.5 | is.na(hp)) &amp; wt &gt;= 3.01250005 ~ -0.392053694, </span></span>
-<span><span class="co">#&gt;     hp &gt;= 222.5 &amp; wt &gt;= 3.01250005 ~ -0.0240745768) + case_when((gear &lt; </span></span>
-<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.355945677, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.325712085, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.0384863913) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.309683114, </span></span>
-<span><span class="co">#&gt;     (wt &lt; 3.01250005 | is.na(wt)) &amp; gear &gt;= 3.5 ~ 0.283893973, </span></span>
-<span><span class="co">#&gt;     wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ -0.032039877) + case_when((gear &lt; </span></span>
-<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.275577009, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.252453178, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.0266750772) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.248323873, </span></span>
-<span><span class="co">#&gt;     (qsec &lt; 17.6599998 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.261978835, </span></span>
-<span><span class="co">#&gt;     qsec &gt;= 17.6599998 &amp; gear &gt;= 3.5 ~ -0.00959526002) + case_when((gear &lt; </span></span>
-<span><span class="co">#&gt;     3.5 | is.na(gear)) ~ -0.225384533, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.218285918, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.0373593047) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.205454513, </span></span>
-<span><span class="co">#&gt;     (qsec &lt; 18.7550011 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.196076646, </span></span>
-<span><span class="co">#&gt;     qsec &gt;= 18.7550011 &amp; gear &gt;= 3.5 ~ -0.0544253439) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.01250005 | is.na(wt)) ~ 0.149246693, (qsec &lt; 17.4099998 | </span></span>
-<span><span class="co">#&gt;     is.na(qsec)) &amp; wt &gt;= 3.01250005 ~ 0.0354709327, qsec &gt;= 17.4099998 &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt;= 3.01250005 ~ -0.226075932) + case_when((gear &lt; 3.5 | </span></span>
-<span><span class="co">#&gt;     is.na(gear)) ~ -0.184417158, (wt &lt; 3.01250005 | is.na(wt)) &amp; </span></span>
-<span><span class="co">#&gt;     gear &gt;= 3.5 ~ 0.176768288, wt &gt;= 3.01250005 &amp; gear &gt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;     -0.0237750355) + case_when((gear &lt; 3.5 | is.na(gear)) ~ -0.168993726, </span></span>
-<span><span class="co">#&gt;     (qsec &lt; 18.6049995 | is.na(qsec)) &amp; gear &gt;= 3.5 ~ 0.155569643, </span></span>
-<span><span class="co">#&gt;     qsec &gt;= 18.6049995 &amp; gear &gt;= 3.5 ~ -0.0325752236) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.01250005 | is.na(wt)) ~ 0.119126029, wt &gt;= 3.01250005 ~ </span></span>
-<span><span class="co">#&gt;     -0.105012275) + case_when((qsec &lt; 17.1749992 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.117254697, qsec &gt;= 17.1749992 ~ -0.0994235724) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.18000007 | is.na(wt)) ~ 0.097100094, wt &gt;= 3.18000007 ~ </span></span>
-<span><span class="co">#&gt;     -0.10567718) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0824323222, wt &gt;= 3.18000007 ~ -0.091120176) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     17.5100002 | is.na(qsec)) ~ 0.0854752287, qsec &gt;= 17.5100002 ~ </span></span>
-<span><span class="co">#&gt;     -0.0764453933) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0749477893, wt &gt;= 3.18000007 ~ -0.0799863264) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     17.7099991 | is.na(qsec)) ~ 0.0728750378, qsec &gt;= 17.7099991 ~ </span></span>
-<span><span class="co">#&gt;     -0.0646049976) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0682478622, wt &gt;= 3.18000007 ~ -0.0711427554) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.18000007 | is.na(wt)) ~ 0.0579533465, wt &gt;= 3.18000007 ~ </span></span>
-<span><span class="co">#&gt;     -0.0613371208) + case_when((qsec &lt; 18.1499996 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.0595484748, qsec &gt;= 18.1499996 ~ -0.0546668135) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.18000007 | is.na(wt)) ~ 0.0535288528, wt &gt;= 3.18000007 ~ </span></span>
-<span><span class="co">#&gt;     -0.0558333211) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0454574414, wt &gt;= 3.18000007 ~ -0.048143398) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.5600014 | is.na(qsec)) ~ 0.0422042683, qsec &gt;= 18.5600014 ~ </span></span>
-<span><span class="co">#&gt;     -0.0454404354) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0420555808, wt &gt;= 3.18000007 ~ -0.0449385941) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.5600014 | is.na(qsec)) ~ 0.0393446013, qsec &gt;= 18.5600014 ~ </span></span>
-<span><span class="co">#&gt;     -0.0425945036) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0391179025, wt &gt;= 3.18000007 ~ -0.0420661867) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.0304145869, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.031833414) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0362136625, wt &gt;= 3.18000007 ~ -0.038949281) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.0295153651, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.0307046026) + case_when((drat &lt; 3.80999994 | is.na(drat)) ~ </span></span>
-<span><span class="co">#&gt;     -0.0306891855, drat &gt;= 3.80999994 ~ 0.0288283136) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.0271221269, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.0281750448) + case_when((qsec &lt; 18.4099998 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.0228891298, qsec &gt;= 18.4099998 ~ -0.0238814205) + case_when((drat &lt; </span></span>
-<span><span class="co">#&gt;     3.80999994 | is.na(drat)) ~ -0.0296511576, drat &gt;= 3.80999994 ~ </span></span>
-<span><span class="co">#&gt;     0.0280048084) + case_when((qsec &lt; 18.4099998 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.0214707125, qsec &gt;= 18.4099998 ~ -0.0224219449) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.0181306079, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.0190209728) + case_when((wt &lt; 3.18000007 | is.na(wt)) ~ </span></span>
-<span><span class="co">#&gt;     0.0379650332, wt &gt;= 3.18000007 ~ -0.0395050682) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.0194106717, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.0202215631) + case_when((qsec &lt; 18.4099998 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.0164139606, qsec &gt;= 18.4099998 ~ -0.0171694476) + case_when((qsec &lt; </span></span>
-<span><span class="co">#&gt;     18.4099998 | is.na(qsec)) ~ 0.013879573, qsec &gt;= 18.4099998 ~ </span></span>
-<span><span class="co">#&gt;     -0.0145772668) + case_when((qsec &lt; 18.4099998 | is.na(qsec)) ~ </span></span>
-<span><span class="co">#&gt;     0.0117362784, qsec &gt;= 18.4099998 ~ -0.0123759825) + case_when((wt &lt; </span></span>
-<span><span class="co">#&gt;     3.18000007 | is.na(wt)) ~ 0.0388614088, wt &gt;= 3.18000007 ~ </span></span>
-<span><span class="co">#&gt;     -0.0400568396) + log(0.5/(1 - 0.5))))</span></span></code></pre></div>
+<span><span class="co">#&gt; 1 - 1/(1 + exp(case_when((wt &gt;= 3.19000006 | is.na(wt)) ~ -0.436363667, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 19.4400005 &amp; wt &lt; 3.19000006 ~ 0.428571463, (qsec &gt;= </span></span>
+<span><span class="co">#&gt;         19.4400005 | is.na(qsec)) &amp; wt &lt; 3.19000006 ~ 0) + case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.1500001 ~ 0.311573088, hp &lt; 230 &amp; (wt &gt;= 3.1500001 | is.na(wt)) ~ </span></span>
+<span><span class="co">#&gt;     -0.392053694, (hp &gt;= 230 | is.na(hp)) &amp; (wt &gt;= 3.1500001 | </span></span>
+<span><span class="co">#&gt;     is.na(wt)) ~ -0.0240745768) + case_when(gear &lt; 4 ~ -0.355945677, </span></span>
+<span><span class="co">#&gt;     wt &lt; 3.1500001 &amp; (gear &gt;= 4 | is.na(gear)) ~ 0.325712085, </span></span>
+<span><span class="co">#&gt;     (wt &gt;= 3.1500001 | is.na(wt)) &amp; (gear &gt;= 4 | is.na(gear)) ~ </span></span>
+<span><span class="co">#&gt;         -0.0384863913) + case_when(gear &lt; 4 ~ -0.309683114, wt &lt; </span></span>
+<span><span class="co">#&gt;     3.1500001 &amp; (gear &gt;= 4 | is.na(gear)) ~ 0.283893973, (wt &gt;= </span></span>
+<span><span class="co">#&gt;     3.1500001 | is.na(wt)) &amp; (gear &gt;= 4 | is.na(gear)) ~ -0.032039877) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.275577009, wt &lt; 3.1500001 &amp; (gear &gt;= </span></span>
+<span><span class="co">#&gt;         4 | is.na(gear)) ~ 0.252453178, (wt &gt;= 3.1500001 | is.na(wt)) &amp; </span></span>
+<span><span class="co">#&gt;         (gear &gt;= 4 | is.na(gear)) ~ -0.0266750772) + case_when(gear &lt; </span></span>
+<span><span class="co">#&gt;     4 ~ -0.248323873, qsec &lt; 17.0499992 &amp; (gear &gt;= 4 | is.na(gear)) ~ </span></span>
+<span><span class="co">#&gt;     0.261978835, (qsec &gt;= 17.0499992 | is.na(qsec)) &amp; (gear &gt;= </span></span>
+<span><span class="co">#&gt;     4 | is.na(gear)) ~ -0.00959526002) + case_when(gear &lt; 4 ~ </span></span>
+<span><span class="co">#&gt;     -0.225384533, wt &lt; 3.1500001 &amp; (gear &gt;= 4 | is.na(gear)) ~ </span></span>
+<span><span class="co">#&gt;     0.218285918, (wt &gt;= 3.1500001 | is.na(wt)) &amp; (gear &gt;= 4 | </span></span>
+<span><span class="co">#&gt;     is.na(gear)) ~ -0.0373593047) + case_when(gear &lt; 4 ~ -0.205454513, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 18.8999996 &amp; (gear &gt;= 4 | is.na(gear)) ~ 0.196076646, </span></span>
+<span><span class="co">#&gt;     (qsec &gt;= 18.8999996 | is.na(qsec)) &amp; (gear &gt;= 4 | is.na(gear)) ~ </span></span>
+<span><span class="co">#&gt;         -0.0544253439) + case_when(wt &lt; 3.1500001 ~ 0.149246693, </span></span>
+<span><span class="co">#&gt;     qsec &lt; 17.4200001 &amp; (wt &gt;= 3.1500001 | is.na(wt)) ~ 0.0354709327, </span></span>
+<span><span class="co">#&gt;     (qsec &gt;= 17.4200001 | is.na(qsec)) &amp; (wt &gt;= 3.1500001 | is.na(wt)) ~ </span></span>
+<span><span class="co">#&gt;         -0.226075932) + case_when(gear &lt; 4 ~ -0.184417158, wt &lt; </span></span>
+<span><span class="co">#&gt;     3.1500001 &amp; (gear &gt;= 4 | is.na(gear)) ~ 0.176768288, (wt &gt;= </span></span>
+<span><span class="co">#&gt;     3.1500001 | is.na(wt)) &amp; (gear &gt;= 4 | is.na(gear)) ~ -0.0237750355) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.168993726, qsec &lt; 18.6100006 &amp; (gear &gt;= </span></span>
+<span><span class="co">#&gt;         4 | is.na(gear)) ~ 0.155569643, (qsec &gt;= 18.6100006 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) &amp; (gear &gt;= 4 | is.na(gear)) ~ -0.0325752236) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.1500001 ~ 0.119126029, (wt &gt;= 3.1500001 | </span></span>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.105012275) + case_when(qsec &lt; 17.2999992 ~ </span></span>
+<span><span class="co">#&gt;     0.117254697, (qsec &gt;= 17.2999992 | is.na(qsec)) ~ -0.0994235724) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.097100094, (wt &gt;= 3.19000006 | </span></span>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.10567718) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0824323222, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.091120176) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 17.6000004 ~ 0.0854752287, (qsec &gt;= 17.6000004 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0764453933) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0749477893, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.0799863264) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 17.8199997 ~ 0.0728750378, (qsec &gt;= 17.8199997 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0646049976) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0682478622, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.0711427554) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0579533465, (wt &gt;= 3.19000006 | </span></span>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.0613371208) + case_when(qsec &lt; 18.2999992 ~ </span></span>
+<span><span class="co">#&gt;     0.0595484748, (qsec &gt;= 18.2999992 | is.na(qsec)) ~ -0.0546668135) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0535288528, (wt &gt;= 3.19000006 | </span></span>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.0558333211) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0454574414, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.048143398) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.6000004 ~ 0.0422042683, (qsec &gt;= 18.6000004 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0454404354) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0420555808, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.0449385941) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.6000004 ~ 0.0393446013, (qsec &gt;= 18.6000004 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0425945036) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0391179025, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.0420661867) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0304145869, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.031833414) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0362136625, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.038949281) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0295153651, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0307046026) + case_when(drat &lt; 3.8499999 ~ </span></span>
+<span><span class="co">#&gt;     -0.0306891855, (drat &gt;= 3.8499999 | is.na(drat)) ~ 0.0288283136) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0271221269, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0281750448) + case_when(qsec &lt; 18.5200005 ~ </span></span>
+<span><span class="co">#&gt;     0.0228891298, (qsec &gt;= 18.5200005 | is.na(qsec)) ~ -0.0238814205) + </span></span>
+<span><span class="co">#&gt;     case_when(drat &lt; 3.8499999 ~ -0.0296511576, (drat &gt;= 3.8499999 | </span></span>
+<span><span class="co">#&gt;         is.na(drat)) ~ 0.0280048084) + case_when(qsec &lt; 18.5200005 ~ </span></span>
+<span><span class="co">#&gt;     0.0214707125, (qsec &gt;= 18.5200005 | is.na(qsec)) ~ -0.0224219449) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0181306079, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0190209728) + case_when(wt &lt; 3.19000006 ~ </span></span>
+<span><span class="co">#&gt;     0.0379650332, (wt &gt;= 3.19000006 | is.na(wt)) ~ -0.0395050682) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0194106717, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0202215631) + case_when(qsec &lt; 18.5200005 ~ </span></span>
+<span><span class="co">#&gt;     0.0164139606, (qsec &gt;= 18.5200005 | is.na(qsec)) ~ -0.0171694476) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.013879573, (qsec &gt;= 18.5200005 | </span></span>
+<span><span class="co">#&gt;         is.na(qsec)) ~ -0.0145772668) + case_when(qsec &lt; 18.5200005 ~ </span></span>
+<span><span class="co">#&gt;     0.0117362784, (qsec &gt;= 18.5200005 | is.na(qsec)) ~ -0.0123759825) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0388614088, (wt &gt;= 3.19000006 | </span></span>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.0400568396) + log(0.5/(1 - 0.5))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -248,7 +250,7 @@
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98576418<span style="color: #949494;">, </span>0.98576418<span style="color: #949494;">, </span>0.92735110<span style="color: #949494;">, </span>0.01081509<span style="color: #949494;">, </span>0.046390…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98576418<span style="color: #949494;">, </span>0.98576418<span style="color: #949494;">, </span>0.93905137<span style="color: #949494;">, </span>0.01081509<span style="color: #949494;">, </span>0.046390…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that <code>tidypredict</code> results match to the
@@ -283,11 +285,11 @@ issue</a> for more information.</p>
 <span><span class="co">#&gt; tidypredict test results</span></span>
 <span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Fitted records above the threshold: 15</span></span>
+<span><span class="co">#&gt; Fitted records above the threshold: 12</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Fit max  difference:</span></span>
 <span><span class="co">#&gt; Lower max difference:</span></span>
-<span><span class="co">#&gt; Upper max difference:8.06462707725331e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; Upper max difference:1.04374733855828e-07</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
@@ -300,9 +302,9 @@ issue</a> for more information.</p>
 <span><span class="co">#&gt;  $ general:List of 7</span></span>
 <span><span class="co">#&gt;   ..$ model        : chr "xgb.Booster"</span></span>
 <span><span class="co">#&gt;   ..$ type         : chr "xgb"</span></span>
-<span><span class="co">#&gt;   ..$ params       :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ params       :List of 5</span></span>
 <span><span class="co">#&gt;   ..$ feature_names: chr [1:10] "mpg" "cyl" "disp" "hp" ...</span></span>
-<span><span class="co">#&gt;   ..$ niter        : num 50</span></span>
+<span><span class="co">#&gt;   ..$ niter        : int 50</span></span>
 <span><span class="co">#&gt;   ..$ nfeatures    : int 10</span></span>
 <span><span class="co">#&gt;   ..$ version      : num 1</span></span>
 <span><span class="co">#&gt;  $ trees  :List of 42</span></span>
@@ -359,39 +361,39 @@ issue</a> for more information.</p>
 <span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ col    : chr "wt"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.18</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.19</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
 <span><span class="co">#&gt;   ..$ :List of 2</span></span>
 <span><span class="co">#&gt;   .. ..$ prediction: num 0.429</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 2</span></span>
 <span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ col    : chr "qsec"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 19.2</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val    : num 19.4</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
 <span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ col    : chr "wt"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.18</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.19</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
 <span><span class="co">#&gt;   ..$ :List of 2</span></span>
 <span><span class="co">#&gt;   .. ..$ prediction: num 0</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 2</span></span>
 <span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ col    : chr "qsec"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 19.2</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val    : num 19.4</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
 <span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ col    : chr "wt"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.18</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val    : num 3.19</span></span>
 <span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span></code></pre></div>
+<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

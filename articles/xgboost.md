@@ -37,82 +37,84 @@ model <- xgboost::xgb.train(
 
   ``` r
   tidypredict_fit(model)
-  #> 1 - 1/(1 + exp(case_when(wt >= 3.18000007 ~ -0.436363667, (qsec < 
-  #>     19.1849995 | is.na(qsec)) & (wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.428571463, qsec >= 19.1849995 & (wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0) + case_when((wt < 3.01250005 | is.na(wt)) ~ 0.311573088, 
-  #>     (hp < 222.5 | is.na(hp)) & wt >= 3.01250005 ~ -0.392053694, 
-  #>     hp >= 222.5 & wt >= 3.01250005 ~ -0.0240745768) + case_when((gear < 
-  #>     3.5 | is.na(gear)) ~ -0.355945677, (wt < 3.01250005 | is.na(wt)) & 
-  #>     gear >= 3.5 ~ 0.325712085, wt >= 3.01250005 & gear >= 3.5 ~ 
-  #>     -0.0384863913) + case_when((gear < 3.5 | is.na(gear)) ~ -0.309683114, 
-  #>     (wt < 3.01250005 | is.na(wt)) & gear >= 3.5 ~ 0.283893973, 
-  #>     wt >= 3.01250005 & gear >= 3.5 ~ -0.032039877) + case_when((gear < 
-  #>     3.5 | is.na(gear)) ~ -0.275577009, (wt < 3.01250005 | is.na(wt)) & 
-  #>     gear >= 3.5 ~ 0.252453178, wt >= 3.01250005 & gear >= 3.5 ~ 
-  #>     -0.0266750772) + case_when((gear < 3.5 | is.na(gear)) ~ -0.248323873, 
-  #>     (qsec < 17.6599998 | is.na(qsec)) & gear >= 3.5 ~ 0.261978835, 
-  #>     qsec >= 17.6599998 & gear >= 3.5 ~ -0.00959526002) + case_when((gear < 
-  #>     3.5 | is.na(gear)) ~ -0.225384533, (wt < 3.01250005 | is.na(wt)) & 
-  #>     gear >= 3.5 ~ 0.218285918, wt >= 3.01250005 & gear >= 3.5 ~ 
-  #>     -0.0373593047) + case_when((gear < 3.5 | is.na(gear)) ~ -0.205454513, 
-  #>     (qsec < 18.7550011 | is.na(qsec)) & gear >= 3.5 ~ 0.196076646, 
-  #>     qsec >= 18.7550011 & gear >= 3.5 ~ -0.0544253439) + case_when((wt < 
-  #>     3.01250005 | is.na(wt)) ~ 0.149246693, (qsec < 17.4099998 | 
-  #>     is.na(qsec)) & wt >= 3.01250005 ~ 0.0354709327, qsec >= 17.4099998 & 
-  #>     wt >= 3.01250005 ~ -0.226075932) + case_when((gear < 3.5 | 
-  #>     is.na(gear)) ~ -0.184417158, (wt < 3.01250005 | is.na(wt)) & 
-  #>     gear >= 3.5 ~ 0.176768288, wt >= 3.01250005 & gear >= 3.5 ~ 
-  #>     -0.0237750355) + case_when((gear < 3.5 | is.na(gear)) ~ -0.168993726, 
-  #>     (qsec < 18.6049995 | is.na(qsec)) & gear >= 3.5 ~ 0.155569643, 
-  #>     qsec >= 18.6049995 & gear >= 3.5 ~ -0.0325752236) + case_when((wt < 
-  #>     3.01250005 | is.na(wt)) ~ 0.119126029, wt >= 3.01250005 ~ 
-  #>     -0.105012275) + case_when((qsec < 17.1749992 | is.na(qsec)) ~ 
-  #>     0.117254697, qsec >= 17.1749992 ~ -0.0994235724) + case_when((wt < 
-  #>     3.18000007 | is.na(wt)) ~ 0.097100094, wt >= 3.18000007 ~ 
-  #>     -0.10567718) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0824323222, wt >= 3.18000007 ~ -0.091120176) + case_when((qsec < 
-  #>     17.5100002 | is.na(qsec)) ~ 0.0854752287, qsec >= 17.5100002 ~ 
-  #>     -0.0764453933) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0749477893, wt >= 3.18000007 ~ -0.0799863264) + case_when((qsec < 
-  #>     17.7099991 | is.na(qsec)) ~ 0.0728750378, qsec >= 17.7099991 ~ 
-  #>     -0.0646049976) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0682478622, wt >= 3.18000007 ~ -0.0711427554) + case_when((wt < 
-  #>     3.18000007 | is.na(wt)) ~ 0.0579533465, wt >= 3.18000007 ~ 
-  #>     -0.0613371208) + case_when((qsec < 18.1499996 | is.na(qsec)) ~ 
-  #>     0.0595484748, qsec >= 18.1499996 ~ -0.0546668135) + case_when((wt < 
-  #>     3.18000007 | is.na(wt)) ~ 0.0535288528, wt >= 3.18000007 ~ 
-  #>     -0.0558333211) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0454574414, wt >= 3.18000007 ~ -0.048143398) + case_when((qsec < 
-  #>     18.5600014 | is.na(qsec)) ~ 0.0422042683, qsec >= 18.5600014 ~ 
-  #>     -0.0454404354) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0420555808, wt >= 3.18000007 ~ -0.0449385941) + case_when((qsec < 
-  #>     18.5600014 | is.na(qsec)) ~ 0.0393446013, qsec >= 18.5600014 ~ 
-  #>     -0.0425945036) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0391179025, wt >= 3.18000007 ~ -0.0420661867) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.0304145869, qsec >= 18.4099998 ~ 
-  #>     -0.031833414) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0362136625, wt >= 3.18000007 ~ -0.038949281) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.0295153651, qsec >= 18.4099998 ~ 
-  #>     -0.0307046026) + case_when((drat < 3.80999994 | is.na(drat)) ~ 
-  #>     -0.0306891855, drat >= 3.80999994 ~ 0.0288283136) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.0271221269, qsec >= 18.4099998 ~ 
-  #>     -0.0281750448) + case_when((qsec < 18.4099998 | is.na(qsec)) ~ 
-  #>     0.0228891298, qsec >= 18.4099998 ~ -0.0238814205) + case_when((drat < 
-  #>     3.80999994 | is.na(drat)) ~ -0.0296511576, drat >= 3.80999994 ~ 
-  #>     0.0280048084) + case_when((qsec < 18.4099998 | is.na(qsec)) ~ 
-  #>     0.0214707125, qsec >= 18.4099998 ~ -0.0224219449) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.0181306079, qsec >= 18.4099998 ~ 
-  #>     -0.0190209728) + case_when((wt < 3.18000007 | is.na(wt)) ~ 
-  #>     0.0379650332, wt >= 3.18000007 ~ -0.0395050682) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.0194106717, qsec >= 18.4099998 ~ 
-  #>     -0.0202215631) + case_when((qsec < 18.4099998 | is.na(qsec)) ~ 
-  #>     0.0164139606, qsec >= 18.4099998 ~ -0.0171694476) + case_when((qsec < 
-  #>     18.4099998 | is.na(qsec)) ~ 0.013879573, qsec >= 18.4099998 ~ 
-  #>     -0.0145772668) + case_when((qsec < 18.4099998 | is.na(qsec)) ~ 
-  #>     0.0117362784, qsec >= 18.4099998 ~ -0.0123759825) + case_when((wt < 
-  #>     3.18000007 | is.na(wt)) ~ 0.0388614088, wt >= 3.18000007 ~ 
-  #>     -0.0400568396) + log(0.5/(1 - 0.5))))
+  #> 1 - 1/(1 + exp(case_when((wt >= 3.19000006 | is.na(wt)) ~ -0.436363667, 
+  #>     qsec < 19.4400005 & wt < 3.19000006 ~ 0.428571463, (qsec >= 
+  #>         19.4400005 | is.na(qsec)) & wt < 3.19000006 ~ 0) + case_when(wt < 
+  #>     3.1500001 ~ 0.311573088, hp < 230 & (wt >= 3.1500001 | is.na(wt)) ~ 
+  #>     -0.392053694, (hp >= 230 | is.na(hp)) & (wt >= 3.1500001 | 
+  #>     is.na(wt)) ~ -0.0240745768) + case_when(gear < 4 ~ -0.355945677, 
+  #>     wt < 3.1500001 & (gear >= 4 | is.na(gear)) ~ 0.325712085, 
+  #>     (wt >= 3.1500001 | is.na(wt)) & (gear >= 4 | is.na(gear)) ~ 
+  #>         -0.0384863913) + case_when(gear < 4 ~ -0.309683114, wt < 
+  #>     3.1500001 & (gear >= 4 | is.na(gear)) ~ 0.283893973, (wt >= 
+  #>     3.1500001 | is.na(wt)) & (gear >= 4 | is.na(gear)) ~ -0.032039877) + 
+  #>     case_when(gear < 4 ~ -0.275577009, wt < 3.1500001 & (gear >= 
+  #>         4 | is.na(gear)) ~ 0.252453178, (wt >= 3.1500001 | is.na(wt)) & 
+  #>         (gear >= 4 | is.na(gear)) ~ -0.0266750772) + case_when(gear < 
+  #>     4 ~ -0.248323873, qsec < 17.0499992 & (gear >= 4 | is.na(gear)) ~ 
+  #>     0.261978835, (qsec >= 17.0499992 | is.na(qsec)) & (gear >= 
+  #>     4 | is.na(gear)) ~ -0.00959526002) + case_when(gear < 4 ~ 
+  #>     -0.225384533, wt < 3.1500001 & (gear >= 4 | is.na(gear)) ~ 
+  #>     0.218285918, (wt >= 3.1500001 | is.na(wt)) & (gear >= 4 | 
+  #>     is.na(gear)) ~ -0.0373593047) + case_when(gear < 4 ~ -0.205454513, 
+  #>     qsec < 18.8999996 & (gear >= 4 | is.na(gear)) ~ 0.196076646, 
+  #>     (qsec >= 18.8999996 | is.na(qsec)) & (gear >= 4 | is.na(gear)) ~ 
+  #>         -0.0544253439) + case_when(wt < 3.1500001 ~ 0.149246693, 
+  #>     qsec < 17.4200001 & (wt >= 3.1500001 | is.na(wt)) ~ 0.0354709327, 
+  #>     (qsec >= 17.4200001 | is.na(qsec)) & (wt >= 3.1500001 | is.na(wt)) ~ 
+  #>         -0.226075932) + case_when(gear < 4 ~ -0.184417158, wt < 
+  #>     3.1500001 & (gear >= 4 | is.na(gear)) ~ 0.176768288, (wt >= 
+  #>     3.1500001 | is.na(wt)) & (gear >= 4 | is.na(gear)) ~ -0.0237750355) + 
+  #>     case_when(gear < 4 ~ -0.168993726, qsec < 18.6100006 & (gear >= 
+  #>         4 | is.na(gear)) ~ 0.155569643, (qsec >= 18.6100006 | 
+  #>         is.na(qsec)) & (gear >= 4 | is.na(gear)) ~ -0.0325752236) + 
+  #>     case_when(wt < 3.1500001 ~ 0.119126029, (wt >= 3.1500001 | 
+  #>         is.na(wt)) ~ -0.105012275) + case_when(qsec < 17.2999992 ~ 
+  #>     0.117254697, (qsec >= 17.2999992 | is.na(qsec)) ~ -0.0994235724) + 
+  #>     case_when(wt < 3.19000006 ~ 0.097100094, (wt >= 3.19000006 | 
+  #>         is.na(wt)) ~ -0.10567718) + case_when(wt < 3.19000006 ~ 
+  #>     0.0824323222, (wt >= 3.19000006 | is.na(wt)) ~ -0.091120176) + 
+  #>     case_when(qsec < 17.6000004 ~ 0.0854752287, (qsec >= 17.6000004 | 
+  #>         is.na(qsec)) ~ -0.0764453933) + case_when(wt < 3.19000006 ~ 
+  #>     0.0749477893, (wt >= 3.19000006 | is.na(wt)) ~ -0.0799863264) + 
+  #>     case_when(qsec < 17.8199997 ~ 0.0728750378, (qsec >= 17.8199997 | 
+  #>         is.na(qsec)) ~ -0.0646049976) + case_when(wt < 3.19000006 ~ 
+  #>     0.0682478622, (wt >= 3.19000006 | is.na(wt)) ~ -0.0711427554) + 
+  #>     case_when(wt < 3.19000006 ~ 0.0579533465, (wt >= 3.19000006 | 
+  #>         is.na(wt)) ~ -0.0613371208) + case_when(qsec < 18.2999992 ~ 
+  #>     0.0595484748, (qsec >= 18.2999992 | is.na(qsec)) ~ -0.0546668135) + 
+  #>     case_when(wt < 3.19000006 ~ 0.0535288528, (wt >= 3.19000006 | 
+  #>         is.na(wt)) ~ -0.0558333211) + case_when(wt < 3.19000006 ~ 
+  #>     0.0454574414, (wt >= 3.19000006 | is.na(wt)) ~ -0.048143398) + 
+  #>     case_when(qsec < 18.6000004 ~ 0.0422042683, (qsec >= 18.6000004 | 
+  #>         is.na(qsec)) ~ -0.0454404354) + case_when(wt < 3.19000006 ~ 
+  #>     0.0420555808, (wt >= 3.19000006 | is.na(wt)) ~ -0.0449385941) + 
+  #>     case_when(qsec < 18.6000004 ~ 0.0393446013, (qsec >= 18.6000004 | 
+  #>         is.na(qsec)) ~ -0.0425945036) + case_when(wt < 3.19000006 ~ 
+  #>     0.0391179025, (wt >= 3.19000006 | is.na(wt)) ~ -0.0420661867) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.0304145869, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.031833414) + case_when(wt < 3.19000006 ~ 
+  #>     0.0362136625, (wt >= 3.19000006 | is.na(wt)) ~ -0.038949281) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.0295153651, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.0307046026) + case_when(drat < 3.8499999 ~ 
+  #>     -0.0306891855, (drat >= 3.8499999 | is.na(drat)) ~ 0.0288283136) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.0271221269, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.0281750448) + case_when(qsec < 18.5200005 ~ 
+  #>     0.0228891298, (qsec >= 18.5200005 | is.na(qsec)) ~ -0.0238814205) + 
+  #>     case_when(drat < 3.8499999 ~ -0.0296511576, (drat >= 3.8499999 | 
+  #>         is.na(drat)) ~ 0.0280048084) + case_when(qsec < 18.5200005 ~ 
+  #>     0.0214707125, (qsec >= 18.5200005 | is.na(qsec)) ~ -0.0224219449) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.0181306079, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.0190209728) + case_when(wt < 3.19000006 ~ 
+  #>     0.0379650332, (wt >= 3.19000006 | is.na(wt)) ~ -0.0395050682) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.0194106717, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.0202215631) + case_when(qsec < 18.5200005 ~ 
+  #>     0.0164139606, (qsec >= 18.5200005 | is.na(qsec)) ~ -0.0171694476) + 
+  #>     case_when(qsec < 18.5200005 ~ 0.013879573, (qsec >= 18.5200005 | 
+  #>         is.na(qsec)) ~ -0.0145772668) + case_when(qsec < 18.5200005 ~ 
+  #>     0.0117362784, (qsec >= 18.5200005 | is.na(qsec)) ~ -0.0123759825) + 
+  #>     case_when(wt < 3.19000006 ~ 0.0388614088, (wt >= 3.19000006 | 
+  #>         is.na(wt)) ~ -0.0400568396) + log(0.5/(1 - 0.5))))
   ```
 
 - Add the prediction to the original table
@@ -136,7 +138,7 @@ model <- xgboost::xgb.train(
   #> $ am   <dbl> 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…
   #> $ gear <dbl> 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4,…
   #> $ carb <dbl> 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2,…
-  #> $ fit  <dbl> 0.98576418, 0.98576418, 0.92735110, 0.01081509, 0.046390…
+  #> $ fit  <dbl> 0.98576418, 0.98576418, 0.93905137, 0.01081509, 0.046390…
   ```
 
 - Confirm that `tidypredict` results match to the model’s
@@ -174,11 +176,11 @@ tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
 #> tidypredict test results
 #> Difference threshold: 1e-12
 #> 
-#> Fitted records above the threshold: 15
+#> Fitted records above the threshold: 12
 #> 
 #> Fit max  difference:
 #> Lower max difference:
-#> Upper max difference:8.06462707725331e-08
+#> Upper max difference:1.04374733855828e-07
 ```
 
 ## Parse model spec
@@ -192,9 +194,9 @@ str(pm, 2)
 #>  $ general:List of 7
 #>   ..$ model        : chr "xgb.Booster"
 #>   ..$ type         : chr "xgb"
-#>   ..$ params       :List of 4
+#>   ..$ params       :List of 5
 #>   ..$ feature_names: chr [1:10] "mpg" "cyl" "disp" "hp" ...
-#>   ..$ niter        : num 50
+#>   ..$ niter        : int 50
 #>   ..$ nfeatures    : int 10
 #>   ..$ version      : num 1
 #>  $ trees  :List of 42
@@ -253,37 +255,37 @@ str(pm$trees[1])
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
 #>   .. .. .. ..$ col    : chr "wt"
-#>   .. .. .. ..$ val    : num 3.18
+#>   .. .. .. ..$ val    : num 3.19
 #>   .. .. .. ..$ op     : chr "less"
-#>   .. .. .. ..$ missing: logi FALSE
+#>   .. .. .. ..$ missing: logi TRUE
 #>   ..$ :List of 2
 #>   .. ..$ prediction: num 0.429
 #>   .. ..$ path      :List of 2
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
 #>   .. .. .. ..$ col    : chr "qsec"
-#>   .. .. .. ..$ val    : num 19.2
+#>   .. .. .. ..$ val    : num 19.4
 #>   .. .. .. ..$ op     : chr "more-equal"
-#>   .. .. .. ..$ missing: logi TRUE
+#>   .. .. .. ..$ missing: logi FALSE
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
 #>   .. .. .. ..$ col    : chr "wt"
-#>   .. .. .. ..$ val    : num 3.18
+#>   .. .. .. ..$ val    : num 3.19
 #>   .. .. .. ..$ op     : chr "more-equal"
-#>   .. .. .. ..$ missing: logi TRUE
+#>   .. .. .. ..$ missing: logi FALSE
 #>   ..$ :List of 2
 #>   .. ..$ prediction: num 0
 #>   .. ..$ path      :List of 2
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
 #>   .. .. .. ..$ col    : chr "qsec"
-#>   .. .. .. ..$ val    : num 19.2
+#>   .. .. .. ..$ val    : num 19.4
 #>   .. .. .. ..$ op     : chr "less"
-#>   .. .. .. ..$ missing: logi FALSE
+#>   .. .. .. ..$ missing: logi TRUE
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
 #>   .. .. .. ..$ col    : chr "wt"
-#>   .. .. .. ..$ val    : num 3.18
+#>   .. .. .. ..$ val    : num 3.19
 #>   .. .. .. ..$ op     : chr "more-equal"
-#>   .. .. .. ..$ missing: logi TRUE
+#>   .. .. .. ..$ missing: logi FALSE
 ```

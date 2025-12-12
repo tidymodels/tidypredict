@@ -102,8 +102,7 @@ The following models are supported by `tidypredict`:
   [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
 - MARS models -
   [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html)
-- XGBoost models -
-  [`xgboost::xgb.Booster.complete()`](https://rdrr.io/pkg/xgboost/man/xgb.Booster.complete.html)
+- XGBoost models - `xgboost::xgb.Booster.complete()`
 - Cubist models -
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
 - Tree models, via `partykit` -

@@ -125,7 +125,7 @@ a variable called <code>sklearn_model</code>. Because <code>yaml</code>
 requires local YAML variables to be split by line, we use
 <code><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit()</a></code>.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/vubiostat/r-yaml/" class="external-link">yaml</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yaml.r-lib.org" class="external-link">yaml</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/strsplit.html" class="external-link">strsplit</a></span><span class="op">(</span><span class="st">"general:</span></span>
 <span><span class="st">  is_glm: 0</span></span>
@@ -175,7 +175,7 @@ requires local YAML variables to be split by line, we use
 <p>Now the model is converted to an R <code>list</code> using
 <code>yaml.load</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yaml/man/yaml.load.html" class="external-link">yaml.load</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">sklearn_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://yaml.r-lib.org/reference/yaml.load.html" class="external-link">yaml.load</a></span><span class="op">(</span><span class="va">sklearn_model</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">sklearn_model</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
