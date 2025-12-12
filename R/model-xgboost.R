@@ -146,6 +146,8 @@ parse_model.xgb.Booster <- function(model) {
     pm$general$nfeatures <- length(pm$general$feature_names)
   }
 
+  pm$general$params$base_score <- get_base_score(model)
+
   pm$general$version <- 1
   pm$trees <- get_xgb_trees(model)
   as_parsed_model(pm)
@@ -246,6 +248,19 @@ build_fit_formula_xgb <- function(parsedmodel) {
   f
 }
 
+get_base_score <- function(model) {
+  tmp_file <- tempfile(fileext = ".json")
+  xgboost::xgb.save(model, tmp_file)
+
+  base_score <- jsonlite::fromJSON(tmp_file)
+  base_score <- base_score$learner$learner_model_param$base_score
+  base_score <- gsub("\\[", "", base_score)
+  base_score <- gsub("\\]", "", base_score)
+  base_score <- strsplit(base_score, ",")[[1]]
+  base_score <- as.numeric(base_score)
+  base_score
+}
+
 #' @export
 tidypredict_fit.xgb.Booster <- function(model) {
   parsedmodel <- parse_model(model)
@@ -265,18 +280,34 @@ tidypredict_fit.xgb.Booster <- function(model) {
     )
   }
 
-  params <- model$params
+  old <- is.null(attr(model, "param"))
+
+  params <- attr(model, "param") %||% model$params
   wosilent <- params[names(params) != "silent"]
   wosilent$silent <- params$silent
 
   pm <- list()
   pm$general$model <- "xgb.Booster"
   pm$general$type <- "xgb"
-  pm$general$niter <- model$niter
   pm$general$params <- wosilent
-  pm$general$feature_names <- model$feature_names
-  pm$general$nfeatures <- model$nfeatures
+
+  if (old) {
+    pm$general$feature_names <- model$feature_names
+    pm$general$niter <- model$niter
+    pm$general$nfeatures <- model$nfeatures
+  } else {
+    pm$general$feature_names <- xgboost::getinfo(model, "feature_name")
+    pm$general$niter <- utils::getFromNamespace(
+      "xgb.get.num.boosted.rounds",
+      ns = "xgboost"
+    )(model)
+    pm$general$nfeatures <- length(pm$general$feature_names)
+  }
+
+  pm$general$params$base_score <- get_base_score(model)
+
   pm$general$version <- 1
+
   pm$trees <- get_xgb_trees(model, filter_trees = FALSE)
 
   parsedmodel <- as_parsed_model(pm)

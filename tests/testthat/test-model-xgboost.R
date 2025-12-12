@@ -70,8 +70,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "reg:squarederror",
-          base_score = 0.5
+          objective = "reg:squarederror"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -88,8 +87,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "binary:logitraw",
-          base_score = 0.5
+          objective = "binary:logitraw"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -106,8 +104,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "reg:logistic",
-          base_score = 0.5
+          objective = "reg:logistic"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -124,8 +121,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "binary:logistic",
-          base_score = 0.5
+          objective = "binary:logistic"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -142,8 +138,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "reg:tweedie",
-          base_score = 0.5
+          objective = "reg:tweedie"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -160,8 +155,7 @@ test_that("formulas produces correct predictions", {
       xgboost::xgb.train(
         params = list(
           max_depth = 2,
-          objective = "count:poisson",
-          base_score = 0.5
+          objective = "count:poisson"
         ),
         data = xgb_bin_data,
         nrounds = 4
@@ -314,4 +308,23 @@ test_that("base_score isn't included when 0 (#147)", {
   res <- tidypredict_fit(model)
   res <- expr_text(res)
   expect_false(grepl("+ 0$", res))
+})
+
+test_that(".extract_xgb_trees() works", {
+  xgb_bin_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 1,
+      objective = "reg:squarederror",
+      base_score = 0.5
+    ),
+    data = xgb_bin_data,
+    nrounds = 4
+  )
+
+  .extract_xgb_trees(model)
 })
