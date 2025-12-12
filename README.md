@@ -24,7 +24,7 @@ several databases back-ends, such as MS SQL:
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-    ## <SQL> (39.686261480253 + (`wt` * -3.19097213898374)) + (`cyl` * -1.5077949682598)
+    ## <SQL> (39.6862614802529 + (`wt` * -3.19097213898374)) + (`cyl` * -1.5077949682598)
 
 ## Installation
 
