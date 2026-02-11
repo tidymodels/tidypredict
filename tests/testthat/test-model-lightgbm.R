@@ -458,7 +458,11 @@ test_that("regression predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -485,7 +489,11 @@ test_that("binary classification predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -539,7 +547,11 @@ test_that("regression_l1 predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -566,7 +578,11 @@ test_that("regression_l2 predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -593,7 +609,11 @@ test_that("mape predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp # positive values required for mape
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -620,7 +640,11 @@ test_that("huber predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -647,7 +671,11 @@ test_that("fair predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -674,7 +702,11 @@ test_that("quantile predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -702,7 +734,11 @@ test_that("gamma predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp # positive values
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -729,7 +765,11 @@ test_that("tweedie predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp # positive values
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -757,7 +797,11 @@ test_that("cross_entropy predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
@@ -852,7 +896,6 @@ test_that("tidypredict_sql works with parsed model", {
   skip_if_not_installed("dbplyr")
   model <- make_lgb_model()
   pm <- parse_model(model)
-
 
   sql_result <- tidypredict_sql(pm, dbplyr::simulate_dbi())
 
@@ -1204,7 +1247,11 @@ test_that("parse_model handles categorical splits", {
   X <- matrix(cat_int, ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1241,7 +1288,11 @@ test_that("categorical predictions match native predictions", {
   X <- matrix(cat_int, ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1274,7 +1325,11 @@ test_that("mixed numerical + categorical predictions match", {
 
   X <- cbind(num_feat = num_feat, cat_feat = cat_int)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 8L,
@@ -1312,7 +1367,11 @@ test_that("categorical with missing values predictions match", {
   X <- matrix(as.numeric(cat_int), ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1353,7 +1412,11 @@ test_that("categorical SQL generation works", {
   X <- matrix(cat_int, ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1427,7 +1490,11 @@ test_that("categorical path contains both in and not-in operators", {
   X <- matrix(cat_int, ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1464,7 +1531,11 @@ test_that("categorical with many categories works", {
   X <- matrix(cat_int, ncol = 1)
   colnames(X) <- "cat_feat"
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = "cat_feat"
+  )
   model <- lightgbm::lgb.train(
     params = list(
       num_leaves = 4L,
@@ -1514,4 +1585,422 @@ test_that("get_lgb_case_fun errors on unknown set operator", {
     get_lgb_case_fun(condition),
     "Unknown operator for set"
   )
+})
+
+test_that("parsed model can be saved and loaded via YAML", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("yaml")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, mp)
+  l <- yaml::read_yaml(mp)
+  pm_loaded <- as_parsed_model(l)
+
+  # Check predictions match
+  fit_original <- tidypredict_fit(pm)
+  fit_loaded <- tidypredict_fit(pm_loaded)
+
+  test_df <- as.data.frame(X)
+  preds_original <- dplyr::mutate(test_df, pred = !!fit_original)$pred
+  preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded)$pred
+
+  # YAML serialization loses some precision, so use tolerance of 1e-6
+  expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
+})
+
+test_that("parsed multiclass model can be saved and loaded via YAML", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("yaml")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, mp)
+  l <- yaml::read_yaml(mp)
+  pm_loaded <- as_parsed_model(l)
+
+  # Check predictions match for all classes
+  fit_original <- tidypredict_fit(pm)
+  fit_loaded <- tidypredict_fit(pm_loaded)
+
+  test_df <- as.data.frame(X)
+  for (i in seq_along(fit_original)) {
+    preds_original <- dplyr::mutate(test_df, pred = !!fit_original[[i]])$pred
+    preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded[[i]])$pred
+    # YAML serialization loses some precision, so use tolerance of 1e-6
+    expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
+  }
+})
+
+test_that("tidypredict_test works for regression model", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  result <- tidypredict_test(model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+  expect_equal(max(result$raw_results$fit_diff), 0, tolerance = 1e-10)
+})
+
+test_that("tidypredict_test works for binary classification model", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.integer(mtcars$am)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y)
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "binary",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  result <- tidypredict_test(model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test errors for multiclass model", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  expect_error(
+    tidypredict_test(model, xg_df = X),
+    "multiclass"
+  )
+})
+
+test_that("tidypredict_test errors when matrix not provided", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  expect_error(
+    tidypredict_test(model),
+    "matrix"
+  )
+})
+
+test_that("tidypredict_test respects max_rows parameter", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  result <- tidypredict_test(model, xg_df = X, max_rows = 10)
+
+  expect_equal(nrow(result$raw_results), 10)
+})
+
+test_that(".extract_lgb_trees returns list of tree expressions", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  trees <- .extract_lgb_trees(model)
+
+  expect_type(trees, "list")
+  expect_length(trees, 5) # 5 trees for nrounds = 5
+
+  # Each element should be a language object (case_when expression)
+  for (tree in trees) {
+    expect_true(is.language(tree))
+  }
+})
+
+test_that(".extract_lgb_trees errors on non-lgb.Booster", {
+  expect_error(
+    .extract_lgb_trees(list()),
+    "lgb.Booster"
+  )
+})
+
+test_that("tidypredict works with parsnip/bonsai lightgbm model", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  set.seed(123)
+  train_data <- mtcars[, c("hp", "mpg", "cyl", "disp")]
+
+  # Fit model via parsnip/bonsai
+  model_spec <- parsnip::boost_tree(
+    trees = 5,
+    tree_depth = 3,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("lightgbm") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    hp ~ mpg + cyl + disp,
+    data = train_data
+  )
+
+  # Extract underlying lgb.Booster
+  lgb_model <- model_fit$fit
+
+  expect_s3_class(lgb_model, "lgb.Booster")
+
+  # Test parse_model works
+
+  pm <- parse_model(lgb_model)
+  expect_s3_class(pm, "parsed_model")
+  expect_s3_class(pm, "pm_lgb")
+  expect_gt(length(pm$trees), 0)
+
+  # Test tidypredict_fit works
+  fit_formula <- tidypredict_fit(lgb_model)
+  expect_true(is.language(fit_formula))
+
+  # Test predictions match
+  X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
+  native_preds <- predict(lgb_model, X)
+  tidy_preds <- dplyr::mutate(train_data, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("tidypredict works with parsnip/bonsai binary classification", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  set.seed(456)
+  train_data <- mtcars[, c("am", "mpg", "cyl", "disp")]
+  train_data$am <- factor(train_data$am)
+
+  # Fit model via parsnip/bonsai
+  model_spec <- parsnip::boost_tree(
+    trees = 5,
+    tree_depth = 3,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("lightgbm") |>
+    parsnip::set_mode("classification")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    am ~ mpg + cyl + disp,
+    data = train_data
+  )
+
+  # Extract underlying lgb.Booster
+  lgb_model <- model_fit$fit
+
+  expect_s3_class(lgb_model, "lgb.Booster")
+
+  # Test tidypredict_fit works
+  fit_formula <- tidypredict_fit(lgb_model)
+  expect_true(is.language(fit_formula))
+
+  # Test predictions match
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  native_preds <- predict(lgb_model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("tidypredict_sql works with parsnip/bonsai model", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+  skip_if_not_installed("dbplyr")
+
+  set.seed(123)
+  train_data <- mtcars[, c("hp", "mpg", "cyl", "disp")]
+
+  model_spec <- parsnip::boost_tree(
+    trees = 3,
+    tree_depth = 2,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("lightgbm") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    hp ~ mpg + cyl + disp,
+    data = train_data
+  )
+  lgb_model <- model_fit$fit
+
+  sql_result <- tidypredict_sql(lgb_model, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("tidypredict_test works with parsnip/bonsai model", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  set.seed(123)
+  train_data <- mtcars[, c("hp", "mpg", "cyl", "disp")]
+
+  model_spec <- parsnip::boost_tree(
+    trees = 5,
+    tree_depth = 3,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("lightgbm") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    hp ~ mpg + cyl + disp,
+    data = train_data
+  )
+  lgb_model <- model_fit$fit
+
+  X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
+  result <- tidypredict_test(lgb_model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
 })
