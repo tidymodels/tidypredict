@@ -126,3 +126,108 @@ get_lgb_path <- function(leaf_row, tree_df, children_map) {
 
   rev(path) # Reverse to get root-to-leaf order
 }
+
+# Fit model -----------------------------------------------
+
+#' @export
+tidypredict_fit.lgb.Booster <- function(model) {
+  parsedmodel <- parse_model(model)
+  build_fit_formula_lgb(parsedmodel)
+}
+
+build_fit_formula_lgb <- function(parsedmodel) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  f <- map(
+    seq_len(n_trees),
+    ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
+  )
+
+  f <- reduce_addition(f)
+
+  objective <- parsedmodel$general$params$objective
+  if (is.null(objective)) {
+    objective <- "regression"
+  }
+
+  identity_objectives <- c(
+    "regression",
+    "regression_l2",
+    "regression_l1",
+    "huber",
+    "fair",
+    "quantile",
+    "mape"
+  )
+  exp_objectives <- c("poisson", "gamma", "tweedie")
+  sigmoid_objectives <- c("binary", "cross_entropy")
+  all_supported <- c(identity_objectives, exp_objectives, sigmoid_objectives)
+
+  if (objective %in% exp_objectives) {
+    f <- expr(exp(!!f))
+  } else if (objective %in% sigmoid_objectives) {
+    f <- expr(1 / (1 + exp(-(!!f))))
+  } else {
+    if (!objective %in% identity_objectives) {
+      cli::cli_abort(
+        c(
+          "Unsupported objective: {.val {objective}}.",
+          "i" = "Supported objectives: {.val {all_supported}}."
+        )
+      )
+    }
+  }
+
+  f
+}
+
+get_lgb_case_tree <- function(tree_no, parsedmodel) {
+  map(
+    parsedmodel$trees[[tree_no]],
+    ~ get_lgb_case(.x$path, .x$prediction)
+  )
+}
+
+get_lgb_case <- function(path, prediction) {
+  cl <- map(path, get_lgb_case_fun)
+  cl_length <- length(cl)
+
+  if (cl_length == 0) {
+    cl <- TRUE
+  } else if (cl_length == 1) {
+    cl <- cl[[1]]
+  } else if (cl_length == 2) {
+    cl <- expr_and(cl[[1]], cl[[2]])
+  } else {
+    cl <- reduce_and(cl)
+  }
+
+  expr(!!cl ~ !!prediction)
+}
+
+get_lgb_case_fun <- function(.x) {
+  col_name <- as.name(.x$col)
+  val <- as.numeric(.x$val)
+
+  if (.x$op == "less-equal") {
+    if (.x$missing) {
+      i <- expr((!!col_name <= !!val | is.na(!!col_name)))
+    } else {
+      i <- expr(!!col_name <= !!val)
+    }
+  } else if (.x$op == "more") {
+    if (.x$missing) {
+      i <- expr((!!col_name > !!val | is.na(!!col_name)))
+    } else {
+      i <- expr(!!col_name > !!val)
+    }
+  } else {
+    cli::cli_abort("Unknown operator: {.val {.x$op}}")
+  }
+
+  i
+}
