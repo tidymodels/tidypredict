@@ -731,3 +731,117 @@ test_that("SQL predictions match native predictions with SQLite", {
 
   expect_equal(sql_preds, native_preds, tolerance = 1e-10)
 })
+
+# Integration tests -------------------------------------------------------
+
+test_that("tidypredict_test works for regression", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+
+  result <- tidypredict_test(model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test works for binary classification", {
+  skip_if_not_installed("catboost")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.numeric(mtcars$am)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "Logloss",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  result <- tidypredict_test(model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test requires matrix", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  expect_error(
+    tidypredict_test(model),
+    "require.*matrix"
+  )
+})
+
+test_that(".extract_catboost_trees returns list of expressions", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  trees <- .extract_catboost_trees(model)
+
+  expect_type(trees, "list")
+  expect_length(trees, 10)
+  expect_type(trees[[1]], "language")
+})
+
+test_that(".extract_catboost_trees errors on non-catboost model", {
+  expect_error(
+    .extract_catboost_trees(lm(mpg ~ wt, data = mtcars)),
+    "catboost.Model"
+  )
+})
+
+# YAML serialization tests ------------------------------------------------
+
+test_that("parsed model can be saved and loaded via YAML", {
+  skip_if_not_installed("catboost")
+  skip_if_not_installed("yaml")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  tmp_file <- tempfile(fileext = ".yml")
+  on.exit(unlink(tmp_file), add = TRUE)
+
+  yaml::write_yaml(pm, tmp_file)
+  loaded <- yaml::read_yaml(tmp_file)
+  class(loaded) <- class(pm)
+
+  expect_equal(loaded$general$model, pm$general$model)
+  expect_equal(loaded$general$type, pm$general$type)
+  expect_equal(loaded$general$niter, pm$general$niter)
+})
+
+test_that("loaded model produces same predictions", {
+  skip_if_not_installed("catboost")
+  skip_if_not_installed("yaml")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  tmp_file <- tempfile(fileext = ".yml")
+  on.exit(unlink(tmp_file), add = TRUE)
+
+  yaml::write_yaml(pm, tmp_file)
+  loaded <- yaml::read_yaml(tmp_file)
+  class(loaded) <- class(pm)
+
+  original_preds <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+  loaded_preds <- rlang::eval_tidy(tidypredict_fit(loaded), mtcars)
+
+  expect_equal(loaded_preds, original_preds, tolerance = 1e-6)
+})
