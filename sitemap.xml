@@ -7,6 +7,7 @@
 <url><loc>https://tidypredict.tidymodels.org/articles/glm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/glmnet.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/index.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/lightgbm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/lm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/mars.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/non-r.html</loc></url>
@@ -22,6 +23,7 @@
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/acceptable_formula.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_lgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>

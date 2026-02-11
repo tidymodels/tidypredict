@@ -8,6 +8,8 @@
   Regression](https://tidypredict.tidymodels.org/articles/glm.md):
 - [glmnet
   models](https://tidypredict.tidymodels.org/articles/glmnet.md):
+- [LightGBM
+  models](https://tidypredict.tidymodels.org/articles/lightgbm.md):
 - [Linear
   Regression](https://tidypredict.tidymodels.org/articles/lm.md):
 - [MARS models via the \`earth\`

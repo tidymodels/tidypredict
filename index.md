@@ -103,6 +103,7 @@ The following models are supported by `tidypredict`:
 - MARS models -
   [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html)
 - XGBoost models - `xgboost::xgb.Booster.complete()`
+- LightGBM models - `lightgbm::lgb.Booster()`
 - Cubist models -
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
 - Tree models, via `partykit` -
@@ -121,6 +122,8 @@ ones confirmed currently work in `tidypredict` are:
   `parsnip`: `rand_forest()` with *“ranger”* as the engine.
 - [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html) -
   `parsnip`: `mars()` with *“earth”* as the engine.
+- `lightgbm::lgb.Booster()` - `parsnip`: `boost_tree()` with
+  *“lightgbm”* as the engine (via `bonsai`).
 
 ### `broom`
 
