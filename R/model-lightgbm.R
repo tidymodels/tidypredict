@@ -37,12 +37,15 @@ get_lgb_trees <- function(model) {
   supported_types <- c("<=", "==")
   unsupported <- setdiff(decision_types, supported_types)
   if (length(unsupported) > 0) {
+    # nocov start
     cli::cli_abort(
       c(
         "Unsupported decision type{?s} found: {.val {unsupported}}.",
         "i" = "Supported types: {.val {supported_types}}."
-      )
+      ),
+      .internal = TRUE
     )
+    # nocov end
   }
 
   # Split by tree_index
@@ -344,7 +347,12 @@ get_lgb_case_fun <- function(.x) {
         i <- expr(!!col_name > !!val)
       }
     } else {
-      cli::cli_abort("Unknown operator for conditional: {.val {(.x$op)}}")
+      # nocov start
+      cli::cli_abort(
+        "Unknown operator for conditional: {.val {(.x$op)}}.",
+        .internal = TRUE
+      )
+      # nocov end
     }
   } else if (.x$type == "set") {
     # Categorical split
