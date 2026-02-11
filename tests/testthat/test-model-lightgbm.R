@@ -416,14 +416,14 @@ test_that("model with missing values produces valid parse", {
   expect_length(pm$trees, 3)
 
   # Verify all paths have valid missing flags (TRUE or FALSE, not NA)
-  for (tree in pm$trees) {
-    for (leaf in tree) {
-      for (cond in leaf$path) {
-        expect_type(cond$missing, "logical")
-        expect_equal(is.na(cond$missing), FALSE)
-      }
-    }
-  }
+  all_missing_flags <- unlist(lapply(pm$trees, function(tree) {
+    lapply(tree, function(leaf) {
+      vapply(leaf$path, function(cond) cond$missing, logical(1))
+    })
+  }))
+
+  expect_type(all_missing_flags, "logical")
+  expect_false(anyNA(all_missing_flags))
 })
 
 # Fit formula tests -----------------------------------------------------------
