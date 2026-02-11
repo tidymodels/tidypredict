@@ -35,7 +35,7 @@ CRAN release: 2025-11-29
   [@SimonCoulombe](https://github.com/SimonCoulombe))
 
 - tree based models now uses `.default` argument in produced
-  [`case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+  [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
   code when applicable.
   ([\#153](https://github.com/tidymodels/tidypredict/issues/153))
 

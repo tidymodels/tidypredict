@@ -117,7 +117,7 @@ db_fligths %>%
   head(10)
 #> Warning: Closing open result set, pending rows
 #> # Source:   SQL [?? x 1]
-#> # Database: sqlite 3.51.1 []
+#> # Database: sqlite 3.51.2 []
 #>    current_score
 #>            <dbl>
 #>  1       -0.969 
@@ -226,7 +226,7 @@ tbl(con, "daily_scores") %>%
   select(dep_delay, hour, distance, score, date)
 #> Warning: Closing open result set, pending rows
 #> # Source:   SQL [?? x 5]
-#> # Database: sqlite 3.51.1 []
+#> # Database: sqlite 3.51.2 []
 #>    dep_delay  hour distance   score date      
 #>        <dbl> <dbl>    <dbl>   <dbl> <chr>     
 #>  1        14    23     1617 23.3    01/01/2018

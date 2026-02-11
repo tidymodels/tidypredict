@@ -52,7 +52,7 @@ The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
 is transformed into a `dplyr`, a.k.a Tidy Eval, formula. Each decision
 tree becomes one
-[`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case_when.html)
+[`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
 statement, which are then combined.
 
 ``` r
