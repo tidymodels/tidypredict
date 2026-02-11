@@ -9,15 +9,19 @@ parse_model.catboost.Model <- function(model) {
 
   # Export model to JSON
   tmp_file <- tempfile(fileext = ".json")
-  catboost::catboost.save_model(model, tmp_file, format = "json")
+  catboost::catboost.save_model(model, tmp_file, file_format = "json")
   model_json <- jsonlite::fromJSON(tmp_file, simplifyVector = FALSE)
 
   # Extract params
+
   pm$general$params <- list()
-  if (!is.null(model_json$model_info$params$loss_function)) {
-    pm$general$params$objective <- model_json$model_info$params$loss_function
-  } else if (!is.null(model_json$model_info$params$loss_function$type)) {
-    pm$general$params$objective <- model_json$model_info$params$loss_function$type
+  loss_fn <- model_json$model_info$params$loss_function
+  if (!is.null(loss_fn)) {
+    if (is.list(loss_fn) && !is.null(loss_fn$type)) {
+      pm$general$params$objective <- loss_fn$type
+    } else {
+      pm$general$params$objective <- loss_fn
+    }
   }
 
   # Extract feature names from features_info
