@@ -31,17 +31,17 @@ get_lgb_trees <- function(model) {
   trees_df <- lightgbm::lgb.model.dt.tree(model)
   trees_df <- as.data.frame(trees_df)
 
-  # Check for unsupported categorical splits
+  # Check for unsupported decision types
   decision_types <- unique(trees_df$decision_type[
     !is.na(trees_df$decision_type)
   ])
-  unsupported <- setdiff(decision_types, "<=")
+  supported_types <- c("<=", "==")
+  unsupported <- setdiff(decision_types, supported_types)
   if (length(unsupported) > 0) {
     cli::cli_abort(
       c(
         "Unsupported decision type{?s} found: {.val {unsupported}}.",
-        "i" = "Only {.val <=} (numerical splits) are currently supported.",
-        "i" = "Categorical splits ({.val ==}) are not yet implemented."
+        "i" = "Supported types: {.val {supported_types}}."
       )
     )
   }
@@ -96,31 +96,52 @@ get_lgb_path <- function(leaf_row, tree_df, children_map) {
     children <- children_map[[as.character(current_parent_split)]]
     is_left_child <- (current_row == children[1])
 
-    # Build condition
+    # Build condition based on decision type
+    decision_type <- tree_df$decision_type[[parent_row]]
     default_left <- tree_df$default_left[[parent_row]] == "TRUE"
 
-    if (is_left_child) {
-      # Went left: condition (feature <= threshold) was TRUE
-      op <- "less-equal"
-      # Missing goes with us if default_left is TRUE
-      missing_with_us <- default_left
-    } else {
-      # Went right: condition (feature <= threshold) was FALSE
-      op <- "more"
-      # Missing goes with us if default_left is FALSE
-      missing_with_us <- !default_left
-    }
+    if (decision_type == "<=") {
+      # Numerical split
+      if (is_left_child) {
+        op <- "less-equal"
+        missing_with_us <- default_left
+      } else {
+        op <- "more"
+        missing_with_us <- !default_left
+      }
 
-    path <- c(
-      path,
-      list(list(
+      condition <- list(
         type = "conditional",
         col = tree_df$split_feature[[parent_row]],
         val = tree_df$threshold[[parent_row]],
         op = op,
         missing = missing_with_us
-      ))
-    )
+      )
+    } else if (decision_type == "==") {
+      # Categorical split: threshold is "0||1||3" format
+      # LEFT = category IN set, RIGHT = category NOT IN set
+      category_set <- parse_lgb_categorical_threshold(
+        tree_df$threshold[[parent_row]]
+      )
+
+      if (is_left_child) {
+        op <- "in"
+        missing_with_us <- default_left
+      } else {
+        op <- "not-in"
+        missing_with_us <- !default_left
+      }
+
+      condition <- list(
+        type = "set",
+        col = tree_df$split_feature[[parent_row]],
+        vals = category_set,
+        op = op,
+        missing = missing_with_us
+      )
+    }
+
+    path <- c(path, list(condition))
 
     # Move up the tree
     current_row <- parent_row
@@ -128,6 +149,11 @@ get_lgb_path <- function(leaf_row, tree_df, children_map) {
   }
 
   rev(path) # Reverse to get root-to-leaf order
+}
+
+# Parse LightGBM categorical threshold format "0||1||3" -> c(0, 1, 3)
+parse_lgb_categorical_threshold <- function(threshold) {
+  as.integer(strsplit(threshold, "[|][|]")[[1]])
 }
 
 # Fit model -----------------------------------------------
@@ -272,22 +298,47 @@ get_lgb_case <- function(path, prediction) {
 
 get_lgb_case_fun <- function(.x) {
   col_name <- as.name(.x$col)
-  val <- as.numeric(.x$val)
 
-  if (.x$op == "less-equal") {
-    if (.x$missing) {
-      i <- expr((!!col_name <= !!val | is.na(!!col_name)))
+  if (.x$type == "conditional") {
+    # Numerical split
+    val <- as.numeric(.x$val)
+
+    if (.x$op == "less-equal") {
+      if (.x$missing) {
+        i <- expr((!!col_name <= !!val | is.na(!!col_name)))
+      } else {
+        i <- expr(!!col_name <= !!val)
+      }
+    } else if (.x$op == "more") {
+      if (.x$missing) {
+        i <- expr((!!col_name > !!val | is.na(!!col_name)))
+      } else {
+        i <- expr(!!col_name > !!val)
+      }
     } else {
-      i <- expr(!!col_name <= !!val)
+      cli::cli_abort("Unknown operator for conditional: {.val {(.x$op)}}")
     }
-  } else if (.x$op == "more") {
-    if (.x$missing) {
-      i <- expr((!!col_name > !!val | is.na(!!col_name)))
+  } else if (.x$type == "set") {
+    # Categorical split
+    vals <- .x$vals
+
+    if (.x$op == "in") {
+      if (.x$missing) {
+        i <- expr((!!col_name %in% !!vals | is.na(!!col_name)))
+      } else {
+        i <- expr(!!col_name %in% !!vals)
+      }
+    } else if (.x$op == "not-in") {
+      if (.x$missing) {
+        i <- expr((!(!!col_name %in% !!vals) | is.na(!!col_name)))
+      } else {
+        i <- expr(!(!!col_name %in% !!vals))
+      }
     } else {
-      i <- expr(!!col_name > !!val)
+      cli::cli_abort("Unknown operator for set: {.val {(.x$op)}}")
     }
   } else {
-    cli::cli_abort("Unknown operator: {.val {.x$op}}")
+    cli::cli_abort("Unknown condition type: {.val {(.x$type)}}")
   }
 
   i

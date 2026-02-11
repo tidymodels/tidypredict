@@ -1190,3 +1190,328 @@ test_that("multiclass with NULL num_class throws error", {
     "num_class >= 2"
   )
 })
+
+# Categorical feature tests -------------------------------------------------
+
+test_that("parse_model handles categorical splits", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  n <- 200
+  cat_int <- sample(0:3, n, replace = TRUE)
+  y <- ifelse(cat_int %in% c(0, 1), 10, -10) + rnorm(n, sd = 0.3)
+
+  X <- matrix(cat_int, ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 1L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+
+  expect_s3_class(pm, "parsed_model")
+  expect_gt(length(pm$trees), 0)
+
+  # Check that path contains set-type conditions
+  first_leaf <- pm$trees[[1]][[1]]
+  expect_gt(length(first_leaf$path), 0)
+  expect_equal(first_leaf$path[[1]]$type, "set")
+  expect_equal(first_leaf$path[[1]]$op, "in")
+  expect_type(first_leaf$path[[1]]$vals, "integer")
+})
+
+test_that("categorical predictions match native predictions", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(457)
+  n <- 200
+  cat_int <- sample(0:3, n, replace = TRUE)
+  y <- ifelse(cat_int %in% c(0, 1), 10, -10) + rnorm(n, sd = 2)
+
+  X <- matrix(cat_int, ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 2L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- data.frame(cat_feat = cat_int)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("mixed numerical + categorical predictions match", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(789)
+  n <- 300
+  cat_int <- sample(0:3, n, replace = TRUE)
+  num_feat <- rnorm(n)
+  y <- ifelse(cat_int %in% c(0, 1), 5, -5) + num_feat * 2 + rnorm(n, sd = 0.3)
+
+  X <- cbind(num_feat = num_feat, cat_feat = cat_int)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 8L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("categorical with missing values predictions match", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(321)
+  n <- 300
+  cat_int <- sample(0:3, n, replace = TRUE)
+  y <- ifelse(cat_int %in% c(0, 1), 10, -10) + rnorm(n, sd = 0.3)
+
+  # Add NAs
+  na_idx <- sample(n, 30)
+  cat_int[na_idx] <- NA
+  y[na_idx] <- 10 + rnorm(30, sd = 0.3)
+
+  X <- matrix(as.numeric(cat_int), ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L,
+      use_missing = TRUE
+    ),
+    data = dtrain,
+    nrounds = 1L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+
+  # Test with NA
+  test_X <- matrix(c(0, 1, 2, 3, NA), ncol = 1)
+  colnames(test_X) <- "cat_feat"
+  test_df <- data.frame(cat_feat = c(0, 1, 2, 3, NA))
+
+  native_preds <- predict(model, test_X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("categorical SQL generation works", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("dbplyr")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+
+  set.seed(123)
+  n <- 200
+  cat_int <- sample(0:3, n, replace = TRUE)
+  y <- ifelse(cat_int %in% c(0, 1), 10, -10) + rnorm(n, sd = 2)
+
+  X <- matrix(cat_int, ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 1L,
+    verbose = -1L
+  )
+
+  # Test SQL generation
+  sql_result <- tidypredict_sql(model, dbplyr::simulate_dbi())
+  expect_s3_class(sql_result, "sql")
+
+  # Test with actual SQLite
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  test_data <- data.frame(cat_feat = 0:3)
+  DBI::dbWriteTable(con, "test_data", test_data)
+
+  sql_query <- tidypredict_sql(model, con)
+  db_result <- DBI::dbGetQuery(
+    con,
+    paste0("SELECT ", sql_query, " AS pred FROM test_data")
+  )
+
+  test_X <- matrix(0:3, ncol = 1)
+  colnames(test_X) <- "cat_feat"
+  native_preds <- predict(model, test_X)
+
+  expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("parse_lgb_categorical_threshold handles various formats", {
+  # Two categories
+  expect_equal(
+    parse_lgb_categorical_threshold("0||1"),
+    c(0L, 1L)
+  )
+
+  # Three categories
+  expect_equal(
+    parse_lgb_categorical_threshold("0||1||3"),
+    c(0L, 1L, 3L)
+  )
+
+  # Single category
+  expect_equal(
+    parse_lgb_categorical_threshold("2"),
+    2L
+  )
+
+  # Many categories
+  expect_equal(
+    parse_lgb_categorical_threshold("0||2||4||6||8"),
+    c(0L, 2L, 4L, 6L, 8L)
+  )
+})
+
+test_that("categorical path contains both in and not-in operators", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  n <- 200
+  cat_int <- sample(0:3, n, replace = TRUE)
+  y <- ifelse(cat_int %in% c(0, 1), 10, -10) + rnorm(n, sd = 0.3)
+
+  X <- matrix(cat_int, ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 1L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+
+  # Collect all operators from paths
+  all_ops <- unlist(lapply(pm$trees[[1]], function(leaf) {
+    sapply(leaf$path, function(p) p$op)
+  }))
+
+  expect_contains(all_ops, "in")
+  expect_contains(all_ops, "not-in")
+})
+
+test_that("categorical with many categories works", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(555)
+  n <- 400
+  # 8 categories
+  cat_int <- sample(0:7, n, replace = TRUE)
+  # Categories 0,1,2,3 -> high, 4,5,6,7 -> low
+  y <- ifelse(cat_int < 4, 10, -10) + rnorm(n, sd = 2)
+
+  X <- matrix(cat_int, ncol = 1)
+  colnames(X) <- "cat_feat"
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, categorical_feature = "cat_feat")
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 1.0,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 2L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- data.frame(cat_feat = cat_int)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("get_lgb_case_fun errors on unknown type", {
+  condition <- list(
+    type = "unknown_type",
+    col = "x",
+    val = 1,
+    op = "less-equal",
+    missing = FALSE
+  )
+
+  expect_error(
+    get_lgb_case_fun(condition),
+    "Unknown condition type"
+  )
+})
+
+test_that("get_lgb_case_fun errors on unknown set operator", {
+  condition <- list(
+    type = "set",
+    col = "x",
+    vals = c(1, 2),
+    op = "unknown_op",
+    missing = FALSE
+  )
+
+  expect_error(
+    get_lgb_case_fun(condition),
+    "Unknown operator for set"
+  )
+})
