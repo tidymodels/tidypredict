@@ -58,7 +58,11 @@ test_that("each tree has leaves with predictions and paths", {
   expect_gt(length(tree1), 0)
 
   leaf_names <- lapply(tree1, names)
-  expect_true(all(vapply(leaf_names, \(x) all(c("prediction", "path") %in% x), logical(1))))
+  expect_true(all(vapply(
+    leaf_names,
+    \(x) all(c("prediction", "path") %in% x),
+    logical(1)
+  )))
 
   predictions <- vapply(tree1, \(x) x$prediction, double(1))
   expect_type(predictions, "double")
@@ -137,3 +141,234 @@ test_that("path contains both more and less-equal operators", {
   expect_contains(all_ops, "less-equal")
 })
 
+test_that("leaf 0 has all less-equal conditions (binary 00...0)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(42)
+  X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
+  y <- c(100, 200, 300, 400)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("x1", "x2"))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 1L,
+      depth = 2L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+  leaf_0 <- pm$trees[[1]][[1]]
+
+  # Leaf 0 (binary 00) should have all less-equal operators
+  ops <- vapply(leaf_0$path, \(p) p$op, character(1))
+  expect_true(all(ops == "less-equal"))
+})
+
+test_that("last leaf has all more conditions (binary 11...1)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(42)
+  X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
+  y <- c(100, 200, 300, 400)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("x1", "x2"))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 1L,
+      depth = 2L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+  n_leaves <- length(pm$trees[[1]])
+  last_leaf <- pm$trees[[1]][[n_leaves]]
+
+  # Last leaf (binary 11) should have all more operators
+  ops <- vapply(last_leaf$path, \(p) p$op, character(1))
+  expect_true(all(ops == "more"))
+})
+
+test_that("leaf index binary representation determines operator pattern", {
+  skip_if_not_installed("catboost")
+
+  set.seed(42)
+  X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
+  y <- c(100, 200, 300, 400)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("x1", "x2"))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 1L,
+      depth = 2L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+  tree <- pm$trees[[1]]
+
+  # With 2 splits, we have 4 leaves (indices 0-3)
+  # Leaf index binary -> operator pattern:
+  # 0 (00): [<=, <=]
+  # 1 (01): [>, <=]
+  # 2 (10): [<=, >]
+  # 3 (11): [>, >]
+
+  for (leaf_idx in 0:3) {
+    leaf <- tree[[leaf_idx + 1]]
+    n_splits <- length(leaf$path)
+
+    for (split_idx in seq_len(n_splits)) {
+      bit_val <- bitwAnd(bitwShiftR(leaf_idx, split_idx - 1L), 1L)
+      expected_op <- if (bit_val == 1L) "more" else "less-equal"
+      expect_equal(
+        leaf$path[[split_idx]]$op,
+        expected_op,
+        info = sprintf("leaf %d, split %d", leaf_idx, split_idx)
+      )
+    }
+  }
+})
+
+test_that("single split tree produces correct paths", {
+  skip_if_not_installed("catboost")
+
+  set.seed(42)
+  X <- matrix(c(1, 10), ncol = 1)
+  y <- c(0, 100)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("x"))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 1L,
+      depth = 1L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+
+  expect_length(pm$trees[[1]], 2) # 2^1 = 2 leaves
+
+  # Leaf 0: x <= border
+  expect_equal(pm$trees[[1]][[1]]$path[[1]]$op, "less-equal")
+  expect_equal(pm$trees[[1]][[1]]$path[[1]]$col, "x")
+
+  # Leaf 1: x > border
+  expect_equal(pm$trees[[1]][[2]]$path[[1]]$op, "more")
+  expect_equal(pm$trees[[1]][[2]]$path[[1]]$col, "x")
+})
+
+test_that("model without explicit feature names still works", {
+  skip_if_not_installed("catboost")
+
+  set.seed(789)
+  X <- data.matrix(mtcars[, c("mpg", "cyl")])
+  y <- mtcars$hp
+
+  # Create pool WITHOUT specifying feature_names
+  pool <- catboost::catboost.load_pool(X, label = y)
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 2L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+
+  expect_s3_class(pm, "pm_catboost")
+  expect_length(pm$trees, 3)
+  expect_equal(pm$general$nfeatures, 2)
+  expect_type(pm$general$feature_names, "character")
+})
+
+test_that("deeper tree paths are traced correctly", {
+  skip_if_not_installed("catboost")
+
+  # Create data that forces a 3-split tree
+  set.seed(123)
+  n <- 100
+  X <- matrix(rnorm(n * 3), ncol = 3)
+  colnames(X) <- c("a", "b", "c")
+  y <- X[, 1] + X[, 2] * 2 + X[, 3] * 3 + rnorm(n, sd = 0.1)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("a", "b", "c"))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 1L,
+      depth = 3L,
+      learning_rate = 1.0,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir(),
+      min_data_in_leaf = 1L
+    )
+  )
+
+  pm <- parse_model(model)
+  tree <- pm$trees[[1]]
+
+  # All leaves should have 3 conditions in their path (if tree is full depth)
+  n_splits <- length(tree[[1]]$path)
+  expect_lte(n_splits, 3)
+
+  # Verify leaf count matches 2^n_splits
+  expect_equal(length(tree), 2^n_splits)
+})

@@ -7,12 +7,10 @@ parse_model.catboost.Model <- function(model) {
   pm$general$type <- "catboost"
   pm$general$version <- 1
 
-  # Export model to JSON
   tmp_file <- tempfile(fileext = ".json")
+  on.exit(unlink(tmp_file), add = TRUE)
   catboost::catboost.save_model(model, tmp_file, file_format = "json")
   model_json <- jsonlite::fromJSON(tmp_file, simplifyVector = FALSE)
-
-  # Extract params
 
   pm$general$params <- list()
   loss_fn <- model_json$model_info$params$loss_function
@@ -24,7 +22,6 @@ parse_model.catboost.Model <- function(model) {
     }
   }
 
-  # Extract feature names from features_info
   features_info <- model_json$features_info
   float_features <- features_info$float_features
   feature_names <- vapply(
@@ -35,7 +32,6 @@ parse_model.catboost.Model <- function(model) {
   pm$general$feature_names <- feature_names
   pm$general$nfeatures <- length(feature_names)
 
-  # Extract trees
   oblivious_trees <- model_json$oblivious_trees
   pm$general$niter <- length(oblivious_trees)
 
@@ -64,7 +60,6 @@ get_catboost_tree <- function(tree_json, float_features) {
 
   n_leaves <- 2^n_splits
 
-  # For each leaf, build the path based on binary representation of index
   map(seq_len(n_leaves) - 1L, function(leaf_idx) {
     path <- vector("list", n_splits)
 
