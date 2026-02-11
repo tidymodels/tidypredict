@@ -2,7 +2,6 @@
 
 #' @export
 parse_model.lgb.Booster <- function(model) {
-
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
@@ -189,7 +188,10 @@ build_fit_formula_lgb <- function(parsedmodel) {
   sigmoid_objectives <- c("binary", "cross_entropy")
   multiclass_objectives <- c("multiclass", "multiclassova")
   all_supported <- c(
-    identity_objectives, exp_objectives, sigmoid_objectives, multiclass_objectives
+    identity_objectives,
+    exp_objectives,
+    sigmoid_objectives,
+    multiclass_objectives
   )
 
   if (!objective %in% all_supported) {
@@ -228,14 +230,18 @@ build_fit_formula_lgb_multiclass <- function(parsedmodel, objective) {
     cli::cli_abort("Multiclass model must have num_class >= 2.")
   }
 
- # Group trees by class: tree i belongs to class (i-1) %% num_class
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
   # (trees are 1-indexed in our list, but LightGBM uses 0-indexed tree_index)
   class_trees <- lapply(seq_len(num_class), function(class_idx) {
     which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
   })
 
   # Build raw score formula for each class
-  raw_scores <- lapply(class_trees, build_lgb_tree_sum, parsedmodel = parsedmodel)
+  raw_scores <- lapply(
+    class_trees,
+    build_lgb_tree_sum,
+    parsedmodel = parsedmodel
+  )
 
   # Apply transformation based on objective
   if (objective == "multiclass") {
