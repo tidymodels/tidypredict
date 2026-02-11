@@ -834,3 +834,100 @@ test_that("unsupported objective throws error", {
     "Unsupported objective"
   )
 })
+
+# SQL generation tests ------------------------------------------------------
+
+test_that("tidypredict_sql returns SQL class", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("dbplyr")
+  model <- make_lgb_model()
+
+  sql_result <- tidypredict_sql(model, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("tidypredict_sql works with parsed model", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("dbplyr")
+  model <- make_lgb_model()
+  pm <- parse_model(model)
+
+
+  sql_result <- tidypredict_sql(pm, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("SQL predictions match native predictions with SQLite", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dbplyr")
+
+  model <- make_lgb_model()
+
+  # Create in-memory SQLite database
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  # Copy test data to database
+  test_data <- mtcars[, c("mpg", "cyl", "disp")]
+  DBI::dbWriteTable(con, "test_data", test_data)
+
+  # Get predictions via SQL
+  sql_query <- tidypredict_sql(model, con)
+  db_result <- DBI::dbGetQuery(
+    con,
+    paste0("SELECT ", sql_query, " AS pred FROM test_data")
+  )
+
+  # Get native predictions
+  X <- data.matrix(test_data)
+  native_preds <- predict(model, X)
+
+  expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("SQL predictions match for binary classification with SQLite", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dbplyr")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.integer(mtcars$am)
+  dtrain <- lightgbm::lgb.Dataset(X, label = y)
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "binary",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  # Create in-memory SQLite database
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  # Copy test data to database
+  test_data <- mtcars[, c("mpg", "cyl", "disp")]
+  DBI::dbWriteTable(con, "test_data", test_data)
+
+  # Get predictions via SQL
+  sql_query <- tidypredict_sql(model, con)
+  db_result <- DBI::dbGetQuery(
+    con,
+    paste0("SELECT ", sql_query, " AS pred FROM test_data")
+  )
+
+  # Get native predictions
+  native_preds <- predict(model, X)
+
+  expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
+})
