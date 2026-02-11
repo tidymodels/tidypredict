@@ -931,3 +931,262 @@ test_that("SQL predictions match for binary classification with SQLite", {
 
   expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
 })
+
+# Multiclass tests ----------------------------------------------------------
+
+test_that("parse_model extracts num_class for multiclass", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 2L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$num_class, 3)
+  expect_equal(pm$general$num_tree_per_iteration, 3)
+  # 2 rounds * 3 classes = 6 trees
+  expect_equal(length(pm$trees), 6)
+})
+
+test_that("tidypredict_fit returns list for multiclass", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  fit_formulas <- tidypredict_fit(model)
+
+  expect_type(fit_formulas, "list")
+  expect_length(fit_formulas, 3)
+  expect_named(fit_formulas, c("class_0", "class_1", "class_2"))
+
+  # Each element should be a language object
+  for (f in fit_formulas) {
+    expect_true(is.language(f))
+  }
+})
+
+test_that("multiclass predictions match native predictions", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(789)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 8L,
+      learning_rate = 0.3,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formulas <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(
+    test_df,
+    class_0 = !!fit_formulas$class_0,
+    class_1 = !!fit_formulas$class_1,
+    class_2 = !!fit_formulas$class_2
+  )
+  tidy_mat <- as.matrix(tidy_preds[, c("class_0", "class_1", "class_2")])
+
+  expect_equal(unname(tidy_mat), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("multiclass probabilities sum to 1", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(321)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  fit_formulas <- tidypredict_fit(model)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(
+    test_df,
+    class_0 = !!fit_formulas$class_0,
+    class_1 = !!fit_formulas$class_1,
+    class_2 = !!fit_formulas$class_2
+  )
+
+  row_sums <- tidy_preds$class_0 + tidy_preds$class_1 + tidy_preds$class_2
+  expect_equal(row_sums, rep(1, nrow(X)), tolerance = 1e-10)
+})
+
+test_that("multiclassova predictions match native predictions", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(654)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 8L,
+      learning_rate = 0.3,
+      objective = "multiclassova",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formulas <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  expect_named(fit_formulas, c("class_0", "class_1", "class_2"))
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(
+    test_df,
+    class_0 = !!fit_formulas$class_0,
+    class_1 = !!fit_formulas$class_1,
+    class_2 = !!fit_formulas$class_2
+  )
+  tidy_mat <- as.matrix(tidy_preds[, c("class_0", "class_1", "class_2")])
+
+  expect_equal(unname(tidy_mat), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("multiclass SQL generation returns list of SQL", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("dbplyr")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "multiclass",
+      num_class = 3L,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 2L,
+    verbose = -1L
+  )
+
+  sql_result <- tidypredict_sql(model, dbplyr::simulate_dbi())
+
+  expect_type(sql_result, "list")
+  expect_length(sql_result, 3)
+  for (s in sql_result) {
+    expect_s3_class(s, "sql")
+  }
+})
+
+# Edge case tests -----------------------------------------------------------
+
+test_that("empty trees throws error", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list()
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "Model has no trees"
+  )
+})
+
+test_that("multiclass with num_class < 2 throws error", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "multiclass")
+  pm$general$num_class <- 1
+  pm$trees <- list(list(list(prediction = 1, path = list())))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "num_class >= 2"
+  )
+})
+
+test_that("multiclass with NULL num_class throws error", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "multiclass")
+  pm$general$num_class <- NULL
+  pm$trees <- list(list(list(prediction = 1, path = list())))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "num_class >= 2"
+  )
+})
