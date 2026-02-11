@@ -93,8 +93,9 @@ The following models are supported by `tidypredict`:
 - Random Forest models - `randomForest::randomForest()`
 - Random Forest models, via `ranger` - `ranger::ranger()`
 - MARS models - `earth::earth()`
-- XGBoost models - `xgboost::xgb.Booster.complete()` 
-- Cubist models - `Cubist::cubist()` 
+- XGBoost models - `xgboost::xgb.Booster.complete()`
+- LightGBM models - `lightgbm::lgb.Booster()`
+- Cubist models - `Cubist::cubist()`
 - Tree models, via `partykit` - `partykit::ctree()` 
 
 ### `parsnip` 
@@ -105,6 +106,7 @@ The following models are supported by `tidypredict`:
 - `randomForest::randomForest()` - `parsnip`: `rand_forest()` with *"randomForest"* as the engine.
 - `ranger::ranger()` - `parsnip`: `rand_forest()` with *"ranger"* as the engine.
 - `earth::earth()`  - `parsnip`: `mars()` with *"earth"* as the engine.
+- `lightgbm::lgb.Booster()` - `parsnip`: `boost_tree()` with *"lightgbm"* as the engine (via `bonsai`).
 
 ### `broom`
 

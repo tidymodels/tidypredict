@@ -1,0 +1,248 @@
+---
+title: "LightGBM models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LightGBM models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("lightgbm", quietly = TRUE)) {
+  library(tidypredict)
+  library(lightgbm)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+## `tidypredict_` functions
+
+```{r}
+library(lightgbm)
+
+# Prepare data
+X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y <- mtcars$hp
+
+dtrain <- lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+model <- lgb.train(
+  params = list(
+    num_leaves = 4L,
+    learning_rate = 0.5,
+    objective = "regression",
+    min_data_in_leaf = 1L
+  ),
+  data = dtrain,
+  nrounds = 10L,
+  verbose = -1L
+)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the prediction to the original table
+    ```{r}
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the matrix data set.
+    ```{r}
+tidypredict_test(model, xg_df = X)
+    ```
+
+## Supported objectives
+
+LightGBM supports many objective functions. The following objectives are supported by `tidypredict`:
+
+### Regression objectives (identity transform)
+
+- `regression` / `regression_l2` (default)
+- `regression_l1`
+- `huber`
+- `fair`
+- `quantile`
+- `mape`
+
+### Regression objectives (exp transform)
+
+- `poisson`
+- `gamma`
+- `tweedie`
+
+### Binary classification (sigmoid transform)
+
+- `binary`
+- `cross_entropy`
+
+### Multiclass classification
+
+- `multiclass` (softmax transform)
+- `multiclassova` (per-class sigmoid)
+
+## Binary classification example
+
+```{r}
+X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y_bin <- mtcars$am
+
+dtrain_bin <- lgb.Dataset(X_bin, label = y_bin, colnames = c("mpg", "cyl", "disp"))
+
+model_bin <- lgb.train(
+  params = list(
+    num_leaves = 4L,
+    learning_rate = 0.5,
+    objective = "binary",
+    min_data_in_leaf = 1L
+  ),
+  data = dtrain_bin,
+  nrounds = 10L,
+  verbose = -1L
+)
+
+tidypredict_test(model_bin, xg_df = X_bin)
+```
+
+## Multiclass classification
+
+For multiclass models, `tidypredict_fit()` returns a named list of formulas, one for each class:
+
+```{r}
+X_iris <- data.matrix(iris[, 1:4])
+colnames(X_iris) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+y_iris <- as.integer(iris$Species) - 1L
+
+dtrain_iris <- lgb.Dataset(X_iris, label = y_iris, colnames = colnames(X_iris))
+
+model_multi <- lgb.train(
+  params = list(
+    num_leaves = 4L,
+    learning_rate = 0.5,
+    objective = "multiclass",
+    num_class = 3L,
+    min_data_in_leaf = 1L
+  ),
+  data = dtrain_iris,
+  nrounds = 5L,
+  verbose = -1L
+)
+
+fit_formulas <- tidypredict_fit(model_multi)
+names(fit_formulas)
+```
+
+Each formula produces the predicted probability for that class:
+
+```{r}
+iris %>%
+  mutate(
+    prob_setosa = !!fit_formulas$class_0,
+    prob_versicolor = !!fit_formulas$class_1,
+    prob_virginica = !!fit_formulas$class_2
+  ) %>%
+  select(Species, starts_with("prob_")) %>%
+  head()
+```
+
+Note: `tidypredict_test()` does not support multiclass models. Use `tidypredict_fit()` directly.
+
+## Categorical features
+
+LightGBM supports native categorical features. When a feature is marked as categorical, `tidypredict` generates appropriate `%in%` conditions:
+
+```{r}
+set.seed(123)
+n <- 200
+cat_data <- data.frame(
+  cat_feat = sample(0:3, n, replace = TRUE),
+  y = NA
+)
+cat_data$y <- ifelse(cat_data$cat_feat %in% c(0, 1), 10, -10) + rnorm(n, sd = 2)
+
+X_cat <- matrix(cat_data$cat_feat, ncol = 1)
+colnames(X_cat) <- "cat_feat"
+
+dtrain_cat <- lgb.Dataset(
+  X_cat,
+  label = cat_data$y,
+  categorical_feature = "cat_feat"
+)
+
+model_cat <- lgb.train(
+  params = list(
+    num_leaves = 4L,
+    learning_rate = 1.0,
+    objective = "regression",
+    min_data_in_leaf = 1L
+  ),
+  data = dtrain_cat,
+  nrounds = 2L,
+  verbose = -1L
+)
+
+tidypredict_fit(model_cat)
+```
+
+## parsnip
+
+`parsnip` fitted models (via the `bonsai` package) are also supported by `tidypredict`:
+
+```{r, eval = requireNamespace("parsnip", quietly = TRUE) && requireNamespace("bonsai", quietly = TRUE)}
+library(parsnip)
+library(bonsai)
+
+p_model <- boost_tree(
+  trees = 10,
+  tree_depth = 3,
+  min_n = 1
+) %>%
+  set_engine("lightgbm") %>%
+  set_mode("regression") %>%
+  fit(hp ~ mpg + cyl + disp, data = mtcars)
+
+# Extract the underlying lgb.Booster
+lgb_model <- p_model$fit
+
+tidypredict_test(lgb_model, xg_df = X)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+```{r}
+str(pm$trees[1])
+```
+
+## Limitations
+
+- Ranking objectives (`lambdarank`, `rank_xendcg`) are not supported
+- Prediction intervals are not supported
+- `tidypredict_test()` does not support multiclass models
