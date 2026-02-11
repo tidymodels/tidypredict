@@ -213,6 +213,13 @@ get_catboost_case <- function(path, prediction) {
 }
 
 get_catboost_case_fun <- function(.x) {
+  if (.x$type != "conditional") {
+    cli::cli_abort(
+      "CatBoost only supports conditional splits, not {.val {.x$type}}.",
+      .internal = TRUE
+    )
+  }
+
   col_name <- as.name(.x$col)
   val <- as.numeric(.x$val)
 
