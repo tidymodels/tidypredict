@@ -111,7 +111,7 @@ test_that("model without explicit colnames still works", {
   X <- data.matrix(mtcars[, c("mpg", "cyl")])
   y <- mtcars$hp
 
- # Create dataset WITHOUT specifying colnames
+  # Create dataset WITHOUT specifying colnames
   dtrain <- lightgbm::lgb.Dataset(X, label = y)
 
   model <- lightgbm::lgb.train(
