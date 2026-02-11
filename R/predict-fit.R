@@ -42,3 +42,8 @@ tidypredict_fit.pm_xgb <- function(model) {
 tidypredict_fit.pm_lgb <- function(model) {
   build_fit_formula_lgb(model)
 }
+
+#' @export
+tidypredict_fit.pm_catboost <- function(model) {
+  build_fit_formula_catboost(model)
+}

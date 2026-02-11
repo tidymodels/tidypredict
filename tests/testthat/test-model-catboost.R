@@ -372,3 +372,362 @@ test_that("deeper tree paths are traced correctly", {
   # Verify leaf count matches 2^n_splits
   expect_equal(length(tree), 2^n_splits)
 })
+
+# Fit formula tests -------------------------------------------------------
+
+test_that("tidypredict_fit returns language object", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  result <- tidypredict_fit(model)
+
+  expect_type(result, "language")
+})
+
+test_that("tidypredict_fit works on parsed model", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  result <- tidypredict_fit(pm)
+
+  expect_type(result, "language")
+})
+
+test_that("regression predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  pool <- catboost::catboost.load_pool(X)
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("Logloss predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.numeric(mtcars$am)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "Logloss",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("MAE predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "MAE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("Quantile predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "Quantile:alpha=0.5",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("MAPE predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "MAPE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("Poisson predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$carb
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "Poisson",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("CrossEntropy predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.numeric(mtcars$am)
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "CrossEntropy",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+
+  native_preds <- catboost::catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("unsupported objective throws error", {
+  skip_if_not_installed("catboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "MultiClass"),
+      model = "catboost.Model",
+      type = "catboost"
+    ),
+    trees = list(list(list(prediction = 1, path = list())))
+  )
+  class(pm) <- c("pm_catboost", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "Unsupported objective"
+  )
+})
+
+test_that("empty trees throws error", {
+  skip_if_not_installed("catboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "RMSE"),
+      model = "catboost.Model",
+      type = "catboost"
+    ),
+    trees = list()
+  )
+  class(pm) <- c("pm_catboost", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "Model has no trees"
+  )
+})
+
+test_that("NULL objective defaults to RMSE (identity)", {
+  skip_if_not_installed("catboost")
+
+  pm <- list(
+    general = list(
+      params = list(), # No objective specified
+      model = "catboost.Model",
+      type = "catboost"
+    ),
+    trees = list(list(list(prediction = 5.0, path = list())))
+  )
+  class(pm) <- c("pm_catboost", "parsed_model", "list")
+
+  result <- tidypredict_fit(pm)
+
+  # Should be identity transformation (no sigmoid)
+  expect_false(grepl("exp", deparse(result)))
+})
+
+test_that("stump tree (empty path) works", {
+  skip_if_not_installed("catboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "RMSE"),
+      model = "catboost.Model",
+      type = "catboost"
+    ),
+    trees = list(list(list(prediction = 42.5, path = list())))
+  )
+  class(pm) <- c("pm_catboost", "parsed_model", "list")
+
+  result <- tidypredict_fit(pm)
+  value <- rlang::eval_tidy(result, data.frame(x = 1))
+
+  expect_equal(value, 42.5)
+})
+
+test_that("scale and bias are extracted correctly", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  expect_type(pm$general$scale, "integer")
+  expect_type(pm$general$bias, "double")
+})
+
+# SQL generation tests ----------------------------------------------------
+
+test_that("tidypredict_sql returns SQL class", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  sql <- tidypredict_sql(model, dbplyr::simulate_sqlite())
+
+  expect_s3_class(sql, "sql")
+})
+
+test_that("SQL predictions match native predictions with SQLite", {
+  skip_if_not_installed("catboost")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+
+  model <- make_catboost_model()
+
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  pool <- catboost::catboost.load_pool(X)
+  native_preds <- catboost::catboost.predict(model, pool)
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+  DBI::dbWriteTable(con, "mtcars", mtcars)
+
+  sql <- tidypredict_sql(model, con)
+  query <- paste0("SELECT ", sql, " AS pred FROM mtcars")
+  sql_preds <- DBI::dbGetQuery(con, query)$pred
+
+  expect_equal(sql_preds, native_preds, tolerance = 1e-10)
+})

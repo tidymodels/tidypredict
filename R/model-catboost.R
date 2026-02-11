@@ -35,6 +35,16 @@ parse_model.catboost.Model <- function(model) {
   oblivious_trees <- model_json$oblivious_trees
   pm$general$niter <- length(oblivious_trees)
 
+  # Extract scale and bias
+  scale_and_bias <- model_json$scale_and_bias
+  if (!is.null(scale_and_bias)) {
+    pm$general$scale <- scale_and_bias[[1]]
+    pm$general$bias <- scale_and_bias[[2]][[1]]
+  } else {
+    pm$general$scale <- 1
+    pm$general$bias <- 0
+  }
+
   pm$trees <- get_catboost_trees(oblivious_trees, float_features)
 
   as_parsed_model(pm)
@@ -120,4 +130,110 @@ get_catboost_missing <- function(nan_treatment, op) {
     # "AsIs" or unknown
     return(FALSE)
   }
+}
+
+# Fit model -----------------------------------------------
+
+#' @export
+tidypredict_fit.catboost.Model <- function(model) {
+  parsedmodel <- parse_model(model)
+  build_fit_formula_catboost(parsedmodel)
+}
+
+build_fit_formula_catboost <- function(parsedmodel) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective
+  if (is.null(objective)) {
+    objective <- "RMSE"
+  }
+
+  identity_objectives <- c("RMSE", "MAE", "Quantile", "MAPE", "Poisson")
+  sigmoid_objectives <- c("Logloss", "CrossEntropy")
+  all_supported <- c(identity_objectives, sigmoid_objectives)
+
+  if (!objective %in% all_supported) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {all_supported}}."
+      )
+    )
+  }
+
+  tree_formulas <- map(
+    seq_len(n_trees),
+    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+  )
+  f <- reduce_addition(tree_formulas)
+
+  scale <- parsedmodel$general$scale %||% 1
+  bias <- parsedmodel$general$bias %||% 0
+
+  if (scale != 1) {
+    f <- expr(!!scale * (!!f))
+  }
+  if (bias != 0) {
+    f <- expr(!!f + !!bias)
+  }
+
+  if (objective %in% sigmoid_objectives) {
+    f <- expr(1 / (1 + exp(-(!!f))))
+  }
+
+  f
+}
+
+get_catboost_case_tree <- function(tree_no, parsedmodel) {
+  map(
+    parsedmodel$trees[[tree_no]],
+    function(leaf) get_catboost_case(leaf$path, leaf$prediction)
+  )
+}
+
+get_catboost_case <- function(path, prediction) {
+  cl <- map(path, get_catboost_case_fun)
+  cl_length <- length(cl)
+
+  if (cl_length == 0) {
+    cl <- TRUE
+  } else if (cl_length == 1) {
+    cl <- cl[[1]]
+  } else if (cl_length == 2) {
+    cl <- expr_and(cl[[1]], cl[[2]])
+  } else {
+    cl <- reduce_and(cl)
+  }
+
+  expr(!!cl ~ !!prediction)
+}
+
+get_catboost_case_fun <- function(.x) {
+  col_name <- as.name(.x$col)
+  val <- as.numeric(.x$val)
+
+  if (.x$op == "less-equal") {
+    if (.x$missing) {
+      i <- expr((!!col_name <= !!val | is.na(!!col_name)))
+    } else {
+      i <- expr(!!col_name <= !!val)
+    }
+  } else if (.x$op == "more") {
+    if (.x$missing) {
+      i <- expr((!!col_name > !!val | is.na(!!col_name)))
+    } else {
+      i <- expr(!!col_name > !!val)
+    }
+  } else {
+    cli::cli_abort(
+      "Unknown operator: {.val {.x$op}}.",
+      .internal = TRUE
+    )
+  }
+
+  i
 }
