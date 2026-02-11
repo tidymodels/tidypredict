@@ -1,5 +1,9 @@
 # tidypredict (development version)
 
+## New Model Supports
+
+- Added support for LightGBM models (`lgb.Booster`). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)
+
 # tidypredict 1.0.1
 
 ## Bug Fixes

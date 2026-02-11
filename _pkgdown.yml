@@ -34,6 +34,8 @@ navbar:
       href: articles/cubist.html
     - text: XGboost - xgb.Booster.complete()
       href: articles/xgboost.html
+    - text: LightGBM - lgb.Booster()
+      href: articles/lightgbm.html
   - text: Articles
     menu:
     - text: Save/Reload

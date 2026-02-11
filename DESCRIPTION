@@ -11,7 +11,7 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     several databases back-ends because it leverages 'dplyr' and 'dbplyr'
     for the final 'SQL' translation of the algorithm. It currently
     supports lm(), glm(), randomForest(), ranger(), earth(),
-    xgb.Booster.complete(), cubist(), and ctree() models.
+    xgb.Booster.complete(), lgb.Booster(), cubist(), and ctree() models.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,
     https://github.com/tidymodels/tidypredict
@@ -29,12 +29,14 @@ Imports:
     tibble,
     tidyr
 Suggests:
+    bonsai,
     covr,
     Cubist (>= 0.5.1),
     DBI,
     dbplyr,
     earth (>= 5.1.2),
     glmnet,
+    lightgbm,
     methods,
     mlbench,
     modeldata,

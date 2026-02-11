@@ -418,6 +418,110 @@ xgb_booster <- function(
 setOldClass(c("tidypredict_test", "list"))
 
 #' @export
+tidypredict_test.lgb.Booster <- function(
+  model,
+  df = NULL,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  lgb_booster(
+    model = model,
+    df = df,
+    threshold = threshold,
+    include_intervals = include_intervals,
+    max_rows = max_rows,
+    lgb_df = xg_df
+  )
+}
+
+lgb_booster <- function(
+  model,
+  df = NULL,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  lgb_df = NULL
+) {
+  if (is.null(lgb_df)) {
+    cli::cli_abort(
+      c(
+        "LightGBM models require a matrix for predictions.",
+        "i" = "Pass the prediction matrix via the {.arg xg_df} argument."
+      )
+    )
+  }
+
+  if (is.null(df)) {
+    df <- as.data.frame(lgb_df)
+  }
+
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+    lgb_df <- lgb_df[seq_len(max_rows), , drop = FALSE]
+  }
+
+  base <- predict(model, lgb_df)
+
+  # Check for multiclass (returns matrix)
+  if (is.matrix(base)) {
+    cli::cli_abort(
+      c(
+        "tidypredict_test does not support multiclass LightGBM models.",
+        "i" = "Use tidypredict_fit() directly for multiclass predictions."
+      )
+    )
+  }
+
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+
+  raw_results <- cbind(data.frame(base = base), te)
+  raw_results$fit_diff <- abs(raw_results$base - raw_results$fit_te)
+  raw_results$fit_threshold <- raw_results$fit_diff > threshold
+
+  rowid <- seq_len(nrow(raw_results))
+  raw_results <- cbind(data.frame(rowid), raw_results)
+
+  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
+  alert <- any(threshold_df > 0)
+
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+
+  if (alert) {
+    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ",
+      threshold_df$fit_threshold,
+      "\n\nMax difference: ",
+      difference$fit_diff
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  results <- list()
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}
+
+#' @export
 tidypredict_test.model_fit <- function(
   model,
   df = model$model,

@@ -37,3 +37,8 @@ tidypredict_fit.pm_tree <- function(model) {
 tidypredict_fit.pm_xgb <- function(model) {
   build_fit_formula_xgb(model)
 }
+
+#' @export
+tidypredict_fit.pm_lgb <- function(model) {
+  build_fit_formula_lgb(model)
+}
