@@ -237,3 +237,25 @@ get_catboost_case_fun <- function(.x) {
 
   i
 }
+
+# For {orbital}
+#' Extract processed CatBoost trees
+#'
+#' For use in orbital package.
+#' @param model A CatBoost model object
+#' @keywords internal
+#' @export
+.extract_catboost_trees <- function(model) {
+  if (!inherits(model, "catboost.Model")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls catboost.Model}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  parsedmodel <- parse_model(model)
+
+  map(
+    seq_len(length(parsedmodel$trees)),
+    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+  )
+}
