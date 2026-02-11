@@ -540,6 +540,117 @@ tidypredict_test.model_fit <- function(
   )
 }
 
+#' @export
+tidypredict_test.catboost.Model <- function(
+  model,
+  df = NULL,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  catboost_model(
+    model = model,
+    df = df,
+    threshold = threshold,
+    include_intervals = include_intervals,
+    max_rows = max_rows,
+    cb_df = xg_df
+  )
+}
+
+catboost_model <- function(
+  model,
+  df = NULL,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  cb_df = NULL
+) {
+  if (is.null(cb_df)) {
+    cli::cli_abort(
+      c(
+        "CatBoost models require a matrix for predictions.",
+        "i" = "Pass the prediction matrix via the {.arg xg_df} argument."
+      )
+    )
+  }
+
+  if (is.null(df)) {
+    df <- as.data.frame(cb_df)
+  }
+
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+    cb_df <- cb_df[seq_len(max_rows), , drop = FALSE]
+  }
+
+  # Create pool for prediction
+  pool <- catboost::catboost.load_pool(cb_df)
+
+  # Detect if binary classification based on objective
+  pm <- parse_model(model)
+  objective <- pm$general$params$objective
+  is_binary <- !is.null(objective) &&
+    objective %in% c("Logloss", "CrossEntropy")
+
+  if (is_binary) {
+    base <- catboost::catboost.predict(
+      model,
+      pool,
+      prediction_type = "Probability"
+    )
+  } else {
+    base <- catboost::catboost.predict(model, pool)
+  }
+
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+
+  raw_results <- cbind(data.frame(base = base), te)
+  raw_results$fit_diff <- abs(raw_results$base - raw_results$fit_te)
+  raw_results$fit_threshold <- raw_results$fit_diff > threshold
+
+  rowid <- seq_len(nrow(raw_results))
+  raw_results <- cbind(data.frame(rowid), raw_results)
+
+  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
+  alert <- any(threshold_df > 0)
+
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+
+  if (alert) {
+    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ",
+      threshold_df$fit_threshold,
+      "\n\nMax difference: ",
+      difference$fit_diff
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  results <- list()
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}
+
 setOldClass(c("tidypredict_test", "list"))
 
 #' print method for test predictions results
