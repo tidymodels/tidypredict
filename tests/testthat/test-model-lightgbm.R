@@ -1217,6 +1217,97 @@ test_that("multiclass with NULL num_class throws error", {
   )
 })
 
+test_that("NULL objective defaults to regression", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+
+  pm$general$version <- 1
+  pm$general$params <- list() # No objective set
+  pm$trees <- list(list(list(prediction = 42, path = list())))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  expect_type(fit_formula, "language")
+  # Should produce identity transform (no exp/sigmoid)
+  expect_false(grepl("exp", deparse(fit_formula)))
+})
+
+test_that("stump tree formula generation works (empty path)", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list(list(list(prediction = 42.5, path = list())))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  expect_type(fit_formula, "language")
+  # Should contain TRUE ~ 42.5 for the stump
+  formula_str <- deparse(fit_formula)
+  expect_true(grepl("TRUE", formula_str))
+  expect_true(grepl("42.5", formula_str))
+})
+
+test_that("categorical with missing=TRUE for 'in' operator", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list(list(
+    list(
+      prediction = 10,
+      path = list(list(
+        type = "set",
+        col = "cat_feat",
+        vals = c(0L, 1L),
+        op = "in",
+        missing = TRUE
+      ))
+    )
+  ))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  formula_str <- deparse(fit_formula)
+  # Should contain %in% and is.na for missing handling
+  expect_true(grepl("%in%", formula_str))
+  expect_true(grepl("is.na", formula_str))
+})
+
+test_that("categorical with missing=FALSE for 'not-in' operator", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 1
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list(list(
+    list(
+      prediction = -10,
+      path = list(list(
+        type = "set",
+        col = "cat_feat",
+        vals = c(0L, 1L),
+        op = "not-in",
+        missing = FALSE
+      ))
+    )
+  ))
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  formula_str <- deparse(fit_formula)
+  # Should contain !(...%in%...) but NOT is.na
+  expect_true(grepl("%in%", formula_str))
+  expect_false(grepl("is.na", formula_str))
+})
+
 # Categorical feature tests -------------------------------------------------
 
 test_that("parse_model handles categorical splits", {

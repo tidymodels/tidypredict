@@ -267,7 +267,9 @@ build_fit_formula_lgb_multiclass <- function(parsedmodel, objective) {
 # Helper to build sum of tree predictions for given indices
 build_lgb_tree_sum <- function(tree_indices, parsedmodel) {
   if (length(tree_indices) == 0) {
-    return(expr(0))
+    # nocov start
+    cli::cli_abort("No trees found for tree indices.", .internal = TRUE)
+    # nocov end
   }
   tree_formulas <- map(
     tree_indices,
