@@ -430,3 +430,407 @@ test_that("model with missing values produces valid parse", {
     }
   }
 })
+
+# Fit formula tests -----------------------------------------------------------
+
+test_that("tidypredict_fit returns language object", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+
+  fit_formula <- tidypredict_fit(model)
+
+  expect_type(fit_formula, "language")
+})
+
+test_that("tidypredict_fit works on parsed model", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+  pm <- parse_model(model)
+
+  fit_formula <- tidypredict_fit(pm)
+
+  expect_type(fit_formula, "language")
+})
+
+test_that("regression predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("binary classification predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$am
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "binary",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("poisson predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "disp")])
+  y <- mtcars$carb # count variable
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "poisson",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("regression_l1 predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "regression_l1",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("regression_l2 predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "regression_l2",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("mape predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp # positive values required for mape
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "mape",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("huber predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "huber",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("fair predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "fair",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("quantile predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "quantile",
+      alpha = 0.5,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("gamma predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp # positive values
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "gamma",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("tweedie predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp # positive values
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "tweedie",
+      tweedie_variance_power = 1.5,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("cross_entropy predictions match native predict", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$am
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "cyl", "disp"))
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "cross_entropy",
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("predictions with missing values match", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl")])
+  y <- mtcars$hp
+
+  # Training data with NAs
+  X_train <- X
+  X_train[1:3, 1] <- NA
+  dtrain <- lightgbm::lgb.Dataset(
+    X_train,
+    label = y,
+    colnames = c("mpg", "cyl")
+  )
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      learning_rate = 0.5,
+      objective = "regression",
+      min_data_in_leaf = 1L,
+      use_missing = TRUE
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  # Prediction data with NAs
+  X_pred <- X
+  X_pred[5:7, 1] <- NA
+  X_pred[10:12, 2] <- NA
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X_pred)
+
+  pred_df <- as.data.frame(X_pred)
+  tidy_preds <- dplyr::mutate(pred_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("unsupported objective throws error", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+  pm <- parse_model(model)
+
+  # Modify the objective to an unsupported one
+  pm$general$params$objective <- "unsupported_objective"
+
+  expect_error(
+    tidypredict_fit(pm),
+    "Unsupported objective"
+  )
+})
