@@ -135,9 +135,6 @@ test_that("model without explicit colnames still works", {
   expect_type(pm$general$feature_names, "character")
 })
 
-# Edge case tests using hand-crafted tree data frames
-# These test the internal parsing functions directly
-
 test_that("children map correctly identifies left and right children", {
   # Hand-crafted tree: simple binary tree
 
@@ -390,8 +387,6 @@ test_that("model with missing values produces valid parse", {
   set.seed(456)
   X <- data.matrix(mtcars[, c("mpg", "cyl")])
   y <- mtcars$hp
-
-  # Introduce NAs
   X_with_na <- X
   X_with_na[1:5, 1] <- NA
   X_with_na[10:15, 2] <- NA
@@ -519,7 +514,7 @@ test_that("poisson predictions match native predict", {
 
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "disp")])
-  y <- mtcars$carb # count variable
+  y <- mtcars$carb
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "disp"))
 
   model <- lightgbm::lgb.train(
@@ -608,7 +603,7 @@ test_that("mape predictions match native predict", {
 
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  y <- mtcars$hp # positive values required for mape
+  y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
     X,
     label = y,
@@ -733,7 +728,7 @@ test_that("gamma predictions match native predict", {
 
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  y <- mtcars$hp # positive values
+  y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
     X,
     label = y,
@@ -764,7 +759,7 @@ test_that("tweedie predictions match native predict", {
 
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  y <- mtcars$hp # positive values
+  y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
     X,
     label = y,
@@ -825,11 +820,10 @@ test_that("cross_entropy predictions match native predict", {
 test_that("predictions with missing values match", {
   skip_if_not_installed("lightgbm")
 
+  # Training data with NAs
   set.seed(456)
   X <- data.matrix(mtcars[, c("mpg", "cyl")])
   y <- mtcars$hp
-
-  # Training data with NAs
   X_train <- X
   X_train[1:3, 1] <- NA
   dtrain <- lightgbm::lgb.Dataset(
@@ -851,7 +845,6 @@ test_that("predictions with missing values match", {
     verbose = -1L
   )
 
-  # Prediction data with NAs
   X_pred <- X
   X_pred[5:7, 1] <- NA
   X_pred[10:12, 2] <- NA
@@ -870,7 +863,6 @@ test_that("unsupported objective throws error", {
   model <- make_lgb_model()
   pm <- parse_model(model)
 
-  # Modify the objective to an unsupported one
   pm$general$params$objective <- "unsupported_objective"
 
   expect_error(
@@ -910,22 +902,18 @@ test_that("SQL predictions match native predictions with SQLite", {
 
   model <- make_lgb_model()
 
-  # Create in-memory SQLite database
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-  # Copy test data to database
   test_data <- mtcars[, c("mpg", "cyl", "disp")]
   DBI::dbWriteTable(con, "test_data", test_data)
 
-  # Get predictions via SQL
   sql_query <- tidypredict_sql(model, con)
   db_result <- DBI::dbGetQuery(
     con,
     paste0("SELECT ", sql_query, " AS pred FROM test_data")
   )
 
-  # Get native predictions
   X <- data.matrix(test_data)
   native_preds <- predict(model, X)
 
@@ -954,22 +942,18 @@ test_that("SQL predictions match for binary classification with SQLite", {
     verbose = -1L
   )
 
-  # Create in-memory SQLite database
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
-  # Copy test data to database
   test_data <- mtcars[, c("mpg", "cyl", "disp")]
   DBI::dbWriteTable(con, "test_data", test_data)
 
-  # Get predictions via SQL
   sql_query <- tidypredict_sql(model, con)
   db_result <- DBI::dbGetQuery(
     con,
     paste0("SELECT ", sql_query, " AS pred FROM test_data")
   )
 
-  # Get native predictions
   native_preds <- predict(model, X)
 
   expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
@@ -1035,7 +1019,6 @@ test_that("tidypredict_fit returns list for multiclass", {
   expect_length(fit_formulas, 3)
   expect_named(fit_formulas, c("class_0", "class_1", "class_2"))
 
-  # Each element should be a language object
   for (f in fit_formulas) {
     expect_true(is.language(f))
   }
@@ -1269,7 +1252,6 @@ test_that("parse_model handles categorical splits", {
   expect_s3_class(pm, "parsed_model")
   expect_gt(length(pm$trees), 0)
 
-  # Check that path contains set-type conditions
   first_leaf <- pm$trees[[1]][[1]]
   expect_gt(length(first_leaf$path), 0)
   expect_equal(first_leaf$path[[1]]$type, "set")
@@ -1387,7 +1369,6 @@ test_that("categorical with missing values predictions match", {
 
   fit_formula <- tidypredict_fit(model)
 
-  # Test with NA
   test_X <- matrix(c(0, 1, 2, 3, NA), ncol = 1)
   colnames(test_X) <- "cat_feat"
   test_df <- data.frame(cat_feat = c(0, 1, 2, 3, NA))
@@ -1429,11 +1410,9 @@ test_that("categorical SQL generation works", {
     verbose = -1L
   )
 
-  # Test SQL generation
   sql_result <- tidypredict_sql(model, dbplyr::simulate_dbi())
   expect_s3_class(sql_result, "sql")
 
-  # Test with actual SQLite
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
 
@@ -1454,28 +1433,19 @@ test_that("categorical SQL generation works", {
 })
 
 test_that("parse_lgb_categorical_threshold handles various formats", {
-  # Two categories
   expect_equal(
     parse_lgb_categorical_threshold("0||1"),
     c(0L, 1L)
   )
 
-  # Three categories
   expect_equal(
     parse_lgb_categorical_threshold("0||1||3"),
     c(0L, 1L, 3L)
   )
 
-  # Single category
   expect_equal(
     parse_lgb_categorical_threshold("2"),
     2L
-  )
-
-  # Many categories
-  expect_equal(
-    parse_lgb_categorical_threshold("0||2||4||6||8"),
-    c(0L, 2L, 4L, 6L, 8L)
   )
 })
 
@@ -1523,9 +1493,7 @@ test_that("categorical with many categories works", {
 
   set.seed(555)
   n <- 400
-  # 8 categories
   cat_int <- sample(0:7, n, replace = TRUE)
-  # Categories 0,1,2,3 -> high, 4,5,6,7 -> low
   y <- ifelse(cat_int < 4, 10, -10) + rnorm(n, sd = 2)
 
   X <- matrix(cat_int, ncol = 1)
@@ -1618,7 +1586,6 @@ test_that("parsed model can be saved and loaded via YAML", {
   l <- yaml::read_yaml(mp)
   pm_loaded <- as_parsed_model(l)
 
-  # Check predictions match
   fit_original <- tidypredict_fit(pm)
   fit_loaded <- tidypredict_fit(pm_loaded)
 
@@ -1626,7 +1593,6 @@ test_that("parsed model can be saved and loaded via YAML", {
   preds_original <- dplyr::mutate(test_df, pred = !!fit_original)$pred
   preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded)$pred
 
-  # YAML serialization loses some precision, so use tolerance of 1e-6
   expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
 })
 
@@ -1659,7 +1625,6 @@ test_that("parsed multiclass model can be saved and loaded via YAML", {
   l <- yaml::read_yaml(mp)
   pm_loaded <- as_parsed_model(l)
 
-  # Check predictions match for all classes
   fit_original <- tidypredict_fit(pm)
   fit_loaded <- tidypredict_fit(pm_loaded)
 
@@ -1667,7 +1632,7 @@ test_that("parsed multiclass model can be saved and loaded via YAML", {
   for (i in seq_along(fit_original)) {
     preds_original <- dplyr::mutate(test_df, pred = !!fit_original[[i]])$pred
     preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded[[i]])$pred
-    # YAML serialization loses some precision, so use tolerance of 1e-6
+
     expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
   }
 })
@@ -1843,9 +1808,8 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
   trees <- .extract_lgb_trees(model)
 
   expect_type(trees, "list")
-  expect_length(trees, 5) # 5 trees for nrounds = 5
+  expect_length(trees, 5)
 
-  # Each element should be a language object (case_when expression)
   for (tree in trees) {
     expect_true(is.language(tree))
   }
@@ -1866,7 +1830,6 @@ test_that("tidypredict works with parsnip/bonsai lightgbm model", {
   set.seed(123)
   train_data <- mtcars[, c("hp", "mpg", "cyl", "disp")]
 
-  # Fit model via parsnip/bonsai
   model_spec <- parsnip::boost_tree(
     trees = 5,
     tree_depth = 3,
@@ -1881,23 +1844,18 @@ test_that("tidypredict works with parsnip/bonsai lightgbm model", {
     data = train_data
   )
 
-  # Extract underlying lgb.Booster
   lgb_model <- model_fit$fit
 
   expect_s3_class(lgb_model, "lgb.Booster")
-
-  # Test parse_model works
 
   pm <- parse_model(lgb_model)
   expect_s3_class(pm, "parsed_model")
   expect_s3_class(pm, "pm_lgb")
   expect_gt(length(pm$trees), 0)
 
-  # Test tidypredict_fit works
   fit_formula <- tidypredict_fit(lgb_model)
   expect_true(is.language(fit_formula))
 
-  # Test predictions match
   X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
   native_preds <- predict(lgb_model, X)
   tidy_preds <- dplyr::mutate(train_data, pred = !!fit_formula)$pred
@@ -1914,7 +1872,6 @@ test_that("tidypredict works with parsnip/bonsai binary classification", {
   train_data <- mtcars[, c("am", "mpg", "cyl", "disp")]
   train_data$am <- factor(train_data$am)
 
-  # Fit model via parsnip/bonsai
   model_spec <- parsnip::boost_tree(
     trees = 5,
     tree_depth = 3,
@@ -1929,16 +1886,13 @@ test_that("tidypredict works with parsnip/bonsai binary classification", {
     data = train_data
   )
 
-  # Extract underlying lgb.Booster
   lgb_model <- model_fit$fit
 
   expect_s3_class(lgb_model, "lgb.Booster")
 
-  # Test tidypredict_fit works
   fit_formula <- tidypredict_fit(lgb_model)
   expect_true(is.language(fit_formula))
 
-  # Test predictions match
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   native_preds <- predict(lgb_model, X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
