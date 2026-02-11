@@ -1,0 +1,141 @@
+---
+title: "catboost models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{CatBoost models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("catboost", quietly = TRUE)) {
+  library(tidypredict)
+  library(catboost)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |
+|`tidypredict_to_column()`                                      |
+|`tidypredict_test()`                                           |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |
+|`parsnip`                                                      |
+
+## `tidypredict_` functions
+
+```{r}
+library(catboost)
+
+# Prepare data
+X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y <- mtcars$hp
+
+pool <- catboost.load_pool(
+  X,
+  label = y,
+  feature_names = as.list(c("mpg", "cyl", "disp"))
+)
+
+model <- catboost.train(
+  pool,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "RMSE",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the prediction to the original table
+    ```{r}
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the matrix data set.
+    ```{r}
+tidypredict_test(model, xg_df = X)
+    ```
+
+## Supported objectives
+
+CatBoost supports many objective functions. The following objectives are supported by `tidypredict`:
+
+### Regression objectives (identity transform)
+
+- `RMSE` (default)
+- `MAE`
+- `Quantile`
+- `MAPE`
+- `Poisson`
+
+### Binary classification (sigmoid transform)
+
+- `Logloss`
+- `CrossEntropy`
+
+## Binary classification example
+
+```{r}
+X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y_bin <- mtcars$am
+
+pool_bin <- catboost.load_pool(
+  X_bin,
+  label = y_bin,
+  feature_names = as.list(c("mpg", "cyl", "disp"))
+)
+
+model_bin <- catboost.train(
+  pool_bin,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "Logloss",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+
+tidypredict_test(model_bin, xg_df = X_bin)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+```{r}
+str(pm$trees[1])
+```
+
+## Limitations
+
+- Multiclass classification is not supported
+- Categorical features (native CatBoost categoricals) are not supported
+- Prediction intervals are not supported
