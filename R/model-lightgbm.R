@@ -296,6 +296,28 @@ get_lgb_case <- function(path, prediction) {
   expr(!!cl ~ !!prediction)
 }
 
+# For {orbital}
+#' Extract processed LightGBM trees
+#'
+#' For use in orbital package.
+#' @param model A LightGBM model object
+#' @keywords internal
+#' @export
+.extract_lgb_trees <- function(model) {
+  if (!inherits(model, "lgb.Booster")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  parsedmodel <- parse_model(model)
+
+  map(
+    seq_len(length(parsedmodel$trees)),
+    ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
+  )
+}
+
 get_lgb_case_fun <- function(.x) {
   col_name <- as.name(.x$col)
 
