@@ -36,6 +36,8 @@ navbar:
       href: articles/xgboost.html
     - text: LightGBM - lgb.Booster()
       href: articles/lightgbm.html
+    - text: CatBoost - catboost.Model()
+      href: articles/catboost.html
   - text: Articles
     menu:
     - text: Save/Reload

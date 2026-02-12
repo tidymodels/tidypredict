@@ -8,6 +8,12 @@ tidypredict_fit._xgb.Booster <- function(model) {
 #' @export
 tidypredict_fit.model_fit <- function(model) {
   model <- glmnet_set_lambda(model)
+
+  # Special handling for CatBoost models with categorical features
+  if (inherits(model$fit, "catboost.Model")) {
+    return(tidypredict_fit_catboost_parsnip(model))
+  }
+
   tidypredict_fit(model$fit)
 }
 
