@@ -27,6 +27,57 @@ make_catboost_model <- function(
   )
 }
 
+make_multiclass_model <- function(objective = "MultiClass") {
+  set.seed(42)
+  X <- data.matrix(iris[, 1:4])
+  y <- as.integer(iris$Species) - 1L
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(colnames(iris)[1:4])
+  )
+
+  catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = objective,
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+}
+
+make_categorical_model <- function() {
+  set.seed(42)
+  df <- data.frame(
+    num_feat = rnorm(100),
+    cat_feat = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
+    target = rnorm(100)
+  )
+
+  X <- df[, c("num_feat", "cat_feat")]
+  y <- df$target
+
+  pool <- catboost::catboost.load_pool(X, label = y)
+
+  catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      one_hot_max_size = 10
+    )
+  )
+}
+
 # Parser tests ---------------------------------------------------------------
 
 test_that("parse_model returns correct structure", {
@@ -129,6 +180,15 @@ test_that("niter and nfeatures are extracted", {
 
   expect_equal(pm$general$niter, 10)
   expect_equal(pm$general$nfeatures, 3)
+})
+
+test_that("scale and bias are extracted correctly", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  expect_type(pm$general$scale, "integer")
+  expect_type(pm$general$bias, "double")
 })
 
 test_that("path contains both more and less-equal operators", {
@@ -300,6 +360,37 @@ test_that("single split tree produces correct paths", {
   expect_equal(pm$trees[[1]][[2]]$path[[1]]$col, "x")
 })
 
+test_that("stump trees (depth=0) are parsed correctly", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 0L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+
+  # Depth 0 trees should have no splits
+  expect_equal(length(pm$trees[[1]][[1]]$path), 0)
+})
+
 test_that("model without explicit feature names still works", {
   skip_if_not_installed("catboost")
 
@@ -370,6 +461,35 @@ test_that("deeper tree paths are traced correctly", {
   expect_length(tree, 2^n_splits)
 })
 
+test_that("num_class is extracted for multiclass model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model()
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$num_class, 3)
+})
+
+test_that("num_class is 1 for regression model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$num_class, 1)
+})
+
+test_that("categorical features are extracted from model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_categorical_model()
+  pm <- parse_model(model)
+
+  expect_length(pm$general$cat_features, 1)
+  expect_equal(pm$general$cat_feature_names, "cat_feat")
+  expect_type(pm$general$cat_features[[1]]$hash_values, "integer")
+})
+
 # Fit formula tests -------------------------------------------------------
 
 test_that("tidypredict_fit returns language object", {
@@ -403,6 +523,32 @@ test_that("regression predictions match catboost.predict", {
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("model with custom scale works correctly", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  # Simulate a calibrated model with scale != 1
+  # (set_scale_and_bias is Python-only, so we modify the parsed model directly)
+  original_scale <- pm$general$scale
+  bias <- pm$general$bias
+  pm$general$scale <- 0.5
+
+  formula <- tidypredict_fit(pm)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  # Formula is: scale * tree_sum + bias
+  # With scale=0.5: 0.5 * tree_sum + bias
+  # With scale=1: tree_sum + bias (unscaled)
+  # So: scaled = 0.5 * (unscaled - bias) + bias = 0.5 * unscaled + 0.5 * bias
+  pm$general$scale <- original_scale
+  formula_unscaled <- tidypredict_fit(pm)
+  unscaled_preds <- rlang::eval_tidy(formula_unscaled, mtcars)
+
+  expected <- 0.5 * unscaled_preds + 0.5 * bias
+  expect_equal(tidy_preds, expected, tolerance = 1e-10)
 })
 
 test_that("Logloss predictions match catboost.predict", {
@@ -605,6 +751,120 @@ test_that("CrossEntropy predictions match catboost.predict", {
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
 
+test_that("stump trees (depth=0) predictions work correctly", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 0L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  formula <- tidypredict_fit(model)
+  expect_type(formula, "language")
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  # Stump trees produce constant predictions
+  # The formula returns a scalar when no data columns are referenced
+  expect_equal(tidy_preds[[1]], native_preds[[1]], tolerance = 1e-10)
+})
+
+test_that("model with NaN values handles missing correctly with nan_mode Min", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  X[1, 1] <- NA
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 5L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      nan_mode = "Min"
+    )
+  )
+
+  formula <- tidypredict_fit(model)
+  expect_type(formula, "language")
+
+  test_data <- mtcars
+  test_data$mpg[1] <- NA
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  tidy_preds <- rlang::eval_tidy(formula, test_data)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("model with NaN values handles missing correctly with nan_mode Max", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  X[1, 1] <- NA
+  y <- mtcars$hp
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 5L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      nan_mode = "Max"
+    )
+  )
+
+  formula <- tidypredict_fit(model)
+  expect_type(formula, "language")
+
+  test_data <- mtcars
+  test_data$mpg[1] <- NA
+
+  native_preds <- catboost::catboost.predict(model, pool)
+  tidy_preds <- rlang::eval_tidy(formula, test_data)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
 test_that("unsupported objective throws error", {
   skip_if_not_installed("catboost")
 
@@ -679,15 +939,6 @@ test_that("stump tree (empty path) works", {
   value <- rlang::eval_tidy(result, data.frame(x = 1))
 
   expect_equal(value, 42.5)
-})
-
-test_that("scale and bias are extracted correctly", {
-  skip_if_not_installed("catboost")
-  model <- make_catboost_model()
-  pm <- parse_model(model)
-
-  expect_type(pm$general$scale, "integer")
-  expect_type(pm$general$bias, "double")
 })
 
 # SQL generation tests ----------------------------------------------------
@@ -834,48 +1085,6 @@ test_that("loaded model produces same predictions", {
 
 # Multiclass tests ---------------------------------------------------------
 
-make_multiclass_model <- function(objective = "MultiClass") {
-  set.seed(42)
-  X <- data.matrix(iris[, 1:4])
-  y <- as.integer(iris$Species) - 1L
-
-  pool <- catboost::catboost.load_pool(
-    X,
-    label = y,
-    feature_names = as.list(colnames(iris)[1:4])
-  )
-
-  catboost::catboost.train(
-    pool,
-    params = list(
-      iterations = 10L,
-      depth = 3L,
-      learning_rate = 0.5,
-      loss_function = objective,
-      logging_level = "Silent",
-      allow_writing_files = FALSE
-    )
-  )
-}
-
-test_that("num_class is extracted for multiclass model", {
-  skip_if_not_installed("catboost")
-
-  model <- make_multiclass_model()
-  pm <- parse_model(model)
-
-  expect_equal(pm$general$num_class, 3)
-})
-
-test_that("num_class is 1 for regression model", {
-  skip_if_not_installed("catboost")
-
-  model <- make_catboost_model()
-  pm <- parse_model(model)
-
-  expect_equal(pm$general$num_class, 1)
-})
-
 test_that("MultiClass predictions match catboost.predict", {
   skip_if_not_installed("catboost")
 
@@ -971,45 +1180,40 @@ test_that("multiclass model requires num_class >= 2", {
   )
 })
 
-# Categorical feature tests -----------------------------------------------
-
-make_categorical_model <- function() {
-  set.seed(42)
-  df <- data.frame(
-    num_feat = rnorm(100),
-    cat_feat = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
-    target = rnorm(100)
-  )
-
-  X <- df[, c("num_feat", "cat_feat")]
-  y <- df$target
-
-  pool <- catboost::catboost.load_pool(X, label = y)
-
-  catboost::catboost.train(
-    pool,
-    params = list(
-      iterations = 10L,
-      depth = 3L,
-      learning_rate = 0.5,
-      loss_function = "RMSE",
-      logging_level = "Silent",
-      allow_writing_files = FALSE,
-      one_hot_max_size = 10
-    )
-  )
-}
-
-test_that("categorical features are extracted from model", {
+test_that("multiclass stump trees (depth=0) work correctly", {
   skip_if_not_installed("catboost")
 
-  model <- make_categorical_model()
-  pm <- parse_model(model)
+  set.seed(42)
+  X <- data.matrix(iris[, 1:4])
+  y <- as.integer(iris$Species) - 1L
 
-  expect_length(pm$general$cat_features, 1)
-  expect_equal(pm$general$cat_feature_names, "cat_feat")
-  expect_type(pm$general$cat_features[[1]]$hash_values, "integer")
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(colnames(iris)[1:4])
+  )
+
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 0L,
+      learning_rate = 0.5,
+      loss_function = "MultiClass",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+  expect_equal(pm$general$num_class, 3)
+
+  formulas <- tidypredict_fit(model)
+  expect_type(formulas, "list")
+  expect_length(formulas, 3)
 })
+
+# Categorical feature tests -----------------------------------------------
 
 test_that("set_catboost_categories adds hash mapping", {
   skip_if_not_installed("catboost")
@@ -1046,6 +1250,68 @@ test_that("set_catboost_categories adds hash mapping", {
   expect_true(all(
     c("A", "B", "C") %in% unlist(pm$general$cat_features[[1]]$hash_to_category)
   ))
+})
+
+test_that("set_catboost_categories validates parsed_model argument", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+
+  expect_error(
+    set_catboost_categories("not a parsed model", model, data.frame()),
+    "parsed CatBoost model"
+  )
+})
+
+test_that("set_catboost_categories validates model argument", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  expect_error(
+    set_catboost_categories(pm, "not a model", data.frame()),
+    "catboost.Model"
+  )
+})
+
+test_that("set_catboost_categories returns early when no categorical features", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  result <- set_catboost_categories(pm, model, mtcars)
+
+  expect_identical(result, pm)
+})
+
+test_that("set_catboost_categories errors when column not found in data", {
+  skip_if_not_installed("catboost")
+
+  model <- make_categorical_model()
+  pm <- parse_model(model)
+
+  wrong_data <- data.frame(num_feat = 1, other_col = factor("A"))
+
+  expect_error(
+    set_catboost_categories(pm, model, wrong_data),
+    "not found"
+  )
+})
+
+test_that("set_catboost_categories errors when column is not a factor", {
+  skip_if_not_installed("catboost")
+
+  model <- make_categorical_model()
+  pm <- parse_model(model)
+
+  wrong_data <- data.frame(num_feat = 1, cat_feat = "A")
+
+  expect_error(
+    set_catboost_categories(pm, model, wrong_data),
+    "must be a factor"
+  )
 })
 
 test_that("categorical predictions match catboost.predict", {
@@ -1093,7 +1359,6 @@ test_that("categorical features without mapping throws error", {
   model <- make_categorical_model()
   pm <- parse_model(model)
 
-  # Try to generate formula without setting categories
   expect_error(
     tidypredict_fit(pm),
     "No category mapping found"
@@ -1134,7 +1399,6 @@ test_that("categorical features SQL generation works", {
   sql <- tidypredict_sql(pm, dbplyr::simulate_dbi())
 
   expect_s3_class(sql, "sql")
-  # Check that categorical comparisons are present
   sql_str <- as.character(sql)
   expect_true(grepl("cat_feat", sql_str))
   expect_true(grepl("=", sql_str))
@@ -1285,8 +1549,6 @@ test_that("parsnip/bonsai catboost with categorical features works automatically
     data = train_data
   )
 
-  # Categorical features should be handled automatically for parsnip models
-  # No need to call set_catboost_categories()
   fit_formula <- tidypredict_fit(model_fit)
   expect_type(fit_formula, "language")
 
@@ -1423,14 +1685,85 @@ test_that("parsnip categorical predictions match native predictions", {
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
 
-test_that("set_catboost_categories validates model argument", {
+test_that("parsnip model without xlevels throws error", {
   skip_if_not_installed("catboost")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
 
-  model <- make_catboost_model()
-  pm <- parse_model(model)
+  set.seed(42)
+  train_data <- data.frame(
+    num_feat = rnorm(100),
+    cat_feat = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
+    target = rnorm(100)
+  )
+
+  model_spec <- parsnip::boost_tree(
+    trees = 5,
+    tree_depth = 3,
+    min_n = 1
+  ) |>
+    parsnip::set_engine(
+      "catboost",
+      logging_level = "Silent",
+      one_hot_max_size = 10
+    ) |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    target ~ num_feat + cat_feat,
+    data = train_data
+  )
+
+  model_fit$preproc$xlevels <- NULL
 
   expect_error(
-    set_catboost_categories(pm, "not a model", data.frame()),
-    "catboost.Model"
+    tidypredict_fit(model_fit),
+    "no factor level information"
   )
+})
+
+test_that("model with only categorical features works", {
+  skip_if_not_installed("catboost")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  set.seed(42)
+  df <- data.frame(
+    cat_feat1 = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
+    cat_feat2 = factor(sample(c("X", "Y", "Z"), 100, replace = TRUE)),
+    target = rnorm(100)
+  )
+
+  model_spec <- parsnip::boost_tree(
+    trees = 5,
+    tree_depth = 3,
+    min_n = 1
+  ) |>
+    parsnip::set_engine(
+      "catboost",
+      logging_level = "Silent",
+      one_hot_max_size = 10
+    ) |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    target ~ cat_feat1 + cat_feat2,
+    data = df
+  )
+
+  pm <- parse_model(model_fit$fit)
+
+  expect_length(pm$general$feature_names, 0)
+  expect_length(pm$general$cat_features, 2)
+
+  formula <- tidypredict_fit(model_fit)
+  tidy_preds <- rlang::eval_tidy(formula, df)
+
+  X <- df[, c("cat_feat1", "cat_feat2")]
+  pool <- catboost::catboost.load_pool(X)
+  native_preds <- catboost::catboost.predict(model_fit$fit, pool)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })

@@ -25,12 +25,8 @@ parse_model.catboost.Model <- function(model) {
 
   pm$general$params <- list()
   loss_fn <- model_json$model_info$params$loss_function
-  if (!is.null(loss_fn)) {
-    if (is.list(loss_fn) && !is.null(loss_fn$type)) {
-      pm$general$params$objective <- loss_fn$type
-    } else {
-      pm$general$params$objective <- loss_fn
-    }
+  if (!is.null(loss_fn) && is.list(loss_fn) && !is.null(loss_fn$type)) {
+    pm$general$params$objective <- loss_fn$type
   }
 
   # Extract num_class for multiclass models
@@ -95,13 +91,8 @@ parse_model.catboost.Model <- function(model) {
 
   # Extract scale and bias
   scale_and_bias <- model_json$scale_and_bias
-  if (!is.null(scale_and_bias)) {
-    pm$general$scale <- scale_and_bias[[1]]
-    pm$general$bias <- scale_and_bias[[2]][[1]]
-  } else {
-    pm$general$scale <- 1
-    pm$general$bias <- 0
-  }
+  pm$general$scale <- scale_and_bias[[1]]
+  pm$general$bias <- scale_and_bias[[2]][[1]]
 
   num_class <- pm$general$num_class
   pm$trees <- get_catboost_trees(
@@ -640,7 +631,9 @@ build_fit_formula_catboost_multiclass <- function(parsedmodel, objective) {
 
 build_catboost_tree_sum <- function(tree_indices, parsedmodel) {
   if (length(tree_indices) == 0) {
+    # nocov start
     cli::cli_abort("No trees found for tree indices.", .internal = TRUE)
+    # nocov end
   }
   tree_formulas <- map(
     tree_indices,
@@ -687,10 +680,12 @@ get_catboost_case_fun <- function(.x, cat_mapping = list()) {
   }
 
   if (.x$type != "conditional") {
+    # nocov start
     cli::cli_abort(
       "CatBoost only supports conditional and categorical splits, not {.val {.x$type}}.",
       .internal = TRUE
     )
+    # nocov end
   }
 
   build_catboost_comparison_expr(
@@ -709,7 +704,7 @@ build_catboost_comparison_expr <- function(col, op, val, include_missing) {
     op,
     "less-equal" = expr(!!col_name <= !!val),
     "more" = expr(!!col_name > !!val),
-    cli::cli_abort("Unknown operator: {.val {op}}.", .internal = TRUE)
+    cli::cli_abort("Unknown operator: {.val {op}}.", .internal = TRUE) # nocov
   )
 
   if (include_missing) {
@@ -743,10 +738,12 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
   } else if (.x$op == "not-equal") {
     i <- expr(!!col_name != !!category)
   } else {
+    # nocov start
     cli::cli_abort(
       "Unknown categorical operator: {.val {.x$op}}.",
       .internal = TRUE
     )
+    # nocov end
   }
 
   i
