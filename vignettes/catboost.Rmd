@@ -8,9 +8,8 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("catboost", quietly = TRUE)) {
+if (FALSE) {
   library(tidypredict)
-  library(catboost)
   library(dplyr)
   eval_code <- TRUE
 } else {
@@ -33,9 +32,8 @@ knitr::opts_chunk$set(
 
 ## `tidypredict_` functions
 
-```{r}
+```r
 library(catboost)
-
 # Prepare data
 X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y <- mtcars$hp
@@ -60,12 +58,12 @@ model <- catboost.train(
 ```
 
 - Create the R formula
-    ```{r}
+    ```r
 tidypredict_fit(model)
     ```
 
 - Add the prediction to the original table
-    ```{r}
+    ```r
 library(dplyr)
 
 mtcars %>%
@@ -74,7 +72,7 @@ mtcars %>%
     ```
 
 - Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the matrix data set.
-    ```{r}
+    ```r
 tidypredict_test(model, xg_df = X)
     ```
 
@@ -102,7 +100,7 @@ CatBoost supports many objective functions. The following objectives are support
 
 ## Binary classification example
 
-```{r}
+```r
 X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y_bin <- mtcars$am
 
@@ -129,7 +127,7 @@ tidypredict_test(model_bin, xg_df = X_bin)
 
 ## Multiclass classification example
 
-```{r}
+```r
 X_multi <- data.matrix(iris[, 1:4])
 y_multi <- as.integer(iris$Species) - 1L
 
@@ -158,7 +156,7 @@ names(formulas)
 
 Test multiclass predictions:
 
-```{r}
+```r
 tidypredict_test(model_multi, xg_df = X_multi)
 ```
 
@@ -170,7 +168,7 @@ CatBoost models can use categorical features with one-hot encoding.
 
 When using parsnip/bonsai, categorical features are handled automatically:
 
-```{r}
+```r
 library(parsnip)
 library(bonsai)
 
@@ -194,7 +192,7 @@ tidypredict_fit(model_fit)
 
 For raw CatBoost models, you need to manually establish the hash-to-category mapping:
 
-```{r}
+```r
 pool_cat <- catboost.load_pool(
   df_cat[, c("num_feat", "cat_feat")],
   label = df_cat$target
@@ -224,12 +222,12 @@ tidypredict_fit(pm_cat)
 ## Parse model spec
 
 Here is an example of the model spec:
-```{r}
+```r
 pm <- parse_model(model)
 str(pm, 2)
 ```
 
-```{r}
+```r
 str(pm$trees[1])
 ```
 

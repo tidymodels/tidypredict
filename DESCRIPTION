@@ -31,7 +31,6 @@ Imports:
     tidyr
 Suggests:
     bonsai,
-    catboost,
     covr,
     Cubist (>= 0.5.1),
     DBI,

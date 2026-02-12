@@ -8,13 +8,13 @@ make_catboost_model <- function(
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  catboost::catboost.train(
+  catboost_catboost.train(
     pool,
     params = list(
       iterations = iterations,
@@ -32,13 +32,13 @@ make_multiclass_model <- function(objective = "MultiClass") {
   X <- data.matrix(iris[, 1:4])
   y <- as.integer(iris$Species) - 1L
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(colnames(iris)[1:4])
   )
 
-  catboost::catboost.train(
+  catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -62,9 +62,9 @@ make_categorical_model <- function() {
   X <- df[, c("num_feat", "cat_feat")]
   y <- df$target
 
-  pool <- catboost::catboost.load_pool(X, label = y)
+  pool <- catboost_catboost.load_pool(X, label = y)
 
-  catboost::catboost.train(
+  catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -211,12 +211,12 @@ test_that("leaf 0 has all less-equal conditions (binary 00...0)", {
   X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
   y <- c(100, 200, 300, 400)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("x1", "x2"))
   )
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 1L,
@@ -244,12 +244,12 @@ test_that("last leaf has all more conditions (binary 11...1)", {
   X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
   y <- c(100, 200, 300, 400)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("x1", "x2"))
   )
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 1L,
@@ -278,12 +278,12 @@ test_that("leaf index binary representation determines operator pattern", {
   X <- matrix(c(1, 1, 10, 10, 1, 10, 1, 10), ncol = 2)
   y <- c(100, 200, 300, 400)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("x1", "x2"))
   )
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 1L,
@@ -329,12 +329,12 @@ test_that("single split tree produces correct paths", {
   X <- matrix(c(1, 10), ncol = 1)
   y <- c(0, 100)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("x"))
   )
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 1L,
@@ -367,13 +367,13 @@ test_that("stump trees (depth=0) are parsed correctly", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 3L,
@@ -399,9 +399,9 @@ test_that("model without explicit feature names still works", {
   y <- mtcars$hp
 
   # Create pool WITHOUT specifying feature_names
-  pool <- catboost::catboost.load_pool(X, label = y)
+  pool <- catboost_catboost.load_pool(X, label = y)
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 3L,
@@ -432,12 +432,12 @@ test_that("deeper tree paths are traced correctly", {
   colnames(X) <- c("a", "b", "c")
   y <- X[, 1] + X[, 2] * 2 + X[, 3] * 3 + rnorm(n, sd = 0.1)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("a", "b", "c"))
   )
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 1L,
@@ -516,9 +516,9 @@ test_that("regression predictions match catboost.predict", {
   model <- make_catboost_model()
 
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  pool <- catboost::catboost.load_pool(X)
+  pool <- catboost_catboost.load_pool(X)
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -558,13 +558,13 @@ test_that("Logloss predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- as.numeric(mtcars$am)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -576,7 +576,7 @@ test_that("Logloss predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(
+  native_preds <- catboost_catboost.predict(
     model,
     pool,
     prediction_type = "Probability"
@@ -594,13 +594,13 @@ test_that("MAE predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -612,7 +612,7 @@ test_that("MAE predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -626,13 +626,13 @@ test_that("Quantile predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -644,7 +644,7 @@ test_that("Quantile predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -658,13 +658,13 @@ test_that("MAPE predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -676,7 +676,7 @@ test_that("MAPE predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -690,13 +690,13 @@ test_that("Poisson predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$carb
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -708,7 +708,7 @@ test_that("Poisson predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -722,13 +722,13 @@ test_that("CrossEntropy predictions match catboost.predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- as.numeric(mtcars$am)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -740,7 +740,7 @@ test_that("CrossEntropy predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost::catboost.predict(
+  native_preds <- catboost_catboost.predict(
     model,
     pool,
     prediction_type = "Probability"
@@ -758,13 +758,13 @@ test_that("stump trees (depth=0) predictions work correctly", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 3L,
@@ -779,7 +779,7 @@ test_that("stump trees (depth=0) predictions work correctly", {
   formula <- tidypredict_fit(model)
   expect_type(formula, "language")
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
   # Stump trees produce constant predictions
@@ -795,13 +795,13 @@ test_that("model with NaN values handles missing correctly with nan_mode Min", {
   X[1, 1] <- NA
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 5L,
@@ -820,7 +820,7 @@ test_that("model with NaN values handles missing correctly with nan_mode Min", {
   test_data <- mtcars
   test_data$mpg[1] <- NA
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   tidy_preds <- rlang::eval_tidy(formula, test_data)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
@@ -834,13 +834,13 @@ test_that("model with NaN values handles missing correctly with nan_mode Max", {
   X[1, 1] <- NA
   y <- mtcars$hp
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 5L,
@@ -859,7 +859,7 @@ test_that("model with NaN values handles missing correctly with nan_mode Max", {
   test_data <- mtcars
   test_data$mpg[1] <- NA
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
   tidy_preds <- rlang::eval_tidy(formula, test_data)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
@@ -960,8 +960,8 @@ test_that("SQL predictions match native predictions with SQLite", {
   model <- make_catboost_model()
 
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(model, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(model, pool)
 
   con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
   on.exit(DBI::dbDisconnect(con), add = TRUE)
@@ -994,13 +994,13 @@ test_that("tidypredict_test works for binary classification", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- as.numeric(mtcars$am)
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -1090,9 +1090,9 @@ test_that("MultiClass predictions match catboost.predict", {
 
   model <- make_multiclass_model("MultiClass")
   X <- data.matrix(iris[, 1:4])
-  pool <- catboost::catboost.load_pool(X)
+  pool <- catboost_catboost.load_pool(X)
 
-  native_preds <- catboost::catboost.predict(
+  native_preds <- catboost_catboost.predict(
     model,
     pool,
     prediction_type = "Probability"
@@ -1110,9 +1110,9 @@ test_that("MultiClassOneVsAll predictions match catboost.predict", {
 
   model <- make_multiclass_model("MultiClassOneVsAll")
   X <- data.matrix(iris[, 1:4])
-  pool <- catboost::catboost.load_pool(X)
+  pool <- catboost_catboost.load_pool(X)
 
-  native_preds <- catboost::catboost.predict(
+  native_preds <- catboost_catboost.predict(
     model,
     pool,
     prediction_type = "Probability"
@@ -1187,13 +1187,13 @@ test_that("multiclass stump trees (depth=0) work correctly", {
   X <- data.matrix(iris[, 1:4])
   y <- as.integer(iris$Species) - 1L
 
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     X,
     label = y,
     feature_names = as.list(colnames(iris)[1:4])
   )
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 3L,
@@ -1228,9 +1228,9 @@ test_that("set_catboost_categories adds hash mapping", {
   X <- df[, c("num_feat", "cat_feat")]
   y <- df$target
 
-  pool <- catboost::catboost.load_pool(X, label = y)
+  pool <- catboost_catboost.load_pool(X, label = y)
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -1327,9 +1327,9 @@ test_that("categorical predictions match catboost.predict", {
   X <- df[, c("num_feat", "cat_feat")]
   y <- df$target
 
-  pool <- catboost::catboost.load_pool(X, label = y)
+  pool <- catboost_catboost.load_pool(X, label = y)
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -1348,7 +1348,7 @@ test_that("categorical predictions match catboost.predict", {
   formula <- tidypredict_fit(pm)
   tidy_preds <- rlang::eval_tidy(formula, df)
 
-  native_preds <- catboost::catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(model, pool)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
@@ -1378,9 +1378,9 @@ test_that("categorical features SQL generation works", {
   X <- df[, c("num_feat", "cat_feat")]
   y <- df$target
 
-  pool <- catboost::catboost.load_pool(X, label = y)
+  pool <- catboost_catboost.load_pool(X, label = y)
 
-  model <- catboost::catboost.train(
+  model <- catboost_catboost.train(
     pool,
     params = list(
       iterations = 10L,
@@ -1441,8 +1441,8 @@ test_that("tidypredict works with parsnip/bonsai catboost regression", {
   expect_type(fit_formula, "language")
 
   X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(cb_model, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(cb_model, pool)
   tidy_preds <- rlang::eval_tidy(fit_formula, train_data)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
@@ -1479,8 +1479,8 @@ test_that("tidypredict works with parsnip/bonsai catboost classification", {
   expect_type(fit_formula, "language")
 
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(
     cb_model,
     pool,
     prediction_type = "Probability"
@@ -1554,8 +1554,8 @@ test_that("parsnip/bonsai catboost with categorical features works automatically
 
   cb_model <- model_fit$fit
   X <- train_data[, c("num_feat", "cat_feat")]
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(cb_model, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(cb_model, pool)
   tidy_preds <- rlang::eval_tidy(fit_formula, train_data)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
@@ -1639,8 +1639,8 @@ test_that("multiple categorical features work correctly", {
   tidy_preds <- rlang::eval_tidy(formula, df)
 
   X <- df[, c("num_feat", "cat_feat1", "cat_feat2")]
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(model_fit$fit, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(model_fit$fit, pool)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
@@ -1679,8 +1679,8 @@ test_that("parsnip categorical predictions match native predictions", {
   tidy_preds <- rlang::eval_tidy(formula, train_data)
 
   X <- train_data[, c("num_feat", "cat_feat")]
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(model_fit$fit, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(model_fit$fit, pool)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
@@ -1762,8 +1762,8 @@ test_that("model with only categorical features works", {
   tidy_preds <- rlang::eval_tidy(formula, df)
 
   X <- df[, c("cat_feat1", "cat_feat2")]
-  pool <- catboost::catboost.load_pool(X)
-  native_preds <- catboost::catboost.predict(model_fit$fit, pool)
+  pool <- catboost_catboost.load_pool(X)
+  native_preds <- catboost_catboost.predict(model_fit$fit, pool)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })

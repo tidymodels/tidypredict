@@ -586,7 +586,7 @@ catboost_model <- function(
   }
 
   # Create pool for prediction
-  pool <- catboost::catboost.load_pool(cb_df)
+  pool <- catboost_catboost.load_pool(cb_df)
 
   # Detect objective type
   pm <- parse_model(model)
@@ -608,13 +608,13 @@ catboost_model <- function(
   }
 
   if (is_binary) {
-    base <- catboost::catboost.predict(
+    base <- catboost_catboost.predict(
       model,
       pool,
       prediction_type = "Probability"
     )
   } else {
-    base <- catboost::catboost.predict(model, pool)
+    base <- catboost_catboost.predict(model, pool)
   }
 
   te <- tidypredict_to_column(
@@ -675,7 +675,7 @@ catboost_model_multiclass <- function(
   num_class <- pm$general$num_class
 
   # Get native predictions as matrix
-  base <- catboost::catboost.predict(
+  base <- catboost_catboost.predict(
     model,
     pool,
     prediction_type = "Probability"

@@ -11,6 +11,22 @@ catboost_supported_objectives <- c(
 
 # Model parser ------------------------------------------------------------
 
+catboost_catboost.save_model <- function(...) {
+  rlang::eval_tidy(rlang::call2("catboost.save_model", ..., .ns = "catboost"))
+}
+
+catboost_catboost.load_pool <- function(...) {
+  rlang::eval_tidy(rlang::call2("catboost.load_pool", ..., .ns = "catboost"))
+}
+
+catboost_catboost.train <- function(...) {
+  rlang::eval_tidy(rlang::call2("catboost.train", ..., .ns = "catboost"))
+}
+
+catboost_catboost.predict <- function(...) {
+  rlang::eval_tidy(rlang::call2("catboost.predict", ..., .ns = "catboost"))
+}
+
 #' @export
 parse_model.catboost.Model <- function(model) {
   pm <- list()
@@ -20,7 +36,7 @@ parse_model.catboost.Model <- function(model) {
 
   tmp_file <- tempfile(fileext = ".json")
   on.exit(unlink(tmp_file), add = TRUE)
-  catboost::catboost.save_model(model, tmp_file, file_format = "json")
+  catboost_catboost.save_model(model, tmp_file, file_format = "json")
   model_json <- jsonlite::fromJSON(tmp_file, simplifyVector = FALSE)
 
   pm$general$params <- list()
@@ -284,12 +300,12 @@ make_catboost_probe_data <- function(feat_name, categories, target) {
 }
 
 train_catboost_probe_model <- function(train_data, feat_name, n_cat, depth) {
-  pool <- catboost::catboost.load_pool(
+  pool <- catboost_catboost.load_pool(
     train_data[, feat_name, drop = FALSE],
     label = train_data$target
   )
 
-  catboost::catboost.train(
+  catboost_catboost.train(
     pool,
     params = list(
       iterations = if (depth == 1L) 10L else 100L,
@@ -307,7 +323,7 @@ train_catboost_probe_model <- function(train_data, feat_name, n_cat, depth) {
 extract_catboost_model_hashes <- function(model) {
   tmp_file <- tempfile(fileext = ".json")
   on.exit(unlink(tmp_file), add = TRUE)
-  catboost::catboost.save_model(model, tmp_file, file_format = "json")
+  catboost_catboost.save_model(model, tmp_file, file_format = "json")
   model_json <- jsonlite::fromJSON(tmp_file, simplifyVector = FALSE)
   unlist(model_json$features_info$categorical_features[[1]]$values)
 }
