@@ -95,6 +95,11 @@ CatBoost supports many objective functions. The following objectives are support
 - `Logloss`
 - `CrossEntropy`
 
+### Multiclass classification
+
+- `MultiClass` (softmax transform)
+- `MultiClassOneVsAll` (sigmoid per class)
+
 ## Binary classification example
 
 ```{r}
@@ -122,6 +127,41 @@ model_bin <- catboost.train(
 tidypredict_test(model_bin, xg_df = X_bin)
 ```
 
+## Multiclass classification example
+
+```{r}
+X_multi <- data.matrix(iris[, 1:4])
+y_multi <- as.integer(iris$Species) - 1L
+
+pool_multi <- catboost.load_pool(
+  X_multi,
+  label = y_multi,
+  feature_names = as.list(colnames(iris)[1:4])
+)
+
+model_multi <- catboost.train(
+  pool_multi,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "MultiClass",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+
+# Multiclass returns a list of formulas, one per class
+formulas <- tidypredict_fit(model_multi)
+names(formulas)
+```
+
+Test multiclass predictions:
+
+```{r}
+tidypredict_test(model_multi, xg_df = X_multi)
+```
+
 ## Parse model spec
 
 Here is an example of the model spec:
@@ -136,6 +176,5 @@ str(pm$trees[1])
 
 ## Limitations
 
-- Multiclass classification is not supported
 - Categorical features (native CatBoost categoricals) are not supported
 - Prediction intervals are not supported

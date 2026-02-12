@@ -2,7 +2,7 @@
 
 ## New Model Supports
 
-- Added support for CatBoost models (`catboost.Model`). Supports regression and binary classification objectives including RMSE, MAE, Quantile, MAPE, Poisson, Logloss, and CrossEntropy. (#TBD)
+- Added support for CatBoost models (`catboost.Model`). Supports regression, binary classification, and multiclass classification objectives including RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll. (#TBD)
 
 - Added support for LightGBM models (`lgb.Booster`). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)
 

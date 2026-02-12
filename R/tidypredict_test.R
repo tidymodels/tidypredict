@@ -588,11 +588,24 @@ catboost_model <- function(
   # Create pool for prediction
   pool <- catboost::catboost.load_pool(cb_df)
 
-  # Detect if binary classification based on objective
+  # Detect objective type
   pm <- parse_model(model)
   objective <- pm$general$params$objective
   is_binary <- !is.null(objective) &&
     objective %in% c("Logloss", "CrossEntropy")
+  is_multiclass <- !is.null(objective) &&
+    objective %in% c("MultiClass", "MultiClassOneVsAll")
+
+  if (is_multiclass) {
+    return(catboost_model_multiclass(
+      model,
+      df,
+      threshold,
+      pool,
+      pm,
+      objective
+    ))
+  }
 
   if (is_binary) {
     base <- catboost::catboost.predict(
@@ -643,6 +656,77 @@ catboost_model <- function(
       "\n All results are within the difference threshold"
     )
   }
+
+  results <- list()
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}
+
+catboost_model_multiclass <- function(
+  model,
+  df,
+  threshold,
+  pool,
+  pm,
+  objective
+) {
+  num_class <- pm$general$num_class
+
+  # Get native predictions as matrix
+  base <- catboost::catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+
+  # Get tidypredict formulas (returns a list)
+  formulas <- tidypredict_fit(model)
+
+  # Evaluate each class formula
+  te_preds <- lapply(formulas, function(f) rlang::eval_tidy(f, df))
+  te_matrix <- do.call(cbind, te_preds)
+
+  # Compare predictions
+  diffs <- abs(base - te_matrix)
+  max_diff <- max(diffs)
+  above_threshold <- sum(diffs > threshold)
+  alert <- above_threshold > 0
+
+  message <- paste0(
+    "tidypredict test results (multiclass: ",
+    num_class,
+    " classes)\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+
+  if (alert) {
+    message <- paste0(
+      message,
+      "\nRecords above threshold: ",
+      above_threshold,
+      "\nMax difference: ",
+      max_diff
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  # Build raw_results for consistency
+  raw_results <- data.frame(rowid = seq_len(nrow(df)))
+  for (i in seq_len(num_class)) {
+    raw_results[[paste0("base_class_", i - 1)]] <- base[, i]
+    raw_results[[paste0("te_class_", i - 1)]] <- te_matrix[, i]
+    raw_results[[paste0("diff_class_", i - 1)]] <- diffs[, i]
+  }
+  raw_results$max_diff <- apply(diffs, 1, max)
+  raw_results$fit_threshold <- raw_results$max_diff > threshold
 
   results <- list()
   results$raw_results <- raw_results

@@ -619,7 +619,7 @@ test_that("unsupported objective throws error", {
 
   pm <- list(
     general = list(
-      params = list(objective = "MultiClass"),
+      params = list(objective = "UnsupportedObjective"),
       model = "catboost.Model",
       type = "catboost"
     ),
@@ -844,4 +844,144 @@ test_that("loaded model produces same predictions", {
   loaded_preds <- rlang::eval_tidy(tidypredict_fit(loaded), mtcars)
 
   expect_equal(loaded_preds, original_preds, tolerance = 1e-6)
+})
+
+# Multiclass tests ---------------------------------------------------------
+
+make_multiclass_model <- function(objective = "MultiClass") {
+  set.seed(42)
+  X <- data.matrix(iris[, 1:4])
+  y <- as.integer(iris$Species) - 1L
+
+  pool <- catboost::catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(colnames(iris)[1:4])
+  )
+
+  catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = objective,
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      train_dir = tempdir()
+    )
+  )
+}
+
+test_that("num_class is extracted for multiclass model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model()
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$num_class, 3)
+})
+
+test_that("num_class is 1 for regression model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$num_class, 1)
+})
+
+test_that("MultiClass predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model("MultiClass")
+  X <- data.matrix(iris[, 1:4])
+  pool <- catboost::catboost.load_pool(X)
+
+  native_preds <- catboost::catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+
+  formulas <- tidypredict_fit(model)
+  tidy_preds <- lapply(formulas, function(f) rlang::eval_tidy(f, iris))
+  tidy_matrix <- do.call(cbind, tidy_preds)
+
+  expect_equal(unname(tidy_matrix), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("MultiClassOneVsAll predictions match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model("MultiClassOneVsAll")
+  X <- data.matrix(iris[, 1:4])
+  pool <- catboost::catboost.load_pool(X)
+
+  native_preds <- catboost::catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+
+  formulas <- tidypredict_fit(model)
+  tidy_preds <- lapply(formulas, function(f) rlang::eval_tidy(f, iris))
+  tidy_matrix <- do.call(cbind, tidy_preds)
+
+  expect_equal(unname(tidy_matrix), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("multiclass output is list with correct names", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model()
+  formulas <- tidypredict_fit(model)
+
+  expect_type(formulas, "list")
+  expect_length(formulas, 3)
+  expect_named(formulas, c("class_0", "class_1", "class_2"))
+})
+
+test_that("MultiClass probabilities sum to 1", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model("MultiClass")
+  formulas <- tidypredict_fit(model)
+
+  tidy_preds <- lapply(formulas, function(f) rlang::eval_tidy(f, iris))
+  row_sums <- Reduce(`+`, tidy_preds)
+
+  expect_equal(row_sums, rep(1, nrow(iris)), tolerance = 1e-10)
+})
+
+test_that("tidypredict_test works for multiclass", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model()
+  X <- data.matrix(iris[, 1:4])
+
+  result <- tidypredict_test(model, xg_df = X)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("multiclass model requires num_class >= 2", {
+  skip_if_not_installed("catboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "MultiClass"),
+      model = "catboost.Model",
+      type = "catboost",
+      num_class = 1
+    ),
+    trees = list(list(list(prediction = 1, path = list())))
+  )
+  class(pm) <- c("pm_catboost", "parsed_model", "list")
+
+  expect_error(
+    tidypredict_fit(pm),
+    "num_class >= 2"
+  )
 })

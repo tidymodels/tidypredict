@@ -22,6 +22,22 @@ parse_model.catboost.Model <- function(model) {
     }
   }
 
+  # Extract num_class for multiclass models
+  # Only set num_class > 1 for actual multiclass objectives
+  multiclass_objectives <- c("MultiClass", "MultiClassOneVsAll")
+  objective <- pm$general$params$objective
+  class_params <- model_json$model_info$class_params
+  if (
+    !is.null(objective) &&
+      objective %in% multiclass_objectives &&
+      !is.null(class_params) &&
+      !is.null(class_params$class_names)
+  ) {
+    pm$general$num_class <- length(class_params$class_names)
+  } else {
+    pm$general$num_class <- 1
+  }
+
   features_info <- model_json$features_info
   float_features <- features_info$float_features
   feature_names <- vapply(
@@ -45,16 +61,49 @@ parse_model.catboost.Model <- function(model) {
     pm$general$bias <- 0
   }
 
-  pm$trees <- get_catboost_trees(oblivious_trees, float_features)
+  num_class <- pm$general$num_class
+  pm$trees <- get_catboost_trees(oblivious_trees, float_features, num_class)
 
   as_parsed_model(pm)
 }
 
-get_catboost_trees <- function(oblivious_trees, float_features) {
-  map(oblivious_trees, get_catboost_tree, float_features = float_features)
+get_catboost_trees <- function(oblivious_trees, float_features, num_class) {
+  if (num_class <= 1) {
+    # Single output: one tree per iteration
+    map(
+      oblivious_trees,
+      get_catboost_tree,
+      float_features = float_features,
+      class_idx = NULL,
+      num_class = 1
+    )
+  } else {
+    # Multiclass: create num_class virtual trees per iteration
+    # Trees are stored round-robin by class: tree 1 class 0, tree 1 class 1, ...
+    trees <- list()
+    for (i in seq_along(oblivious_trees)) {
+      for (class_idx in seq_len(num_class)) {
+        trees <- c(
+          trees,
+          list(get_catboost_tree(
+            oblivious_trees[[i]],
+            float_features,
+            class_idx = class_idx,
+            num_class = num_class
+          ))
+        )
+      }
+    }
+    trees
+  }
 }
 
-get_catboost_tree <- function(tree_json, float_features) {
+get_catboost_tree <- function(
+  tree_json,
+  float_features,
+  class_idx = NULL,
+  num_class = 1
+) {
   splits <- tree_json$splits
   leaf_values <- unlist(tree_json$leaf_values)
 
@@ -62,8 +111,14 @@ get_catboost_tree <- function(tree_json, float_features) {
 
   # Handle stump (no splits, single leaf)
   if (n_splits == 0) {
+    # For multiclass, leaf_values has num_class values per leaf
+    if (!is.null(class_idx) && num_class > 1) {
+      pred_value <- leaf_values[class_idx]
+    } else {
+      pred_value <- leaf_values[1]
+    }
     return(list(list(
-      prediction = leaf_values[1],
+      prediction = pred_value,
       path = list()
     )))
   }
@@ -110,8 +165,16 @@ get_catboost_tree <- function(tree_json, float_features) {
       )
     }
 
+    # For multiclass, leaf_values has num_class values per leaf
+    # Layout: [leaf0_class0, leaf0_class1, ..., leaf1_class0, leaf1_class1, ...]
+    if (!is.null(class_idx) && num_class > 1) {
+      value_idx <- leaf_idx * num_class + class_idx
+    } else {
+      value_idx <- leaf_idx + 1L # 1-indexed in R
+    }
+
     list(
-      prediction = leaf_values[leaf_idx + 1L], # 1-indexed in R
+      prediction = leaf_values[value_idx],
       path = path
     )
   })
@@ -154,7 +217,12 @@ build_fit_formula_catboost <- function(parsedmodel) {
 
   identity_objectives <- c("RMSE", "MAE", "Quantile", "MAPE", "Poisson")
   sigmoid_objectives <- c("Logloss", "CrossEntropy")
-  all_supported <- c(identity_objectives, sigmoid_objectives)
+  multiclass_objectives <- c("MultiClass", "MultiClassOneVsAll")
+  all_supported <- c(
+    identity_objectives,
+    sigmoid_objectives,
+    multiclass_objectives
+  )
 
   if (!objective %in% all_supported) {
     cli::cli_abort(
@@ -163,6 +231,11 @@ build_fit_formula_catboost <- function(parsedmodel) {
         "i" = "Supported objectives: {.val {all_supported}}."
       )
     )
+  }
+
+  # Handle multiclass separately
+  if (objective %in% multiclass_objectives) {
+    return(build_fit_formula_catboost_multiclass(parsedmodel, objective))
   }
 
   tree_formulas <- map(
@@ -186,6 +259,71 @@ build_fit_formula_catboost <- function(parsedmodel) {
   }
 
   f
+}
+
+build_fit_formula_catboost_multiclass <- function(parsedmodel, objective) {
+  n_trees <- length(parsedmodel$trees)
+  num_class <- parsedmodel$general$num_class
+
+  if (is.null(num_class) || num_class < 2) {
+    cli::cli_abort("Multiclass model must have num_class >= 2.")
+  }
+
+  # Trees are stored round-robin by class: tree1_class0, tree1_class1, ...,
+  # tree2_class0, tree2_class1, ...
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  raw_scores <- lapply(
+    class_trees,
+    build_catboost_tree_sum,
+    parsedmodel = parsedmodel
+  )
+
+  scale <- parsedmodel$general$scale %||% 1
+  bias <- parsedmodel$general$bias %||% 0
+
+  if (scale != 1 || bias != 0) {
+    raw_scores <- lapply(raw_scores, function(f) {
+      if (scale != 1) {
+        f <- expr(!!scale * (!!f))
+      }
+      if (bias != 0) {
+        f <- expr(!!f + !!bias)
+      }
+      f
+    })
+  }
+
+  # Apply transformation based on objective
+  if (objective == "MultiClass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else if (objective == "MultiClassOneVsAll") {
+    # One-vs-all: sigmoid for each class independently
+    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
+build_catboost_tree_sum <- function(tree_indices, parsedmodel) {
+  if (length(tree_indices) == 0) {
+    cli::cli_abort("No trees found for tree indices.", .internal = TRUE)
+  }
+  tree_formulas <- map(
+    tree_indices,
+    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+  )
+  reduce_addition(tree_formulas)
 }
 
 get_catboost_case_tree <- function(tree_no, parsedmodel) {
