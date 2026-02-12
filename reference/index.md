@@ -14,6 +14,8 @@
   : Turn a path object into an expression
 - [`path_formulas()`](https://tidypredict.tidymodels.org/reference/path_formulas.md)
   : Turn a path object into a combined expression
+- [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md)
+  : Set categorical feature mappings for CatBoost model
 - [`tidy(`*`<pm_regression>`*`)`](https://tidypredict.tidymodels.org/reference/tidy.pm_regression.md)
   : Tidy the parsed model results
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)

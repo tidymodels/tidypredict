@@ -26,6 +26,7 @@
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
+    <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
   </ul></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
@@ -57,7 +58,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="tidypredict-development-version">tidypredict (development version)<a class="anchor" aria-label="anchor" href="#tidypredict-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-model-supports-development-version">New Model Supports<a class="anchor" aria-label="anchor" href="#new-model-supports-development-version"></a></h3>
-<ul><li>Added support for LightGBM models (<code>lgb.Booster</code>). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)</li>
+<ul><li><p>Added support for CatBoost models (<code>catboost.Model</code>). Supports regression, binary classification, and multiclass classification objectives including RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll. Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use <code><a href="../reference/set_catboost_categories.html">set_catboost_categories()</a></code>. (#TBD)</p></li>
+<li><p>Added support for LightGBM models (<code>lgb.Booster</code>). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)</p></li>
 </ul></div>
 </div>
     <div class="section level2">

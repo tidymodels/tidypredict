@@ -1,0 +1,210 @@
+# catboost models
+
+| Function                                                                                                                                                                                                                                                       | Works |
+|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |       |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             |       |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       |       |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     |       |
+| `parsnip`                                                                                                                                                                                                                                                      |       |
+
+## `tidypredict_` functions
+
+``` r
+library(catboost)
+# Prepare data
+X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y <- mtcars$hp
+
+pool <- catboost.load_pool(
+  X,
+  label = y,
+  feature_names = as.list(c("mpg", "cyl", "disp"))
+)
+
+model <- catboost.train(
+  pool,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "RMSE",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+```
+
+- Create the R formula `r tidypredict_fit(model)`
+
+- Add the prediction to the original table \`\`\`r library(dplyr)
+
+mtcars %\>% tidypredict_to_column(model) %\>% glimpse() \`\`\`
+
+- Confirm that `tidypredict` results match to the model’s
+  [`predict()`](https://rdrr.io/r/stats/predict.html) results. The
+  `xg_df` argument expects the matrix data set.
+  `r tidypredict_test(model, xg_df = X)`
+
+## Supported objectives
+
+CatBoost supports many objective functions. The following objectives are
+supported by `tidypredict`:
+
+### Regression objectives (identity transform)
+
+- `RMSE` (default)
+- `MAE`
+- `Quantile`
+- `MAPE`
+- `Poisson`
+
+### Binary classification (sigmoid transform)
+
+- `Logloss`
+- `CrossEntropy`
+
+### Multiclass classification
+
+- `MultiClass` (softmax transform)
+- `MultiClassOneVsAll` (sigmoid per class)
+
+## Binary classification example
+
+``` r
+X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+y_bin <- mtcars$am
+
+pool_bin <- catboost.load_pool(
+  X_bin,
+  label = y_bin,
+  feature_names = as.list(c("mpg", "cyl", "disp"))
+)
+
+model_bin <- catboost.train(
+  pool_bin,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "Logloss",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+
+tidypredict_test(model_bin, xg_df = X_bin)
+```
+
+## Multiclass classification example
+
+``` r
+X_multi <- data.matrix(iris[, 1:4])
+y_multi <- as.integer(iris$Species) - 1L
+
+pool_multi <- catboost.load_pool(
+  X_multi,
+  label = y_multi,
+  feature_names = as.list(colnames(iris)[1:4])
+)
+
+model_multi <- catboost.train(
+  pool_multi,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "MultiClass",
+    logging_level = "Silent",
+    allow_writing_files = FALSE
+  )
+)
+
+# Multiclass returns a list of formulas, one per class
+formulas <- tidypredict_fit(model_multi)
+names(formulas)
+```
+
+Test multiclass predictions:
+
+``` r
+tidypredict_test(model_multi, xg_df = X_multi)
+```
+
+## Categorical features
+
+CatBoost models can use categorical features with one-hot encoding.
+
+### With parsnip/bonsai (recommended)
+
+When using parsnip/bonsai, categorical features are handled
+automatically:
+
+``` r
+library(parsnip)
+library(bonsai)
+
+df_cat <- data.frame(
+  num_feat = mtcars$mpg,
+  cat_feat = factor(ifelse(mtcars$am == 1, "manual", "auto")),
+  target = mtcars$hp
+)
+
+model_spec <- boost_tree(trees = 10, tree_depth = 3) |>
+  set_engine("catboost", logging_level = "Silent", one_hot_max_size = 10) |>
+  set_mode("regression")
+
+model_fit <- fit(model_spec, target ~ num_feat + cat_feat, data = df_cat)
+
+# Categorical features are handled automatically
+tidypredict_fit(model_fit)
+```
+
+### With raw CatBoost
+
+For raw CatBoost models, you need to manually establish the
+hash-to-category mapping:
+
+``` r
+pool_cat <- catboost.load_pool(
+  df_cat[, c("num_feat", "cat_feat")],
+  label = df_cat$target
+)
+
+model_cat <- catboost.train(
+  pool_cat,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "RMSE",
+    logging_level = "Silent",
+    allow_writing_files = FALSE,
+    one_hot_max_size = 10
+  )
+)
+
+# Parse and set category mapping manually
+pm_cat <- parse_model(model_cat)
+pm_cat <- set_catboost_categories(pm_cat, model_cat, df_cat)
+
+# Now use the parsed model
+tidypredict_fit(pm_cat)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+
+``` r
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+``` r
+str(pm$trees[1])
+```
+
+## Limitations
+
+- Prediction intervals are not supported

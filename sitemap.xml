@@ -3,6 +3,7 @@
 <url><loc>https://tidypredict.tidymodels.org/CODE_OF_CONDUCT.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/LICENSE-text.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/LICENSE.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/catboost.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/cubist.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/glm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/glmnet.html</loc></url>
@@ -23,6 +24,7 @@
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/acceptable_formula.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_catboost_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_lgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
@@ -35,6 +37,7 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/path_formulas.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/print.tidypredict_test.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/reexports.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/set_catboost_categories.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidy.pm_regression.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict-package.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict_fit.html</loc></url>

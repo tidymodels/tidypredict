@@ -2,6 +2,8 @@
 
 ### All vignettes
 
+- [catboost
+  models](https://tidypredict.tidymodels.org/articles/catboost.md):
 - [Cubist
   models](https://tidypredict.tidymodels.org/articles/cubist.md):
 - [Generalized Linear
