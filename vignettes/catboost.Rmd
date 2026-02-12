@@ -162,6 +162,65 @@ Test multiclass predictions:
 tidypredict_test(model_multi, xg_df = X_multi)
 ```
 
+## Categorical features
+
+CatBoost models can use categorical features with one-hot encoding.
+
+### With parsnip/bonsai (recommended)
+
+When using parsnip/bonsai, categorical features are handled automatically:
+
+```{r}
+library(parsnip)
+library(bonsai)
+
+df_cat <- data.frame(
+  num_feat = mtcars$mpg,
+  cat_feat = factor(ifelse(mtcars$am == 1, "manual", "auto")),
+  target = mtcars$hp
+)
+
+model_spec <- boost_tree(trees = 10, tree_depth = 3) |>
+  set_engine("catboost", logging_level = "Silent", one_hot_max_size = 10) |>
+  set_mode("regression")
+
+model_fit <- fit(model_spec, target ~ num_feat + cat_feat, data = df_cat)
+
+# Categorical features are handled automatically
+tidypredict_fit(model_fit)
+```
+
+### With raw CatBoost
+
+For raw CatBoost models, you need to manually establish the hash-to-category mapping:
+
+```{r}
+pool_cat <- catboost.load_pool(
+  df_cat[, c("num_feat", "cat_feat")],
+  label = df_cat$target
+)
+
+model_cat <- catboost.train(
+  pool_cat,
+  params = list(
+    iterations = 10L,
+    depth = 3L,
+    learning_rate = 0.5,
+    loss_function = "RMSE",
+    logging_level = "Silent",
+    allow_writing_files = FALSE,
+    one_hot_max_size = 10
+  )
+)
+
+# Parse and set category mapping manually
+pm_cat <- parse_model(model_cat)
+pm_cat <- set_catboost_categories(pm_cat, model_cat, df_cat)
+
+# Now use the parsed model
+tidypredict_fit(pm_cat)
+```
+
 ## Parse model spec
 
 Here is an example of the model spec:
@@ -176,5 +235,4 @@ str(pm$trees[1])
 
 ## Limitations
 
-- Categorical features (native CatBoost categoricals) are not supported
 - Prediction intervals are not supported

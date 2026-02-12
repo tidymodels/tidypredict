@@ -735,8 +735,6 @@ catboost_model_multiclass <- function(
   structure(results, class = c("tidypredict_test", "list"))
 }
 
-setOldClass(c("tidypredict_test", "list"))
-
 #' print method for test predictions results
 #' @keywords internal
 #' @export
