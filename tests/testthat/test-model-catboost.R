@@ -111,18 +111,18 @@ test_that("each tree has leaves with predictions and paths", {
   tree1 <- pm$trees[[1]]
   expect_gt(length(tree1), 0)
 
-  leaf_names <- lapply(tree1, names)
-  expect_true(all(vapply(
-    leaf_names,
-    \(x) all(c("prediction", "path") %in% x),
+  has_required_names <- vapply(
+    tree1,
+    \(x) all(c("prediction", "path") %in% names(x)),
     logical(1)
-  )))
+  )
+  expect_all_equal(has_required_names, TRUE)
 
   predictions <- vapply(tree1, \(x) x$prediction, double(1))
   expect_type(predictions, "double")
 
-  paths <- lapply(tree1, \(x) x$path)
-  expect_true(all(vapply(paths, is.list, logical(1))))
+  path_is_list <- vapply(tree1, \(x) is.list(x$path), logical(1))
+  expect_all_equal(path_is_list, TRUE)
 })
 
 test_that("symmetric trees have 2^n_splits leaves", {
@@ -878,10 +878,7 @@ test_that("unsupported objective throws error", {
   )
   class(pm) <- c("pm_catboost", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "Unsupported objective"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("empty trees throws error", {
@@ -897,10 +894,7 @@ test_that("empty trees throws error", {
   )
   class(pm) <- c("pm_catboost", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "Model has no trees"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("NULL objective defaults to RMSE (identity)", {
@@ -919,7 +913,7 @@ test_that("NULL objective defaults to RMSE (identity)", {
   result <- tidypredict_fit(pm)
 
   # Should be identity transformation (no sigmoid)
-  expect_false(grepl("exp", deparse(result)))
+  expect_no_match(deparse(result), "exp")
 })
 
 test_that("stump tree (empty path) works", {
@@ -1022,10 +1016,7 @@ test_that("tidypredict_test requires matrix", {
   skip_if_not_installed("catboost")
   model <- make_catboost_model()
 
-  expect_error(
-    tidypredict_test(model),
-    "require.*matrix"
-  )
+  expect_snapshot(tidypredict_test(model), error = TRUE)
 })
 
 test_that(".extract_catboost_trees returns list of expressions", {
@@ -1040,9 +1031,9 @@ test_that(".extract_catboost_trees returns list of expressions", {
 })
 
 test_that(".extract_catboost_trees errors on non-catboost model", {
-  expect_error(
+  expect_snapshot(
     .extract_catboost_trees(lm(mpg ~ wt, data = mtcars)),
-    "catboost.Model"
+    error = TRUE
   )
 })
 
@@ -1174,10 +1165,7 @@ test_that("multiclass model requires num_class >= 2", {
   )
   class(pm) <- c("pm_catboost", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "num_class >= 2"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("multiclass stump trees (depth=0) work correctly", {
@@ -1247,9 +1235,10 @@ test_that("set_catboost_categories adds hash mapping", {
   pm <- set_catboost_categories(pm, model, df)
 
   expect_type(pm$general$cat_features[[1]]$hash_to_category, "list")
-  expect_true(all(
-    c("A", "B", "C") %in% unlist(pm$general$cat_features[[1]]$hash_to_category)
-  ))
+  expect_contains(
+    unlist(pm$general$cat_features[[1]]$hash_to_category),
+    c("A", "B", "C")
+  )
 })
 
 test_that("set_catboost_categories validates parsed_model argument", {
@@ -1257,9 +1246,9 @@ test_that("set_catboost_categories validates parsed_model argument", {
 
   model <- make_catboost_model()
 
-  expect_error(
+  expect_snapshot(
     set_catboost_categories("not a parsed model", model, data.frame()),
-    "parsed CatBoost model"
+    error = TRUE
   )
 })
 
@@ -1269,9 +1258,9 @@ test_that("set_catboost_categories validates model argument", {
   model <- make_catboost_model()
   pm <- parse_model(model)
 
-  expect_error(
+  expect_snapshot(
     set_catboost_categories(pm, "not a model", data.frame()),
-    "catboost.Model"
+    error = TRUE
   )
 })
 
@@ -1294,10 +1283,7 @@ test_that("set_catboost_categories errors when column not found in data", {
 
   wrong_data <- data.frame(num_feat = 1, other_col = factor("A"))
 
-  expect_error(
-    set_catboost_categories(pm, model, wrong_data),
-    "not found"
-  )
+  expect_snapshot(set_catboost_categories(pm, model, wrong_data), error = TRUE)
 })
 
 test_that("set_catboost_categories errors when column is not a factor", {
@@ -1308,10 +1294,7 @@ test_that("set_catboost_categories errors when column is not a factor", {
 
   wrong_data <- data.frame(num_feat = 1, cat_feat = "A")
 
-  expect_error(
-    set_catboost_categories(pm, model, wrong_data),
-    "must be a factor"
-  )
+  expect_snapshot(set_catboost_categories(pm, model, wrong_data), error = TRUE)
 })
 
 test_that("categorical predictions match catboost.predict", {
@@ -1359,10 +1342,7 @@ test_that("categorical features without mapping throws error", {
   model <- make_categorical_model()
   pm <- parse_model(model)
 
-  expect_error(
-    tidypredict_fit(pm),
-    "No category mapping found"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("categorical features SQL generation works", {
@@ -1400,8 +1380,8 @@ test_that("categorical features SQL generation works", {
 
   expect_s3_class(sql, "sql")
   sql_str <- as.character(sql)
-  expect_true(grepl("cat_feat", sql_str))
-  expect_true(grepl("=", sql_str))
+  expect_match(sql_str, "cat_feat")
+  expect_match(sql_str, "=")
 })
 
 # Parsnip/bonsai tests -----------------------------------------------
@@ -1596,7 +1576,7 @@ test_that("parsnip/bonsai catboost categorical SQL generation works automaticall
 
   expect_s3_class(sql, "sql")
   sql_str <- as.character(sql)
-  expect_true(grepl("cat_feat", sql_str))
+  expect_match(sql_str, "cat_feat")
 })
 
 test_that("multiple categorical features work correctly", {
@@ -1717,10 +1697,7 @@ test_that("parsnip model without xlevels throws error", {
 
   model_fit$preproc$xlevels <- NULL
 
-  expect_error(
-    tidypredict_fit(model_fit),
-    "no factor level information"
-  )
+  expect_snapshot(tidypredict_fit(model_fit), error = TRUE)
 })
 
 test_that("model with only categorical features works", {
