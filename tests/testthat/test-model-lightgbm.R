@@ -52,12 +52,18 @@ test_that("each tree has leaves with predictions and paths", {
   tree1 <- pm$trees[[1]]
   expect_gt(length(tree1), 0)
 
-  for (leaf in tree1) {
-    expect_contains(names(leaf), "prediction")
-    expect_contains(names(leaf), "path")
-    expect_type(leaf$prediction, "double")
-    expect_type(leaf$path, "list")
-  }
+  has_required_names <- vapply(
+    tree1,
+    \(x) all(c("prediction", "path") %in% names(x)),
+    logical(1)
+  )
+  expect_all_equal(has_required_names, TRUE)
+
+  predictions <- vapply(tree1, \(x) x$prediction, double(1))
+  expect_type(predictions, "double")
+
+  path_is_list <- vapply(tree1, \(x) is.list(x$path), logical(1))
+  expect_all_equal(path_is_list, TRUE)
 })
 
 test_that("path conditions have correct structure", {
@@ -865,10 +871,7 @@ test_that("unsupported objective throws error", {
 
   pm$general$params$objective <- "unsupported_objective"
 
-  expect_error(
-    tidypredict_fit(pm),
-    "Unsupported objective"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 # SQL generation tests ------------------------------------------------------
@@ -1019,9 +1022,8 @@ test_that("tidypredict_fit returns list for multiclass", {
   expect_length(fit_formulas, 3)
   expect_named(fit_formulas, c("class_0", "class_1", "class_2"))
 
-  for (f in fit_formulas) {
-    expect_true(is.language(f))
-  }
+  types <- vapply(fit_formulas, typeof, character(1))
+  expect_all_equal(types, "language")
 })
 
 test_that("multiclass predictions match native predictions", {
@@ -1163,9 +1165,8 @@ test_that("multiclass SQL generation returns list of SQL", {
 
   expect_type(sql_result, "list")
   expect_length(sql_result, 3)
-  for (s in sql_result) {
-    expect_s3_class(s, "sql")
-  }
+  is_sql <- vapply(sql_result, \(x) inherits(x, "sql"), logical(1))
+  expect_all_equal(is_sql, TRUE)
 })
 
 # Edge case tests -----------------------------------------------------------
@@ -1179,10 +1180,7 @@ test_that("empty trees throws error", {
   pm$trees <- list()
   class(pm) <- c("pm_lgb", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "Model has no trees"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("multiclass with num_class < 2 throws error", {
@@ -1195,10 +1193,7 @@ test_that("multiclass with num_class < 2 throws error", {
   pm$trees <- list(list(list(prediction = 1, path = list())))
   class(pm) <- c("pm_lgb", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "num_class >= 2"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("multiclass with NULL num_class throws error", {
@@ -1211,10 +1206,7 @@ test_that("multiclass with NULL num_class throws error", {
   pm$trees <- list(list(list(prediction = 1, path = list())))
   class(pm) <- c("pm_lgb", "parsed_model", "list")
 
-  expect_error(
-    tidypredict_fit(pm),
-    "num_class >= 2"
-  )
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
 test_that("NULL objective defaults to regression", {
@@ -1231,7 +1223,7 @@ test_that("NULL objective defaults to regression", {
 
   expect_type(fit_formula, "language")
   # Should produce identity transform (no exp/sigmoid)
-  expect_false(grepl("exp", deparse(fit_formula)))
+  expect_no_match(deparse(fit_formula), "exp")
 })
 
 test_that("stump tree formula generation works (empty path)", {
@@ -1248,8 +1240,8 @@ test_that("stump tree formula generation works (empty path)", {
   expect_type(fit_formula, "language")
   # Should contain TRUE ~ 42.5 for the stump
   formula_str <- deparse(fit_formula)
-  expect_true(grepl("TRUE", formula_str))
-  expect_true(grepl("42.5", formula_str))
+  expect_match(formula_str, "TRUE")
+  expect_match(formula_str, "42.5")
 })
 
 test_that("categorical with missing=TRUE for 'in' operator", {
@@ -1276,8 +1268,8 @@ test_that("categorical with missing=TRUE for 'in' operator", {
 
   formula_str <- deparse(fit_formula)
   # Should contain %in% and is.na for missing handling
-  expect_true(grepl("%in%", formula_str))
-  expect_true(grepl("is.na", formula_str))
+  expect_match(formula_str, "%in%")
+  expect_match(formula_str, "is.na")
 })
 
 test_that("categorical with missing=FALSE for 'not-in' operator", {
@@ -1304,8 +1296,8 @@ test_that("categorical with missing=FALSE for 'not-in' operator", {
 
   formula_str <- deparse(fit_formula)
   # Should contain !(...%in%...) but NOT is.na
-  expect_true(grepl("%in%", formula_str))
-  expect_false(grepl("is.na", formula_str))
+  expect_match(formula_str, "%in%")
+  expect_no_match(formula_str, "is.na")
 })
 
 # Categorical feature tests -------------------------------------------------
@@ -1625,10 +1617,7 @@ test_that("get_lgb_case_fun errors on unknown type", {
     missing = FALSE
   )
 
-  expect_error(
-    get_lgb_case_fun(condition),
-    "Unknown condition type"
-  )
+  expect_snapshot(get_lgb_case_fun(condition), error = TRUE)
 })
 
 test_that("get_lgb_case_fun errors on unknown set operator", {
@@ -1640,10 +1629,7 @@ test_that("get_lgb_case_fun errors on unknown set operator", {
     missing = FALSE
   )
 
-  expect_error(
-    get_lgb_case_fun(condition),
-    "Unknown operator for set"
-  )
+  expect_snapshot(get_lgb_case_fun(condition), error = TRUE)
 })
 
 test_that("parsed model can be saved and loaded via YAML", {
@@ -1720,12 +1706,14 @@ test_that("parsed multiclass model can be saved and loaded via YAML", {
   fit_loaded <- tidypredict_fit(pm_loaded)
 
   test_df <- as.data.frame(X)
-  for (i in seq_along(fit_original)) {
-    preds_original <- dplyr::mutate(test_df, pred = !!fit_original[[i]])$pred
-    preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded[[i]])$pred
+  preds_original <- lapply(fit_original, \(f) {
+    dplyr::mutate(test_df, pred = !!f)$pred
+  })
+  preds_loaded <- lapply(fit_loaded, \(f) {
+    dplyr::mutate(test_df, pred = !!f)$pred
+  })
 
-    expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
-  }
+  expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
 })
 
 test_that("tidypredict_test works for regression model", {
@@ -1807,10 +1795,7 @@ test_that("tidypredict_test errors for multiclass model", {
     verbose = -1L
   )
 
-  expect_error(
-    tidypredict_test(model, xg_df = X),
-    "multiclass"
-  )
+  expect_snapshot(tidypredict_test(model, xg_df = X), error = TRUE)
 })
 
 test_that("tidypredict_test errors when matrix not provided", {
@@ -1837,10 +1822,7 @@ test_that("tidypredict_test errors when matrix not provided", {
     verbose = -1L
   )
 
-  expect_error(
-    tidypredict_test(model),
-    "matrix"
-  )
+  expect_snapshot(tidypredict_test(model), error = TRUE)
 })
 
 test_that("tidypredict_test respects max_rows parameter", {
@@ -1901,16 +1883,12 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
   expect_type(trees, "list")
   expect_length(trees, 5)
 
-  for (tree in trees) {
-    expect_true(is.language(tree))
-  }
+  types <- vapply(trees, typeof, character(1))
+  expect_all_equal(types, "language")
 })
 
 test_that(".extract_lgb_trees errors on non-lgb.Booster", {
-  expect_error(
-    .extract_lgb_trees(list()),
-    "lgb.Booster"
-  )
+  expect_snapshot(.extract_lgb_trees(list()), error = TRUE)
 })
 
 test_that("tidypredict works with parsnip/bonsai lightgbm model", {
@@ -1945,7 +1923,7 @@ test_that("tidypredict works with parsnip/bonsai lightgbm model", {
   expect_gt(length(pm$trees), 0)
 
   fit_formula <- tidypredict_fit(lgb_model)
-  expect_true(is.language(fit_formula))
+  expect_type(fit_formula, "language")
 
   X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
   native_preds <- predict(lgb_model, X)
@@ -1982,7 +1960,7 @@ test_that("tidypredict works with parsnip/bonsai binary classification", {
   expect_s3_class(lgb_model, "lgb.Booster")
 
   fit_formula <- tidypredict_fit(lgb_model)
-  expect_true(is.language(fit_formula))
+  expect_type(fit_formula, "language")
 
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   native_preds <- predict(lgb_model, X)
