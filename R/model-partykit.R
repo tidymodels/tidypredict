@@ -132,6 +132,12 @@ tidypredict_fit.party <- function(model) {
 #' @keywords internal
 #' @export
 .extract_partykit_classprob <- function(model) {
+  if (!inherits(model, "party")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls party}, not {.obj_type_friendly {model}}."
+    )
+  }
+
   extract_classprob <- function(model) {
     mod <- model$fitted
     response <- mod[["(response)"]]

@@ -1887,6 +1887,24 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
   expect_all_equal(types, "language")
 })
 
+test_that(".extract_lgb_trees combined results match tidypredict_fit", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+  test_data <- mtcars[, c("mpg", "cyl", "disp")]
+
+  trees <- .extract_lgb_trees(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(test_data),
+    parent = asNamespace("dplyr")
+  )
+  tree_preds <- lapply(trees, rlang::eval_tidy, env = eval_env)
+  combined <- Reduce(`+`, tree_preds)
+
+  fit_result <- rlang::eval_tidy(tidypredict_fit(model), test_data)
+
+  expect_equal(combined, fit_result)
+})
+
 test_that(".extract_lgb_trees errors on non-lgb.Booster", {
   expect_snapshot(.extract_lgb_trees(list()), error = TRUE)
 })

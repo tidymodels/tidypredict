@@ -674,6 +674,25 @@ test_that(".extract_xgb_trees returns list of expressions", {
   }
 })
 
+test_that(".extract_xgb_trees combined results match tidypredict_fit", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model(nrounds = 4L, objective = "reg:squarederror")
+
+  trees <- .extract_xgb_trees(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(mtcars),
+    parent = asNamespace("dplyr")
+  )
+  tree_preds <- lapply(trees, rlang::eval_tidy, env = eval_env)
+  pm <- parse_model(model)
+  base_score <- pm$general$params$base_score
+  combined <- Reduce(`+`, tree_preds) + base_score
+
+  fit_result <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+
+  expect_equal(combined, fit_result)
+})
+
 test_that(".extract_xgb_trees errors on non-xgb.Booster", {
   expect_snapshot(.extract_xgb_trees(list()), error = TRUE)
 })
