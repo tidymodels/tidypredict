@@ -276,7 +276,7 @@ tidypredict_fit.xgb.Booster <- function(model) {
 .extract_xgb_trees <- function(model) {
   if (!inherits(model, "xgb.Booster")) {
     cli::cli_abort(
-      "{.arg model} must be {.cls xgb.Booster}, not {.obj_type_friendly {x}}."
+      "{.arg model} must be {.cls xgb.Booster}, not {.obj_type_friendly {model}}."
     )
   }
 

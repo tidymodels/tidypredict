@@ -29,8 +29,6 @@
     Code
       .extract_xgb_trees(list())
     Condition
-      Error:
-      ! ! Could not evaluate cli `{}` expression: `x`.
-      Caused by error in `eval(expr, envir = envir)`:
-      ! object 'x' not found
+      Error in `.extract_xgb_trees()`:
+      ! `model` must be <xgb.Booster>, not an empty list.
 
