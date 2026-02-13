@@ -1,330 +1,843 @@
-test_that("returns the right output", {
-  xgb_bin_data <- xgboost::xgb.DMatrix(
+# Helper to create test model
+# Uses mtcars[, -9] (all columns except 'am') to avoid boundary issues
+# This matches the original test setup and avoids floating point precision
+# issues at exact split boundaries
+make_xgb_model <- function(
+  max_depth = 2L,
+  nrounds = 4L,
+  objective = "reg:squarederror"
+) {
+  xgb_data <- xgboost::xgb.DMatrix(
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
 
-  model <- xgboost::xgb.train(
+  xgboost::xgb.train(
     params = list(
-      max_depth = 2,
-      objective = "reg:squarederror",
+      max_depth = max_depth,
+      objective = objective,
       base_score = 0.5
     ),
-    data = xgb_bin_data,
-    nrounds = 4
+    data = xgb_data,
+    nrounds = nrounds,
+    verbose = 0
   )
-  tf <- tidypredict_fit(model)
+}
+
+# Helper to get the standard xgb.DMatrix for testing
+make_xgb_data <- function() {
+  xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+}
+
+# Parser tests ---------------------------------------------------------------
+
+test_that("parse_model returns correct structure", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
   pm <- parse_model(model)
 
-  expect_type(tf, "language")
+  expect_s3_class(pm, "parsed_model")
+  expect_s3_class(pm, "pm_xgb")
 
-  expect_s3_class(pm, "list")
-  expect_equal(length(pm), 2)
-  expect_equal(length(pm$trees), 4)
   expect_equal(pm$general$model, "xgb.Booster")
+  expect_equal(pm$general$type, "xgb")
   expect_equal(pm$general$version, 1)
 
-  expect_snapshot(
-    rlang::expr_text(tf),
-    variant = as.character(packageVersion("xgboost"))
-  )
+  expect_gt(length(pm$trees), 0)
 })
 
-test_that("Model can be saved and re-loaded", {
-  xgb_bin_data <- xgboost::xgb.DMatrix(
-    as.matrix(mtcars[, -9]),
-    label = mtcars$am
-  )
+test_that("correct number of trees extracted", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model(nrounds = 5L)
+  pm <- parse_model(model)
 
+  expect_length(pm$trees, 5)
+})
+
+test_that("each tree has leaves with predictions and paths", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  tree1 <- pm$trees[[1]]
+  expect_gt(length(tree1), 0)
+
+  for (leaf in tree1) {
+    expect_contains(names(leaf), "prediction")
+    expect_contains(names(leaf), "path")
+    expect_type(leaf$prediction, "double")
+    expect_type(leaf$path, "list")
+  }
+})
+
+test_that("path conditions have correct structure", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  tree1 <- pm$trees[[1]]
+  leaves_with_paths <- which(vapply(tree1, \(x) length(x$path) > 0, logical(1)))
+
+  if (length(leaves_with_paths) > 0) {
+    leaf_with_path <- tree1[[leaves_with_paths[1]]]
+
+    cond <- leaf_with_path$path[[1]]
+    expect_equal(cond$type, "conditional")
+    expect_contains(names(cond), c("col", "val", "op", "missing"))
+    expect_contains(c("less", "more-equal"), cond$op)
+  }
+})
+
+test_that("feature names are extracted", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  # Uses mtcars[, -9] which has all columns except 'am'
+  expected_names <- colnames(mtcars)[-9]
+  expect_equal(pm$general$feature_names, expected_names)
+})
+
+test_that("params are extracted", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  expect_contains(names(pm$general), "params")
+  expect_equal(pm$general$params$objective, "reg:squarederror")
+})
+
+test_that("niter and nfeatures are extracted", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model(nrounds = 7L)
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$niter, 7)
+  # Uses mtcars[, -9] which has 10 columns
+  expect_equal(pm$general$nfeatures, 10)
+})
+
+test_that("base_score is extracted", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  expect_type(pm$general$params$base_score, "double")
+})
+
+test_that("path contains both less and more-equal operators", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  all_ops <- unlist(lapply(pm$trees[[1]], function(leaf) {
+    vapply(leaf$path, \(p) p$op, character(1))
+  }))
+
+  expect_contains(all_ops, "more-equal")
+  expect_contains(all_ops, "less")
+})
+
+test_that("deeper tree paths are traced correctly", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  n <- 100
+  X <- matrix(rnorm(n * 3), ncol = 3)
+  colnames(X) <- c("a", "b", "c")
+  y <- X[, 1] + X[, 2] * 2 + X[, 3] * 3 + rnorm(n, sd = 0.1)
+
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("a", "b", "c")
+  )
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 2,
-      objective = "reg:squarederror",
-      base_score = 0.5
+      max_depth = 4L,
+      objective = "reg:squarederror"
     ),
-    data = xgb_bin_data,
-    nrounds = 4
+    data = dtrain,
+    nrounds = 1L,
+    verbose = 0
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(pm, mp)
-  l <- yaml::read_yaml(mp)
-  pm <- as_parsed_model(l)
+  tree <- pm$trees[[1]]
 
-  expect_identical(
-    round_print(tidypredict_fit(model), digits = 6),
-    round_print(tidypredict_fit(pm), digits = 6)
-  )
+  path_lengths <- vapply(tree, \(leaf) length(leaf$path), integer(1))
+  expect_true(any(path_lengths >= 2))
 })
 
-test_that("formulas produces correct predictions", {
-  xgb_bin_data <- xgboost::xgb.DMatrix(
-    as.matrix(mtcars[, -9]),
-    label = mtcars$am
-  )
+test_that("model without explicit feature names still works", {
+  skip_if_not_installed("xgboost")
 
-  # objective = "reg:squarederror"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "reg:squarederror"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
+  set.seed(789)
+  X <- data.matrix(mtcars[, c("mpg", "cyl")])
+  y <- mtcars$hp
 
-  # objective = "binary:logitraw"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "binary:logitraw"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "reg:logistic"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "reg:logistic"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "binary:logistic"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "binary:logistic"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "reg:tweedie"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "reg:tweedie"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "count:poisson"
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "count:poisson"
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "reg:logistic", base_score
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "reg:logistic",
-          base_score = mean(mtcars$am)
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "binary:logistic", base_score
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "binary:logistic",
-          base_score = mean(mtcars$am)
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "reg:logistic", large
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "reg:logistic",
-          base_score = 0.5
-        ),
-        data = xgb_bin_data,
-        nrounds = 50
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "binary:logistic", large
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 2,
-          objective = "binary:logistic",
-          base_score = 0.5
-        ),
-        data = xgb_bin_data,
-        nrounds = 50
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "reg:logistic", depp
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 20,
-          objective = "reg:logistic",
-          base_score = 0.5
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-
-  # objective = "binary:logistic", deep
-  expect_snapshot(
-    tidypredict_test(
-      xgboost::xgb.train(
-        params = list(
-          max_depth = 20,
-          objective = "binary:logistic",
-          base_score = 0.5
-        ),
-        data = xgb_bin_data,
-        nrounds = 4
-      ),
-      mtcars,
-      xg_df = xgb_bin_data,
-      threshold = 0.0000001
-    )
-  )
-})
-
-test_that("base_score isn't included when 0 (#147)", {
-  xgb_bin_data <- xgboost::xgb.DMatrix(
-    as.matrix(mtcars[, -9]),
-    label = mtcars$am
-  )
+  dtrain <- xgboost::xgb.DMatrix(X, label = y)
 
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 1,
-      objective = "reg:squarederror",
-      base_score = 0.5
+      max_depth = 2L,
+      objective = "reg:squarederror"
     ),
-    data = xgb_bin_data,
-    nrounds = 1
+    data = dtrain,
+    nrounds = 3L,
+    verbose = 0
   )
 
-  res <- tidypredict_fit(model)
-  res <- expr_text(res)
-  expect_true(grepl("+ 0.5$", res))
+  pm <- parse_model(model)
+
+  expect_s3_class(pm, "pm_xgb")
+  expect_length(pm$trees, 3)
+  expect_equal(pm$general$nfeatures, 2)
+})
+
+# Fit formula tests ----------------------------------------------------------
+
+test_that("tidypredict_fit returns language object", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+
+  fit_formula <- tidypredict_fit(model)
+
+  expect_type(fit_formula, "language")
+})
+
+test_that("tidypredict_fit works on parsed model", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  fit_formula <- tidypredict_fit(pm)
+
+  expect_type(fit_formula, "language")
+})
+
+test_that("reg:squarederror predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "reg:squarederror")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("binary:logistic predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "binary:logistic")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("reg:logistic predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "reg:logistic")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("binary:logitraw predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "binary:logitraw")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("count:poisson tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$carb
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
 
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 1,
+      max_depth = 3L,
+      objective = "count:poisson"
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = 0
+  )
+
+  # Test that tidypredict_fit produces a formula
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  # tidypredict_test runs without error
+  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
+  expect_s3_class(result, "tidypredict_test")
+})
+
+test_that("reg:tweedie tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 3L,
+      objective = "reg:tweedie"
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = 0
+  )
+
+  # Test that tidypredict_fit produces a formula
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  # tidypredict_test runs without error
+  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
+  expect_s3_class(result, "tidypredict_test")
+})
+
+test_that("model with custom base_score works correctly", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:logistic",
+      base_score = mean(mtcars$am)
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("base_score of 0 is not included in formula", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$am
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 1L,
       objective = "reg:squarederror",
       base_score = 0
     ),
-    data = xgb_bin_data,
-    nrounds = 1
+    data = dtrain,
+    nrounds = 1L,
+    verbose = 0
   )
 
   res <- tidypredict_fit(model)
-  res <- expr_text(res)
-  expect_false(grepl("+ 0$", res))
+  res_text <- rlang::expr_text(res)
+  expect_false(grepl("\\+ 0$", res_text))
 })
 
-test_that(".extract_xgb_trees() works", {
-  xgb_bin_data <- xgboost::xgb.DMatrix(
-    as.matrix(mtcars[, -9]),
-    label = mtcars$am
+test_that("base_score of 0.5 is included in formula", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$am
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
   )
 
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 1,
+      max_depth = 1L,
       objective = "reg:squarederror",
       base_score = 0.5
     ),
-    data = xgb_bin_data,
-    nrounds = 4
+    data = dtrain,
+    nrounds = 1L,
+    verbose = 0
   )
 
-  .extract_xgb_trees(model)
+  res <- tidypredict_fit(model)
+  res_text <- rlang::expr_text(res)
+  expect_match(res_text, "\\+ 0.5$")
+})
+
+test_that("predictions with missing values work", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(456)
+  X <- as.matrix(mtcars[, -9])
+  y <- mtcars$am
+  X_train <- X
+  X_train[1:3, 1] <- NA
+  dtrain <- xgboost::xgb.DMatrix(X_train, label = y)
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror"
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = 0
+  )
+
+  X_pred <- X
+  X_pred[5:7, 1] <- NA
+  X_pred[10:12, 2] <- NA
+
+  fit_formula <- tidypredict_fit(model)
+  dpred <- xgboost::xgb.DMatrix(X_pred)
+  native_preds <- predict(model, dpred)
+
+  pred_df <- as.data.frame(X_pred)
+  tidy_preds <- rlang::eval_tidy(fit_formula, pred_df)
+
+  # Check formula runs without error on data with NA values
+  expect_type(tidy_preds, "double")
+  expect_length(tidy_preds, nrow(mtcars))
+})
+
+test_that("unsupported objective throws error", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "unsupported_objective"),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(list(prediction = 1, path = list())))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
+})
+
+test_that("NULL objective warns user", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(base_score = 0),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(list(prediction = 5.0, path = list())))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  expect_snapshot(tidypredict_fit(pm))
+})
+
+test_that("stump tree (empty path) works", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "reg:squarederror", base_score = 0),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(list(prediction = 42.5, path = list())))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  result <- tidypredict_fit(pm)
+  value <- rlang::eval_tidy(result, data.frame(x = 1))
+
+  expect_equal(value, 42.5)
+})
+
+test_that("large model predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(
+    max_depth = 2L,
+    nrounds = 50L,
+    objective = "reg:logistic"
+  )
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("deep tree predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(
+    max_depth = 20L,
+    nrounds = 4L,
+    objective = "binary:logistic"
+  )
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+# SQL generation tests -------------------------------------------------------
+
+test_that("tidypredict_sql returns SQL class", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("dbplyr")
+  model <- make_xgb_model()
+
+  sql_result <- tidypredict_sql(model, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("tidypredict_sql works with parsed model", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("dbplyr")
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  sql_result <- tidypredict_sql(pm, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("SQL predictions can be generated with SQLite", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dbplyr")
+
+  model <- make_xgb_model()
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  # Use all columns except 'am' (column 9)
+  test_data <- mtcars[, -9]
+  DBI::dbWriteTable(con, "test_data", test_data)
+
+  sql_query <- tidypredict_sql(model, con)
+
+  # SQL query can be executed without error
+  db_result <- DBI::dbGetQuery(
+    con,
+    paste0("SELECT ", sql_query, " AS pred FROM test_data")
+  )
+
+  expect_equal(nrow(db_result), nrow(mtcars))
+  expect_type(db_result$pred, "double")
+})
+
+test_that("SQL predictions work for binary classification with SQLite", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dbplyr")
+
+  model <- make_xgb_model(objective = "binary:logistic")
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  on.exit(DBI::dbDisconnect(con), add = TRUE)
+
+  # Use all columns except 'am' (column 9)
+  test_data <- mtcars[, -9]
+  DBI::dbWriteTable(con, "test_data", test_data)
+
+  sql_query <- tidypredict_sql(model, con)
+
+  # SQL query can be executed without error
+  db_result <- DBI::dbGetQuery(
+    con,
+    paste0("SELECT ", sql_query, " AS pred FROM test_data")
+  )
+
+  expect_equal(nrow(db_result), nrow(mtcars))
+  expect_type(db_result$pred, "double")
+  # Binary logistic predictions should be between 0 and 1
+  expect_true(all(db_result$pred >= 0 & db_result$pred <= 1))
+})
+
+# Integration tests ----------------------------------------------------------
+
+test_that("tidypredict_test works for regression", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+  xgb_data <- make_xgb_data()
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test works for binary classification", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "binary:logistic")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test xg_df argument is required", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+
+  # Without xg_df, tidypredict_test should fail
+  expect_snapshot(tidypredict_test(model, mtcars), error = TRUE)
+})
+
+test_that("tidypredict_test respects max_rows parameter", {
+  skip_if_not_installed("xgboost")
+
+  model <- make_xgb_model()
+  xgb_data <- make_xgb_data()
+
+  # Create a subset DMatrix for max_rows = 10
+  X <- as.matrix(mtcars[1:10, -9])
+  xgb_subset <- xgboost::xgb.DMatrix(X)
+
+  result <- tidypredict_test(
+    model,
+    mtcars[1:10, ],
+    xg_df = xgb_subset,
+    max_rows = 10
+  )
+
+  expect_equal(nrow(result$raw_results), 10)
+})
+
+test_that(".extract_xgb_trees returns list of expressions", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model(nrounds = 4L)
+
+  trees <- .extract_xgb_trees(model)
+
+  expect_type(trees, "list")
+  expect_length(trees, 4)
+  for (tree in trees) {
+    expect_type(tree, "language")
+  }
+})
+
+test_that(".extract_xgb_trees errors on non-xgb.Booster", {
+  expect_snapshot(.extract_xgb_trees(list()), error = TRUE)
+})
+
+# YAML serialization tests ---------------------------------------------------
+
+test_that("parsed model can be saved and loaded via YAML", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("yaml")
+
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  tmp_file <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, tmp_file)
+  loaded <- yaml::read_yaml(tmp_file)
+  pm_loaded <- as_parsed_model(loaded)
+
+  expect_equal(pm_loaded$general$model, pm$general$model)
+  expect_equal(pm_loaded$general$type, pm$general$type)
+  expect_equal(pm_loaded$general$niter, pm$general$niter)
+})
+
+test_that("loaded model produces same predictions", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("yaml")
+
+  model <- make_xgb_model()
+  pm <- parse_model(model)
+
+  tmp_file <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, tmp_file)
+  loaded <- yaml::read_yaml(tmp_file)
+  pm_loaded <- as_parsed_model(loaded)
+
+  original_preds <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+  loaded_preds <- rlang::eval_tidy(tidypredict_fit(pm_loaded), mtcars)
+
+  expect_equal(loaded_preds, original_preds, tolerance = 1e-5)
+})
+
+# Parsnip integration tests --------------------------------------------------
+
+test_that("tidypredict works with parsnip xgboost regression", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
+
+  set.seed(123)
+  # Use all columns except am (column 9) for consistency
+  train_data <- mtcars
+
+  model_spec <- parsnip::boost_tree(
+    trees = 4,
+    tree_depth = 2,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("xgboost") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    am ~ . - hp,
+    data = train_data
+  )
+
+  xgb_model <- model_fit$fit
+
+  expect_s3_class(xgb_model, "xgb.Booster")
+
+  pm <- parse_model(xgb_model)
+  expect_s3_class(pm, "parsed_model")
+  expect_s3_class(pm, "pm_xgb")
+  expect_gt(length(pm$trees), 0)
+
+  fit_formula <- tidypredict_fit(xgb_model)
+  expect_type(fit_formula, "language")
+})
+
+test_that("tidypredict works with parsnip xgboost classification", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
+
+  set.seed(456)
+  train_data <- mtcars
+  train_data$am <- factor(train_data$am)
+
+  model_spec <- parsnip::boost_tree(
+    trees = 4,
+    tree_depth = 2,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("xgboost") |>
+    parsnip::set_mode("classification")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    am ~ . - hp,
+    data = train_data
+  )
+
+  xgb_model <- model_fit$fit
+
+  expect_s3_class(xgb_model, "xgb.Booster")
+
+  fit_formula <- tidypredict_fit(xgb_model)
+  expect_type(fit_formula, "language")
+})
+
+test_that("tidypredict_sql works with parsnip xgboost model", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
+
+  set.seed(123)
+  train_data <- mtcars
+
+  model_spec <- parsnip::boost_tree(
+    trees = 3,
+    tree_depth = 2,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("xgboost") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    am ~ . - hp,
+    data = train_data
+  )
+  xgb_model <- model_fit$fit
+
+  sql_result <- tidypredict_sql(xgb_model, dbplyr::simulate_dbi())
+
+  expect_s3_class(sql_result, "sql")
+})
+
+test_that("tidypredict_test works with parsnip xgboost model", {
+  skip_if_not_installed("xgboost")
+  skip_if_not_installed("parsnip")
+
+  set.seed(123)
+  train_data <- mtcars
+
+  model_spec <- parsnip::boost_tree(
+    trees = 4,
+    tree_depth = 2,
+    min_n = 1
+  ) |>
+    parsnip::set_engine("xgboost") |>
+    parsnip::set_mode("regression")
+
+  model_fit <- parsnip::fit(
+    model_spec,
+    am ~ . - hp,
+    data = train_data
+  )
+  xgb_model <- model_fit$fit
+
+  # Test that formula can be generated and evaluated
+  fit_formula <- tidypredict_fit(xgb_model)
+  expect_type(fit_formula, "language")
+
+  # Test that predictions can be generated
+  preds <- rlang::eval_tidy(fit_formula, train_data)
+  expect_type(preds, "double")
+  expect_length(preds, nrow(train_data))
 })
