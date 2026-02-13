@@ -73,3 +73,37 @@ test_that("formulas produces correct predictions", {
     )
   )
 })
+
+# .extract_partykit_classprob tests ------------------------------------------
+
+test_that(".extract_partykit_classprob returns list of expressions", {
+  model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+  exprs <- .extract_partykit_classprob(model)
+
+  expect_type(exprs, "list")
+  expect_length(exprs, 3)
+  for (expr in exprs) {
+    expect_type(expr, "language")
+  }
+})
+
+test_that(".extract_partykit_classprob results match predict probabilities", {
+  model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+  exprs <- .extract_partykit_classprob(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(iris),
+    parent = asNamespace("dplyr")
+  )
+  probs <- lapply(exprs, rlang::eval_tidy, env = eval_env)
+  combined <- do.call(cbind, probs)
+
+  native <- predict(model, type = "prob")
+
+  expect_equal(unname(combined), unname(native))
+})
+
+test_that(".extract_partykit_classprob errors on non-party model", {
+  expect_snapshot(.extract_partykit_classprob(list()), error = TRUE)
+})

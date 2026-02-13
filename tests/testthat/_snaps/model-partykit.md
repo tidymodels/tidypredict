@@ -46,3 +46,11 @@
       
        All results are within the difference threshold
 
+# .extract_partykit_classprob errors on non-party model
+
+    Code
+      .extract_partykit_classprob(list())
+    Condition
+      Error in `.extract_partykit_classprob()`:
+      ! `model` must be <party>, not an empty list.
+

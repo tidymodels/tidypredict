@@ -1030,6 +1030,27 @@ test_that(".extract_catboost_trees returns list of expressions", {
   expect_type(trees[[1]], "language")
 })
 
+test_that(".extract_catboost_trees combined results match tidypredict_fit", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+  test_data <- mtcars[, c("mpg", "cyl", "disp")]
+
+  trees <- .extract_catboost_trees(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(test_data),
+    parent = asNamespace("dplyr")
+  )
+  tree_preds <- lapply(trees, rlang::eval_tidy, env = eval_env)
+  pm <- parse_model(model)
+  scale <- pm$general$scale %||% 1
+  bias <- pm$general$bias %||% 0
+  combined <- Reduce(`+`, tree_preds) * scale + bias
+
+  fit_result <- rlang::eval_tidy(tidypredict_fit(model), test_data)
+
+  expect_equal(combined, fit_result)
+})
+
 test_that(".extract_catboost_trees errors on non-catboost model", {
   expect_snapshot(
     .extract_catboost_trees(lm(mpg ~ wt, data = mtcars)),
