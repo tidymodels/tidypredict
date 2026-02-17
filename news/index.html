@@ -61,6 +61,11 @@
 <ul><li><p>Added support for CatBoost models (<code>catboost.Model</code>). Supports regression, binary classification, and multiclass classification objectives including RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll. Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use <code><a href="../reference/set_catboost_categories.html">set_catboost_categories()</a></code>. (#TBD)</p></li>
 <li><p>Added support for LightGBM models (<code>lgb.Booster</code>). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)</p></li>
 </ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
+<ul><li>
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly handles xgboost models with stump trees (single leaf, no splits). (<a href="https://github.com/tidymodels/tidypredict/issues/182" class="external-link">#182</a>)</li>
+</ul></div>
 </div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.1" id="tidypredict-101">tidypredict 1.0.1<a class="anchor" aria-label="anchor" href="#tidypredict-101"></a></h2><p class="text-muted">CRAN release: 2025-12-13</p>

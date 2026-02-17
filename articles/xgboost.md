@@ -114,7 +114,11 @@ model <- xgboost::xgb.train(
   #>         is.na(qsec)) ~ -0.0145772668) + case_when(qsec < 18.5200005 ~ 
   #>     0.0117362784, (qsec >= 18.5200005 | is.na(qsec)) ~ -0.0123759825) + 
   #>     case_when(wt < 3.19000006 ~ 0.0388614088, (wt >= 3.19000006 | 
-  #>         is.na(wt)) ~ -0.0400568396) + log(0.5/(1 - 0.5))))
+  #>         is.na(wt)) ~ -0.0400568396) + case_when(TRUE ~ -0.000357544719) + 
+  #>     case_when(TRUE ~ -0.000285989838) + case_when(TRUE ~ -0.000228823963) + 
+  #>     case_when(TRUE ~ -0.00018303754) + case_when(TRUE ~ -0.000146419203) + 
+  #>     case_when(TRUE ~ -0.000117138377) + case_when(TRUE ~ -9.37248842e-05) + 
+  #>     case_when(TRUE ~ -7.49547908e-05) + log(0.5/(1 - 0.5))))
   ```
 
 - Add the prediction to the original table
@@ -138,7 +142,7 @@ model <- xgboost::xgb.train(
   #> $ am   <dbl> 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…
   #> $ gear <dbl> 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4,…
   #> $ carb <dbl> 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2,…
-  #> $ fit  <dbl> 0.98576418, 0.98576418, 0.93905137, 0.01081509, 0.046390…
+  #> $ fit  <dbl> 0.98574329, 0.98574329, 0.93896617, 0.01079918, 0.046325…
   ```
 
 - Confirm that `tidypredict` results match to the model’s
@@ -150,7 +154,11 @@ model <- xgboost::xgb.train(
   #> tidypredict test results
   #> Difference threshold: 1e-12
   #> 
-  #>  All results are within the difference threshold
+  #> Fitted records above the threshold: 5
+  #> 
+  #> Fit max  difference:
+  #> Lower max difference:
+  #> Upper max difference:7.11972936162653e-08
   ```
 
 Please be aware that xgboost converts data into 32-bit floats
@@ -199,7 +207,7 @@ str(pm, 2)
 #>   ..$ niter        : int 50
 #>   ..$ nfeatures    : int 10
 #>   ..$ version      : num 1
-#>  $ trees  :List of 42
+#>  $ trees  :List of 50
 #>   ..$ 0 :List of 3
 #>   ..$ 1 :List of 3
 #>   ..$ 2 :List of 3
@@ -242,6 +250,14 @@ str(pm, 2)
 #>   ..$ 39:List of 2
 #>   ..$ 40:List of 2
 #>   ..$ 41:List of 2
+#>   ..$ 42:List of 1
+#>   ..$ 43:List of 1
+#>   ..$ 44:List of 1
+#>   ..$ 45:List of 1
+#>   ..$ 46:List of 1
+#>   ..$ 47:List of 1
+#>   ..$ 48:List of 1
+#>   ..$ 49:List of 1
 #>  - attr(*, "class")= chr [1:3] "parsed_model" "pm_xgb" "list"
 ```
 

@@ -229,7 +229,11 @@
 <span><span class="co">#&gt;         is.na(qsec)) ~ -0.0145772668) + case_when(qsec &lt; 18.5200005 ~ </span></span>
 <span><span class="co">#&gt;     0.0117362784, (qsec &gt;= 18.5200005 | is.na(qsec)) ~ -0.0123759825) + </span></span>
 <span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0388614088, (wt &gt;= 3.19000006 | </span></span>
-<span><span class="co">#&gt;         is.na(wt)) ~ -0.0400568396) + log(0.5/(1 - 0.5))))</span></span></code></pre></div>
+<span><span class="co">#&gt;         is.na(wt)) ~ -0.0400568396) + case_when(TRUE ~ -0.000357544719) + </span></span>
+<span><span class="co">#&gt;     case_when(TRUE ~ -0.000285989838) + case_when(TRUE ~ -0.000228823963) + </span></span>
+<span><span class="co">#&gt;     case_when(TRUE ~ -0.00018303754) + case_when(TRUE ~ -0.000146419203) + </span></span>
+<span><span class="co">#&gt;     case_when(TRUE ~ -0.000117138377) + case_when(TRUE ~ -9.37248842e-05) + </span></span>
+<span><span class="co">#&gt;     case_when(TRUE ~ -7.49547908e-05) + log(0.5/(1 - 0.5))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -252,7 +256,7 @@
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98576418<span style="color: #949494;">, </span>0.98576418<span style="color: #949494;">, </span>0.93905137<span style="color: #949494;">, </span>0.01081509<span style="color: #949494;">, </span>0.046390…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98574329<span style="color: #949494;">, </span>0.98574329<span style="color: #949494;">, </span>0.93896617<span style="color: #949494;">, </span>0.01079918<span style="color: #949494;">, </span>0.046325…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that <code>tidypredict</code> results match to the
@@ -263,7 +267,11 @@ expects the <code>xgb.DMatrix</code> data set.</p>
 <span><span class="co">#&gt; tidypredict test results</span></span>
 <span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
+<span><span class="co">#&gt; Fitted records above the threshold: 5</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Fit max  difference:</span></span>
+<span><span class="co">#&gt; Lower max difference:</span></span>
+<span><span class="co">#&gt; Upper max difference:7.11972936162653e-08</span></span></code></pre></div>
 </li>
 </ul>
 <p>Please be aware that xgboost converts data into 32-bit floats
@@ -309,7 +317,7 @@ issue</a> for more information.</p>
 <span><span class="co">#&gt;   ..$ niter        : int 50</span></span>
 <span><span class="co">#&gt;   ..$ nfeatures    : int 10</span></span>
 <span><span class="co">#&gt;   ..$ version      : num 1</span></span>
-<span><span class="co">#&gt;  $ trees  :List of 42</span></span>
+<span><span class="co">#&gt;  $ trees  :List of 50</span></span>
 <span><span class="co">#&gt;   ..$ 0 :List of 3</span></span>
 <span><span class="co">#&gt;   ..$ 1 :List of 3</span></span>
 <span><span class="co">#&gt;   ..$ 2 :List of 3</span></span>
@@ -352,6 +360,14 @@ issue</a> for more information.</p>
 <span><span class="co">#&gt;   ..$ 39:List of 2</span></span>
 <span><span class="co">#&gt;   ..$ 40:List of 2</span></span>
 <span><span class="co">#&gt;   ..$ 41:List of 2</span></span>
+<span><span class="co">#&gt;   ..$ 42:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 43:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 44:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 45:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 46:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 47:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 48:List of 1</span></span>
+<span><span class="co">#&gt;   ..$ 49:List of 1</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_xgb" "list"</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>

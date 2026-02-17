@@ -17,6 +17,13 @@
   regression, binary classification, multiclass classification, and
   categorical features. (#TBD)
 
+### Bug Fixes
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now correctly handles xgboost models with stump trees (single leaf, no
+  splits).
+  ([\#182](https://github.com/tidymodels/tidypredict/issues/182))
+
 ## tidypredict 1.0.1
 
 CRAN release: 2025-12-13
