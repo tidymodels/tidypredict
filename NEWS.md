@@ -12,6 +12,8 @@
 
 ## Bug Fixes
 
+- `tidypredict_fit()` now correctly incorporates `base_score` for xgboost models with `count:poisson` and `reg:tweedie` objectives. Previously, predictions were incorrect when `base_score` was not the default value. (#184)
+
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)
 
 # tidypredict 1.0.1
