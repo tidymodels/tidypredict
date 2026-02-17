@@ -8,7 +8,7 @@
 
 ## Improvements
 
-- xgboost support now includes additional objectives: `binary:hinge`, `reg:absoluteerror`, `reg:gamma`, and `reg:pseudohubererror`. (#184)
+- xgboost support now includes additional objectives: `binary:hinge`, `reg:absoluteerror`, `reg:gamma`, `reg:pseudohubererror`, and `reg:squaredlogerror`. (#184)
 
 ## Bug Fixes
 

@@ -220,7 +220,14 @@ build_fit_formula_xgb <- function(parsedmodel) {
       "If the objective is a custom function, 
       please explicitly apply it to the output."
     )
-  } else if (objective %in% c("reg:squarederror", "binary:logitraw")) {
+  } else if (
+    objective %in%
+      c(
+        "reg:squarederror",
+        "reg:squaredlogerror",
+        "binary:logitraw"
+      )
+  ) {
     assigned <- 1
     if (base_score != 0) {
       f <- expr_addition(f, base_score)
@@ -248,7 +255,7 @@ build_fit_formula_xgb <- function(parsedmodel) {
         i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
         {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
         {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
-        {.val reg:squarederror}, {.val reg:tweedie}.",
+        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
         i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
         are not supported."
       )

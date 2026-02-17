@@ -335,6 +335,40 @@ test_that("reg:tweedie predictions match native predict", {
   expect_false(result$alert)
 })
 
+test_that("reg:squaredlogerror predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squaredlogerror",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
 test_that("reg:gamma predictions match native predict", {
   skip_if_not_installed("xgboost")
 
