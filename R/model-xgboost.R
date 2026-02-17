@@ -62,7 +62,7 @@ get_xgb_tree <- function(tree) {
   x
 }
 
-get_xgb_trees <- function(model, filter_trees = TRUE) {
+get_xgb_trees <- function(model) {
   xd <- xgboost::xgb.dump(
     model = model,
     dump_format = "text",
@@ -75,14 +75,14 @@ get_xgb_trees <- function(model, filter_trees = TRUE) {
       with_stats = TRUE
     )
     feature_names <- model$feature_names
-    get_xgb_trees_character(xd, feature_names, filter_trees)
+    get_xgb_trees_character(xd, feature_names)
   } else {
     feature_names <- xgboost::getinfo(model, "feature_name")
-    get_xgb_trees_character(model, feature_names, filter_trees)
+    get_xgb_trees_character(model, feature_names)
   }
 }
 
-get_xgb_trees_character <- function(x, feature_names, filter_trees) {
+get_xgb_trees_character <- function(x, feature_names) {
   # To deal with new agboost version
   if (is.character(x)) {
     trees <- xgboost::xgb.model.dt.tree(text = x)
@@ -112,10 +112,6 @@ get_xgb_trees_character <- function(x, feature_names, filter_trees) {
     lapply(trees[, c("Yes", "No", "Missing")], function(x) as.integer(x) + 1)
 
   trees_split <- split(trees, trees$Tree)
-  if (filter_trees) {
-    trees_rows <- purrr::map_dbl(trees_split, nrow)
-    trees_split <- trees_split[trees_rows > 1]
-  }
 
   purrr::map(trees_split, get_xgb_tree)
 }
@@ -149,7 +145,7 @@ parse_model.xgb.Booster <- function(model) {
   pm$general$params$base_score <- get_base_score(model)
 
   pm$general$version <- 1
-  pm$trees <- get_xgb_trees(model, filter_trees = FALSE)
+  pm$trees <- get_xgb_trees(model)
   as_parsed_model(pm)
 }
 
@@ -308,7 +304,7 @@ tidypredict_fit.xgb.Booster <- function(model) {
 
   pm$general$version <- 1
 
-  pm$trees <- get_xgb_trees(model, filter_trees = FALSE)
+  pm$trees <- get_xgb_trees(model)
 
   parsedmodel <- as_parsed_model(pm)
   map(
