@@ -68,6 +68,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
 <ul><li><p><code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly incorporates <code>base_score</code> for xgboost models with <code>count:poisson</code> and <code>reg:tweedie</code> objectives. Previously, predictions were incorrect when <code>base_score</code> was not the default value. (<a href="https://github.com/tidymodels/tidypredict/issues/184" class="external-link">#184</a>)</p></li>
+<li><p><code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly handles xgboost DART booster models with <code>rate_drop &gt; 0</code>. DART uses tree weight normalization during training, and these weights are now properly applied to each tree’s predictions. (<a href="https://github.com/tidymodels/tidypredict/issues/183" class="external-link">#183</a>)</p></li>
 <li><p><code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly handles xgboost models with stump trees (single leaf, no splits). (<a href="https://github.com/tidymodels/tidypredict/issues/182" class="external-link">#182</a>)</p></li>
 </ul></div>
 </div>

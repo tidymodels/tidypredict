@@ -199,13 +199,14 @@ Here is an example of the model spec:
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
-#>  $ general:List of 7
+#>  $ general:List of 8
 #>   ..$ model        : chr "xgb.Booster"
 #>   ..$ type         : chr "xgb"
 #>   ..$ params       :List of 5
 #>   ..$ feature_names: chr [1:10] "mpg" "cyl" "disp" "hp" ...
 #>   ..$ niter        : int 50
 #>   ..$ nfeatures    : int 10
+#>   ..$ booster_name : chr "gbtree"
 #>   ..$ version      : num 1
 #>  $ trees  :List of 50
 #>   ..$ 0 :List of 3

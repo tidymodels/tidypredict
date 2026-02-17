@@ -33,6 +33,12 @@
   ([\#184](https://github.com/tidymodels/tidypredict/issues/184))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now correctly handles xgboost DART booster models with
+  `rate_drop > 0`. DART uses tree weight normalization during training,
+  and these weights are now properly applied to each tree’s predictions.
+  ([\#183](https://github.com/tidymodels/tidypredict/issues/183))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now correctly handles xgboost models with stump trees (single leaf, no
   splits).
   ([\#182](https://github.com/tidymodels/tidypredict/issues/182))

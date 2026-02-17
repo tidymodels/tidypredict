@@ -309,13 +309,14 @@ issue</a> for more information.</p>
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
-<span><span class="co">#&gt;  $ general:List of 7</span></span>
+<span><span class="co">#&gt;  $ general:List of 8</span></span>
 <span><span class="co">#&gt;   ..$ model        : chr "xgb.Booster"</span></span>
 <span><span class="co">#&gt;   ..$ type         : chr "xgb"</span></span>
 <span><span class="co">#&gt;   ..$ params       :List of 5</span></span>
 <span><span class="co">#&gt;   ..$ feature_names: chr [1:10] "mpg" "cyl" "disp" "hp" ...</span></span>
 <span><span class="co">#&gt;   ..$ niter        : int 50</span></span>
 <span><span class="co">#&gt;   ..$ nfeatures    : int 10</span></span>
+<span><span class="co">#&gt;   ..$ booster_name : chr "gbtree"</span></span>
 <span><span class="co">#&gt;   ..$ version      : num 1</span></span>
 <span><span class="co">#&gt;  $ trees  :List of 50</span></span>
 <span><span class="co">#&gt;   ..$ 0 :List of 3</span></span>
