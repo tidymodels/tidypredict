@@ -149,7 +149,7 @@ parse_model.xgb.Booster <- function(model) {
   pm$general$params$base_score <- get_base_score(model)
 
   pm$general$version <- 1
-  pm$trees <- get_xgb_trees(model)
+  pm$trees <- get_xgb_trees(model, filter_trees = FALSE)
   as_parsed_model(pm)
 }
 

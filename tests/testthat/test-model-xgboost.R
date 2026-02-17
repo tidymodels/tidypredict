@@ -462,6 +462,44 @@ test_that("unsupported objective throws error", {
   expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
+test_that("stump trees (no splits) predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      gamma = 100,
+      objective = "reg:squarederror",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  # Verify model contains stump trees (single leaf, no splits)
+  pm <- parse_model(model)
+  leaves_per_tree <- vapply(pm$trees, length, integer(1), USE.NAMES = FALSE)
+  path_lengths <- vapply(
+    pm$trees,
+    \(tree) length(tree[[1]]$path),
+    integer(1),
+    USE.NAMES = FALSE
+  )
+  expect_all_equal(leaves_per_tree, 1L)
+  expect_all_equal(path_lengths, 0L)
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
 test_that("NULL objective warns user", {
   skip_if_not_installed("xgboost")
 
