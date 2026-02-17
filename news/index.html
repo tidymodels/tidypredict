@@ -62,9 +62,13 @@
 <li><p>Added support for LightGBM models (<code>lgb.Booster</code>). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)</p></li>
 </ul></div>
 <div class="section level3">
+<h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>
+<ul><li>xgboost support now includes additional objectives: <code>binary:hinge</code>, <code>reg:absoluteerror</code>, <code>reg:gamma</code>, <code>reg:pseudohubererror</code>, and <code>reg:squaredlogerror</code>. (<a href="https://github.com/tidymodels/tidypredict/issues/184" class="external-link">#184</a>)</li>
+</ul></div>
+<div class="section level3">
 <h3 id="bug-fixes-development-version">Bug Fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-development-version"></a></h3>
-<ul><li>
-<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly handles xgboost models with stump trees (single leaf, no splits). (<a href="https://github.com/tidymodels/tidypredict/issues/182" class="external-link">#182</a>)</li>
+<ul><li><p><code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly incorporates <code>base_score</code> for xgboost models with <code>count:poisson</code> and <code>reg:tweedie</code> objectives. Previously, predictions were incorrect when <code>base_score</code> was not the default value. (<a href="https://github.com/tidymodels/tidypredict/issues/184" class="external-link">#184</a>)</p></li>
+<li><p><code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> now correctly handles xgboost models with stump trees (single leaf, no splits). (<a href="https://github.com/tidymodels/tidypredict/issues/182" class="external-link">#182</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
