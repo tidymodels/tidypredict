@@ -267,66 +267,242 @@ test_that("binary:logitraw predictions match native predict", {
   expect_false(result$alert)
 })
 
-test_that("count:poisson tidypredict_test runs", {
+test_that("count:poisson predictions match native predict", {
   skip_if_not_installed("xgboost")
 
-  set.seed(123)
-  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  y <- mtcars$carb
-  dtrain <- xgboost::xgb.DMatrix(
-    X,
-    label = y,
-    feature_names = c("mpg", "cyl", "disp")
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$carb
   )
 
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 3L,
-      objective = "count:poisson"
+      max_depth = 2L,
+      objective = "count:poisson",
+      base_score = 0.5
     ),
-    data = dtrain,
-    nrounds = 5L,
+    data = xgb_data,
+    nrounds = 4L,
     verbose = 0
   )
 
-  # Test that tidypredict_fit produces a formula
-  fit_formula <- tidypredict_fit(model)
-  expect_type(fit_formula, "language")
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
 
-  # tidypredict_test runs without error
-  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
   expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
 })
 
-test_that("reg:tweedie tidypredict_test runs", {
+test_that("reg:tweedie predictions match native predict", {
   skip_if_not_installed("xgboost")
 
-  set.seed(123)
-  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  y <- mtcars$hp
-  dtrain <- xgboost::xgb.DMatrix(
-    X,
-    label = y,
-    feature_names = c("mpg", "cyl", "disp")
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
   )
 
   model <- xgboost::xgb.train(
     params = list(
-      max_depth = 3L,
-      objective = "reg:tweedie"
+      max_depth = 2L,
+      objective = "reg:tweedie",
+      base_score = 0.5
     ),
-    data = dtrain,
-    nrounds = 5L,
+    data = xgb_data,
+    nrounds = 4L,
     verbose = 0
   )
 
-  # Test that tidypredict_fit produces a formula
-  fit_formula <- tidypredict_fit(model)
-  expect_type(fit_formula, "language")
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
 
-  # tidypredict_test runs without error
-  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
   expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("reg:squaredlogerror predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squaredlogerror",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("reg:gamma predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:gamma",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("reg:pseudohubererror predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:pseudohubererror",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("reg:absoluteerror predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$hp
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:absoluteerror",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-5
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("binary:hinge predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "binary:hinge",
+      base_score = 0.5
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-7
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
 })
 
 test_that("model with custom base_score works correctly", {
