@@ -142,7 +142,10 @@ parse_model.xgb.Booster <- function(model) {
     pm$general$nfeatures <- length(pm$general$feature_names)
   }
 
-  pm$general$params$base_score <- get_base_score(model)
+  json_params <- get_xgb_json_params(model)
+  pm$general$params$base_score <- json_params$base_score
+  pm$general$booster_name <- json_params$booster_name
+  pm$general$weight_drop <- json_params$weight_drop
 
   pm$general$version <- 1
   pm$trees <- get_xgb_trees(model)
@@ -200,6 +203,9 @@ build_fit_formula_xgb <- function(parsedmodel) {
     seq_len(length(parsedmodel$trees)),
     ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
   )
+
+  # Apply DART weight_drop if present
+  f <- apply_dart_weights(f, parsedmodel$general$weight_drop)
 
   # additive model
   f <- reduce_addition(f)
@@ -264,17 +270,43 @@ build_fit_formula_xgb <- function(parsedmodel) {
   f
 }
 
-get_base_score <- function(model) {
+apply_dart_weights <- function(trees, weight_drop) {
+  if (!is.null(weight_drop) && !all(weight_drop == 1)) {
+    trees <- Map(
+      function(tree_expr, weight) {
+        expr(!!tree_expr * !!weight)
+      },
+      trees,
+      weight_drop
+    )
+  }
+  trees
+}
+
+get_xgb_json_params <- function(model) {
   tmp_file <- tempfile(fileext = ".json")
   xgboost::xgb.save(model, tmp_file)
 
-  base_score <- jsonlite::fromJSON(tmp_file)
-  base_score <- base_score$learner$learner_model_param$base_score
+  json <- jsonlite::fromJSON(tmp_file)
+
+  base_score <- json$learner$learner_model_param$base_score
   base_score <- gsub("\\[", "", base_score)
   base_score <- gsub("\\]", "", base_score)
   base_score <- strsplit(base_score, ",")[[1]]
   base_score <- as.numeric(base_score)
-  base_score
+
+  booster_name <- json$learner$gradient_booster$name
+  weight_drop <- json$learner$gradient_booster$weight_drop
+
+  list(
+    base_score = base_score,
+    booster_name = booster_name,
+    weight_drop = weight_drop
+  )
+}
+
+get_base_score <- function(model) {
+  get_xgb_json_params(model)$base_score
 }
 
 #' @export
@@ -296,39 +328,12 @@ tidypredict_fit.xgb.Booster <- function(model) {
     )
   }
 
-  old <- is.null(attr(model, "param"))
+  parsedmodel <- parse_model(model)
 
-  params <- attr(model, "param") %||% model$params
-  wosilent <- params[names(params) != "silent"]
-  wosilent$silent <- params$silent
-
-  pm <- list()
-  pm$general$model <- "xgb.Booster"
-  pm$general$type <- "xgb"
-  pm$general$params <- wosilent
-
-  if (old) {
-    pm$general$feature_names <- model$feature_names
-    pm$general$niter <- model$niter
-    pm$general$nfeatures <- model$nfeatures
-  } else {
-    pm$general$feature_names <- xgboost::getinfo(model, "feature_name")
-    pm$general$niter <- utils::getFromNamespace(
-      "xgb.get.num.boosted.rounds",
-      ns = "xgboost"
-    )(model)
-    pm$general$nfeatures <- length(pm$general$feature_names)
-  }
-
-  pm$general$params$base_score <- get_base_score(model)
-
-  pm$general$version <- 1
-
-  pm$trees <- get_xgb_trees(model)
-
-  parsedmodel <- as_parsed_model(pm)
-  map(
+  trees <- map(
     seq_len(length(parsedmodel$trees)),
     ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
   )
+
+  apply_dart_weights(trees, parsedmodel$general$weight_drop)
 }
