@@ -6,6 +6,10 @@
 
 - Added support for LightGBM models (`lgb.Booster`). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)
 
+## Improvements
+
+- xgboost support now includes additional objectives: `binary:hinge`, `reg:absoluteerror`, `reg:gamma`, and `reg:pseudohubererror`. (#184)
+
 ## Bug Fixes
 
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)

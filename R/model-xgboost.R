@@ -234,11 +234,30 @@ build_fit_formula_xgb <- function(parsedmodel) {
   } else if (objective %in% c("reg:tweedie")) {
     assigned <- 1
     f <- expr(0.5 * exp(!!f)) ## I'm not sure why one has to multiply by 0.5, but it works.
+  } else if (objective == "reg:gamma") {
+    assigned <- 1
+    f <- expr(!!base_score * exp(!!f))
+  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+  } else if (objective == "binary:hinge") {
+    assigned <- 1
+    # binary:hinge returns 0 or 1 based on margin sign
+    f <- expr(as.numeric((!!f + !!base_score) >= 0))
   }
   if (assigned == 0) {
     cli::cli_abort(
-      "Only objectives {.val binary:logistic}, {.val reg:squarederror},
-      {.val reg:logistic}, {.val binary:logitraw} are supported yet."
+      c(
+        "Objective {.val {objective}} is not supported.",
+        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
+        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
+        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
+        {.val reg:squarederror}, {.val reg:tweedie}.",
+        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
+        are not supported."
+      )
     )
   }
   f

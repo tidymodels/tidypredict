@@ -329,6 +329,106 @@ test_that("reg:tweedie tidypredict_test runs", {
   expect_s3_class(result, "tidypredict_test")
 })
 
+test_that("reg:gamma tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 3L,
+      objective = "reg:gamma"
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = 0
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
+  expect_s3_class(result, "tidypredict_test")
+})
+
+test_that("reg:pseudohubererror tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 3L,
+      objective = "reg:pseudohubererror"
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = 0
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
+  expect_s3_class(result, "tidypredict_test")
+})
+
+test_that("reg:absoluteerror tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- xgboost::xgb.DMatrix(
+    X,
+    label = y,
+    feature_names = c("mpg", "cyl", "disp")
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 3L,
+      objective = "reg:absoluteerror"
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = 0
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  result <- tidypredict_test(model, mtcars, xg_df = dtrain)
+  expect_s3_class(result, "tidypredict_test")
+})
+
+test_that("binary:hinge tidypredict_test runs", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model(objective = "binary:hinge")
+
+  fit_formula <- tidypredict_fit(model)
+  expect_type(fit_formula, "language")
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data)
+  expect_s3_class(result, "tidypredict_test")
+})
+
 test_that("model with custom base_score works correctly", {
   skip_if_not_installed("xgboost")
 

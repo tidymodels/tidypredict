@@ -4,7 +4,9 @@
       tidypredict_fit(pm)
     Condition
       Error in `build_fit_formula_xgb()`:
-      ! Only objectives "binary:logistic", "reg:squarederror", "reg:logistic", "binary:logitraw" are supported yet.
+      ! Objective "unsupported_objective" is not supported.
+      i Supported objectives: "binary:hinge", "binary:logistic", "binary:logitraw", "count:poisson", "reg:absoluteerror", "reg:gamma", "reg:logistic", "reg:pseudohubererror", "reg:squarederror", "reg:tweedie".
+      i Multiclass objectives ("multi:softmax", "multi:softprob") are not supported.
 
 # NULL objective warns user
 
