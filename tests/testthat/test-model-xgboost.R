@@ -505,6 +505,124 @@ test_that("binary:hinge predictions match native predict", {
   expect_false(result$alert)
 })
 
+test_that("DART booster with rate_drop = 0 predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror",
+      base_score = 0.5,
+      booster = "dart",
+      rate_drop = 0
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("DART booster with rate_drop > 0 predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror",
+      base_score = 0.5,
+      booster = "dart",
+      rate_drop = 0.3,
+      seed = 123
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  result <- tidypredict_test(
+    model,
+    mtcars_adj,
+    xg_df = xgb_data,
+    threshold = 1e-6
+  )
+
+  expect_s3_class(result, "tidypredict_test")
+  expect_false(result$alert)
+})
+
+test_that("DART booster weight_drop is extracted correctly", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror",
+      base_score = 0.5,
+      booster = "dart",
+      rate_drop = 0.3,
+      seed = 123
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$booster_name, "dart")
+  expect_type(pm$general$weight_drop, "double")
+  expect_length(pm$general$weight_drop, 4)
+  # At least one weight should be different from 1 when rate_drop > 0
+  expect_false(all(pm$general$weight_drop == 1))
+})
+
+test_that("gbtree booster has no weight_drop", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror",
+      base_score = 0.5,
+      booster = "gbtree"
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  pm <- parse_model(model)
+
+  expect_equal(pm$general$booster_name, "gbtree")
+  expect_null(pm$general$weight_drop)
+})
+
 test_that("model with custom base_score works correctly", {
   skip_if_not_installed("xgboost")
 
@@ -909,6 +1027,47 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit", {
 
 test_that(".extract_xgb_trees errors on non-xgb.Booster", {
   expect_snapshot(.extract_xgb_trees(list()), error = TRUE)
+})
+
+test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", {
+  skip_if_not_installed("xgboost")
+
+  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  mtcars_adj <- mtcars
+  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars_adj[, -9]),
+    label = mtcars_adj$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 2L,
+      objective = "reg:squarederror",
+      base_score = 0.5,
+      booster = "dart",
+      rate_drop = 0.3,
+      seed = 123
+    ),
+    data = xgb_data,
+    nrounds = 4L,
+    verbose = 0
+  )
+
+  trees <- .extract_xgb_trees(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(mtcars_adj),
+    parent = asNamespace("dplyr")
+  )
+  tree_preds <- lapply(trees, rlang::eval_tidy, env = eval_env)
+  pm <- parse_model(model)
+  base_score <- pm$general$params$base_score
+  combined <- Reduce(`+`, tree_preds) + base_score
+
+  fit_result <- rlang::eval_tidy(tidypredict_fit(model), mtcars_adj)
+
+  expect_equal(combined, fit_result)
 })
 
 # YAML serialization tests ---------------------------------------------------
