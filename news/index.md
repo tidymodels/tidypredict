@@ -79,6 +79,12 @@
   ([\#196](https://github.com/tidymodels/tidypredict/issues/196))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now throws a clear error for ranger and randomForest classification
+  models, which are not supported.
+  ([\#191](https://github.com/tidymodels/tidypredict/issues/191),
+  [\#193](https://github.com/tidymodels/tidypredict/issues/193))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
   [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
   that use family function syntax (e.g., `family = gaussian()`) instead
