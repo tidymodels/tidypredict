@@ -61,8 +61,8 @@ These functions also accept a previously parsed model.
 ``` r
 tidypredict_fit(parsed)
 #> 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + 
-#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + 
-#>     (disp * cyl * 0.00540618405824794)
+#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938274) + 
+#>     (disp * cyl * 0.00540618405824793)
 ```
 
 ## Saving the model

@@ -25,6 +25,12 @@
 
 ### Improvements
 
+- [`earth()`](https://rdrr.io/pkg/earth/man/earth.html) models now
+  support additional GLM families and link functions: Gamma,
+  inverse.gaussian, probit, and cloglog.
+  ([\#194](https://github.com/tidymodels/tidypredict/issues/194),
+  [\#195](https://github.com/tidymodels/tidypredict/issues/195))
+
 - [`glm()`](https://rdrr.io/r/stats/glm.html) models now support
   additional families and link functions: Gamma family with inverse
   link, inverse.gaussian family with 1/mu^2 link, probit link, cloglog
