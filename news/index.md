@@ -19,6 +19,16 @@
 
 ### Improvements
 
+- [`glm()`](https://rdrr.io/r/stats/glm.html) models now support
+  additional families and link functions: Gamma family with inverse
+  link, inverse.gaussian family with 1/mu^2 link, probit link, cloglog
+  link, and sqrt link.
+  ([\#203](https://github.com/tidymodels/tidypredict/issues/203),
+  [\#204](https://github.com/tidymodels/tidypredict/issues/204),
+  [\#205](https://github.com/tidymodels/tidypredict/issues/205),
+  [\#206](https://github.com/tidymodels/tidypredict/issues/206),
+  [\#207](https://github.com/tidymodels/tidypredict/issues/207))
+
 - xgboost support now includes additional objectives: `binary:hinge`,
   `reg:absoluteerror`, `reg:gamma`, `reg:pseudohubererror`, and
   `reg:squaredlogerror`.
