@@ -137,6 +137,7 @@ test_that("Gamma family works (#200)", {
 })
 
 test_that("Cox family works (#201)", {
+  skip_if_not_installed("survival")
   x <- as.matrix(mtcars[, -c(1, 8)])
   y <- survival::Surv(mtcars$mpg, mtcars$vs)
   model <- glmnet::glmnet(x, y, family = "cox", lambda = 0.1)
