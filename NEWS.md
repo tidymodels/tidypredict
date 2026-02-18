@@ -18,6 +18,8 @@
 
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)
 
+- `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for randomForest models. (#192)
+
 # tidypredict 1.0.1
 
 ## Bug Fixes

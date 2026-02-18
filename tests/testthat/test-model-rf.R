@@ -47,3 +47,25 @@ test_that("formulas produces correct predictions", {
     )
   )
 })
+
+test_that("split operator uses <= for left child (#192)", {
+  set.seed(42)
+  df <- data.frame(x = c(1, 2, 3, 4), y = c(10, 20, 100, 200))
+  suppressWarnings(
+    model <- randomForest::randomForest(
+      y ~ x,
+      data = df,
+      ntree = 1,
+      nodesize = 2,
+      maxnodes = 3
+    )
+  )
+
+  test_df <- data.frame(x = c(2.99, 3, 3.01))
+
+  native <- as.numeric(predict(model, test_df))
+  fit <- tidypredict_fit(model)
+  tidy <- rlang::eval_tidy(fit, test_df)
+
+  expect_equal(native, tidy)
+})
