@@ -27,6 +27,9 @@ tidypredict_fit.pm_tree <- function(model) {
   if (model$general$model == "randomForest") {
     return(tidypredict_fit_randomForest(model))
   }
+  if (model$general$model == "ranger") {
+    return(tidypredict_fit_ranger(model))
+  }
 
   res <- generate_case_when_trees(model)
 

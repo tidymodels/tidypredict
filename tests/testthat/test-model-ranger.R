@@ -91,7 +91,28 @@ test_that("split operator uses <= for left child (#189)", {
 
   native <- predict(model, mtcars)$predictions
   fit <- tidypredict_fit(model)
-  tidy <- rlang::eval_tidy(fit, mtcars) / model$num.trees
+  tidy <- rlang::eval_tidy(fit, mtcars)
+
+  expect_equal(native, tidy)
+})
+
+test_that("predictions are averaged not summed (#190)", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    num.trees = 5,
+    max.depth = 3,
+    seed = 123,
+    num.threads = 2
+  )
+
+  native <- predict(model, mtcars)$predictions
+  fit <- tidypredict_fit(model)
+  tidy <- rlang::eval_tidy(fit, mtcars)
 
   expect_equal(native, tidy)
 })
