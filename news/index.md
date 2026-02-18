@@ -29,6 +29,12 @@
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
+  ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
+  [\#201](https://github.com/tidymodels/tidypredict/issues/201))
+
 - xgboost support now includes additional objectives: `binary:hinge`,
   `reg:absoluteerror`, `reg:gamma`, `reg:pseudohubererror`, and
   `reg:squaredlogerror`.
