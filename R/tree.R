@@ -61,6 +61,13 @@ generate_case_when_trees <- function(parsedmodel, default = TRUE) {
 generate_case_when_tree <- function(tree, mode, default = TRUE) {
   nodes <- generate_tree_nodes(tree, mode)
 
+  # Handle stump trees (single node with no conditions, returns simple value)
+  if (
+    length(nodes) == 1 && (is.numeric(nodes[[1]]) || is.character(nodes[[1]]))
+  ) {
+    return(nodes[[1]])
+  }
+
   if (default) {
     default <- nodes[[length(nodes)]]
     default <- rlang::f_rhs(default)
