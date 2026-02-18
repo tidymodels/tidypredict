@@ -18,6 +18,8 @@
 
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)
 
+- `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for randomForest models. (#192)
+
 - `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for ranger models. Previously, predictions were incorrect when data values exactly matched split values. (#189)
 
 - `tidypredict_fit()` now works with `glmnet()` models that use family function syntax (e.g., `family = gaussian()`) instead of string syntax (e.g., `family = "gaussian"`). (#197)
