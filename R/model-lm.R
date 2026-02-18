@@ -38,7 +38,7 @@ build_fit_formula <- function(parsedmodel) {
   f
 }
 
-apply_glm_link <- function(f, link) {
+apply_inverse_link <- function(f, link) {
   switch(
     link,
     "identity" = f,
