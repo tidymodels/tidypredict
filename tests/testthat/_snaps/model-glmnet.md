@@ -61,3 +61,21 @@
     Output
       [1] "35.3140536966127 + (cyl * -0.871623418095165) + (hp * -0.0101157918502673) + \n    (wt * -2.59426484734253)"
 
+# multinomial family errors with helpful message (#198)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit()`:
+      ! Multinomial glmnet models are not supported.
+      i Models fit with `family = "multinomial"` have multiple outcome columns which is not supported.
+
+# mgaussian family errors with helpful message (#199)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit()`:
+      ! Multivariate gaussian glmnet models are not supported.
+      i Models fit with `family = "mgaussian"` have multiple outcome columns which is not supported.
+

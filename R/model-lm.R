@@ -38,6 +38,22 @@ build_fit_formula <- function(parsedmodel) {
   f
 }
 
+apply_glm_link <- function(f, link) {
+  switch(
+    link,
+    "identity" = f,
+    "logit" = expr(1 - 1 / (1 + exp(!!f))),
+    "log" = expr(exp(!!f)),
+    "inverse" = expr(1 / (!!f)),
+    "1/mu^2" = expr(1 / sqrt(!!f)),
+    # Bowling et al. approximation to normal CDF (max error ~0.014%)
+    "probit" = expr(1 / (1 + exp(-0.07056 * (!!f)^3 - 1.5976 * (!!f)))),
+    "cloglog" = expr(1 - exp(-exp(!!f))),
+    "sqrt" = expr((!!f)^2),
+    cli::cli_abort("Link {.val {link}} is not supported.")
+  )
+}
+
 # Parse model --------------------------------------
 
 #' @export
@@ -182,24 +198,6 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
   qrs <- reduce_addition(qrs_map)
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
-}
-
-# Link functions ------------------------------------------
-
-apply_glm_link <- function(f, link) {
-  switch(
-    link,
-    "identity" = f,
-    "logit" = expr(1 - 1 / (1 + exp(!!f))),
-    "log" = expr(exp(!!f)),
-    "inverse" = expr(1 / (!!f)),
-    "1/mu^2" = expr(1 / sqrt(!!f)),
-    # Bowling et al. approximation to normal CDF (max error ~0.014%)
-    "probit" = expr(1 / (1 + exp(-0.07056 * (!!f)^3 - 1.5976 * (!!f)))),
-    "cloglog" = expr(1 - exp(-exp(!!f))),
-    "sqrt" = expr((!!f)^2),
-    cli::cli_abort("Link {.val {link}} is not supported.")
-  )
 }
 
 # Helpers -------------------------------------------------
