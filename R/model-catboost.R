@@ -103,7 +103,7 @@ parse_model.catboost.Model <- function(model) {
   pm$general$nfeatures <- length(feature_names) + length(cat_feature_names)
 
   oblivious_trees <- model_json$oblivious_trees
-  pm$general$niter <- length(oblivious_trees)
+  nonoblivious_trees <- model_json$trees
 
   # Extract scale and bias
   scale_and_bias <- model_json$scale_and_bias
@@ -111,12 +111,30 @@ parse_model.catboost.Model <- function(model) {
   pm$general$bias <- scale_and_bias[[2]][[1]]
 
   num_class <- pm$general$num_class
-  pm$trees <- get_catboost_trees(
-    oblivious_trees,
-    float_features,
-    cat_features,
-    num_class
-  )
+
+  if (length(oblivious_trees) > 0) {
+    pm$general$niter <- length(oblivious_trees)
+    pm$general$tree_type <- "oblivious"
+    pm$trees <- get_catboost_trees(
+      oblivious_trees,
+      float_features,
+      cat_features,
+      num_class
+    )
+  } else if (length(nonoblivious_trees) > 0) {
+    pm$general$niter <- length(nonoblivious_trees)
+    pm$general$tree_type <- "nonoblivious"
+    pm$trees <- get_catboost_nonoblivious_trees(
+      nonoblivious_trees,
+      float_features,
+      cat_features,
+      num_class
+    )
+  } else {
+    pm$general$niter <- 0
+    pm$general$tree_type <- "none"
+    pm$trees <- list()
+  }
 
   as_parsed_model(pm)
 }
@@ -328,17 +346,17 @@ extract_catboost_model_hashes <- function(model) {
   unlist(model_json$features_info$categorical_features[[1]]$values)
 }
 
-get_catboost_trees <- function(
-  oblivious_trees,
+process_catboost_trees <- function(
+  trees,
+  tree_fn,
   float_features,
   cat_features,
   num_class
 ) {
   if (num_class <= 1) {
-    # Single output: one tree per iteration
     map(
-      oblivious_trees,
-      get_catboost_tree,
+      trees,
+      tree_fn,
       float_features = float_features,
       cat_features = cat_features,
       class_idx = NULL,
@@ -347,13 +365,13 @@ get_catboost_trees <- function(
   } else {
     # Multiclass: create num_class virtual trees per iteration
     # Trees are stored round-robin by class: tree 1 class 0, tree 1 class 1, ...
-    trees <- list()
-    for (i in seq_along(oblivious_trees)) {
+    result <- list()
+    for (i in seq_along(trees)) {
       for (class_idx in seq_len(num_class)) {
-        trees <- c(
-          trees,
-          list(get_catboost_tree(
-            oblivious_trees[[i]],
+        result <- c(
+          result,
+          list(tree_fn(
+            trees[[i]],
             float_features,
             cat_features = cat_features,
             class_idx = class_idx,
@@ -362,9 +380,173 @@ get_catboost_trees <- function(
         )
       }
     }
-    trees
+    result
   }
 }
+
+get_catboost_trees <- function(
+  oblivious_trees,
+  float_features,
+  cat_features,
+  num_class
+) {
+  process_catboost_trees(
+    oblivious_trees,
+    get_catboost_tree,
+    float_features,
+    cat_features,
+    num_class
+  )
+}
+
+# Non-oblivious tree parsing (Depthwise/Lossguide grow_policy) ----------------
+
+get_catboost_nonoblivious_trees <- function(
+  trees,
+  float_features,
+  cat_features,
+  num_class
+) {
+  process_catboost_trees(
+    trees,
+    get_catboost_nonoblivious_tree,
+    float_features,
+    cat_features,
+    num_class
+  )
+}
+
+get_catboost_nonoblivious_tree <- function(
+  tree_json,
+  float_features,
+  cat_features = NULL,
+  class_idx = NULL,
+  num_class = 1
+) {
+  # Recursively collect all leaf paths
+  leaves <- collect_nonoblivious_leaves(
+    tree_json,
+    float_features,
+    cat_features,
+    path = list()
+  )
+
+  # Extract predictions for the appropriate class
+  map(leaves, function(leaf) {
+    pred_value <- leaf$value
+    # For multiclass, leaf$value is a list with one element per class
+    if (
+      !is.null(class_idx) && num_class > 1 && length(pred_value) >= num_class
+    ) {
+      pred_value <- pred_value[[class_idx]]
+    } else if (is.list(pred_value) && length(pred_value) == 1) {
+      # Single class but still stored as list
+      pred_value <- pred_value[[1]]
+    }
+    list(prediction = pred_value, path = leaf$path)
+  })
+}
+
+collect_nonoblivious_leaves <- function(
+  node,
+  float_features,
+  cat_features,
+  path
+) {
+  # Check if this is a leaf node (has "value" field)
+  if (!is.null(node$value)) {
+    return(list(list(value = node$value, path = path)))
+  }
+
+  # Internal node: process split and recurse
+  split <- node$split
+  left_node <- node$left
+  right_node <- node$right
+
+  # Parse the split condition
+  left_condition <- parse_nonoblivious_split(
+    split,
+    float_features,
+    cat_features,
+    go_left = TRUE
+  )
+  right_condition <- parse_nonoblivious_split(
+    split,
+    float_features,
+    cat_features,
+    go_left = FALSE
+  )
+
+  # Recurse into both branches
+  left_leaves <- collect_nonoblivious_leaves(
+    left_node,
+    float_features,
+    cat_features,
+    path = c(path, list(left_condition))
+  )
+  right_leaves <- collect_nonoblivious_leaves(
+    right_node,
+    float_features,
+    cat_features,
+    path = c(path, list(right_condition))
+  )
+
+  c(left_leaves, right_leaves)
+}
+
+parse_nonoblivious_split <- function(
+  split,
+  float_features,
+  cat_features,
+  go_left
+) {
+  split_type <- split$split_type %||% "FloatFeature"
+
+  if (split_type == "OneHotFeature") {
+    # left = matches category, right = doesn't match
+    op <- if (go_left) "equal" else "not-equal"
+    make_categorical_split(split, cat_features, op)
+  } else {
+    # left = <= border, right = > border
+    op <- if (go_left) "less-equal" else "more"
+    make_float_split(split, float_features, op)
+  }
+}
+
+# Split building helpers (shared by oblivious and non-oblivious) --------------
+
+make_float_split <- function(split, float_features, op) {
+  feature_index <- split$float_feature_index + 1L
+  feature_info <- float_features[[feature_index]]
+  feature_name <- feature_info$feature_id %||%
+    paste0("feature_", feature_info$flat_feature_index)
+  nan_treatment <- feature_info$nan_value_treatment %||% "AsIs"
+
+  list(
+    type = "conditional",
+    col = feature_name,
+    val = split$border,
+    op = op,
+    missing = get_catboost_missing(nan_treatment, op)
+  )
+}
+
+make_categorical_split <- function(split, cat_features, op) {
+  cat_feature_index <- split$cat_feature_index + 1L
+  cat_feature_info <- cat_features[[cat_feature_index]]
+  feature_name <- cat_feature_info$feature_id %||%
+    paste0("cat_feature_", cat_feature_info$flat_feature_index)
+
+  list(
+    type = "categorical",
+    col = feature_name,
+    hash_value = split$value,
+    op = op,
+    missing = FALSE
+  )
+}
+
+# Oblivious tree parsing ------------------------------------------------------
 
 get_catboost_tree <- function(
   tree_json,
@@ -451,41 +633,15 @@ get_catboost_bit_value <- function(leaf_idx, split_idx) {
 }
 
 parse_catboost_categorical_split <- function(split, bit_val, cat_features) {
-  cat_feature_index <- split$cat_feature_index + 1L
-  cat_feature_info <- cat_features[[cat_feature_index]]
-  feature_name <- cat_feature_info$feature_id %||%
-    paste0("cat_feature_", cat_feature_info$flat_feature_index)
-
   # bit=0: doesn't match, bit=1: matches
   op <- if (bit_val == 0L) "not-equal" else "equal"
-
-  list(
-    type = "categorical",
-    col = feature_name,
-    hash_value = split$value,
-    op = op,
-    missing = FALSE
-  )
+  make_categorical_split(split, cat_features, op)
 }
 
 parse_catboost_float_split <- function(split, bit_val, float_features) {
-  feature_index <- split$float_feature_index + 1L
-  feature_info <- float_features[[feature_index]]
-  feature_name <- feature_info$feature_id %||%
-    paste0("feature_", feature_info$flat_feature_index)
-
   # bit=1: > border (more), bit=0: <= border (less-equal)
   op <- if (bit_val == 1L) "more" else "less-equal"
-
-  nan_treatment <- feature_info$nan_value_treatment %||% "AsIs"
-
-  list(
-    type = "conditional",
-    col = feature_name,
-    val = split$border,
-    op = op,
-    missing = get_catboost_missing(nan_treatment, op)
-  )
+  make_float_split(split, float_features, op)
 }
 
 get_catboost_missing <- function(nan_treatment, op) {

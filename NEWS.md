@@ -2,7 +2,10 @@
 
 ## New Model Supports
 
-- Added support for CatBoost models (`catboost.Model`). Supports regression, binary classification, and multiclass classification objectives including RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll. Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use `set_catboost_categories()`. (#TBD)
+- Added support for CatBoost models (`catboost.Model`). (#TBD, #187)
+  - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.
+  - Tree types: oblivious (default `SymmetricTree`) and non-oblivious (`Depthwise` or `Lossguide` grow policy).
+  - Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use `set_catboost_categories()`.
 
 - Added support for LightGBM models (`lgb.Booster`). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)
 
