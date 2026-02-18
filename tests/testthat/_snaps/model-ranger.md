@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "(case_when(Petal.Length <= 2.6 ~ \"setosa\", Sepal.Length <= 6.25 & \n    Petal.Length > 2.6 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Width <= 0.75 ~ \"setosa\", Petal.Width <= \n        1.75 & Petal.Width > 0.75 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Length <= 2.35 ~ \"setosa\", Petal.Length <= \n        4.75 & Petal.Length > 2.35 ~ \"versicolor\", .default = \"virginica\"))/3L"
+      [1] "(case_when(cyl <= 5 & hp <= 118 ~ 26.7, cyl > 5 & hp <= 118 ~ \n    21.1333333333333, hp <= 205 & hp > 118 ~ 17.48, .default = 14.5416666666667) + \n    case_when(hp <= 80.5 ~ 32.2333333333333, hp <= 118 & hp > \n        80.5 ~ 21.9545454545455, .default = 16.5722222222222) + \n    case_when(disp <= 101.55 ~ 31.9, cyl <= 7 & disp > 101.55 ~ \n        20.8384615384615, .default = 14.8785714285714))/3L"
 
 # formulas produces correct predictions
 
@@ -15,4 +15,14 @@
       Difference threshold: 1e-12
       
        All results are within the difference threshold
+
+# classification models error with clear message (#191)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit_ranger()`:
+      ! Classification models are not supported for ranger.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
 

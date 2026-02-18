@@ -90,6 +90,18 @@ tidypredict_fit.randomForest <- function(model) {
 }
 
 tidypredict_fit_randomForest <- function(parsedmodel) {
+  # Check if this is a classification model (string predictions)
+  first_pred <- parsedmodel$trees[[1]][[1]]$prediction
+  if (is.character(first_pred)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported for randomForest.",
+        i = "Only regression models can be converted to tidy formulas.",
+        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
+      )
+    )
+  }
+
   res <- generate_case_when_trees(parsedmodel)
   res <- reduce_addition(res)
   n_trees <- length(parsedmodel$trees)

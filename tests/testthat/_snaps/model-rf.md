@@ -16,3 +16,13 @@
       
        All results are within the difference threshold
 
+# classification models error with clear message (#193)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit_randomForest()`:
+      ! Classification models are not supported for randomForest.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
+

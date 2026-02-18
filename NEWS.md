@@ -28,6 +28,8 @@
 
 - `tidypredict_fit()` now correctly handles partykit stump trees (models with no splits). (#196)
 
+- `tidypredict_fit()` now throws a clear error for ranger and randomForest classification models, which are not supported. (#191, #193)
+
 - `tidypredict_fit()` now works with `glmnet()` models that use family function syntax (e.g., `family = gaussian()`) instead of string syntax (e.g., `family = "gaussian"`). (#197)
 
 - `tidypredict_fit()` now works with models that use family function syntax (e.g., `family = gaussian()`) instead of string syntax (e.g., `family = "gaussian"`). (#202)
