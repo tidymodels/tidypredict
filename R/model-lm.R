@@ -33,21 +33,7 @@ build_fit_formula <- function(parsedmodel) {
 
   if (parsedmodel$general$is_glm == 1) {
     link <- parsedmodel$general$link
-    assigned <- 0
-    if (link == "identity") {
-      assigned <- 1
-    }
-    if (link == "logit") {
-      assigned <- 1
-      f <- expr(1 - 1 / (1 + exp(!!f)))
-    }
-    if (link == "log") {
-      assigned <- 1
-      f <- expr(exp(!!f))
-    }
-    if (assigned == 0) {
-      cli::cli_abort("Combination of family and link are not supported.")
-    }
+    f <- apply_glm_link(f, link)
   }
   f
 }
@@ -196,6 +182,24 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
   qrs <- reduce_addition(qrs_map)
   tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
+}
+
+# Link functions ------------------------------------------
+
+apply_glm_link <- function(f, link) {
+  switch(
+    link,
+    "identity" = f,
+    "logit" = expr(1 - 1 / (1 + exp(!!f))),
+    "log" = expr(exp(!!f)),
+    "inverse" = expr(1 / (!!f)),
+    "1/mu^2" = expr(1 / sqrt(!!f)),
+    # Bowling et al. approximation to normal CDF (max error ~0.014%)
+    "probit" = expr(1 / (1 + exp(-0.07056 * (!!f)^3 - 1.5976 * (!!f)))),
+    "cloglog" = expr(1 - exp(-exp(!!f))),
+    "sqrt" = expr((!!f)^2),
+    cli::cli_abort("Link {.val {link}} is not supported.")
+  )
 }
 
 # Helpers -------------------------------------------------
