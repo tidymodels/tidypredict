@@ -29,7 +29,7 @@
 
 - `tidypredict_fit()` now correctly averages tree predictions for ranger models instead of summing them. Previously, predictions were `num.trees` times too large. (#190)
 
-- `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for randomForest models. (#192)
+- `tidypredict_fit()` now correctly averages tree predictions for LightGBM models with `boosting="rf"` instead of summing them. (#185)
 
 - `tidypredict_fit()` now correctly handles partykit stump trees (models with no splits). (#196)
 

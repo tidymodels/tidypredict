@@ -823,6 +823,39 @@ test_that("cross_entropy predictions match native predict", {
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
 })
 
+test_that("RF boosting predictions match native predict (#185)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    colnames = c("mpg", "cyl", "disp")
+  )
+
+  model <- lightgbm::lgb.train(
+    params = list(
+      boosting = "rf",
+      num_leaves = 4L,
+      objective = "regression",
+      min_data_in_leaf = 1L,
+      bagging_freq = 1,
+      bagging_fraction = 0.8
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
 test_that("predictions with missing values match", {
   skip_if_not_installed("lightgbm")
 
