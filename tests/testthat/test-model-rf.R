@@ -69,3 +69,14 @@ test_that("split operator uses <= for left child (#192)", {
 
   expect_equal(native, tidy)
 })
+
+test_that("classification models error with clear message (#193)", {
+  set.seed(123)
+  model <- randomForest::randomForest(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    ntree = 3
+  )
+
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
+})

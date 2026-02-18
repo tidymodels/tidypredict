@@ -4,8 +4,8 @@ test_that("returns the right output", {
   skip_on_os("linux")
 
   model <- ranger::ranger(
-    Species ~ .,
-    data = iris,
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
     num.trees = 3,
     max.depth = 2,
     seed = 100,
@@ -34,8 +34,8 @@ test_that("Model can be saved and re-loaded", {
   skip_on_os("linux")
 
   model <- ranger::ranger(
-    Species ~ .,
-    data = iris,
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
     num.trees = 3,
     max.depth = 2,
     seed = 100,
@@ -48,9 +48,9 @@ test_that("Model can be saved and re-loaded", {
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
 
-  expect_equal(
-    tidypredict_fit(model),
-    tidypredict_fit(pm)
+  expect_identical(
+    round_print(tidypredict_fit(model)),
+    round_print(tidypredict_fit(pm))
   )
 })
 
@@ -115,4 +115,21 @@ test_that("predictions are averaged not summed (#190)", {
   tidy <- rlang::eval_tidy(fit, mtcars)
 
   expect_equal(native, tidy)
+})
+
+test_that("classification models error with clear message (#191)", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 2
+  )
+
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
