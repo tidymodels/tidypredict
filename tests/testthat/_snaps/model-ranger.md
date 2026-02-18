@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "case_when(Petal.Length <= 2.6 ~ \"setosa\", Sepal.Length <= 6.25 & \n    Petal.Length > 2.6 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Width <= 0.75 ~ \"setosa\", Petal.Width <= \n        1.75 & Petal.Width > 0.75 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Length <= 2.35 ~ \"setosa\", Petal.Length <= \n        4.75 & Petal.Length > 2.35 ~ \"versicolor\", .default = \"virginica\")"
+      [1] "(case_when(Petal.Length <= 2.6 ~ \"setosa\", Sepal.Length <= 6.25 & \n    Petal.Length > 2.6 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Width <= 0.75 ~ \"setosa\", Petal.Width <= \n        1.75 & Petal.Width > 0.75 ~ \"versicolor\", .default = \"virginica\") + \n    case_when(Petal.Length <= 2.35 ~ \"setosa\", Petal.Length <= \n        4.75 & Petal.Length > 2.35 ~ \"versicolor\", .default = \"virginica\"))/3L"
 
 # formulas produces correct predictions
 
