@@ -241,3 +241,60 @@ test_that("formulas produces correct predictions", {
     )
   )
 })
+
+test_that("probit link works (#194)", {
+  model <- earth::earth(
+    survived ~ age + sibsp,
+    data = earth::etitanic,
+    glm = list(family = binomial(link = "probit"))
+  )
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, earth::etitanic, type = "response")[, 1])
+  tidy <- rlang::eval_tidy(fit, earth::etitanic)
+
+  # Uses Bowling et al. approximation to normal CDF
+  expect_equal(tidy, native, tolerance = 0.001)
+})
+
+test_that("cloglog link works (#194)", {
+  model <- earth::earth(
+    survived ~ age + sibsp,
+    data = earth::etitanic,
+    glm = list(family = binomial(link = "cloglog"))
+  )
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, earth::etitanic, type = "response")[, 1])
+  tidy <- rlang::eval_tidy(fit, earth::etitanic)
+
+  expect_equal(tidy, native)
+})
+
+test_that("Gamma family works (#195)", {
+  model <- earth::earth(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    glm = list(family = Gamma)
+  )
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, mtcars, type = "response")[, 1])
+  tidy <- rlang::eval_tidy(fit, mtcars)
+
+  expect_equal(tidy, native)
+})
+
+test_that("inverse.gaussian family works (#195)", {
+  model <- earth::earth(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    glm = list(family = inverse.gaussian)
+  )
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, mtcars, type = "response")[, 1])
+  tidy <- rlang::eval_tidy(fit, mtcars)
+
+  expect_equal(tidy, native)
+})
