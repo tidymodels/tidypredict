@@ -214,6 +214,12 @@ build_fit_formula_lgb <- function(parsedmodel) {
   # Single output objectives: sum all trees
   f <- build_lgb_tree_sum(seq_len(n_trees), parsedmodel)
 
+  # RF boosting averages trees instead of summing
+  boosting <- parsedmodel$general$params$boosting
+  if (!is.null(boosting) && boosting == "rf") {
+    f <- expr_division(f, n_trees)
+  }
+
   # Apply transformation
   if (objective %in% exp_objectives) {
     f <- expr(exp(!!f))
