@@ -33,7 +33,7 @@ build_fit_formula <- function(parsedmodel) {
 
   if (parsedmodel$general$is_glm == 1) {
     link <- parsedmodel$general$link
-    f <- apply_glm_link(f, link)
+    f <- apply_inverse_link(f, link)
   }
   f
 }
@@ -186,7 +186,7 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
 
 # Link functions ------------------------------------------
 
-apply_glm_link <- function(f, link) {
+apply_inverse_link <- function(f, link) {
   switch(
     link,
     "identity" = f,
