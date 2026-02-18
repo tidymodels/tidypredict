@@ -107,7 +107,7 @@ get_ra_tree <- function(tree_no, model) {
         }
         list(
           prediction = prediction,
-          path = get_ra_path(.x, tree, child_info, TRUE)
+          path = get_ra_path(.x, tree, child_info, FALSE)
         )
       } else {
         preds <- map_lgl(colnames(tree), ~ "pred." == substr(.x, 1, 5))
@@ -125,7 +125,7 @@ get_ra_tree <- function(tree_no, model) {
           prediction = prediction,
           prob = prob,
           probs = predictions,
-          path = get_ra_path(.x, tree, child_info, TRUE)
+          path = get_ra_path(.x, tree, child_info, FALSE)
         )
       }
     }
