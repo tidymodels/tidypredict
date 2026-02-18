@@ -1,6 +1,16 @@
 # Constants ---------------------------------------------------------------
 
-catboost_identity_objectives <- c("RMSE", "MAE", "Quantile", "MAPE", "Poisson")
+catboost_identity_objectives <- c(
+  "RMSE",
+  "MAE",
+  "Quantile",
+  "MAPE",
+  "Poisson",
+  "Huber",
+  "LogCosh",
+  "Expectile",
+  "Tweedie"
+)
 catboost_sigmoid_objectives <- c("Logloss", "CrossEntropy")
 catboost_multiclass_objectives <- c("MultiClass", "MultiClassOneVsAll")
 catboost_supported_objectives <- c(
