@@ -5,9 +5,11 @@
 ### New Model Supports
 
 - Added support for CatBoost models (`catboost.Model`). (#TBD,
-  [\#187](https://github.com/tidymodels/tidypredict/issues/187))
-  - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Logloss,
-    CrossEntropy, MultiClass, and MultiClassOneVsAll.
+  [\#187](https://github.com/tidymodels/tidypredict/issues/187),
+  [\#188](https://github.com/tidymodels/tidypredict/issues/188))
+  - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh,
+    Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and
+    MultiClassOneVsAll.
   - Tree types: oblivious (default `SymmetricTree`) and non-oblivious
     (`Depthwise` or `Lossguide` grow policy).
   - Categorical features are handled automatically for parsnip/bonsai

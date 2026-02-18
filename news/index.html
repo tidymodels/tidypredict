@@ -58,8 +58,8 @@
 <h2 class="pkg-version" data-toc-text="development version" id="tidypredict-development-version">tidypredict (development version)<a class="anchor" aria-label="anchor" href="#tidypredict-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-model-supports-development-version">New Model Supports<a class="anchor" aria-label="anchor" href="#new-model-supports-development-version"></a></h3>
-<ul><li>Added support for CatBoost models (<code>catboost.Model</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/187" class="external-link">#187</a>)
-<ul><li>Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.</li>
+<ul><li>Added support for CatBoost models (<code>catboost.Model</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/187" class="external-link">#187</a>, <a href="https://github.com/tidymodels/tidypredict/issues/188" class="external-link">#188</a>)
+<ul><li>Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh, Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.</li>
 <li>Tree types: oblivious (default <code>SymmetricTree</code>) and non-oblivious (<code>Depthwise</code> or <code>Lossguide</code> grow policy).</li>
 <li>Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use <code><a href="../reference/set_catboost_categories.html">set_catboost_categories()</a></code>.</li>
 </ul></li>
