@@ -44,6 +44,11 @@
   ([\#182](https://github.com/tidymodels/tidypredict/issues/182))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now uses the correct split operator (`<=` instead of `<`) for
+  randomForest models.
+  ([\#192](https://github.com/tidymodels/tidypredict/issues/192))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now uses the correct split operator (`<=` instead of `<`) for ranger
   models. Previously, predictions were incorrect when data values
   exactly matched split values.
