@@ -164,7 +164,7 @@ one <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.h
 combined.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(hp &lt;= 192.5 &amp; gear &lt;= 3.5 ~ 17.4, hp &gt; 192.5 &amp; gear &lt;= </span></span>
+<span><span class="co">#&gt; (case_when(hp &lt;= 192.5 &amp; gear &lt;= 3.5 ~ 17.4, hp &gt; 192.5 &amp; gear &lt;= </span></span>
 <span><span class="co">#&gt;     3.5 ~ 12.9, wt &lt;= 2.26 &amp; gear &gt; 3.5 ~ 29.4375, .default = 21.3625) + </span></span>
 <span><span class="co">#&gt;     case_when(vs &lt;= 0.5 &amp; wt &lt;= 2.455 ~ 26, vs &gt; 0.5 &amp; wt &lt;= </span></span>
 <span><span class="co">#&gt;         2.455 ~ 31.8, gear &lt;= 3.5 &amp; wt &gt; 2.455 ~ 14.25, .default = 19.0666666666667) + </span></span>
@@ -175,7 +175,7 @@ combined.</p>
 <span><span class="co">#&gt;         cyl &lt;= 5 ~ 22.32, cyl &lt;= 7 &amp; cyl &gt; 5 ~ 18.78, .default = 15.7769230769231) + </span></span>
 <span><span class="co">#&gt;     case_when(disp &lt;= 107.6 &amp; cyl &lt;= 5 ~ 31.1333333333333, disp &gt; </span></span>
 <span><span class="co">#&gt;         107.6 &amp; cyl &lt;= 5 ~ 23.6625, hp &lt;= 192.5 &amp; cyl &gt; 5 ~ 18.65, </span></span>
-<span><span class="co">#&gt;         .default = 12.8625)</span></span></code></pre></div>
+<span><span class="co">#&gt;         .default = 12.8625))/5L</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -201,7 +201,7 @@ objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(disp &lt;= 450 &amp; vs &lt;= 0.5 ~ 16.9684210526316, disp &gt; </span></span>
+<span><span class="co">#&gt; (case_when(disp &lt;= 450 &amp; vs &lt;= 0.5 ~ 16.9684210526316, disp &gt; </span></span>
 <span><span class="co">#&gt;     450 &amp; vs &lt;= 0.5 ~ 10.4, drat &lt;= 4 &amp; vs &gt; 0.5 ~ 24.2, .default = 30.6857142857143) + </span></span>
 <span><span class="co">#&gt;     case_when(wt &lt;= 2.3325 &amp; hp &lt;= 131.5 ~ 31.6666666666667, </span></span>
 <span><span class="co">#&gt;         wt &gt; 2.3325 &amp; hp &lt;= 131.5 ~ 21.7571428571429, drat &lt;= </span></span>
@@ -212,7 +212,7 @@ objects fitted via the <code>parsnip</code> package.</p>
 <span><span class="co">#&gt;         drat &lt;= 3.615 ~ 13.4, wt &lt;= 2.23 &amp; drat &gt; 3.615 ~ 28.8857142857143, </span></span>
 <span><span class="co">#&gt;         .default = 20.4285714285714) + case_when(wt &lt;= 2.2775 &amp; </span></span>
 <span><span class="co">#&gt;     disp &lt;= 266.9 ~ 31.375, wt &gt; 2.2775 &amp; disp &lt;= 266.9 ~ 22.4133333333333, </span></span>
-<span><span class="co">#&gt;     wt &lt;= 4.747 &amp; disp &gt; 266.9 ~ 16.5818181818182, .default = 10.4)</span></span></code></pre></div>
+<span><span class="co">#&gt;     wt &lt;= 4.747 &amp; disp &gt; 266.9 ~ 16.5818181818182, .default = 10.4))/5L</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

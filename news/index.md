@@ -55,6 +55,20 @@
   ([\#189](https://github.com/tidymodels/tidypredict/issues/189))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now correctly averages tree predictions for ranger models instead of
+  summing them. Previously, predictions were `num.trees` times too
+  large. ([\#190](https://github.com/tidymodels/tidypredict/issues/190))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now uses the correct split operator (`<=` instead of `<`) for
+  randomForest models.
+  ([\#192](https://github.com/tidymodels/tidypredict/issues/192))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now correctly handles partykit stump trees (models with no splits).
+  ([\#196](https://github.com/tidymodels/tidypredict/issues/196))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
   [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
   that use family function syntax (e.g., `family = gaussian()`) instead
