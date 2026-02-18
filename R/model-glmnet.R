@@ -59,6 +59,9 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   } else if (inherits(model, "fishnet")) {
     pm$general$family <- "poisson"
     pm$general$link <- "log"
+  } else if (inherits(model, "glmnetfit")) {
+    pm$general$family <- model$family$family
+    pm$general$link <- model$family$link
   } else {
     cli::cli_abort(
       "Model fit with this {.arg family} is not supported."
