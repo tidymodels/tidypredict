@@ -57,6 +57,38 @@ test_that("formulas produces correct predictions", {
   )
 })
 
+test_that("family function syntax works (#197)", {
+  x <- as.matrix(mtcars[, -1])
+
+  # gaussian()
+  model <- glmnet::glmnet(x, mtcars$mpg, family = gaussian(), lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+
+  # binomial()
+  model <- glmnet::glmnet(x, mtcars$am, family = binomial(), lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+
+  # poisson()
+  model <- glmnet::glmnet(x, mtcars$carb, family = poisson(), lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+})
+
+test_that("family string syntax works (#197)", {
+  x <- as.matrix(mtcars[, -1])
+
+  # "gaussian"
+  model <- glmnet::glmnet(x, mtcars$mpg, family = "gaussian", lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+
+  # "binomial"
+  model <- glmnet::glmnet(x, mtcars$am, family = "binomial", lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+
+  # "poisson"
+  model <- glmnet::glmnet(x, mtcars$carb, family = "poisson", lambda = 0.5)
+  expect_no_error(tidypredict_fit(model))
+})
+
 test_that("errors if more than 1 penalty is selected", {
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg)
 
