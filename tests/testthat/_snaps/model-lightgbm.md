@@ -44,7 +44,7 @@
     Code
       get_lgb_case_fun(condition)
     Condition
-      Error in `get_lgb_case_fun()`:
+      Error in `build_lgb_set_expr()`:
       ! Unknown operator for set: "unknown_op"
 
 # tidypredict_test errors for multiclass model
