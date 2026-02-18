@@ -63,7 +63,11 @@
 <li>Tree types: oblivious (default <code>SymmetricTree</code>) and non-oblivious (<code>Depthwise</code> or <code>Lossguide</code> grow policy).</li>
 <li>Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use <code><a href="../reference/set_catboost_categories.html">set_catboost_categories()</a></code>.</li>
 </ul></li>
-<li>Added support for LightGBM models (<code>lgb.Booster</code>). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)</li>
+<li>Added support for LightGBM models (<code>lgb.Booster</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/186" class="external-link">#186</a>)
+<ul><li>Objectives: regression, binary classification, and multiclass classification.</li>
+<li>Supports categorical features.</li>
+<li>Supports linear trees (<code>linear_tree = TRUE</code>), which fit a linear model at each leaf instead of a constant.</li>
+</ul></li>
 </ul></div>
 <div class="section level3">
 <h3 id="improvements-development-version">Improvements<a class="anchor" aria-label="anchor" href="#improvements-development-version"></a></h3>

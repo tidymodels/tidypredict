@@ -322,25 +322,26 @@ str(pm, 2)
 #>   ..$ num_tree_per_iteration: int 1
 #>   ..$ niter                 : int 10
 #>  $ trees  :List of 10
-#>   ..$ 0:List of 4
-#>   ..$ 1:List of 4
-#>   ..$ 2:List of 4
-#>   ..$ 3:List of 4
-#>   ..$ 4:List of 4
-#>   ..$ 5:List of 4
-#>   ..$ 6:List of 4
-#>   ..$ 7:List of 4
-#>   ..$ 8:List of 4
-#>   ..$ 9:List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
+#>   ..$ :List of 4
 #>  - attr(*, "class")= chr [1:3] "parsed_model" "pm_lgb" "list"
 ```
 
 ``` r
 str(pm$trees[1])
 #> List of 1
-#>  $ 0:List of 4
-#>   ..$ :List of 2
+#>  $ :List of 4
+#>   ..$ :List of 3
 #>   .. ..$ prediction: num 122
+#>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 1
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
@@ -348,8 +349,9 @@ str(pm$trees[1])
 #>   .. .. .. ..$ val    : num 7
 #>   .. .. .. ..$ op     : chr "less-equal"
 #>   .. .. .. ..$ missing: logi TRUE
-#>   ..$ :List of 2
+#>   ..$ :List of 3
 #>   .. ..$ prediction: num 241
+#>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 3
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
@@ -369,8 +371,9 @@ str(pm$trees[1])
 #>   .. .. .. ..$ val    : num 334
 #>   .. .. .. ..$ op     : chr "less-equal"
 #>   .. .. .. ..$ missing: logi TRUE
-#>   ..$ :List of 2
+#>   ..$ :List of 3
 #>   .. ..$ prediction: num 187
+#>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 3
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
@@ -390,8 +393,9 @@ str(pm$trees[1])
 #>   .. .. .. ..$ val    : num 334
 #>   .. .. .. ..$ op     : chr "more"
 #>   .. .. .. ..$ missing: logi FALSE
-#>   ..$ :List of 2
+#>   ..$ :List of 3
 #>   .. ..$ prediction: num 164
+#>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 2
 #>   .. .. ..$ :List of 5
 #>   .. .. .. ..$ type   : chr "conditional"
