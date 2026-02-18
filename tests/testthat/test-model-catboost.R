@@ -1765,3 +1765,158 @@ test_that("model with only categorical features works", {
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
+
+# Non-oblivious tree tests (Depthwise/Lossguide) -----------------------------
+
+test_that("Depthwise regression predictions match (#187)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost_catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 5L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      grow_policy = "Depthwise",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+  expect_equal(pm$general$tree_type, "nonoblivious")
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("Lossguide regression predictions match (#187)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost_catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 5L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      grow_policy = "Lossguide",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+  expect_equal(pm$general$tree_type, "nonoblivious")
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("Depthwise multiclass predictions match (#187)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(iris[, 1:4])
+  colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
+  y <- as.integer(iris$Species) - 1L
+
+  pool <- catboost_catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(colnames(X))
+  )
+
+  model <- catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 2L,
+      learning_rate = 0.5,
+      loss_function = "MultiClass",
+      grow_policy = "Depthwise",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+  expect_equal(pm$general$tree_type, "nonoblivious")
+  expect_equal(pm$general$num_class, 3)
+
+  native_preds <- catboost_catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+
+  formulas <- tidypredict_fit(model)
+  tidy_preds <- lapply(formulas, function(f) rlang::eval_tidy(f, iris))
+  tidy_matrix <- do.call(cbind, tidy_preds)
+
+  expect_equal(unname(tidy_matrix), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("Depthwise binary classification predictions match (#187)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(456)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- as.numeric(mtcars$am)
+
+  pool <- catboost_catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 5L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "Logloss",
+      grow_policy = "Depthwise",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  native_preds <- catboost_catboost.predict(
+    model,
+    pool,
+    prediction_type = "Probability"
+  )
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
