@@ -128,3 +128,82 @@ test_that("don't add with 0 (#147)", {
     quote((wt * 1.5) + (cyl * 2.2))
   )
 })
+
+test_that("gaussian family with identity link works", {
+  model <- glm(mpg ~ wt + hp, data = mtcars, family = gaussian())
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("binomial family with logit link works", {
+  suppressWarnings(
+    model <- glm(am ~ wt + hp, data = mtcars, family = binomial())
+  )
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("poisson family with log link works", {
+  model <- glm(gear ~ wt + hp, data = mtcars, family = poisson())
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("Gamma family with inverse link works (#203)", {
+  model <- glm(mpg ~ wt + hp, data = mtcars, family = Gamma())
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("inverse.gaussian family with 1/mu^2 link works (#204)", {
+  model <- glm(mpg ~ wt + hp, data = mtcars, family = inverse.gaussian())
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("binomial with probit link works (#205)", {
+  suppressWarnings(
+    model <- glm(
+      am ~ wt + hp,
+      data = mtcars,
+      family = binomial(link = "probit")
+    )
+  )
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  # Uses Bowling et al. approximation to normal CDF for SQL compatibility
+  expect_true(all(abs(tidy - native) < 0.001))
+})
+
+test_that("binomial with cloglog link works (#206)", {
+  suppressWarnings(
+    model <- glm(
+      am ~ wt + hp,
+      data = mtcars,
+      family = binomial(link = "cloglog")
+    )
+  )
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
+
+test_that("poisson with sqrt link works (#207)", {
+  model <- glm(gear ~ wt + hp, data = mtcars, family = poisson(link = "sqrt"))
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, type = "response"))
+  tidy <- rlang::eval_tidy(fit, mtcars)
+  expect_equal(tidy, native, tolerance = 1e-10)
+})
