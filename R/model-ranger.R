@@ -5,9 +5,15 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
 
   leftChild <- tree$leftChild
   rightChild <- tree$rightChild
+
   splitval <- tree$splitval
   splitclass <- tree$splitclass
   splitvarName <- tree$splitvarName
+
+  # Handle stump trees (no splits) - return empty path
+  if (length(child_info) == 0 || find < 1 || find > length(child_info)) {
+    return(list())
+  }
 
   new <- child_info[[find]]
   path <- find

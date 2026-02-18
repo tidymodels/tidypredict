@@ -57,7 +57,7 @@ parse_rf_tree <- function(tree_no, model) {
       }
       list(
         prediction = prediction,
-        path = parse_rf_path(.x, tree, term_labels)
+        path = parse_rf_path(.x, tree, term_labels, default_op = FALSE)
       )
     }
   )

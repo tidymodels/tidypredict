@@ -107,3 +107,16 @@ test_that(".extract_partykit_classprob results match predict probabilities", {
 test_that(".extract_partykit_classprob errors on non-party model", {
   expect_snapshot(.extract_partykit_classprob(list()), error = TRUE)
 })
+
+test_that("stump trees (no splits) work correctly (#196)", {
+  ctrl <- partykit::ctree_control(mincriterion = 0.9999999)
+  model <- partykit::ctree(mpg ~ cyl + disp + hp, data = mtcars, control = ctrl)
+
+  # Verify it's a stump (only root node, no splits)
+  expect_equal(length(partykit::nodeids(model, terminal = TRUE)), 1)
+
+  fit <- tidypredict_fit(model)
+
+  expect_type(fit, "double")
+  expect_equal(fit, mean(mtcars$mpg))
+})
