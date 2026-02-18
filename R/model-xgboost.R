@@ -155,18 +155,8 @@ parse_model.xgb.Booster <- function(model) {
 # Fit model -----------------------------------------------
 
 get_xgb_case <- function(path, prediction) {
-  cl <- map(path, get_xgb_case_fun)
-  cl_length <- length(cl)
-  if (cl_length == 0) {
-    cl <- TRUE
-  } else if (cl_length == 1) {
-    cl <- cl[[1]]
-  } else if (cl_length == 2) {
-    cl <- expr_and(cl[[1]], cl[[2]])
-  } else {
-    cl <- reduce_and(cl)
-  }
-
+  conditions <- map(path, get_xgb_case_fun)
+  cl <- combine_path_conditions(conditions)
   expr(!!cl ~ !!prediction)
 }
 

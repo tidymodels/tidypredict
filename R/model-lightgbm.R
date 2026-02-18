@@ -1,3 +1,24 @@
+# Constants ---------------------------------------------------------------
+
+lgb_identity_objectives <- c(
+  "regression",
+  "regression_l2",
+  "regression_l1",
+  "huber",
+  "fair",
+  "quantile",
+  "mape"
+)
+lgb_exp_objectives <- c("poisson", "gamma", "tweedie")
+lgb_sigmoid_objectives <- c("binary", "cross_entropy")
+lgb_multiclass_objectives <- c("multiclass", "multiclassova")
+lgb_supported_objectives <- c(
+  lgb_identity_objectives,
+  lgb_exp_objectives,
+  lgb_sigmoid_objectives,
+  lgb_multiclass_objectives
+)
+
 # Model parser -------------------------------------
 
 #' @export
@@ -20,13 +41,124 @@ parse_model.lgb.Booster <- function(model) {
   # Extract number of iterations
   pm$general$niter <- model$current_iter()
 
+  # Extract linear tree info from model string (if any)
+  linear_info <- parse_lgb_linear_trees(model, pm$general$feature_names)
+
   # Extract trees
-  pm$trees <- get_lgb_trees(model)
+  pm$trees <- get_lgb_trees(model, linear_info)
 
   as_parsed_model(pm)
 }
 
-get_lgb_trees <- function(model) {
+# Parse linear tree info from model string
+parse_lgb_linear_trees <- function(model, feature_names) {
+  model_str <- model$save_model_to_string()
+  lines <- strsplit(model_str, "\n")[[1]]
+
+  # Find tree boundaries and extract linear info
+  linear_info <- list()
+  current_tree <- NULL
+  is_linear <- FALSE
+  leaf_const <- NULL
+  num_features <- NULL
+  leaf_features <- NULL
+  leaf_coeff <- NULL
+
+  save_tree_linear_info <- function() {
+    if (!is.null(current_tree) && is_linear) {
+      linear_info[[as.character(current_tree)]] <<- parse_lgb_linear_leaves(
+        leaf_const,
+        num_features,
+        leaf_features,
+        leaf_coeff,
+        feature_names
+      )
+    }
+  }
+
+  for (line in lines) {
+    if (grepl("^Tree=", line)) {
+      save_tree_linear_info()
+      # Start new tree
+      current_tree <- as.integer(sub("^Tree=", "", line))
+      is_linear <- FALSE
+      leaf_const <- NULL
+      num_features <- NULL
+      leaf_features <- NULL
+      leaf_coeff <- NULL
+    } else if (grepl("^is_linear=1", line)) {
+      is_linear <- TRUE
+    } else if (grepl("^leaf_const=", line)) {
+      leaf_const <- sub("^leaf_const=", "", line)
+    } else if (grepl("^num_features=", line)) {
+      num_features <- sub("^num_features=", "", line)
+    } else if (grepl("^leaf_features=", line)) {
+      leaf_features <- sub("^leaf_features=", "", line)
+    } else if (grepl("^leaf_coeff=", line)) {
+      leaf_coeff <- sub("^leaf_coeff=", "", line)
+    } else if (grepl("^end of trees", line)) {
+      save_tree_linear_info()
+      break
+    }
+  }
+
+  linear_info
+}
+
+# Parse linear leaf info for a single tree
+parse_lgb_linear_leaves <- function(
+  const_str,
+  num_features_str,
+  features_str,
+  coeff_str,
+  feature_names
+) {
+  # Parse leaf_const (space-separated floats)
+  consts <- as.numeric(strsplit(trimws(const_str), "\\s+")[[1]])
+  n_leaves <- length(consts)
+
+  # Parse num_features to know how many features per leaf
+  num_feats <- as.integer(strsplit(trimws(num_features_str), "\\s+")[[1]])
+
+  # Parse all features and coefficients as flat vectors
+  features_str_trimmed <- trimws(features_str)
+  coeff_str_trimmed <- trimws(coeff_str)
+
+  if (nchar(features_str_trimmed) > 0) {
+    all_features <- as.integer(strsplit(features_str_trimmed, "\\s+")[[1]])
+    all_coeffs <- as.numeric(strsplit(coeff_str_trimmed, "\\s+")[[1]])
+  } else {
+    all_features <- integer(0)
+    all_coeffs <- numeric(0)
+  }
+
+  # Split features and coefficients by num_feats
+  idx <- 1
+  linear_leaves <- lapply(seq_len(n_leaves), function(i) {
+    nf <- num_feats[i]
+    if (nf > 0) {
+      feat_idx <- all_features[idx:(idx + nf - 1)]
+      coeffs <- all_coeffs[idx:(idx + nf - 1)]
+      idx <<- idx + nf
+      list(
+        intercept = consts[i],
+        feature_names = feature_names[feat_idx + 1],
+        coefficients = coeffs
+      )
+    } else {
+      list(
+        intercept = consts[i],
+        feature_names = character(0),
+        coefficients = numeric(0)
+      )
+    }
+  })
+  names(linear_leaves) <- as.character(seq_len(n_leaves) - 1)
+
+  linear_leaves
+}
+
+get_lgb_trees <- function(model, linear_info = list()) {
   trees_df <- lightgbm::lgb.model.dt.tree(model)
   trees_df <- as.data.frame(trees_df)
 
@@ -51,8 +183,11 @@ get_lgb_trees <- function(model) {
   # Split by tree_index
   trees_split <- split(trees_df, trees_df$tree_index)
 
-  # Process each tree
-  map(trees_split, get_lgb_tree)
+  # Process each tree with its linear info (if any)
+  map(names(trees_split), function(tree_idx) {
+    tree_linear <- linear_info[[tree_idx]]
+    get_lgb_tree(trees_split[[tree_idx]], tree_linear)
+  })
 }
 
 get_lgb_children_map <- function(tree_df) {
@@ -69,7 +204,7 @@ get_lgb_children_map <- function(tree_df) {
   children_map
 }
 
-get_lgb_tree <- function(tree_df) {
+get_lgb_tree <- function(tree_df, linear_info = NULL) {
   # Build children map for direction detection
   children_map <- get_lgb_children_map(tree_df)
 
@@ -78,10 +213,27 @@ get_lgb_tree <- function(tree_df) {
 
   # For each leaf, trace path to root
   map(leaf_rows, function(leaf_row) {
-    list(
-      prediction = tree_df$leaf_value[[leaf_row]],
-      path = get_lgb_path(leaf_row, tree_df, children_map)
-    )
+    leaf_idx <- tree_df$leaf_index[[leaf_row]]
+    leaf_idx_str <- as.character(leaf_idx)
+    leaf_value <- tree_df$leaf_value[[leaf_row]]
+
+    # Check if this tree has linear info for this leaf
+    if (!is.null(linear_info) && leaf_idx_str %in% names(linear_info)) {
+      leaf_linear <- linear_info[[leaf_idx_str]]
+      # Store both linear info and fallback value (used when features are NA)
+      leaf_linear$fallback <- leaf_value
+      list(
+        prediction = NULL,
+        linear = leaf_linear,
+        path = get_lgb_path(leaf_row, tree_df, children_map)
+      )
+    } else {
+      list(
+        prediction = leaf_value,
+        linear = NULL,
+        path = get_lgb_path(leaf_row, tree_df, children_map)
+      )
+    }
   })
 }
 
@@ -173,41 +325,18 @@ build_fit_formula_lgb <- function(parsedmodel) {
     cli::cli_abort("Model has no trees.")
   }
 
-  objective <- parsedmodel$general$params$objective
-  if (is.null(objective)) {
-    objective <- "regression"
-  }
+  objective <- parsedmodel$general$params$objective %||% "regression"
 
-  identity_objectives <- c(
-    "regression",
-    "regression_l2",
-    "regression_l1",
-    "huber",
-    "fair",
-    "quantile",
-    "mape"
-  )
-  exp_objectives <- c("poisson", "gamma", "tweedie")
-  sigmoid_objectives <- c("binary", "cross_entropy")
-  multiclass_objectives <- c("multiclass", "multiclassova")
-  all_supported <- c(
-    identity_objectives,
-    exp_objectives,
-    sigmoid_objectives,
-    multiclass_objectives
-  )
-
-  if (!objective %in% all_supported) {
+  if (!objective %in% lgb_supported_objectives) {
     cli::cli_abort(
       c(
         "Unsupported objective: {.val {objective}}.",
-        "i" = "Supported objectives: {.val {all_supported}}."
+        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
       )
     )
   }
 
-  # Handle multiclass separately
-  if (objective %in% multiclass_objectives) {
+  if (objective %in% lgb_multiclass_objectives) {
     return(build_fit_formula_lgb_multiclass(parsedmodel, objective))
   }
 
@@ -221,12 +350,11 @@ build_fit_formula_lgb <- function(parsedmodel) {
   }
 
   # Apply transformation
-  if (objective %in% exp_objectives) {
+  if (objective %in% lgb_exp_objectives) {
     f <- expr(exp(!!f))
-  } else if (objective %in% sigmoid_objectives) {
+  } else if (objective %in% lgb_sigmoid_objectives) {
     f <- lgb_sigmoid(f)
   }
-  # identity_objectives: no transformation needed
 
   f
 }
@@ -292,25 +420,56 @@ lgb_sigmoid <- function(f) {
 get_lgb_case_tree <- function(tree_no, parsedmodel) {
   map(
     parsedmodel$trees[[tree_no]],
-    ~ get_lgb_case(.x$path, .x$prediction)
+    ~ get_lgb_case(.x$path, .x$prediction, .x$linear)
   )
 }
 
-get_lgb_case <- function(path, prediction) {
-  cl <- map(path, get_lgb_case_fun)
-  cl_length <- length(cl)
-
-  if (cl_length == 0) {
-    cl <- TRUE
-  } else if (cl_length == 1) {
-    cl <- cl[[1]]
-  } else if (cl_length == 2) {
-    cl <- expr_and(cl[[1]], cl[[2]])
+get_lgb_case <- function(path, prediction, linear = NULL) {
+  conditions <- map(path, get_lgb_case_fun)
+  cl <- combine_path_conditions(conditions)
+  pred_expr <- if (!is.null(linear)) {
+    build_lgb_linear_prediction(linear)
   } else {
-    cl <- reduce_and(cl)
+    prediction
+  }
+  expr(!!cl ~ !!pred_expr)
+}
+
+# Build linear prediction formula: intercept + sum(coeff * feature)
+# LightGBM uses fallback leaf_value when ANY feature in the formula is NA
+build_lgb_linear_prediction <- function(linear) {
+  intercept <- linear$intercept
+  feature_names <- linear$feature_names
+  coefficients <- linear$coefficients
+  fallback <- linear$fallback
+
+  if (length(feature_names) == 0) {
+    # No features, just return intercept
+    return(intercept)
   }
 
-  expr(!!cl ~ !!prediction)
+  # Build the linear formula: intercept + sum(coeff * feature)
+  terms <- map(seq_along(feature_names), function(i) {
+    feat <- as.name(feature_names[i])
+    coef <- coefficients[i]
+    expr(!!coef * !!feat)
+  })
+  all_terms <- c(list(intercept), terms)
+  linear_formula <- reduce_addition(all_terms)
+
+  # Build condition: any feature is NA
+  na_checks <- map(feature_names, function(fn) {
+    feat <- as.name(fn)
+    expr(is.na(!!feat))
+  })
+  any_na <- if (length(na_checks) == 1) {
+    na_checks[[1]]
+  } else {
+    reduce_or(na_checks)
+  }
+
+  # If any feature is NA, use fallback; otherwise use linear formula
+  expr(ifelse(!!any_na, !!fallback, !!linear_formula))
 }
 
 # For {orbital}
@@ -336,54 +495,51 @@ get_lgb_case <- function(path, prediction) {
 }
 
 get_lgb_case_fun <- function(.x) {
-  col_name <- as.name(.x$col)
-
   if (.x$type == "conditional") {
-    # Numerical split
-    val <- as.numeric(.x$val)
-
-    if (.x$op == "less-equal") {
-      if (.x$missing) {
-        i <- expr((!!col_name <= !!val | is.na(!!col_name)))
-      } else {
-        i <- expr(!!col_name <= !!val)
-      }
-    } else if (.x$op == "more") {
-      if (.x$missing) {
-        i <- expr((!!col_name > !!val | is.na(!!col_name)))
-      } else {
-        i <- expr(!!col_name > !!val)
-      }
-    } else {
-      # nocov start
-      cli::cli_abort(
-        "Unknown operator for conditional: {.val {(.x$op)}}.",
-        .internal = TRUE
-      )
-      # nocov end
-    }
+    build_lgb_conditional_expr(.x$col, .x$op, .x$val, .x$missing)
   } else if (.x$type == "set") {
-    # Categorical split
-    vals <- .x$vals
-
-    if (.x$op == "in") {
-      if (.x$missing) {
-        i <- expr((!!col_name %in% !!vals | is.na(!!col_name)))
-      } else {
-        i <- expr(!!col_name %in% !!vals)
-      }
-    } else if (.x$op == "not-in") {
-      if (.x$missing) {
-        i <- expr((!(!!col_name %in% !!vals) | is.na(!!col_name)))
-      } else {
-        i <- expr(!(!!col_name %in% !!vals))
-      }
-    } else {
-      cli::cli_abort("Unknown operator for set: {.val {(.x$op)}}")
-    }
+    build_lgb_set_expr(.x$col, .x$op, .x$vals, .x$missing)
   } else {
     cli::cli_abort("Unknown condition type: {.val {(.x$type)}}")
   }
+}
 
-  i
+build_lgb_conditional_expr <- function(col, op, val, include_missing) {
+  col_name <- as.name(col)
+  val <- as.numeric(val)
+
+  base_expr <- switch(
+    op,
+    "less-equal" = expr(!!col_name <= !!val),
+    "more" = expr(!!col_name > !!val),
+    # nocov start
+    cli::cli_abort(
+      "Unknown operator for conditional: {.val {op}}.",
+      .internal = TRUE
+    )
+    # nocov end
+  )
+
+  add_missing_condition(base_expr, col_name, include_missing)
+}
+
+build_lgb_set_expr <- function(col, op, vals, include_missing) {
+  col_name <- as.name(col)
+
+  base_expr <- switch(
+    op,
+    "in" = expr(!!col_name %in% !!vals),
+    "not-in" = expr(!(!!col_name %in% !!vals)),
+    cli::cli_abort("Unknown operator for set: {.val {op}}")
+  )
+
+  add_missing_condition(base_expr, col_name, include_missing)
+}
+
+add_missing_condition <- function(base_expr, col_name, include_missing) {
+  if (include_missing) {
+    expr((!!base_expr | is.na(!!col_name)))
+  } else {
+    base_expr
+  }
 }

@@ -2078,3 +2078,228 @@ test_that("tidypredict_test works with parsnip/bonsai model", {
   expect_s3_class(result, "tidypredict_test")
   expect_false(result$alert)
 })
+
+# Linear tree tests ----------------------------------------------------------
+
+test_that("linear tree regression predictions match native predict (#186)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  n <- 100
+  X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
+  y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      objective = "regression",
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 10L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("linear tree binary classification predictions match (#186)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(456)
+  n <- 200
+  X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
+  y <- as.numeric((2 * X[, 1] + 3 * X[, 2] + rnorm(n)) > 0)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      objective = "binary",
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 20L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("linear tree multiclass predictions match (#186)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(789)
+  n <- 300
+  X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
+  y <- as.integer(cut(X[, 1] + X[, 2] + rnorm(n, sd = 0.5), breaks = 3)) - 1L
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      objective = "multiclass",
+      num_class = 3L,
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 20L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  fit_formulas <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+  native_mat <- matrix(native_preds, ncol = 3, byrow = FALSE)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(
+    test_df,
+    class_0 = !!fit_formulas$class_0,
+    class_1 = !!fit_formulas$class_1,
+    class_2 = !!fit_formulas$class_2
+  )
+  tidy_mat <- as.matrix(tidy_preds[, c("class_0", "class_1", "class_2")])
+
+  expect_equal(unname(tidy_mat), unname(native_mat), tolerance = 1e-10)
+})
+
+test_that("linear tree with RF boosting predictions match (#186)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(321)
+  n <- 100
+  X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
+  y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      boosting = "rf",
+      objective = "regression",
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 10L,
+      bagging_freq = 1,
+      bagging_fraction = 0.8
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, X)
+
+  test_df <- as.data.frame(X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})
+
+test_that("linear tree parsed model has correct structure", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  n <- 100
+  X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
+  y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
+
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      objective = "regression",
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 10L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  pm <- parse_model(model)
+
+  expect_s3_class(pm, "parsed_model")
+  expect_length(pm$trees, 3)
+
+  # Check that leaves have linear info instead of constant predictions
+  first_tree <- pm$trees[[1]]
+  first_leaf <- first_tree[[1]]
+
+  expect_contains(names(first_leaf), c("prediction", "linear", "path"))
+
+  # Either prediction is NULL (linear) or linear is NULL (constant)
+  has_linear <- !is.null(first_leaf$linear)
+  if (has_linear) {
+    expect_null(first_leaf$prediction)
+    expect_contains(
+      names(first_leaf$linear),
+      c("intercept", "feature_names", "coefficients")
+    )
+    expect_type(first_leaf$linear$intercept, "double")
+    expect_type(first_leaf$linear$feature_names, "character")
+    expect_type(first_leaf$linear$coefficients, "double")
+  }
+})
+
+test_that("linear tree handles NA values correctly when trained with NAs (#186)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(123)
+  n <- 100
+  x1 <- rnorm(n)
+  x2 <- rnorm(n)
+  y <- 2 + 0.5 * x1 + 0.3 * x2 + rnorm(n, sd = 0.1)
+
+  # Add NAs to training data so model learns NA handling
+
+  x1[c(5, 15, 25)] <- NA
+  x2[c(10, 20, 30)] <- NA
+
+  X <- cbind(x1 = x1, x2 = x2)
+  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  model <- lightgbm::lgb.train(
+    params = list(
+      objective = "regression",
+      linear_tree = TRUE,
+      num_leaves = 4L,
+      min_data_in_leaf = 10L
+    ),
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+
+  # Test data with various NA patterns
+  test_X <- rbind(
+    c(0.5, 0.5), # No NAs
+    c(NA, 0.5), # NA in x1
+    c(0.5, NA), # NA in x2
+    c(NA, NA) # Both NA
+  )
+  colnames(test_X) <- c("x1", "x2")
+
+  fit_formula <- tidypredict_fit(model)
+  native_preds <- predict(model, test_X)
+
+  test_df <- as.data.frame(test_X)
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+})

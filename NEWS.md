@@ -7,7 +7,10 @@
   - Tree types: oblivious (default `SymmetricTree`) and non-oblivious (`Depthwise` or `Lossguide` grow policy).
   - Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use `set_catboost_categories()`.
 
-- Added support for LightGBM models (`lgb.Booster`). Supports regression, binary classification, multiclass classification, and categorical features. (#TBD)
+- Added support for LightGBM models (`lgb.Booster`). (#TBD, #186)
+  - Objectives: regression, binary classification, and multiclass classification.
+  - Supports categorical features.
+  - Supports linear trees (`linear_tree = TRUE`), which fit a linear model at each leaf instead of a constant.
 
 ## Improvements
 

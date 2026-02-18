@@ -852,7 +852,7 @@ get_catboost_cat_mapping <- function(parsedmodel) {
 
 get_catboost_case <- function(path, prediction, cat_mapping = list()) {
   conditions <- map(path, get_catboost_case_fun, cat_mapping = cat_mapping)
-  cl <- if (length(conditions) == 0) TRUE else reduce_and(conditions)
+  cl <- combine_path_conditions(conditions)
   expr(!!cl ~ !!prediction)
 }
 
