@@ -18,6 +18,8 @@
 
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)
 
+- `tidypredict_fit()` now works with `glmnet()` models that use family function syntax (e.g., `family = gaussian()`) instead of string syntax (e.g., `family = "gaussian"`). (#197)
+
 # tidypredict 1.0.1
 
 ## Bug Fixes
