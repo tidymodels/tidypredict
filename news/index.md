@@ -70,9 +70,9 @@
   large. ([\#190](https://github.com/tidymodels/tidypredict/issues/190))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now uses the correct split operator (`<=` instead of `<`) for
-  randomForest models.
-  ([\#192](https://github.com/tidymodels/tidypredict/issues/192))
+  now correctly averages tree predictions for LightGBM models with
+  `boosting="rf"` instead of summing them.
+  ([\#185](https://github.com/tidymodels/tidypredict/issues/185))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now correctly handles partykit stump trees (models with no splits).
