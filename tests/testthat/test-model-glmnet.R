@@ -124,3 +124,46 @@ test_that("glmnet are handeld neatly with parsnip", {
     rlang::expr_text(tf)
   )
 })
+
+test_that("Gamma family works (#200)", {
+  x <- as.matrix(mtcars[, -1])
+  model <- glmnet::glmnet(x, mtcars$mpg, family = Gamma(), lambda = 0.5)
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, x, type = "response")[, 1])
+  tidy <- rlang::eval_tidy(fit, mtcars)
+
+  expect_equal(tidy, native)
+})
+
+test_that("Cox family works (#201)", {
+  skip_if_not_installed("survival")
+  x <- as.matrix(mtcars[, -c(1, 8)])
+  y <- survival::Surv(mtcars$mpg, mtcars$vs)
+  model <- glmnet::glmnet(x, y, family = "cox", lambda = 0.1)
+
+  fit <- tidypredict_fit(model)
+  native <- unname(predict(model, x, type = "link")[, 1])
+  tidy <- rlang::eval_tidy(fit, mtcars)
+
+  expect_equal(tidy, native)
+})
+
+test_that("multinomial family errors with helpful message (#198)", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.5
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
+test_that("mgaussian family errors with helpful message (#199)", {
+  x <- as.matrix(mtcars[, -c(1, 4)])
+  y <- cbind(mtcars$mpg, mtcars$hp)
+  model <- glmnet::glmnet(x, y, family = "mgaussian", lambda = 0.5)
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})

@@ -2,6 +2,24 @@
 
 #' @export
 tidypredict_fit.glmnet <- function(model) {
+  if (inherits(model, "multnet")) {
+    cli::cli_abort(
+      c(
+        "Multinomial glmnet models are not supported.",
+        "i" = "Models fit with {.code family = \"multinomial\"} have multiple
+        outcome columns which is not supported."
+      )
+    )
+  }
+  if (inherits(model, "mrelnet")) {
+    cli::cli_abort(
+      c(
+        "Multivariate gaussian glmnet models are not supported.",
+        "i" = "Models fit with {.code family = \"mgaussian\"} have multiple
+        outcome columns which is not supported."
+      )
+    )
+  }
   parsedmodel <- parse_model(model)
   build_fit_formula(parsedmodel)
 }
@@ -59,6 +77,10 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   } else if (inherits(model, "fishnet")) {
     pm$general$family <- "poisson"
     pm$general$link <- "log"
+  } else if (inherits(model, "coxnet")) {
+    pm$general$family <- "cox"
+    pm$general$link <- "identity"
+    pm$general$is_glm <- 0
   } else if (inherits(model, "glmnetfit")) {
     pm$general$family <- model$family$family
     pm$general$link <- model$family$link

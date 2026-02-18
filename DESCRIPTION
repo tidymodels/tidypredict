@@ -48,6 +48,7 @@ Suggests:
     ranger,
     rmarkdown,
     RSQLite,
+    survival,
     testthat (>= 3.2.0),
     withr,
     xgboost,

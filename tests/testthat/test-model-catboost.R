@@ -715,6 +715,74 @@ test_that("Poisson predictions match catboost.predict", {
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
 
+test_that("Huber predictions match catboost.predict (#188)", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model(loss_function = "Huber:delta=1.0")
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")]),
+    label = mtcars$hp,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds)
+})
+
+test_that("LogCosh predictions match catboost.predict (#188)", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model(loss_function = "LogCosh")
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")]),
+    label = mtcars$hp,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds)
+})
+
+test_that("Expectile predictions match catboost.predict (#188)", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model(loss_function = "Expectile:alpha=0.5")
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")]),
+    label = mtcars$hp,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds)
+})
+
+test_that("Tweedie predictions match catboost.predict (#188)", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model(loss_function = "Tweedie:variance_power=1.5")
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")]),
+    label = mtcars$hp,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  formula <- tidypredict_fit(model)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+
+  expect_equal(tidy_preds, native_preds)
+})
+
 test_that("CrossEntropy predictions match catboost.predict", {
   skip_if_not_installed("catboost")
 

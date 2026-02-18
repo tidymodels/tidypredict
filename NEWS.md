@@ -2,8 +2,8 @@
 
 ## New Model Supports
 
-- Added support for CatBoost models (`catboost.Model`). (#TBD, #187)
-  - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.
+- Added support for CatBoost models (`catboost.Model`). (#TBD, #187, #188)
+  - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh, Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.
   - Tree types: oblivious (default `SymmetricTree`) and non-oblivious (`Depthwise` or `Lossguide` grow policy).
   - Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use `set_catboost_categories()`.
 
@@ -14,6 +14,8 @@
 - `earth()` models now support additional GLM families and link functions: Gamma, inverse.gaussian, probit, and cloglog. (#194, #195)
 
 - `glm()` models now support additional families and link functions: Gamma family with inverse link, inverse.gaussian family with 1/mu^2 link, probit link, cloglog link, and sqrt link. (#203, #204, #205, #206, #207)
+
+- `glmnet()` models now support `Gamma` family and Cox proportional hazards (`family = "cox"`) models. (#200, #201)
 
 - xgboost support now includes additional objectives: `binary:hinge`, `reg:absoluteerror`, `reg:gamma`, `reg:pseudohubererror`, and `reg:squaredlogerror`. (#184)
 
