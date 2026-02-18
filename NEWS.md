@@ -14,6 +14,8 @@
 
 ## Improvements
 
+- `earth()` models now support additional GLM families and link functions: Gamma, inverse.gaussian, probit, and cloglog. (#194, #195)
+
 - `glm()` models now support additional families and link functions: Gamma family with inverse link, inverse.gaussian family with 1/mu^2 link, probit link, cloglog link, and sqrt link. (#203, #204, #205, #206, #207)
 
 - `glmnet()` models now support `Gamma` family and Cox proportional hazards (`family = "cox"`) models. (#200, #201)
