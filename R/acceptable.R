@@ -72,7 +72,7 @@ acceptable_lm <- function(model) {
   )
 
   # Check for in-line formulas
-  funs <- fun_calls(model$call)
+  funs <- fun_calls(stats::formula(model))
   funs <- funs[!(funs %in% accepted_funs)]
   if (length(funs) > 0) {
     contains_offset <- any(funs == "offset")
