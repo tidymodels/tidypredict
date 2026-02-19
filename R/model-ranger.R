@@ -219,35 +219,12 @@ tidypredict_fit_ranger <- function(parsedmodel) {
     tree_exprs <- map(parsedmodel$trees, function(tree) {
       # Build nodes for this tree with probability of this class as prediction
       nodes <- map(tree, function(node) {
-        prob <- node$probs[[lvl]]$prob
         list(
-          prediction = prob,
+          prediction = node$probs[[lvl]]$prob,
           path = node$path
         )
       })
-
-      # Generate case_when for this tree
-      node_exprs <- map(nodes, function(node) {
-        rcl <- path_formulas(node$path)
-        if (isTRUE(rcl)) {
-          return(node$prediction)
-        }
-        expr(!!rcl ~ !!node$prediction)
-      })
-
-      # Handle stump trees
-      if (length(node_exprs) == 1 && is.numeric(node_exprs[[1]])) {
-        return(node_exprs[[1]])
-      }
-
-      default <- node_exprs[[length(node_exprs)]]
-      if (rlang::is_formula(default)) {
-        default <- rlang::f_rhs(default)
-      }
-      node_exprs[[length(node_exprs)]] <- NULL
-      node_exprs <- c(node_exprs, .default = default)
-
-      expr(case_when(!!!node_exprs))
+      .build_case_when_tree(nodes)
     })
     res[[lvl]] <- tree_exprs
   }
