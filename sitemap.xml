@@ -24,9 +24,15 @@
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/acceptable_formula.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-build_case_when_tree.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-build_linear_pred.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_catboost_trees.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_earth_multiclass.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_glmnet_multiclass.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_lgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_tree_node.html</loc></url>

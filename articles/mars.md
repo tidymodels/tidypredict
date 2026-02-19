@@ -25,7 +25,7 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
   #>     (ifelse(parch > 2, parch - 2, 0) * 13.0493891423278) + (ifelse(parch > 
   #>     4, parch - 4, 0) * -18.8998708031821) + (ifelse(sibsp > 1, 
   #>     sibsp - 1, 0) * -7.71566779782019) + (ifelse(sibsp > 1, sibsp - 
-  #>     1, 0) * ifelse(parch < 1, 1 - parch, 0) * 7.40395975552275) + 
+  #>     1, 0) * ifelse(parch < 1, 1 - parch, 0) * 7.40395975552276) + 
   #>     (ifelse(sibsp > 1, sibsp - 1, 0) * ifelse(parch > 1, parch - 
   #>         1, 0) * 4.41874354843216)
   ```
@@ -34,7 +34,7 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
 
   ``` r
   tidypredict_sql(model, dbplyr::simulate_odbc())
-  #> <SQL> (((((22.2918960405404 + (CASE WHEN (`parch` < 2.0) THEN (2.0 - `parch`) WHEN NOT (`parch` < 2.0) THEN 0.0 END * 4.85356462114363)) + (CASE WHEN (`parch` > 2.0) THEN (`parch` - 2.0) WHEN NOT (`parch` > 2.0) THEN 0.0 END * 13.0493891423278)) + (CASE WHEN (`parch` > 4.0) THEN (`parch` - 4.0) WHEN NOT (`parch` > 4.0) THEN 0.0 END * -18.8998708031821)) + (CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * -7.71566779782019)) + ((CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * CASE WHEN (`parch` < 1.0) THEN (1.0 - `parch`) WHEN NOT (`parch` < 1.0) THEN 0.0 END) * 7.40395975552275)) + ((CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * CASE WHEN (`parch` > 1.0) THEN (`parch` - 1.0) WHEN NOT (`parch` > 1.0) THEN 0.0 END) * 4.41874354843216)
+  #> <SQL> (((((22.2918960405404 + (CASE WHEN (`parch` < 2.0) THEN (2.0 - `parch`) WHEN NOT (`parch` < 2.0) THEN 0.0 END * 4.85356462114363)) + (CASE WHEN (`parch` > 2.0) THEN (`parch` - 2.0) WHEN NOT (`parch` > 2.0) THEN 0.0 END * 13.0493891423278)) + (CASE WHEN (`parch` > 4.0) THEN (`parch` - 4.0) WHEN NOT (`parch` > 4.0) THEN 0.0 END * -18.8998708031821)) + (CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * -7.71566779782019)) + ((CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * CASE WHEN (`parch` < 1.0) THEN (1.0 - `parch`) WHEN NOT (`parch` < 1.0) THEN 0.0 END) * 7.40395975552276)) + ((CASE WHEN (`sibsp` > 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` > 1.0) THEN 0.0 END * CASE WHEN (`parch` > 1.0) THEN (`parch` - 1.0) WHEN NOT (`parch` > 1.0) THEN 0.0 END) * 4.41874354843216)
   ```
 
 - Add the prediction to the original table
@@ -82,11 +82,11 @@ tidypredict_fit(model)
 #>     0) * -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * 
 #>     ifelse(sex == "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == 
 #>     "3rd", 1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", 
-#>     1, 0) * ifelse(sibsp < 4, 4 - sibsp, 0) * 0.618652747659845) + 
+#>     1, 0) * ifelse(sibsp < 4, 4 - sibsp, 0) * 0.618652747659846) + 
 #>     (ifelse(pclass == "3rd", 1, 0) * ifelse(sex == "male", 1, 
 #>         0) * 1.22269536265148) + (ifelse(sex == "male", 1, 0) * 
 #>     -3.18562450248531) + (ifelse(sex == "male", 1, 0) * ifelse(age < 
-#>     16, 16 - age, 0) * 0.241814028713262)))
+#>     16, 16 - age, 0) * 0.241814028713263)))
 ```
 
 The spec sets the `is_glm` entry to 1, as well as the `family` and
@@ -130,7 +130,7 @@ tidypredict_fit(p_model)
 #>     (ifelse(parch > 2, parch - 2, 0) * 13.0493891423278) + (ifelse(parch > 
 #>     4, parch - 4, 0) * -18.8998708031821) + (ifelse(sibsp > 1, 
 #>     sibsp - 1, 0) * -7.71566779782019) + (ifelse(sibsp > 1, sibsp - 
-#>     1, 0) * ifelse(parch < 1, 1 - parch, 0) * 7.40395975552275) + 
+#>     1, 0) * ifelse(parch < 1, 1 - parch, 0) * 7.40395975552276) + 
 #>     (ifelse(sibsp > 1, sibsp - 1, 0) * ifelse(parch > 1, parch - 
 #>         1, 0) * 4.41874354843216)
 ```
