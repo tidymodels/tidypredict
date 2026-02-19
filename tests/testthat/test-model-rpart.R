@@ -74,3 +74,13 @@ test_that("categorical predictors work correctly", {
     )
   )
 })
+
+test_that("stump trees work correctly", {
+  ctrl <- rpart::rpart.control(minsplit = 100, cp = 1)
+  model <- rpart::rpart(mpg ~ cyl + disp, data = mtcars, control = ctrl)
+
+  fit <- tidypredict_fit(model)
+
+  expect_type(fit, "double")
+  expect_equal(fit, mean(mtcars$mpg))
+})
