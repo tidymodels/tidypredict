@@ -131,3 +131,89 @@ tidypredict_fit.rpart <- function(model) {
   mode <- parsedmodel$general$mode
   generate_case_when_tree(tree, mode)
 }
+
+#' @export
+tidypredict_test.rpart <- function(
+  model,
+  df = model$model,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+  }
+
+  # rpart uses "vector" for regression, "class" for classification
+  pred_type <- if (model$method == "class") "class" else "vector"
+  preds <- predict(model, df, type = pred_type)
+
+  if (pred_type == "class") {
+    preds <- as.character(preds)
+  }
+
+  base <- data.frame(fit = as.vector(preds), row.names = NULL)
+
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+  te <- data.frame(fit_te = te[, "fit_te"])
+
+  raw_results <- cbind(base, te)
+
+  if (pred_type == "class") {
+    raw_results$fit_diff <- raw_results$fit != raw_results$fit_te
+    raw_results$fit_threshold <- raw_results$fit_diff
+  } else {
+    raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
+    raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
+  }
+
+  rowid <- seq_len(nrow(raw_results))
+  raw_results <- cbind(data.frame(rowid), raw_results)
+
+  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
+  alert <- any(threshold_df > 0)
+
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+
+  if (alert) {
+    if (pred_type == "class") {
+      message <- paste0(
+        message,
+        "\nMismatched predictions: ",
+        threshold_df$fit_threshold
+      )
+    } else {
+      difference <- data.frame(fit_diff = max(abs(raw_results$fit_diff)))
+      message <- paste0(
+        message,
+        "\nFitted records above the threshold: ",
+        threshold_df$fit_threshold,
+        "\n\nMax difference: ",
+        difference$fit_diff
+      )
+    }
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  results <- list()
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}

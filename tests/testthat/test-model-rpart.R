@@ -44,3 +44,33 @@ test_that("Model can be saved and re-loaded", {
     round_print(tidypredict_fit(pm))
   )
 })
+
+test_that("formulas produce correct predictions - regression", {
+  expect_snapshot(
+    tidypredict_test(
+      rpart::rpart(mpg ~ am + cyl + wt, data = mtcars),
+      mtcars
+    )
+  )
+})
+
+test_that("formulas produce correct predictions - classification", {
+  expect_snapshot(
+    tidypredict_test(
+      rpart::rpart(Species ~ ., data = iris),
+      iris
+    )
+  )
+})
+
+test_that("categorical predictors work correctly", {
+  mtcars2 <- mtcars
+  mtcars2$cyl <- factor(mtcars2$cyl)
+
+  expect_snapshot(
+    tidypredict_test(
+      rpart::rpart(mpg ~ cyl + wt, data = mtcars2),
+      mtcars2
+    )
+  )
+})
