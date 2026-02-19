@@ -133,3 +133,135 @@ test_that("classification models error with clear message (#191)", {
 
   expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
+
+# Tests for .extract_ranger_classprob()
+
+test_that(".extract_ranger_classprob returns correct structure", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 2,
+    probability = TRUE
+  )
+
+  result <- .extract_ranger_classprob(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_named(result, levels(iris$Species))
+  # Each class should have num.trees expressions
+  expect_length(result[[1]], 3)
+})
+
+test_that(".extract_ranger_classprob errors on non-ranger model", {
+  model <- lm(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_ranger_classprob(model))
+})
+
+test_that(".extract_ranger_classprob errors without probability = TRUE", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 2,
+    probability = FALSE
+  )
+
+  expect_snapshot(error = TRUE, .extract_ranger_classprob(model))
+})
+
+test_that(".extract_ranger_classprob works with binary classification", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  mtcars$vs <- factor(mtcars$vs)
+  model <- ranger::ranger(
+    vs ~ disp + hp,
+    data = mtcars,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 2,
+    probability = TRUE
+  )
+
+  result <- .extract_ranger_classprob(model)
+
+  expect_type(result, "list")
+  expect_length(result, 2)
+  expect_named(result, c("0", "1"))
+})
+
+test_that(".extract_ranger_classprob produces correct probabilities", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ .,
+    data = iris,
+    num.trees = 5,
+    max.depth = 3,
+    seed = 123,
+    num.threads = 2,
+    probability = TRUE
+  )
+
+  class_trees <- .extract_ranger_classprob(model)
+  n_trees <- model$num.trees
+
+  # Sum probabilities for each class
+  prob_sums <- sapply(names(class_trees), function(cls) {
+    trees <- class_trees[[cls]]
+    tree_vals <- sapply(trees, function(e) {
+      rlang::eval_tidy(e, iris)
+    })
+    if (is.matrix(tree_vals)) rowSums(tree_vals) else tree_vals
+  })
+
+  # Calculate averaged probabilities
+  probs <- prob_sums / n_trees
+
+  # Compare to native predictions
+  native <- predict(model, iris)$predictions
+
+  expect_equal(unname(probs), unname(native), tolerance = 1e-10)
+})
+
+test_that(".extract_ranger_classprob works with single tree", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ .,
+    data = iris,
+    num.trees = 1,
+    max.depth = 3,
+    seed = 123,
+    num.threads = 2,
+    probability = TRUE
+  )
+
+  result <- .extract_ranger_classprob(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  # Each class should have 1 expression
+  expect_length(result[[1]], 1)
+})

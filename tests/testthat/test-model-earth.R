@@ -298,3 +298,29 @@ test_that("inverse.gaussian family works (#195)", {
 
   expect_equal(tidy, native)
 })
+
+# Tests for .extract_earth_multiclass()
+
+test_that(".extract_earth_multiclass errors on non-earth model", {
+  model <- lm(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})
+
+test_that(".extract_earth_multiclass errors on binary model", {
+  suppressWarnings(
+    model <- earth::earth(
+      vs ~ disp + hp,
+      data = mtcars,
+      glm = list(family = binomial)
+    )
+  )
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})
+
+test_that(".extract_earth_multiclass errors on regression model", {
+  model <- earth::earth(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})

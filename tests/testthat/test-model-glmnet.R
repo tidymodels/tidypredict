@@ -167,3 +167,93 @@ test_that("mgaussian family errors with helpful message (#199)", {
 
   expect_snapshot(error = TRUE, tidypredict_fit(model))
 })
+
+# Tests for .extract_glmnet_multiclass()
+
+test_that(".extract_glmnet_multiclass returns correct structure", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.5
+  )
+
+  result <- .extract_glmnet_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_named(result, levels(iris$Species))
+  expect_type(result[[1]], "character")
+})
+
+test_that(".extract_glmnet_multiclass errors on non-multnet model", {
+  model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
+
+  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+})
+
+test_that(".extract_glmnet_multiclass errors with multiple penalties", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial"
+  )
+
+  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+})
+
+test_that(".extract_glmnet_multiclass works with explicit penalty", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial"
+  )
+
+  result <- .extract_glmnet_multiclass(model, penalty = 0.01)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+})
+
+test_that(".extract_glmnet_multiclass handles sparse coefficients", {
+  # High penalty should zero out many coefficients
+
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 10
+  )
+
+  result <- .extract_glmnet_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+})
+
+test_that(".extract_glmnet_multiclass produces correct predictions", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.01
+  )
+
+  eqs <- .extract_glmnet_multiclass(model)
+  n_rows <- nrow(iris)
+
+  # Evaluate each linear predictor, recycling scalars to full length
+  logits <- sapply(eqs, function(eq) {
+    val <- rlang::eval_tidy(rlang::parse_expr(eq), iris)
+    if (length(val) == 1) rep(val, n_rows) else val
+  })
+
+  # Apply softmax
+  exp_logits <- exp(logits)
+  probs <- exp_logits / rowSums(exp_logits)
+
+  # Compare to native predictions
+  native <- predict(model, as.matrix(iris[, 1:4]), type = "response")[,, 1]
+
+  expect_equal(unname(probs), unname(native), tolerance = 1e-10)
+})

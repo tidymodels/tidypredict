@@ -26,3 +26,20 @@
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.
 
+# .extract_rf_classprob errors on non-randomForest model
+
+    Code
+      .extract_rf_classprob(model)
+    Condition
+      Error in `.extract_rf_classprob()`:
+      ! `model` must be <randomForest>, not a <lm> object.
+
+# .extract_rf_classprob errors on regression model
+
+    Code
+      .extract_rf_classprob(model)
+    Condition
+      Error in `.extract_rf_classprob()`:
+      ! Model is not a classification model.
+      i Use `tidypredict_fit()` for regression models.
+

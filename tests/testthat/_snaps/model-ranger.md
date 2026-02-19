@@ -26,3 +26,20 @@
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.
 
+# .extract_ranger_classprob errors on non-ranger model
+
+    Code
+      .extract_ranger_classprob(model)
+    Condition
+      Error in `.extract_ranger_classprob()`:
+      ! `model` must be <ranger>, not a <lm> object.
+
+# .extract_ranger_classprob errors without probability = TRUE
+
+    Code
+      .extract_ranger_classprob(model)
+    Condition
+      Error in `.extract_ranger_classprob()`:
+      ! Model does not contain probability information.
+      i Fit the ranger model with `probability = TRUE`.
+

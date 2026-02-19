@@ -121,7 +121,7 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   }
 
   # Get coefficients for each class at the specified penalty
-  coefs_list <- coef(model, s = penalty)
+  coefs_list <- stats::coef(model, s = penalty)
   class_names <- names(coefs_list)
 
   # Build linear predictor expression for each class
