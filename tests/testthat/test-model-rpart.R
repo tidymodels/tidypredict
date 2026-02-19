@@ -84,3 +84,42 @@ test_that("stump trees work correctly", {
   expect_type(fit, "double")
   expect_equal(fit, mean(mtcars$mpg))
 })
+
+# .extract_rpart_classprob tests ------------------------------------------
+
+test_that(".extract_rpart_classprob returns list of expressions", {
+  model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+  exprs <- .extract_rpart_classprob(model)
+
+  expect_type(exprs, "list")
+  expect_length(exprs, 3)
+  for (expr in exprs) {
+    expect_type(expr, "language")
+  }
+})
+
+test_that(".extract_rpart_classprob results match predict probabilities", {
+  model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+  exprs <- .extract_rpart_classprob(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(iris),
+    parent = asNamespace("dplyr")
+  )
+  probs <- lapply(exprs, rlang::eval_tidy, env = eval_env)
+  combined <- do.call(cbind, probs)
+
+  native <- predict(model, type = "prob")
+
+  expect_equal(unname(combined), unname(native))
+})
+
+test_that(".extract_rpart_classprob errors on non-rpart model", {
+  expect_snapshot(.extract_rpart_classprob(list()), error = TRUE)
+})
+
+test_that(".extract_rpart_classprob errors on regression model", {
+  model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
+  expect_snapshot(.extract_rpart_classprob(model), error = TRUE)
+})

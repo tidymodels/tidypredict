@@ -217,3 +217,75 @@ tidypredict_test.rpart <- function(
   results$alert <- alert
   structure(results, class = c("tidypredict_test", "list"))
 }
+
+# For {orbital}
+#' Extract classprob trees for rpart models
+#'
+#' For use in orbital package.
+#' @param model An rpart model object
+#' @keywords internal
+#' @export
+.extract_rpart_classprob <- function(model) {
+  if (!inherits(model, "rpart")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls rpart}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  if (model$method != "class") {
+    cli::cli_abort(
+      "{.arg model} must be a classification model (method = 'class')."
+    )
+  }
+
+  # Extract class probabilities from yval2
+  # yval2 structure: [yval, count_class1, ..., count_classN, prob_class1, ..., prob_classN, nodeprob]
+  yval2 <- model$frame$yval2
+  ylevels <- attr(model, "ylevels")
+  n_classes <- length(ylevels)
+
+  # Probability columns are at positions (n_classes + 2) to (2 * n_classes + 1)
+  prob_cols <- seq(n_classes + 2, 2 * n_classes + 1)
+  probs <- yval2[, prob_cols, drop = FALSE]
+  colnames(probs) <- ylevels
+
+  # Get tree structure
+  tree_info <- rpart_tree_info(model)
+
+  generate_one_tree <- function(tree_info) {
+    paths <- tree_info$nodeID[tree_info[, "terminal"]]
+    child_info <- get_child_info(tree_info)
+
+    paths <- map(
+      paths,
+      \(x) {
+        prediction <- tree_info$prediction[tree_info$nodeID == x]
+        if (is.null(prediction)) {
+          cli::cli_abort("Prediction column not found.")
+        }
+        list(
+          prediction = prediction,
+          path = get_ra_path(x, tree_info, child_info, FALSE)
+        )
+      }
+    )
+
+    pm <- list()
+    pm$general$model <- "rpart"
+    pm$general$type <- "tree"
+    pm$general$version <- 2
+    pm$trees <- list(paths)
+    parsedmodel <- as_parsed_model(pm)
+
+    tree <- parsedmodel$trees[[1]]
+    mode <- parsedmodel$general$mode
+    generate_case_when_tree(tree, mode)
+  }
+
+  res <- list()
+  for (i in seq_len(ncol(probs))) {
+    tree_info$prediction <- probs[, i]
+    res[[i]] <- generate_one_tree(tree_info)
+  }
+  res
+}
