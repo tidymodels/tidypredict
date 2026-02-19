@@ -13,13 +13,12 @@ rpart_tree_info <- function(model) {
   left_candidates <- 2L * orig_node_ids
   right_candidates <- 2L * orig_node_ids + 1L
 
-  # Map children to new sequential IDs
-  left_child <- ifelse(
+  rpart_left <- ifelse(
     left_candidates %in% orig_node_ids,
     id_map[as.character(left_candidates)],
     NA_integer_
   )
-  right_child <- ifelse(
+  rpart_right <- ifelse(
     right_candidates %in% orig_node_ids,
     id_map[as.character(right_candidates)],
     NA_integer_
@@ -38,6 +37,11 @@ rpart_tree_info <- function(model) {
   split_val <- rep(NA_real_, nrow(frame))
   split_class <- rep(NA_character_, nrow(frame))
 
+  # Track ncat sign to determine if we need to swap left/right
+  # ncat = 1: rpart goes left if value >= split (need swap for get_ra_path)
+  # ncat = -1: rpart goes left if value < split (no swap needed)
+  needs_swap <- rep(FALSE, nrow(frame))
+
   if (!is.null(splits) && nrow(splits) > 0) {
     split_idx <- 1
     for (i in seq_len(nrow(frame))) {
@@ -47,11 +51,19 @@ rpart_tree_info <- function(model) {
 
         if (abs(ncat) == 1) {
           split_val[i] <- index
+          # ncat = 1 means left if >= (opposite of get_ra_path), needs swap
+          # ncat = -1 means left if < (same as get_ra_path), no swap
+          needs_swap[i] <- ncat == 1
         } else if (abs(ncat) > 1) {
           csplit_row <- model$csplit[index, , drop = TRUE]
           xlevels <- attr(model, "xlevels")[[split_var[i]]]
           # 1 = go left, 3 = go right, 2 = missing
-          left_levels <- xlevels[csplit_row == 1]
+          # For categorical, ncat sign indicates direction too
+          if (ncat > 0) {
+            left_levels <- xlevels[csplit_row == 1]
+          } else {
+            left_levels <- xlevels[csplit_row == 3]
+          }
           split_class[i] <- paste0(left_levels, collapse = ", ")
         }
 
@@ -60,6 +72,10 @@ rpart_tree_info <- function(model) {
       }
     }
   }
+
+  # Swap left/right based on ncat direction
+  left_child <- ifelse(needs_swap, rpart_right, rpart_left)
+  right_child <- ifelse(needs_swap, rpart_left, rpart_right)
 
   # Use sequential 0-indexed node IDs
   data.frame(
@@ -96,4 +112,22 @@ get_rpart_tree <- function(model) {
       )
     }
   )
+}
+
+#' @export
+parse_model.rpart <- function(model) {
+  pm <- list()
+  pm$general$model <- "rpart"
+  pm$general$type <- "tree"
+  pm$general$version <- 2
+  pm$trees <- list(get_rpart_tree(model))
+  as_parsed_model(pm)
+}
+
+#' @export
+tidypredict_fit.rpart <- function(model) {
+  parsedmodel <- parse_model(model)
+  tree <- parsedmodel$trees[[1]]
+  mode <- parsedmodel$general$mode
+  generate_case_when_tree(tree, mode)
 }

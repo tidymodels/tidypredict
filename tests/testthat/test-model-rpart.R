@@ -6,8 +6,41 @@ test_that("rpart_tree_info returns correct structure", {
   expect_named(
     tree_info,
     c(
-      "nodeID", "leftChild", "rightChild", "splitvarName",
-      "splitval", "splitclass", "terminal", "prediction"
+      "nodeID",
+      "leftChild",
+      "rightChild",
+      "splitvarName",
+      "splitval",
+      "splitclass",
+      "terminal",
+      "prediction"
     )
+  )
+})
+
+test_that("returns the right output", {
+  model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_type(tf, "language")
+  expect_s3_class(pm, "list")
+  expect_equal(pm$general$model, "rpart")
+  expect_equal(pm$general$version, 2)
+
+  expect_snapshot(rlang::expr_text(tf))
+})
+
+test_that("Model can be saved and re-loaded", {
+  model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
+  pm <- parse_model(model)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, mp)
+  l <- yaml::read_yaml(mp)
+  pm <- as_parsed_model(l)
+
+  expect_identical(
+    round_print(tidypredict_fit(model)),
+    round_print(tidypredict_fit(pm))
   )
 })
