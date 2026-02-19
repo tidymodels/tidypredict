@@ -167,3 +167,167 @@ test_that("mgaussian family errors with helpful message (#199)", {
 
   expect_snapshot(error = TRUE, tidypredict_fit(model))
 })
+
+# Tests for .extract_glmnet_multiclass()
+
+test_that(".extract_glmnet_multiclass returns correct structure", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.5
+  )
+
+  result <- .extract_glmnet_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_named(result, levels(iris$Species))
+  expect_type(result[[1]], "character")
+})
+
+test_that(".extract_glmnet_multiclass errors on non-multnet model", {
+  model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
+
+  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+})
+
+test_that(".extract_glmnet_multiclass errors with multiple penalties", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial"
+  )
+
+  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+})
+
+test_that(".extract_glmnet_multiclass works with explicit penalty", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial"
+  )
+
+  result <- .extract_glmnet_multiclass(model, penalty = 0.01)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+})
+
+test_that(".extract_glmnet_multiclass handles sparse coefficients", {
+  # High penalty should zero out many coefficients
+
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 10
+  )
+
+  result <- .extract_glmnet_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+})
+
+test_that(".extract_glmnet_multiclass produces correct predictions", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.01
+  )
+
+  eqs <- .extract_glmnet_multiclass(model)
+  n_rows <- nrow(iris)
+
+  # Evaluate each linear predictor, recycling scalars to full length
+  logits <- sapply(eqs, function(eq) {
+    val <- rlang::eval_tidy(rlang::parse_expr(eq), iris)
+    if (length(val) == 1) rep(val, n_rows) else val
+  })
+
+  # Apply softmax
+  exp_logits <- exp(logits)
+  probs <- exp_logits / rowSums(exp_logits)
+
+  # Compare to native predictions
+  native <- predict(model, as.matrix(iris[, 1:4]), type = "response")[,, 1]
+
+  expect_equal(unname(probs), unname(native), tolerance = 1e-10)
+})
+
+# Tests for .build_linear_pred()
+
+test_that(".build_linear_pred handles intercept only", {
+  result <- .build_linear_pred("(Intercept)", 5.5)
+
+  expect_equal(result, "5.5")
+})
+
+test_that(".build_linear_pred handles single predictor", {
+  result <- .build_linear_pred(c("(Intercept)", "x"), c(1.5, 2.0))
+
+  expect_equal(result, "1.5 + (`x` * 2)")
+})
+
+test_that(".build_linear_pred handles multiple predictors", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y"),
+    c(1.0, 2.0, 3.0)
+  )
+
+  expect_equal(result, "1 + (`x` * 2) + (`y` * 3)")
+})
+
+test_that(".build_linear_pred skips zero coefficients", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y", "z"),
+    c(1.0, 0.0, 2.0, 0.0)
+  )
+
+  expect_identical(result, "1 + (`y` * 2)")
+})
+
+test_that(".build_linear_pred returns '0' when all coefficients are zero", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y"),
+    c(0, 0, 0)
+  )
+
+  expect_equal(result, "0")
+})
+
+test_that(".build_linear_pred handles negative coefficients", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x"),
+    c(-1.5, -2.0)
+  )
+
+  expect_equal(result, "-1.5 + (`x` * -2)")
+})
+
+test_that(".build_linear_pred handles special characters in variable names", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "var with space", "var.with.dots"),
+    c(1.0, 2.0, 3.0)
+  )
+
+  expect_identical(result, "1 + (`var with space` * 2) + (`var.with.dots` * 3)")
+})
+
+test_that(".build_linear_pred handles no intercept", {
+  result <- .build_linear_pred(c("x", "y"), c(2.0, 3.0))
+
+  expect_equal(result, "(`x` * 2) + (`y` * 3)")
+})
+
+test_that(".build_linear_pred handles zero intercept", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x"),
+    c(0, 2.0)
+  )
+
+  expect_equal(result, "(`x` * 2)")
+})

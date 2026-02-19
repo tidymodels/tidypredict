@@ -222,3 +222,29 @@
       
        All results are within the difference threshold
 
+# .extract_earth_multiclass errors on non-earth model
+
+    Code
+      .extract_earth_multiclass(model)
+    Condition
+      Error in `.extract_earth_multiclass()`:
+      ! `model` must be <earth>, not a <lm> object.
+
+# .extract_earth_multiclass errors on binary model
+
+    Code
+      .extract_earth_multiclass(model)
+    Condition
+      Error in `.extract_earth_multiclass()`:
+      ! Model does not contain multiclass information.
+      i Fit the earth model with `glm = TRUE` for classification.
+
+# .extract_earth_multiclass errors on regression model
+
+    Code
+      .extract_earth_multiclass(model)
+    Condition
+      Error in `.extract_earth_multiclass()`:
+      ! Model does not contain multiclass information.
+      i Fit the earth model with `glm = TRUE` for classification.
+

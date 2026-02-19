@@ -182,3 +182,52 @@ tidypredict_fit_ranger <- function(parsedmodel) {
   n_trees <- length(parsedmodel$trees)
   expr_division(res, n_trees)
 }
+
+# For {orbital}
+#' Extract classification probability trees for ranger models
+#'
+#' For use in orbital package.
+#' @param model A ranger model object fitted with `probability = TRUE`
+#' @keywords internal
+#' @export
+.extract_ranger_classprob <- function(model) {
+  if (!inherits(model, "ranger")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  parsedmodel <- parse_model(model)
+
+  # Check if this is a classification model with probabilities
+  first_node <- parsedmodel$trees[[1]][[1]]
+  if (is.null(first_node$probs)) {
+    cli::cli_abort(
+      c(
+        "Model does not contain probability information.",
+        i = "Fit the ranger model with {.code probability = TRUE}."
+      )
+    )
+  }
+
+  # Get class levels from the first node's probs
+  lvls <- names(first_node$probs)
+
+  # For each class, generate case_when expressions for all trees
+  res <- list()
+  for (lvl in lvls) {
+    tree_exprs <- map(parsedmodel$trees, function(tree) {
+      # Build nodes for this tree with probability of this class as prediction
+      nodes <- map(tree, function(node) {
+        list(
+          prediction = node$probs[[lvl]]$prob,
+          path = node$path
+        )
+      })
+      .build_case_when_tree(nodes)
+    })
+    res[[lvl]] <- tree_exprs
+  }
+
+  res
+}

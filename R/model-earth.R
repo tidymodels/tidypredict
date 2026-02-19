@@ -149,3 +149,48 @@ collapse_lists <- function(label, coef, lst) {
     )
   )
 }
+
+# For {orbital}
+#' Extract multiclass linear predictors for earth models
+#'
+#' For use in orbital package.
+#' @param model An earth model object with multiple classes (glm.list with >1 elements)
+#' @keywords internal
+#' @export
+.extract_earth_multiclass <- function(model) {
+  if (!inherits(model, "earth")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls earth}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  if (is.null(model$glm.list) || length(model$glm.list) < 2) {
+    cli::cli_abort(
+      c(
+        "Model does not contain multiclass information.",
+        "i" = "Fit the earth model with {.code glm = TRUE} for classification."
+      )
+    )
+  }
+
+  # Get class names from glm.coefficients matrix columns
+  class_names <- colnames(model$glm.coefficients)
+
+  # For each class, create a modified model with single-class coefficients
+  # and use the standard parsing machinery
+  eqs <- lapply(class_names, function(cls) {
+    # Create a temporary model with single-class coefficients
+    model_single <- model
+    model_single$glm.coefficients <- model$glm.coefficients[, cls, drop = FALSE]
+
+    # Parse and build expression
+    parsedmodel <- parse_model(model_single)
+    expr <- build_fit_formula(parsedmodel)
+
+    # Deparse to string, preserving numeric precision
+    deparse1(expr, control = "digits17")
+  })
+
+  names(eqs) <- class_names
+  eqs
+}

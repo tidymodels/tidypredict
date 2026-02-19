@@ -92,3 +92,77 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
 
   as_parsed_model(pm)
 }
+
+# For {orbital}
+#' Build linear predictor expression from coefficient names and values
+#'
+#' Shared helper for building linear predictor strings from coefficients.
+#' Used by orbital package for glmnet models.
+#'
+#' @param coef_names Character vector of coefficient names (including "(Intercept)")
+#' @param coef_values Numeric vector of coefficient values
+#' @keywords internal
+#' @export
+.build_linear_pred <- function(coef_names, coef_values) {
+  terms <- character(0)
+  for (i in seq_along(coef_names)) {
+    if (coef_values[i] == 0) {
+      next
+    }
+
+    if (coef_names[i] == "(Intercept)") {
+      terms <- c(terms, as.character(coef_values[i]))
+    } else {
+      # Use backticks for variable names to handle special characters
+      var_name <- paste0("`", coef_names[i], "`")
+      terms <- c(terms, paste0("(", var_name, " * ", coef_values[i], ")"))
+    }
+  }
+
+  if (length(terms) == 0) {
+    return("0")
+  }
+
+  paste(terms, collapse = " + ")
+}
+
+#' Extract multiclass linear predictors for glmnet models
+#'
+#' For use in orbital package.
+#' @param model A glmnet model object with class "multnet"
+#' @param penalty The penalty value to use for coefficient extraction
+#' @keywords internal
+#' @export
+.extract_glmnet_multiclass <- function(model, penalty = NULL) {
+  if (!inherits(model, "multnet")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls multnet}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  if (is.null(penalty)) {
+    if (length(model$lambda) != 1) {
+      cli::cli_abort(
+        c(
+          "glmnet model has multiple penalty values.",
+          "i" = "Specify a single {.arg penalty} value."
+        )
+      )
+    }
+    penalty <- model$lambda
+  }
+
+  # Get coefficients for each class at the specified penalty
+  coefs_list <- stats::coef(model, s = penalty)
+  class_names <- names(coefs_list)
+
+  # Build linear predictor expression for each class
+  eqs <- lapply(coefs_list, function(coef_mat) {
+    coef_names <- rownames(coef_mat)
+    coef_values <- as.numeric(coef_mat)
+    .build_linear_pred(coef_names, coef_values)
+  })
+
+  names(eqs) <- class_names
+  eqs
+}

@@ -298,3 +298,106 @@ test_that("inverse.gaussian family works (#195)", {
 
   expect_equal(tidy, native)
 })
+
+# Tests for .extract_earth_multiclass()
+
+test_that(".extract_earth_multiclass errors on non-earth model", {
+  model <- lm(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})
+
+test_that(".extract_earth_multiclass errors on binary model", {
+  suppressWarnings(
+    model <- earth::earth(
+      vs ~ disp + hp,
+      data = mtcars,
+      glm = list(family = binomial)
+    )
+  )
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})
+
+test_that(".extract_earth_multiclass errors on regression model", {
+  model <- earth::earth(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+})
+
+test_that(".extract_earth_multiclass returns correct structure", {
+  skip_if_not(
+    exists("contr.earth.response", where = asNamespace("earth")),
+    "earth multiclass not available"
+  )
+  library(earth)
+
+  suppressWarnings(
+    model <- earth(
+      Species ~ .,
+      data = iris,
+      glm = list(family = binomial)
+    )
+  )
+
+  result <- .extract_earth_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_named(result, levels(iris$Species))
+  expect_type(result[[1]], "character")
+})
+
+test_that(".extract_earth_multiclass produces correct predictions", {
+  skip_if_not(
+    exists("contr.earth.response", where = asNamespace("earth")),
+    "earth multiclass not available"
+  )
+  library(earth)
+
+  suppressWarnings(
+    model <- earth(
+      Species ~ .,
+      data = iris,
+      glm = list(family = binomial)
+    )
+  )
+
+  eqs <- .extract_earth_multiclass(model)
+  n_rows <- nrow(iris)
+
+  # Evaluate each expression - earth GLM outputs are already on probability scale
+  # (not logits), so we don't apply softmax
+  probs <- sapply(eqs, function(eq) {
+    val <- rlang::eval_tidy(rlang::parse_expr(eq), iris)
+    if (length(val) == 1) rep(val, n_rows) else val
+  })
+
+  # Compare to native predictions
+  native <- predict(model, iris, type = "response")
+
+  expect_equal(unname(probs), unname(native), tolerance = 1e-6)
+})
+
+test_that(".extract_earth_multiclass works with degree > 1", {
+  skip_if_not(
+    exists("contr.earth.response", where = asNamespace("earth")),
+    "earth multiclass not available"
+  )
+  library(earth)
+
+  suppressWarnings(
+    model <- earth(
+      Species ~ .,
+      data = iris,
+      glm = list(family = binomial),
+      degree = 2
+    )
+  )
+
+  result <- .extract_earth_multiclass(model)
+
+  expect_type(result, "list")
+  expect_length(result, 3)
+  expect_named(result, levels(iris$Species))
+})

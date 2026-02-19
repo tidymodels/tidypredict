@@ -562,3 +562,108 @@ test_that("path_formula() errors with unsupported values", {
     path_formula(list(type = "set", op = "unknown", col = "x", vals = 0))
   )
 })
+
+# Tests for .build_case_when_tree()
+
+test_that(".build_case_when_tree handles stump tree (no conditions)", {
+  nodes <- list(list(prediction = 0.5, path = list()))
+
+  expect_identical(.build_case_when_tree(nodes), 0.5)
+})
+
+test_that(".build_case_when_tree handles single node with condition", {
+  nodes <- list(
+    list(
+      prediction = 1,
+      path = list(list(
+        type = "conditional",
+        col = "x",
+        val = 5,
+        op = "less-equal"
+      ))
+    ),
+    list(
+      prediction = 0,
+      path = list(list(type = "conditional", col = "x", val = 5, op = "more"))
+    )
+  )
+
+  expect_identical(
+    deparse1(.build_case_when_tree(nodes)),
+    "case_when(x <= 5 ~ 1, .default = 0)"
+  )
+})
+
+test_that(".build_case_when_tree handles multiple conditions", {
+  nodes <- list(
+    list(
+      prediction = 1,
+      path = list(
+        list(type = "conditional", col = "x", val = 5, op = "less-equal"),
+        list(type = "conditional", col = "y", val = 10, op = "more")
+      )
+    ),
+    list(
+      prediction = 0,
+      path = list(list(type = "conditional", col = "x", val = 5, op = "more"))
+    )
+  )
+
+  expect_identical(
+    deparse1(.build_case_when_tree(nodes)),
+    "case_when(x <= 5 & y > 10 ~ 1, .default = 0)"
+  )
+})
+
+test_that(".build_case_when_tree handles three nodes", {
+  nodes <- list(
+    list(
+      prediction = 1,
+      path = list(list(
+        type = "conditional",
+        col = "x",
+        val = 3,
+        op = "less-equal"
+      ))
+    ),
+    list(
+      prediction = 0.5,
+      path = list(
+        list(type = "conditional", col = "x", val = 3, op = "more"),
+        list(type = "conditional", col = "x", val = 7, op = "less-equal")
+      )
+    ),
+    list(
+      prediction = 0,
+      path = list(list(type = "conditional", col = "x", val = 7, op = "more"))
+    )
+  )
+
+  expect_identical(
+    deparse1(.build_case_when_tree(nodes)),
+    "case_when(x <= 3 ~ 1, x > 3 & x <= 7 ~ 0.5, .default = 0)"
+  )
+})
+
+test_that(".build_case_when_tree handles set conditions", {
+  nodes <- list(
+    list(
+      prediction = 1,
+      path = list(list(type = "set", col = "x", vals = c("a", "b"), op = "in"))
+    ),
+    list(
+      prediction = 0,
+      path = list(list(
+        type = "set",
+        col = "x",
+        vals = c("a", "b"),
+        op = "not-in"
+      ))
+    )
+  )
+
+  expect_identical(
+    deparse1(.build_case_when_tree(nodes)),
+    'case_when(x %in% c("a", "b") ~ 1, .default = 0)'
+  )
+})

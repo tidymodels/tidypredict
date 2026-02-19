@@ -79,3 +79,20 @@
       ! Multivariate gaussian glmnet models are not supported.
       i Models fit with `family = "mgaussian"` have multiple outcome columns which is not supported.
 
+# .extract_glmnet_multiclass errors on non-multnet model
+
+    Code
+      .extract_glmnet_multiclass(model)
+    Condition
+      Error in `.extract_glmnet_multiclass()`:
+      ! `model` must be <multnet>, not an <elnet> object.
+
+# .extract_glmnet_multiclass errors with multiple penalties
+
+    Code
+      .extract_glmnet_multiclass(model)
+    Condition
+      Error in `.extract_glmnet_multiclass()`:
+      ! glmnet model has multiple penalty values.
+      i Specify a single `penalty` value.
+
