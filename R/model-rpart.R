@@ -1,18 +1,27 @@
 rpart_tree_info <- function(model) {
   frame <- model$frame
   splits <- model$splits
-  node_ids <- as.integer(rownames(frame))
+  orig_node_ids <- as.integer(rownames(frame))
 
-  left_candidates <- 2L * node_ids
-  right_candidates <- 2L * node_ids + 1L
+  # Create mapping from original rpart node IDs to sequential 0-indexed IDs
+  # This is needed because rpart uses sparse binary tree numbering (1,2,3,4,5,6,11,12,...)
+  # but get_ra_path assumes nodeID == row_index - 1
+  id_map <- setNames(seq_along(orig_node_ids) - 1L, orig_node_ids)
+
+  # Build child relationships based on binary tree convention
+  # Left child of node n is 2n, right child is 2n+1
+  left_candidates <- 2L * orig_node_ids
+  right_candidates <- 2L * orig_node_ids + 1L
+
+  # Map children to new sequential IDs
   left_child <- ifelse(
-    left_candidates %in% node_ids,
-    left_candidates,
+    left_candidates %in% orig_node_ids,
+    id_map[as.character(left_candidates)],
     NA_integer_
   )
   right_child <- ifelse(
-    right_candidates %in% node_ids,
-    right_candidates,
+    right_candidates %in% orig_node_ids,
+    id_map[as.character(right_candidates)],
     NA_integer_
   )
 
@@ -37,7 +46,6 @@ rpart_tree_info <- function(model) {
         index <- splits[split_idx, "index"]
 
         if (abs(ncat) == 1) {
-          # ncat sign indicates direction (1 = left if <, -1 = left if >=)
           split_val[i] <- index
         } else if (abs(ncat) > 1) {
           csplit_row <- model$csplit[index, , drop = TRUE]
@@ -53,15 +61,39 @@ rpart_tree_info <- function(model) {
     }
   }
 
-  # Convert to 0-indexed to match other tidypredict implementations
+  # Use sequential 0-indexed node IDs
   data.frame(
-    nodeID = node_ids - 1L,
-    leftChild = left_child - 1L,
-    rightChild = right_child - 1L,
+    nodeID = seq_along(orig_node_ids) - 1L,
+    leftChild = left_child,
+    rightChild = right_child,
     splitvarName = split_var,
     splitval = split_val,
     splitclass = split_class,
     terminal = is_terminal,
     prediction = prediction
+  )
+}
+
+get_rpart_tree <- function(model) {
+  tree <- rpart_tree_info(model)
+  paths <- tree$nodeID[tree[, "terminal"]]
+
+  child_info <- get_child_info(tree)
+
+  map(
+    paths,
+    \(x) {
+      prediction <- tree$prediction[tree$nodeID == x]
+      if (is.null(prediction)) {
+        cli::cli_abort("Prediction column not found.")
+      }
+      if (is.factor(prediction)) {
+        prediction <- as.character(prediction)
+      }
+      list(
+        prediction = prediction,
+        path = get_ra_path(x, tree, child_info, FALSE)
+      )
+    }
   )
 }
