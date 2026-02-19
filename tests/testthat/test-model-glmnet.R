@@ -257,3 +257,77 @@ test_that(".extract_glmnet_multiclass produces correct predictions", {
 
   expect_equal(unname(probs), unname(native), tolerance = 1e-10)
 })
+
+# Tests for .build_linear_pred()
+
+test_that(".build_linear_pred handles intercept only", {
+  result <- .build_linear_pred("(Intercept)", 5.5)
+
+  expect_equal(result, "5.5")
+})
+
+test_that(".build_linear_pred handles single predictor", {
+  result <- .build_linear_pred(c("(Intercept)", "x"), c(1.5, 2.0))
+
+  expect_equal(result, "1.5 + (`x` * 2)")
+})
+
+test_that(".build_linear_pred handles multiple predictors", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y"),
+    c(1.0, 2.0, 3.0)
+  )
+
+  expect_equal(result, "1 + (`x` * 2) + (`y` * 3)")
+})
+
+test_that(".build_linear_pred skips zero coefficients", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y", "z"),
+    c(1.0, 0.0, 2.0, 0.0)
+  )
+
+  expect_identical(result, "1 + (`y` * 2)")
+})
+
+test_that(".build_linear_pred returns '0' when all coefficients are zero", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x", "y"),
+    c(0, 0, 0)
+  )
+
+  expect_equal(result, "0")
+})
+
+test_that(".build_linear_pred handles negative coefficients", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x"),
+    c(-1.5, -2.0)
+  )
+
+  expect_equal(result, "-1.5 + (`x` * -2)")
+})
+
+test_that(".build_linear_pred handles special characters in variable names", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "var with space", "var.with.dots"),
+    c(1.0, 2.0, 3.0)
+  )
+
+  expect_identical(result, "1 + (`var with space` * 2) + (`var.with.dots` * 3)")
+})
+
+test_that(".build_linear_pred handles no intercept", {
+  result <- .build_linear_pred(c("x", "y"), c(2.0, 3.0))
+
+  expect_equal(result, "(`x` * 2) + (`y` * 3)")
+})
+
+test_that(".build_linear_pred handles zero intercept", {
+  result <- .build_linear_pred(
+    c("(Intercept)", "x"),
+    c(0, 2.0)
+  )
+
+  expect_equal(result, "(`x` * 2)")
+})
