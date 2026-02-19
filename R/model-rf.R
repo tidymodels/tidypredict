@@ -107,3 +107,76 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
   n_trees <- length(parsedmodel$trees)
   expr_division(res, n_trees)
 }
+
+# For {orbital}
+#' Extract classification vote trees for randomForest models
+#'
+#' For use in orbital package.
+#' @param model A randomForest model object
+#' @keywords internal
+#' @export
+.extract_rf_classprob <- function(model) {
+  if (!inherits(model, "randomForest")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  parsedmodel <- parse_model(model)
+
+  # Check if this is a classification model (string predictions)
+  first_pred <- parsedmodel$trees[[1]][[1]]$prediction
+  if (!is.character(first_pred)) {
+    cli::cli_abort(
+      c(
+        "Model is not a classification model.",
+        i = "Use {.fn tidypredict_fit} for regression models."
+      )
+    )
+  }
+
+  # Get class levels from the model
+  lvls <- model$classes
+
+  # For each class, generate case_when expressions for all trees
+  # Each tree returns 1 if it predicts the class, 0 otherwise (voting)
+  res <- list()
+  for (lvl in lvls) {
+    tree_exprs <- map(parsedmodel$trees, function(tree) {
+      # Build nodes for this tree with 1 if predicted class matches, 0 otherwise
+      nodes <- map(tree, function(node) {
+        vote <- if (node$prediction == lvl) 1 else 0
+        list(
+          prediction = vote,
+          path = node$path
+        )
+      })
+
+      # Generate case_when for this tree
+      node_exprs <- map(nodes, function(node) {
+        rcl <- path_formulas(node$path)
+        if (isTRUE(rcl)) {
+          return(node$prediction)
+        }
+        expr(!!rcl ~ !!node$prediction)
+      })
+
+      # Handle stump trees
+      if (length(node_exprs) == 1 && is.numeric(node_exprs[[1]])) {
+        return(node_exprs[[1]])
+      }
+
+      default <- node_exprs[[length(node_exprs)]]
+      if (rlang::is_formula(default)) {
+        default <- rlang::f_rhs(default)
+      }
+      node_exprs[[length(node_exprs)]] <- NULL
+      node_exprs <- c(node_exprs, .default = default)
+
+      expr(case_when(!!!node_exprs))
+    })
+    res[[lvl]] <- tree_exprs
+  }
+
+  res
+}
