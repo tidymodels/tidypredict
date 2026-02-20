@@ -317,6 +317,38 @@ lgb_sigmoid <- function(f) {
   expr(1 / (1 + exp(-(!!f))))
 }
 
+# Apply multiclass transformation to tree expressions
+# Shared by nested and from_parsed multiclass builders
+apply_lgb_multiclass_transformation <- function(trees, num_class, objective) {
+  n_trees <- length(trees)
+
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  # Build raw score formula for each class
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+
+  # Apply transformation based on objective
+  if (objective == "multiclass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else if (objective == "multiclassova") {
+    # One-vs-all: sigmoid for each class independently
+    result <- map(raw_scores, lgb_sigmoid)
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
 # Build linear prediction formula: intercept + sum(coeff * feature)
 # LightGBM uses fallback leaf_value when ANY feature in the formula is NA
 build_lgb_linear_prediction <- function(linear) {
@@ -430,42 +462,13 @@ build_fit_formula_lgb_multiclass_nested <- function(
   model,
   objective
 ) {
-  n_trees <- length(parsedmodel$trees)
   num_class <- parsedmodel$general$num_class
-
   if (is.null(num_class) || num_class < 2) {
     cli::cli_abort("Multiclass model must have num_class >= 2.")
   }
 
-  # Extract all nested trees
   trees <- extract_lgb_trees_nested(model)
-
-  # Group trees by class: tree i belongs to class (i-1) %% num_class
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
-
-  # Build raw score formula for each class
-  raw_scores <- lapply(class_trees, function(indices) {
-    reduce_addition(trees[indices])
-  })
-
-  # Apply transformation based on objective
-  if (objective == "multiclass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else if (objective == "multiclassova") {
-    # One-vs-all: sigmoid for each class independently
-    result <- map(raw_scores, lgb_sigmoid)
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
+  apply_lgb_multiclass_transformation(trees, num_class, objective)
 }
 
 # Nested formula builder for lightgbm (from parsed model, version 3)
@@ -512,44 +515,15 @@ build_fit_formula_lgb_multiclass_from_parsed <- function(
   parsedmodel,
   objective
 ) {
-  n_trees <- length(parsedmodel$trees)
   num_class <- parsedmodel$general$num_class
-
   if (is.null(num_class) || num_class < 2) {
     cli::cli_abort("Multiclass model must have num_class >= 2.")
   }
 
-  # Build nested trees from flat paths
   trees <- map(parsedmodel$trees, function(tree) {
     build_nested_from_flat_paths(tree, build_lgb_nested_condition)
   })
-
-  # Group trees by class: tree i belongs to class (i-1) %% num_class
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
-
-  # Build raw score formula for each class
-  raw_scores <- lapply(class_trees, function(indices) {
-    reduce_addition(trees[indices])
-  })
-
-  # Apply transformation based on objective
-  if (objective == "multiclass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else if (objective == "multiclassova") {
-    # One-vs-all: sigmoid for each class independently
-    result <- map(raw_scores, lgb_sigmoid)
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
+  apply_lgb_multiclass_transformation(trees, num_class, objective)
 }
 
 # Build condition for lightgbm nested generation from path element

@@ -671,6 +671,42 @@ get_catboost_missing <- function(nan_treatment, op) {
 
 # Shared helpers -----------------------------------------------
 
+# Apply multiclass transformation to tree expressions
+# Shared by nested and legacy multiclass builders
+apply_catboost_multiclass_transformation <- function(
+  trees,
+  num_class,
+  objective,
+  parsedmodel
+) {
+  n_trees <- length(trees)
+
+  # Trees are stored round-robin by class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+  raw_scores <- lapply(raw_scores, apply_catboost_scale_bias, parsedmodel)
+
+  if (objective == "MultiClass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else {
+    # MultiClassOneVsAll: sigmoid for each class independently
+    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
 # Apply catboost scale and bias to formula
 apply_catboost_scale_bias <- function(formula, parsedmodel) {
   scale <- parsedmodel$general$scale %||% 1
@@ -803,40 +839,18 @@ build_fit_formula_catboost_multiclass_nested <- function(
   parsedmodel,
   objective
 ) {
-  n_trees <- length(parsedmodel$trees)
   num_class <- parsedmodel$general$num_class
-
   if (is.null(num_class) || num_class < 2) {
     cli::cli_abort("Multiclass model must have num_class >= 2.")
   }
 
-  # Extract all nested trees
   trees <- extract_catboost_trees_nested(parsedmodel)
-
-  # Trees are stored round-robin by class
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
-
-  raw_scores <- lapply(class_trees, function(indices) {
-    reduce_addition(trees[indices])
-  })
-  raw_scores <- lapply(raw_scores, apply_catboost_scale_bias, parsedmodel)
-
-  if (objective == "MultiClass") {
-    # Softmax
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else {
-    # MultiClassOneVsAll: sigmoid for each class
-    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
+  apply_catboost_multiclass_transformation(
+    trees,
+    num_class,
+    objective,
+    parsedmodel
+  )
 }
 
 # Extract trees in nested format
@@ -1097,29 +1111,18 @@ build_fit_formula_catboost_multiclass <- function(parsedmodel, objective) {
     cli::cli_abort("Multiclass model must have num_class >= 2.")
   }
 
-  # Trees are stored round-robin by class: tree1_class0, tree1_class1, ...,
-  # tree2_class0, tree2_class1, ...
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
+  # Build all tree expressions (flat case_when format)
+  trees <- map(
+    seq_len(n_trees),
+    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+  )
 
-  raw_scores <- lapply(class_trees, build_catboost_tree_sum, parsedmodel)
-  raw_scores <- lapply(raw_scores, apply_catboost_scale_bias, parsedmodel)
-
-  if (objective == "MultiClass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else {
-    # MultiClassOneVsAll: sigmoid for each class independently
-    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
+  apply_catboost_multiclass_transformation(
+    trees,
+    num_class,
+    objective,
+    parsedmodel
+  )
 }
 
 build_catboost_tree_sum <- function(tree_indices, parsedmodel) {
