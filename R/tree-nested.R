@@ -112,9 +112,32 @@ build_nested_split_condition <- function(split) {
 }
 
 # Build nested case_when from flat paths format
-# Used by parsed models (xgboost, lightgbm)
-# @param leaves List of leaves, each with `prediction` and `path`
-# @param build_condition_fn Function to build condition from path element
+#
+# Converts a flat list of leaf paths into a nested case_when expression.
+# Used by parsed models (xgboost, lightgbm, catboost) when reconstructing
+# trees from serialized format.
+#
+# @param leaves List of leaves, each with `prediction` and `path`. Each path
+#   element must have an `op` field indicating the branch direction.
+# @param build_condition_fn Function to build a condition expression from a
+#   path element. Should only build the LEFT branch condition (the right
+#   branch is handled by `.default`).
+#
+# ## Operator naming convention
+#
+# Different models use different operator names, but they follow a pattern:
+# - **Left branch operators** (condition is TRUE): "less", "less-equal", "in",
+#   "more-equal", "equal"
+# - **Right branch operators** (condition is FALSE): "more", "not-in",
+#   "not-equal"
+#
+# Model-specific conventions:
+# - **xgboost**: "less" and "more-equal" for left, inverse for right
+# - **lightgbm**: "less-equal" and "in" for left, "more" and "not-in" for right
+# - **catboost**: "less-equal" and "equal" for left, "more" and "not-equal" for right
+#
+# The `build_condition_fn` is only called with left-branch path elements,
+# so it only needs to handle left-branch operators.
 build_nested_from_flat_paths <- function(leaves, build_condition_fn) {
   if (length(leaves) == 0) {
     cli::cli_abort("Empty tree.", .internal = TRUE)
@@ -145,13 +168,14 @@ build_nested_from_paths_recursive <- function(
   # Get condition at this depth
   split_info <- first_leaf$path[[path_depth]]
 
-  # Partition leaves by left vs right condition
+  # Partition leaves by left vs right condition based on operator name.
+  # See "Operator naming convention" in build_nested_from_flat_paths docs.
   is_left_condition <- function(leaf) {
     if (path_depth > length(leaf$path)) {
       return(TRUE)
     }
     op <- leaf$path[[path_depth]]$op
-    op %in% c("less", "less-equal", "in", "more-equal")
+    op %in% c("less", "less-equal", "in", "more-equal", "equal")
   }
 
   left_leaves <- Filter(is_left_condition, leaves)
