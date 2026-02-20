@@ -94,9 +94,7 @@ test_that(".extract_rpart_classprob returns list of expressions", {
 
   expect_type(exprs, "list")
   expect_length(exprs, 3)
-  for (expr in exprs) {
-    expect_type(expr, "language")
-  }
+  expect_true(all(vapply(exprs, typeof, character(1)) == "language"))
 })
 
 test_that(".extract_rpart_classprob results match predict probabilities", {
@@ -122,4 +120,45 @@ test_that(".extract_rpart_classprob errors on non-rpart model", {
 test_that(".extract_rpart_classprob errors on regression model", {
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
   expect_snapshot(.extract_rpart_classprob(model), error = TRUE)
+})
+
+# Nested case_when tests --------------------------------------------------
+
+test_that("tidypredict_fit with nested = TRUE matches flat predictions", {
+  model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
+
+  flat_expr <- tidypredict_fit(model, nested = FALSE)
+  nested_expr <- tidypredict_fit(model, nested = TRUE)
+
+  flat_pred <- dplyr::mutate(mtcars, pred = !!flat_expr)$pred
+  nested_pred <- dplyr::mutate(mtcars, pred = !!nested_expr)$pred
+
+  expect_equal(nested_pred, flat_pred)
+})
+
+test_that("tidypredict_fit with nested = TRUE works for classification", {
+  model <- rpart::rpart(Species ~ ., data = iris)
+
+  nested_expr <- tidypredict_fit(model, nested = TRUE)
+  nested_pred <- dplyr::mutate(iris, pred = !!nested_expr)$pred
+  original_pred <- as.character(predict(model, iris, type = "class"))
+
+  expect_equal(nested_pred, original_pred)
+})
+
+test_that(".extract_rpart_classprob with nested = TRUE matches flat", {
+  model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
+
+  flat_exprs <- .extract_rpart_classprob(model, nested = FALSE)
+  nested_exprs <- .extract_rpart_classprob(model, nested = TRUE)
+
+  eval_env <- rlang::new_environment(
+    data = as.list(iris),
+    parent = asNamespace("dplyr")
+  )
+
+  flat_probs <- lapply(flat_exprs, rlang::eval_tidy, env = eval_env)
+  nested_probs <- lapply(nested_exprs, rlang::eval_tidy, env = eval_env)
+
+  expect_equal(nested_probs, flat_probs)
 })
