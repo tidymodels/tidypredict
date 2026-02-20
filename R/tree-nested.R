@@ -110,3 +110,73 @@ build_nested_split_condition <- function(split) {
 .build_nested_case_when_tree <- function(tree_info) {
   generate_nested_case_when_tree(tree_info)
 }
+
+# Build nested case_when from flat paths format
+# Used by parsed models (xgboost, lightgbm)
+# @param leaves List of leaves, each with `prediction` and `path`
+# @param build_condition_fn Function to build condition from path element
+build_nested_from_flat_paths <- function(leaves, build_condition_fn) {
+  if (length(leaves) == 0) {
+    cli::cli_abort("Empty tree.", .internal = TRUE)
+  }
+
+  # Single leaf (stump)
+  if (length(leaves) == 1 && length(leaves[[1]]$path) == 0) {
+    return(leaves[[1]]$prediction)
+  }
+
+  build_nested_from_paths_recursive(leaves, build_condition_fn, path_depth = 1)
+}
+
+build_nested_from_paths_recursive <- function(
+  leaves,
+  build_condition_fn,
+  path_depth
+) {
+  if (length(leaves) == 1) {
+    return(leaves[[1]]$prediction)
+  }
+
+  first_leaf <- leaves[[1]]
+  if (path_depth > length(first_leaf$path)) {
+    return(first_leaf$prediction)
+  }
+
+  # Get condition at this depth
+  split_info <- first_leaf$path[[path_depth]]
+
+  # Partition leaves by left vs right condition
+  is_left_condition <- function(leaf) {
+    if (path_depth > length(leaf$path)) {
+      return(TRUE)
+    }
+    op <- leaf$path[[path_depth]]$op
+    op %in% c("less", "less-equal", "in", "more-equal")
+  }
+
+  left_leaves <- Filter(is_left_condition, leaves)
+  right_leaves <- Filter(Negate(is_left_condition), leaves)
+
+  if (length(left_leaves) == 0 || length(right_leaves) == 0) {
+    return(build_nested_from_paths_recursive(
+      leaves,
+      build_condition_fn,
+      path_depth + 1
+    ))
+  }
+
+  condition <- build_condition_fn(split_info)
+
+  left_subtree <- build_nested_from_paths_recursive(
+    left_leaves,
+    build_condition_fn,
+    path_depth + 1
+  )
+  right_subtree <- build_nested_from_paths_recursive(
+    right_leaves,
+    build_condition_fn,
+    path_depth + 1
+  )
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}

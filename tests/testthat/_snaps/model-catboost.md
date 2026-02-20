@@ -79,15 +79,9 @@
     Condition
       Error in `map()`:
       i In index: 1.
-      Caused by error in `map()`:
-      i In index: 1.
-      Caused by error in `map()`:
-      i In index: 1.
-      Caused by error in `get_catboost_categorical_condition()`:
+      Caused by error in `build_nested_catboost_categorical()`:
       ! No category mapping found for hash -254607792.
-      i For raw CatBoost models, use `set_catboost_categories()` to establish the mapping:
-        `pm <- set_catboost_categories(pm, model, training_data)`
-      i For parsnip/bonsai models, pass the model_fit object directly to `tidypredict_fit()`.
+      i For raw CatBoost models, use `set_catboost_categories()`.
 
 # parsnip model without xlevels throws error
 

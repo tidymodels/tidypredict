@@ -169,12 +169,11 @@ get_pk_tree <- function(model) {
 
 #' @export
 parse_model.party <- function(model) {
-  classes <- attr(model$terms, "dataClasses")
   pm <- list()
   pm$general$model <- "party"
   pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- list(get_pk_tree(model))
+  pm$general$version <- 3
+  pm$tree_info <- partykit_tree_info_full(model)
   as_parsed_model(pm)
 }
 

@@ -3,7 +3,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb()`:
+      Error in `build_fit_formula_lgb_from_parsed()`:
       ! Unsupported objective: "unsupported_objective".
       i Supported objectives: "regression", "regression_l2", "regression_l1", "huber", "fair", "quantile", "mape", "poisson", "gamma", "tweedie", "binary", "cross_entropy", "multiclass", and "multiclassova".
 

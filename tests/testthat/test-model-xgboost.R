@@ -44,7 +44,7 @@ test_that("parse_model returns correct structure", {
 
   expect_equal(pm$general$model, "xgb.Booster")
   expect_equal(pm$general$type, "xgb")
-  expect_equal(pm$general$version, 1)
+  expect_equal(pm$general$version, 3)
 
   expect_gt(length(pm$trees), 0)
 })

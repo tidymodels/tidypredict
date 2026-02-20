@@ -26,7 +26,7 @@ test_that("returns the right output", {
   expect_type(tf, "language")
   expect_s3_class(pm, "list")
   expect_equal(pm$general$model, "rpart")
-  expect_equal(pm$general$version, 2)
+  expect_equal(pm$general$version, 3)
 
   expect_snapshot(rlang::expr_text(tf))
 })

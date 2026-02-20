@@ -147,7 +147,7 @@ parse_model.xgb.Booster <- function(model) {
   pm$general$booster_name <- json_params$booster_name
   pm$general$weight_drop <- json_params$weight_drop
 
-  pm$general$version <- 1
+  pm$general$version <- 3
   pm$trees <- get_xgb_trees(model)
   as_parsed_model(pm)
 }
@@ -295,10 +295,6 @@ get_xgb_json_params <- function(model) {
   )
 }
 
-get_base_score <- function(model) {
-  get_xgb_json_params(model)$base_score
-}
-
 #' @export
 tidypredict_fit.xgb.Booster <- function(model, ...) {
   build_fit_formula_xgb_nested(model)
@@ -370,6 +366,95 @@ build_fit_formula_xgb_nested <- function(model) {
     )
   }
   f
+}
+
+# Build nested formula from parsed xgboost model (version 3)
+build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
+  # Build nested trees from flat paths
+  trees_nested <- map(parsedmodel$trees, function(tree) {
+    build_nested_from_flat_paths(tree, build_xgb_nested_condition)
+  })
+
+  # Apply DART weight_drop if present
+  weight_drop <- parsedmodel$general$weight_drop
+  trees_nested <- apply_dart_weights(trees_nested, weight_drop)
+
+  # Additive model
+  f <- reduce_addition(trees_nested)
+
+  base_score <- parsedmodel$general$params$base_score
+  if (is.null(base_score)) {
+    base_score <- 0.5
+  }
+
+  objective <- parsedmodel$general$params$objective
+
+  assigned <- 0
+  if (is.null(objective)) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+    cli::cli_warn(
+      "If the objective is a custom function,
+      please explicitly apply it to the output."
+    )
+  } else if (
+    objective %in%
+      c("reg:squarederror", "reg:squaredlogerror", "binary:logitraw")
+  ) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+  } else if (objective %in% c("binary:logistic", "reg:logistic")) {
+    assigned <- 1
+    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
+  } else if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
+    assigned <- 1
+    f <- expr(!!base_score * exp(!!f))
+  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+  } else if (objective == "binary:hinge") {
+    assigned <- 1
+    f <- expr(as.numeric((!!f + !!base_score) >= 0))
+  }
+  if (assigned == 0) {
+    cli::cli_abort(
+      c(
+        "Objective {.val {objective}} is not supported.",
+        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
+        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
+        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
+        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
+        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
+        are not supported."
+      )
+    )
+  }
+  f
+}
+
+# Build condition for xgboost nested generation from path element
+build_xgb_nested_condition <- function(path_elem) {
+  col <- rlang::sym(path_elem$col)
+  val <- as.numeric(path_elem$val)
+  missing <- path_elem$missing %||% FALSE
+
+  # xgboost uses "less" for left (< threshold) and "more-equal" for right
+  if (path_elem$op %in% c("less", "more-equal")) {
+    if (missing) {
+      expr(!!col < !!val | is.na(!!col))
+    } else {
+      expr(!!col < !!val)
+    }
+  } else {
+    # This shouldn't happen in normal xgboost trees
+    expr(!!col >= !!val)
+  }
 }
 
 # Extract nested trees from xgboost model

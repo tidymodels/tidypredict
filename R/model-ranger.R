@@ -147,13 +147,74 @@ get_ra_trees <- function(model) {
 
 #' @export
 parse_model.ranger <- function(model) {
-  classes <- attr(model$terms, "dataClasses")
+  # Check if this is a classification model
+  first_tree <- ranger::treeInfo(model, 1)
+  first_pred <- first_tree$prediction[first_tree$terminal][1]
+  if (is.character(first_pred) || is.factor(first_pred)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported for ranger.",
+        i = "Only regression models can be converted to tidy formulas.",
+        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
+      )
+    )
+  }
+
   pm <- list()
   pm$general$model <- "ranger"
   pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- get_ra_trees(model)
+  pm$general$version <- 3
+  pm$tree_info_list <- map(
+    seq_len(model$num.trees),
+    function(tree_no) ranger_tree_info_full(model, tree_no)
+  )
   as_parsed_model(pm)
+}
+
+# Convert ranger treeInfo to standard tree_info format
+ranger_tree_info_full <- function(model, tree_no) {
+  tree <- ranger::treeInfo(model, tree_no)
+
+  # Build node_splits list
+  node_splits <- vector("list", nrow(tree))
+  for (i in seq_len(nrow(tree))) {
+    if (!tree$terminal[i]) {
+      var_name <- as.character(tree$splitvarName[i])
+      split_val <- tree$splitval[i]
+
+      if (is.na(split_val)) {
+        # Categorical split
+        split_class <- tree$splitclass[i]
+        cats <- strsplit(as.character(split_class), ", ")[[1]]
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            vals = as.list(cats),
+            is_categorical = TRUE
+          )
+        )
+      } else {
+        # Numeric split
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            val = split_val,
+            is_categorical = FALSE
+          )
+        )
+      }
+    }
+  }
+
+  list(
+    nodeID = tree$nodeID,
+    leftChild = tree$leftChild,
+    rightChild = tree$rightChild,
+    splitvarName = as.character(tree$splitvarName),
+    terminal = tree$terminal,
+    prediction = tree$prediction,
+    node_splits = node_splits
+  )
 }
 
 # Fit formula -----------------------------------

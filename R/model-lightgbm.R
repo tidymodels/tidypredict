@@ -26,7 +26,7 @@ parse_model.lgb.Booster <- function(model) {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-  pm$general$version <- 1
+  pm$general$version <- 3
 
   # Extract params (objective, etc.)
   pm$general$params <- model$params
@@ -44,7 +44,7 @@ parse_model.lgb.Booster <- function(model) {
   # Extract linear tree info from model string (if any)
   linear_info <- parse_lgb_linear_trees(model, pm$general$feature_names)
 
-  # Extract trees
+  # Extract trees (flat path format for serialization)
   pm$trees <- get_lgb_trees(model, linear_info)
 
   as_parsed_model(pm)
@@ -318,7 +318,130 @@ tidypredict_fit.lgb.Booster <- function(model, ...) {
   build_fit_formula_lgb_nested(parsedmodel, model)
 }
 
-# Nested formula builder for lightgbm
+# Nested formula builder for lightgbm (from parsed model)
+build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective %||% "regression"
+
+  if (!objective %in% lgb_supported_objectives) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
+      )
+    )
+  }
+
+  if (objective %in% lgb_multiclass_objectives) {
+    return(build_fit_formula_lgb_multiclass_from_parsed(parsedmodel, objective))
+  }
+
+  # Build nested trees from flat paths
+  trees <- map(parsedmodel$trees, function(tree) {
+    build_nested_from_flat_paths(tree, build_lgb_nested_condition)
+  })
+
+  # RF boosting averages trees instead of summing
+  boosting <- parsedmodel$general$params$boosting
+  if (!is.null(boosting) && boosting == "rf") {
+    f <- reduce_addition(trees)
+    f <- expr_division(f, n_trees)
+  } else {
+    f <- reduce_addition(trees)
+  }
+
+  # Apply transformation
+  if (objective %in% lgb_exp_objectives) {
+    f <- expr(exp(!!f))
+  } else if (objective %in% lgb_sigmoid_objectives) {
+    f <- lgb_sigmoid(f)
+  }
+
+  f
+}
+
+build_fit_formula_lgb_multiclass_from_parsed <- function(
+  parsedmodel,
+  objective
+) {
+  n_trees <- length(parsedmodel$trees)
+  num_class <- parsedmodel$general$num_class
+
+  if (is.null(num_class) || num_class < 2) {
+    cli::cli_abort("Multiclass model must have num_class >= 2.")
+  }
+
+  # Build nested trees from flat paths
+  trees <- map(parsedmodel$trees, function(tree) {
+    build_nested_from_flat_paths(tree, build_lgb_nested_condition)
+  })
+
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  # Build raw score formula for each class
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+
+  # Apply transformation based on objective
+  if (objective == "multiclass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else if (objective == "multiclassova") {
+    # One-vs-all: sigmoid for each class independently
+    result <- map(raw_scores, lgb_sigmoid)
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
+# Build condition for lightgbm nested generation from path element
+build_lgb_nested_condition <- function(path_elem) {
+  col <- rlang::sym(path_elem$col)
+  missing <- path_elem$missing %||% FALSE
+
+  if (path_elem$type == "conditional") {
+    val <- as.numeric(path_elem$val)
+    if (path_elem$op == "less-equal") {
+      if (missing) {
+        expr(!!col <= !!val | is.na(!!col))
+      } else {
+        expr(!!col <= !!val)
+      }
+    } else {
+      expr(!!col <= !!val)
+    }
+  } else if (path_elem$type == "set") {
+    vals <- unlist(path_elem$vals)
+    if (path_elem$op == "in") {
+      if (missing) {
+        expr(!!col %in% !!vals | is.na(!!col))
+      } else {
+        expr(!!col %in% !!vals)
+      }
+    } else {
+      expr(!!col %in% !!vals)
+    }
+  } else {
+    cli::cli_abort("Unknown path element type: {.val {path_elem$type}}")
+  }
+}
+
+# Nested formula builder for lightgbm (from model directly)
 build_fit_formula_lgb_nested <- function(parsedmodel, model) {
   n_trees <- length(parsedmodel$trees)
 

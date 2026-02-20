@@ -72,13 +72,75 @@ get_rf_trees <- function(model) {
 
 #' @export
 parse_model.randomForest <- function(model) {
-  classes <- attr(model$terms, "dataClasses")
+  # Check if this is a classification model
+  if (!is.null(model$classes)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported for randomForest.",
+        i = "Only regression models can be converted to tidy formulas.",
+        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
+      )
+    )
+  }
+
   pm <- list()
   pm$general$model <- "randomForest"
   pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- get_rf_trees(model)
+  pm$general$version <- 3
+  term_labels <- names(model$forest$ncat)
+  pm$tree_info_list <- map(
+    seq_len(model$ntree),
+    function(tree_no) rf_tree_info_full(model, tree_no, term_labels)
+  )
   as_parsed_model(pm)
+}
+
+# Convert randomForest getTree to standard tree_info format
+rf_tree_info_full <- function(model, tree_no, term_labels) {
+  tree <- randomForest::getTree(model, tree_no)
+  n_nodes <- nrow(tree)
+
+  # randomForest uses 1-indexed nodes, convert to 0-indexed
+  # Also convert child IDs to 0-indexed (or NA for leaves)
+  left_child <- tree[, "left daughter"]
+  right_child <- tree[, "right daughter"]
+  left_child <- ifelse(left_child == 0, NA_integer_, left_child - 1L)
+  right_child <- ifelse(right_child == 0, NA_integer_, right_child - 1L)
+
+  terminal <- tree[, "status"] == -1
+  prediction <- ifelse(terminal, tree[, "prediction"], NA_real_)
+
+  # Build split var names
+  split_var_idx <- tree[, "split var"]
+  splitvarName <- ifelse(
+    split_var_idx == 0,
+    NA_character_,
+    term_labels[split_var_idx]
+  )
+
+  # Build node_splits list
+  node_splits <- vector("list", n_nodes)
+  for (i in seq_len(n_nodes)) {
+    if (!terminal[i]) {
+      node_splits[[i]] <- list(
+        primary = list(
+          col = splitvarName[i],
+          val = tree[i, "split point"],
+          is_categorical = FALSE
+        )
+      )
+    }
+  }
+
+  list(
+    nodeID = seq_len(n_nodes) - 1L,
+    leftChild = left_child,
+    rightChild = right_child,
+    splitvarName = splitvarName,
+    terminal = terminal,
+    prediction = prediction,
+    node_splits = node_splits
+  )
 }
 
 # Fit model -----------------------------------------------

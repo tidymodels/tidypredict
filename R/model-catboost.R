@@ -42,7 +42,7 @@ parse_model.catboost.Model <- function(model) {
   pm <- list()
   pm$general$model <- "catboost.Model"
   pm$general$type <- "catboost"
-  pm$general$version <- 1
+  pm$general$version <- 3
 
   tmp_file <- tempfile(fileext = ".json")
   on.exit(unlink(tmp_file), add = TRUE)

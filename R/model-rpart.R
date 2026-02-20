@@ -389,8 +389,8 @@ parse_model.rpart <- function(model) {
   pm <- list()
   pm$general$model <- "rpart"
   pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- list(get_rpart_tree(model))
+  pm$general$version <- 3
+  pm$tree_info <- rpart_tree_info_full(model)
   as_parsed_model(pm)
 }
 

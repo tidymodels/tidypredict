@@ -8,7 +8,7 @@ test_that("returns the right output", {
   expect_s3_class(pm, "list")
   expect_equal(length(pm), 2)
   expect_equal(pm$general$model, "party")
-  expect_equal(pm$general$version, 2)
+  expect_equal(pm$general$version, 3)
 
   expect_snapshot(
     rlang::expr_text(tf)
