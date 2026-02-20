@@ -6,6 +6,9 @@
 \usage{
 .extract_partykit_classprob(model)
 }
+\arguments{
+\item{model}{A partykit model object}
+}
 \description{
 For use in orbital package.
 }

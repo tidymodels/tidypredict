@@ -1,3 +1,15 @@
+# For {orbital}
+#' Extract comprehensive tree info for rpart models
+#'
+#' Returns tree structure in format needed by nested case_when generator.
+#' For use in orbital package.
+#' @param model An rpart model object
+#' @keywords internal
+#' @export
+.rpart_tree_info_full <- function(model) {
+  rpart_tree_info_full(model)
+}
+
 # Extract comprehensive tree info including surrogate splits
 rpart_tree_info_full <- function(model) {
   frame <- model$frame
@@ -377,17 +389,15 @@ parse_model.rpart <- function(model) {
   pm <- list()
   pm$general$model <- "rpart"
   pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- list(get_rpart_tree(model))
+  pm$general$version <- 3
+  pm$tree_info <- rpart_tree_info_full(model)
   as_parsed_model(pm)
 }
 
 #' @export
-tidypredict_fit.rpart <- function(model) {
-  parsedmodel <- parse_model(model)
-  tree <- parsedmodel$trees[[1]]
-  mode <- parsedmodel$general$mode
-  generate_case_when_tree(tree, mode)
+tidypredict_fit.rpart <- function(model, ...) {
+  tree_info <- rpart_tree_info_full(model)
+  generate_nested_case_when_tree(tree_info)
 }
 
 #' @export
@@ -497,40 +507,14 @@ tidypredict_test.rpart <- function(
   probs <- yval2[, prob_cols, drop = FALSE]
   colnames(probs) <- ylevels
 
-  # Get tree structure with surrogate handling
+  # Get tree structure
   tree_info <- rpart_tree_info_full(model)
-  parent_map <- build_parent_map(tree_info)
-  terminal_ids <- tree_info$nodeID[tree_info$terminal]
-
-  generate_one_tree <- function(predictions) {
-    paths <- map(terminal_ids, function(node_id) {
-      node_idx <- which(tree_info$nodeID == node_id)
-      list(
-        prediction = predictions[node_idx],
-        path = build_rpart_path(
-          node_id,
-          tree_info,
-          parent_map,
-          use_surrogates = TRUE
-        )
-      )
-    })
-
-    pm <- list()
-    pm$general$model <- "rpart"
-    pm$general$type <- "tree"
-    pm$general$version <- 2
-    pm$trees <- list(paths)
-    parsedmodel <- as_parsed_model(pm)
-
-    tree <- parsedmodel$trees[[1]]
-    mode <- parsedmodel$general$mode
-    generate_case_when_tree(tree, mode)
-  }
 
   res <- list()
   for (i in seq_len(ncol(probs))) {
-    res[[i]] <- generate_one_tree(probs[, i])
+    tree_info_copy <- tree_info
+    tree_info_copy$prediction <- probs[, i]
+    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
   }
   res
 }

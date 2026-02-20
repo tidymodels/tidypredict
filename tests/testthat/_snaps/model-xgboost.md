@@ -3,7 +3,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_xgb()`:
+      Error in `apply_xgb_objective()`:
       ! Objective "unsupported_objective" is not supported.
       i Supported objectives: "binary:hinge", "binary:logistic", "binary:logitraw", "count:poisson", "reg:absoluteerror", "reg:gamma", "reg:logistic", "reg:pseudohubererror", "reg:squarederror", "reg:squaredlogerror", "reg:tweedie".
       i Multiclass objectives ("multi:softmax", "multi:softprob") are not supported.

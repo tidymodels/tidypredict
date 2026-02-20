@@ -16,6 +16,10 @@
 
 ## Improvements
 
+- Tree models (rpart, partykit, ranger, randomForest, xgboost, lightgbm, catboost) now generate nested `case_when()` expressions that mirror the tree structure, instead of flat expressions with all leaf conditions at the same level. This produces more efficient SQL and R code because conditions are evaluated hierarchically. (#227)
+
+- `parse_model()` now documents the parsed model version system (v1/v2/v3) and model type classes in its help page. (#227)
+
 - `earth()` models now support additional GLM families and link functions: Gamma, inverse.gaussian, probit, and cloglog. (#194, #195)
 
 - `glm()` models now support additional families and link functions: Gamma family with inverse link, inverse.gaussian family with 1/mu^2 link, probit link, cloglog link, and sqrt link. (#203, #204, #205, #206, #207)

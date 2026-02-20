@@ -1,3 +1,66 @@
+# For {orbital}
+#' Extract comprehensive tree info for partykit models
+#'
+#' Returns tree structure in format needed by nested case_when generator.
+#' For use in orbital package.
+#' @param model A partykit model object
+#' @keywords internal
+#' @export
+.partykit_tree_info_full <- function(model) {
+  partykit_tree_info_full(model)
+}
+
+# Convert partykit tree info to the format needed by nested generator
+partykit_tree_info_full <- function(model) {
+  tree_df <- partykit_tree_info(model)
+
+  # Build node_splits list in the format expected by nested generator
+  node_splits <- vector("list", nrow(tree_df))
+
+  for (i in seq_len(nrow(tree_df))) {
+    if (!tree_df$terminal[i]) {
+      var_name <- tree_df$splitvarName[i]
+
+      if (!is.na(tree_df$splitclass[i])) {
+        # Categorical split
+        vals <- strsplit(tree_df$splitclass[i], ", ")[[1]]
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            vals = as.list(vals),
+            is_categorical = TRUE,
+            needs_swap = FALSE
+          ),
+          surrogates = list()
+        )
+      } else {
+        # Continuous split
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            val = tree_df$splitval[i],
+            is_categorical = FALSE,
+            needs_swap = FALSE
+          ),
+          surrogates = list()
+        )
+      }
+    }
+  }
+
+  list(
+    nodeID = tree_df$nodeID,
+    leftChild = tree_df$leftChild,
+    rightChild = tree_df$rightChild,
+    splitvarName = tree_df$splitvarName,
+    terminal = tree_df$terminal,
+    prediction = tree_df$prediction,
+    node_splits = node_splits,
+    majority_left = rep(NA, nrow(tree_df)),
+    use_surrogates = FALSE
+  )
+}
+
 partykit_tree_info <- function(model) {
   model_nodes <- map(seq_along(model), ~ model[[.x]])
   is_split <- map_lgl(model_nodes, ~ class(.x$node[1]) == "partynode")
@@ -80,6 +143,30 @@ partykit_tree_info <- function(model) {
   )
 }
 
+#' @export
+parse_model.party <- function(model) {
+  pm <- list()
+  pm$general$model <- "party"
+  pm$general$type <- "tree"
+  pm$general$version <- 3
+  pm$tree_info <- partykit_tree_info_full(model)
+  as_parsed_model(pm)
+}
+
+# Fit formula -----------------------------------
+
+#' @export
+tidypredict_fit.party <- function(model, ...) {
+  tree_info <- partykit_tree_info_full(model)
+  generate_nested_case_when_tree(tree_info)
+}
+
+# Legacy tree extraction (no longer used) ---------------------------
+# This function was used by the old approach to populate pm$trees in flat path
+# format. Now parse_model.party() uses partykit_tree_info_full() to populate
+# pm$tree_info instead. Uses get_ra_path() and get_child_info() from
+# model-ranger.R. Kept for reference.
+
 get_pk_tree <- function(model) {
   tree <- partykit_tree_info(model)
   paths <- tree$nodeID[tree[, "terminal"]]
@@ -104,31 +191,11 @@ get_pk_tree <- function(model) {
   )
 }
 
-#' @export
-parse_model.party <- function(model) {
-  classes <- attr(model$terms, "dataClasses")
-  pm <- list()
-  pm$general$model <- "party"
-  pm$general$type <- "tree"
-  pm$general$version <- 2
-  pm$trees <- list(get_pk_tree(model))
-  as_parsed_model(pm)
-}
-
-# Fit formula -----------------------------------
-
-#' @export
-tidypredict_fit.party <- function(model) {
-  parsedmodel <- parse_model(model)
-  tree <- parsedmodel$trees[[1]]
-  mode <- parsedmodel$general$mode
-  generate_case_when_tree(tree, mode)
-}
-
 # For {orbital}
 #' Extract classprob trees for partykit models
 #'
 #' For use in orbital package.
+#' @param model A partykit model object
 #' @keywords internal
 #' @export
 .extract_partykit_classprob <- function(model) {
@@ -159,47 +226,13 @@ tidypredict_fit.party <- function(model) {
     dimnames = list(NULL, names(preds[[1]]))
   )
 
-  generate_one_tree <- function(tree_info) {
-    paths <- tree_info$nodeID[tree_info[, "terminal"]]
-
-    child_info <- get_child_info(tree_info)
-
-    paths <- map(
-      paths,
-      ~ {
-        prediction <- tree_info$prediction[tree_info$nodeID == .x]
-        if (is.null(prediction)) {
-          cli::cli_abort("Prediction column not found.")
-        }
-        if (is.factor(prediction)) {
-          prediction <- as.character(prediction)
-        }
-        list(
-          prediction = prediction,
-          path = get_ra_path(.x, tree_info, child_info, FALSE)
-        )
-      }
-    )
-
-    classes <- attr(model$terms, "dataClasses")
-    pm <- list()
-    pm$general$model <- "party"
-    pm$general$type <- "tree"
-    pm$general$version <- 2
-    pm$trees <- list(paths)
-    parsedmodel <- as_parsed_model(pm)
-
-    tree <- parsedmodel$trees[[1]]
-    mode <- parsedmodel$general$mode
-    generate_case_when_tree(tree, mode)
-  }
-
-  tree_info <- partykit_tree_info(model)
+  tree_info_full <- partykit_tree_info_full(model)
 
   res <- list()
   for (i in seq_len(ncol(preds))) {
-    tree_info$prediction <- preds[, i]
-    res[[i]] <- generate_one_tree(tree_info)
+    tree_info_copy <- tree_info_full
+    tree_info_copy$prediction <- preds[, i]
+    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
   }
   res
 }

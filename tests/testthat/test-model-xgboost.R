@@ -44,7 +44,7 @@ test_that("parse_model returns correct structure", {
 
   expect_equal(pm$general$model, "xgb.Booster")
   expect_equal(pm$general$type, "xgb")
-  expect_equal(pm$general$version, 1)
+  expect_equal(pm$general$version, 3)
 
   expect_gt(length(pm$trees), 0)
 })
@@ -701,7 +701,7 @@ test_that("base_score of 0.5 is included in formula", {
 
   res <- tidypredict_fit(model)
   res_text <- rlang::expr_text(res)
-  expect_match(res_text, "\\+ 0.5$")
+  expect_match(res_text, "\\+ \\s*0\\.5")
 })
 
 test_that("predictions with missing values work", {

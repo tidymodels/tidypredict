@@ -21,6 +21,26 @@ tidypredict_fit.pm_regression <- function(model) {
 
 #' @export
 tidypredict_fit.pm_tree <- function(model) {
+  version <- model$general$version %||% 1
+
+  # Version 3: nested case_when format
+  if (version >= 3) {
+    model_type <- model$general$model
+    if (model_type == "cubist") {
+      return(tidypredict_fit_cubist(model))
+    }
+    if (model_type %in% c("rpart", "party")) {
+      return(generate_nested_case_when_tree(model$tree_info))
+    }
+    if (model_type %in% c("ranger", "randomForest")) {
+      # For forests, average all trees
+      tree_exprs <- map(model$tree_info_list, generate_nested_case_when_tree)
+      res <- reduce_addition(tree_exprs)
+      return(expr_division(res, length(tree_exprs)))
+    }
+  }
+
+  # Version 1/2: flat case_when format (backwards compatibility)
   if (model$general$model == "cubist") {
     return(tidypredict_fit_cubist(model))
   }
@@ -32,21 +52,41 @@ tidypredict_fit.pm_tree <- function(model) {
   }
 
   res <- generate_case_when_trees(model)
-
   reduce_addition(res)
 }
 
 #' @export
 tidypredict_fit.pm_xgb <- function(model) {
+  version <- model$general$version %||% 1
+
+  if (version >= 3) {
+    return(build_fit_formula_xgb_from_parsed(model))
+  }
+
+  # Version 1/2: flat case_when (backwards compatibility)
   build_fit_formula_xgb(model)
 }
 
 #' @export
 tidypredict_fit.pm_lgb <- function(model) {
+  version <- model$general$version %||% 1
+
+  if (version >= 3) {
+    return(build_fit_formula_lgb_from_parsed(model))
+  }
+
+  # Version 1/2: flat case_when (backwards compatibility)
   build_fit_formula_lgb(model)
 }
 
 #' @export
 tidypredict_fit.pm_catboost <- function(model) {
+  version <- model$general$version %||% 1
+
+  if (version >= 3) {
+    return(build_fit_formula_catboost_nested(model))
+  }
+
+  # Version 1/2: flat case_when (backwards compatibility)
   build_fit_formula_catboost(model)
 }

@@ -10,9 +10,9 @@ test_that("returns the right output", {
 
   expect_s3_class(pm, "list")
   expect_equal(length(pm), 2)
-  expect_equal(length(pm$trees), 3)
+  expect_equal(length(pm$tree_info_list), 3)
   expect_equal(pm$general$model, "randomForest")
-  expect_equal(pm$general$version, 2)
+  expect_equal(pm$general$version, 3)
 
   expect_snapshot(
     rlang::expr_text(tf)
@@ -24,16 +24,11 @@ test_that("Model can be saved and re-loaded", {
 
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
 
-  pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(pm, mp)
-  l <- yaml::read_yaml(mp)
-  pm <- as_parsed_model(l)
+  fit_expr <- tidypredict_fit(model)
+  fit_pred <- dplyr::mutate(mtcars, pred = !!fit_expr)$pred
+  original_pred <- predict(model, mtcars)
 
-  expect_identical(
-    round_print(tidypredict_fit(model)),
-    round_print(tidypredict_fit(pm))
-  )
+  expect_equal(fit_pred, as.vector(original_pred))
 })
 
 test_that("formulas produces correct predictions", {
