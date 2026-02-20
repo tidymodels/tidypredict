@@ -210,63 +210,25 @@ path_formulas <- function(path) {
 #'   Can be character or numeric.
 #'  @keywords internal
 path_formula <- function(x) {
-  if (x$type == "conditional") {
-    if (x$op == "more") {
-      i <- expr(!!as.name(x$col) > !!x$val)
-    } else if (x$op == "more-equal") {
-      i <- expr(!!as.name(x$col) >= !!x$val)
-    } else if (x$op == "less") {
-      i <- expr(!!as.name(x$col) < !!x$val)
-    } else if (x$op == "less-equal") {
-      i <- expr(!!as.name(x$col) <= !!x$val)
-    } else {
-      cli::cli_abort(
-        "{.field op} has unsupported value of {.value {x$op}}.",
-        .internal = TRUE
-      )
-    }
-  } else if (x$type == "set") {
-    sets <- reduce(x$vals, c)
-    if (x$op == "in") {
-      i <- expr(!!as.name(x$col) %in% !!sets)
-    } else if (x$op == "not-in") {
-      i <- expr((!!as.name(x$col) %in% !!sets) == FALSE)
-    } else {
-      cli::cli_abort(
-        "{.field op} has unsupported value of {.value {x$op}}.",
-        .internal = TRUE
-      )
-    }
-  } else if (x$type == "conditional_with_surrogates") {
+  type <- x$type
+
+  if (type == "conditional") {
+    i <- build_comparison_expr(x$col, x$val, x$op)
+  } else if (type == "set") {
+    i <- build_set_expr(x$col, x$vals, x$op)
+  } else if (
+    type == "conditional_with_surrogates" || type == "set_with_surrogates"
+  ) {
     i <- build_surrogate_condition(x)
-  } else if (x$type == "set_with_surrogates") {
-    i <- build_surrogate_condition(x)
-  } else if (x$type == "na_check") {
-    # For usesurrogate=0: check if the split variable is NA
+  } else if (type == "na_check") {
     i <- expr(is.na(!!as.name(x$col)))
-  } else if (x$type == "conditional_not_na") {
-    # For usesurrogate=0: !is.na(col) & col <op> val
+  } else if (type == "conditional_not_na") {
     col <- as.name(x$col)
-    val <- x$val
-    if (x$op == "more") {
-      cond <- expr(!!col > !!val)
-    } else if (x$op == "more-equal") {
-      cond <- expr(!!col >= !!val)
-    } else if (x$op == "less") {
-      cond <- expr(!!col < !!val)
-    } else if (x$op == "less-equal") {
-      cond <- expr(!!col <= !!val)
-    }
+    cond <- build_comparison_expr(x$col, x$val, x$op)
     i <- expr(!is.na(!!col) & !!cond)
-  } else if (x$type == "set_not_na") {
-    # For usesurrogate=0: !is.na(col) & col %in% vals
+  } else if (type == "set_not_na") {
     col <- as.name(x$col)
-    sets <- reduce(x$vals, c)
-    if (x$op == "in") {
-      cond <- expr(!!col %in% !!sets)
-    } else {
-      cond <- expr((!!col %in% !!sets) == FALSE)
-    }
+    cond <- build_set_expr(x$col, x$vals, x$op)
     i <- expr(!is.na(!!col) & !!cond)
   } else {
     cli::cli_abort(
@@ -275,6 +237,41 @@ path_formula <- function(x) {
     )
   }
   i
+}
+
+# Build a comparison expression (col <op> val)
+build_comparison_expr <- function(col, val, op) {
+  col <- as.name(col)
+  if (op == "more") {
+    expr(!!col > !!val)
+  } else if (op == "more-equal") {
+    expr(!!col >= !!val)
+  } else if (op == "less") {
+    expr(!!col < !!val)
+  } else if (op == "less-equal") {
+    expr(!!col <= !!val)
+  } else {
+    cli::cli_abort(
+      "{.field op} has unsupported value of {.value {op}}.",
+      .internal = TRUE
+    )
+  }
+}
+
+# Build a set membership expression (col %in% vals or not)
+build_set_expr <- function(col, vals, op) {
+  col <- as.name(col)
+  sets <- reduce(vals, c)
+  if (op == "in") {
+    expr(!!col %in% !!sets)
+  } else if (op == "not-in") {
+    expr((!!col %in% !!sets) == FALSE)
+  } else {
+    cli::cli_abort(
+      "{.field op} has unsupported value of {.value {op}}.",
+      .internal = TRUE
+    )
+  }
 }
 
 # Build condition with surrogate fallbacks for rpart
@@ -323,27 +320,10 @@ build_surrogate_condition <- function(x) {
 
 # Build a single condition expression (without NA check)
 build_single_condition <- function(cond) {
-  col <- as.name(cond$col)
   if (!is.null(cond$vals)) {
-    # Set condition
-    sets <- reduce(cond$vals, c)
-    if (cond$op == "in") {
-      expr(!!col %in% !!sets)
-    } else {
-      expr((!!col %in% !!sets) == FALSE)
-    }
+    build_set_expr(cond$col, cond$vals, cond$op)
   } else {
-    # Numeric condition
-    val <- cond$val
-    if (cond$op == "more") {
-      expr(!!col > !!val)
-    } else if (cond$op == "more-equal") {
-      expr(!!col >= !!val)
-    } else if (cond$op == "less") {
-      expr(!!col < !!val)
-    } else if (cond$op == "less-equal") {
-      expr(!!col <= !!val)
-    }
+    build_comparison_expr(cond$col, cond$val, cond$op)
   }
 }
 

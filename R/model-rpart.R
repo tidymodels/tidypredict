@@ -30,7 +30,7 @@ rpart_tree_info_full <- function(model) {
     NA_integer_
   )
 
-  # Get predictions for ALL nodes (needed for usesurrogate=0 where NAs stop at internal nodes)
+  # Get predictions for ALL nodes (needed for usesurrogate=0)
   if (model$method == "class") {
     ylevels <- attr(model, "ylevels")
     prediction <- ylevels[frame$yval]
@@ -147,7 +147,7 @@ extract_one_split <- function(splits, idx, model, var_name) {
   }
 }
 
-# Legacy function for backward compatibility and orbital helpers
+# Simplified tree info for tests (returns data frame like other models)
 rpart_tree_info <- function(model) {
   info <- rpart_tree_info_full(model)
 
@@ -178,94 +178,92 @@ rpart_tree_info <- function(model) {
 }
 
 get_rpart_tree <- function(model) {
-  info <- rpart_tree_info_full(model)
-  terminal_ids <- info$nodeID[info$terminal]
-  internal_ids <- info$nodeID[!info$terminal]
+  tree_info <- rpart_tree_info_full(model)
+  terminal_ids <- tree_info$nodeID[tree_info$terminal]
+  internal_ids <- tree_info$nodeID[!tree_info$terminal]
 
   # Build parent mapping (use -1 for no parent since 0 is a valid node ID)
-  child_info <- rep(-1L, max(info$nodeID) + 1)
-  for (i in seq_along(info$nodeID)) {
-    node <- info$nodeID[i]
-    lc <- info$leftChild[i]
-    rc <- info$rightChild[i]
-    if (!is.na(lc)) {
-      child_info[lc + 1] <- node
-    }
-    if (!is.na(rc)) child_info[rc + 1] <- node
-  }
+  parent_map <- build_parent_map(tree_info)
 
   # Generate paths for terminal nodes (leaves)
   leaf_paths <- map(terminal_ids, function(leaf_id) {
-    prediction <- info$prediction[info$nodeID == leaf_id]
-    if (is.null(prediction)) {
-      cli::cli_abort("Prediction column not found.")
-    }
+    prediction <- tree_info$prediction[tree_info$nodeID == leaf_id]
     if (is.factor(prediction)) {
       prediction <- as.character(prediction)
     }
     list(
       prediction = prediction,
-      path = get_rpart_path(leaf_id, info, child_info)
+      path = build_rpart_path(
+        leaf_id,
+        tree_info,
+        parent_map,
+        use_surrogates = TRUE
+      )
     )
   })
 
   # For usesurrogate=0, also generate paths for internal nodes where NAs stop
-  if (!info$use_surrogates && length(internal_ids) > 0) {
+  if (!tree_info$use_surrogates && length(internal_ids) > 0) {
     na_stop_paths <- map(internal_ids, function(node_id) {
-      prediction <- info$prediction[info$nodeID == node_id]
+      prediction <- tree_info$prediction[tree_info$nodeID == node_id]
       if (is.factor(prediction)) {
         prediction <- as.character(prediction)
       }
-      # Get path to this node, plus the "is.na(split_var)" condition
-      path <- get_rpart_path_na_stop(node_id, info, child_info)
-      list(
-        prediction = prediction,
-        path = path
+      # Get path to this node with explicit !is.na checks, plus final is.na check
+      path <- build_rpart_path(
+        node_id,
+        tree_info,
+        parent_map,
+        use_surrogates = FALSE
       )
+      # Add the "is.na(split_var)" condition for this node
+      node_idx <- which(tree_info$nodeID == node_id)
+      split_info <- tree_info$node_splits[[node_idx]]
+      if (!is.null(split_info)) {
+        na_cond <- list(type = "na_check", col = split_info$primary$col)
+        path <- c(path, list(na_cond))
+      }
+      list(prediction = prediction, path = path)
     })
-    # NA stop paths should come BEFORE leaf paths (more specific conditions first)
+    # NA stop paths come BEFORE leaf paths (more specific conditions first)
     c(na_stop_paths, leaf_paths)
   } else {
     leaf_paths
   }
 }
 
-# Build path for usesurrogate=0 internal node "NA stop"
-# This generates: path_to_node AND is.na(split_var_at_node)
-get_rpart_path_na_stop <- function(node_id, info, child_info) {
-  # Get the path to reach this node (conditions to get here with non-NA values)
-  path_to_node <- get_rpart_path_simple(node_id, info, child_info)
-
-  # Add the "is.na(split_var)" condition for this node
-  node_idx <- which(info$nodeID == node_id)
-  split_info <- info$node_splits[[node_idx]]
-
-  if (!is.null(split_info)) {
-    primary <- split_info$primary
-    na_cond <- list(
-      type = "na_check",
-      col = primary$col
-    )
-    c(path_to_node, list(na_cond))
-  } else {
-    path_to_node
+# Build parent mapping for path tracing
+build_parent_map <- function(tree_info) {
+  parent_map <- rep(-1L, max(tree_info$nodeID) + 1)
+  for (i in seq_along(tree_info$nodeID)) {
+    lc <- tree_info$leftChild[i]
+    rc <- tree_info$rightChild[i]
+    if (!is.na(lc)) {
+      parent_map[lc + 1] <- tree_info$nodeID[i]
+    }
+    if (!is.na(rc)) parent_map[rc + 1] <- tree_info$nodeID[i]
   }
+  parent_map
 }
 
-# Build simple path without surrogate handling (for usesurrogate=0)
-# Each condition is just "!is.na(var) & var <op> val"
-get_rpart_path_simple <- function(node_id, info, child_info) {
-  # Trace path from node to root
+# Trace path from node to root and return list of node IDs
+trace_path_to_root <- function(node_id, parent_map) {
   path_nodes <- node_id
   current <- node_id
-  while (current >= 0 && (current + 1) <= length(child_info)) {
-    parent <- child_info[current + 1]
+  while (current >= 0 && (current + 1) <= length(parent_map)) {
+    parent <- parent_map[current + 1]
     if (parent < 0) {
       break
     }
     path_nodes <- c(path_nodes, parent)
     current <- parent
   }
+  path_nodes
+}
+
+# Build path conditions from node to root
+build_rpart_path <- function(node_id, tree_info, parent_map, use_surrogates) {
+  path_nodes <- trace_path_to_root(node_id, parent_map)
 
   if (length(path_nodes) <= 1) {
     return(list())
@@ -277,25 +275,69 @@ get_rpart_path_simple <- function(node_id, info, child_info) {
     child_node <- path_nodes[i]
     parent_node <- path_nodes[i + 1]
 
-    parent_idx <- which(info$nodeID == parent_node)
-    is_left_child <- info$leftChild[parent_idx] == child_node
+    parent_idx <- which(tree_info$nodeID == parent_node)
+    is_left_child <- tree_info$leftChild[parent_idx] == child_node
 
-    split_info <- info$node_splits[[parent_idx]]
+    split_info <- tree_info$node_splits[[parent_idx]]
     if (is.null(split_info)) {
       next
     }
 
     primary <- split_info$primary
-    # For usesurrogate=0 paths, we need: !is.na(var) & var <op> val
-    cond <- build_simple_condition(primary, is_left_child)
+    surrogates <- split_info$surrogates
+    majority_left <- tree_info$majority_left[parent_idx]
+
+    # Build condition based on surrogate usage
+    if (use_surrogates) {
+      cond <- build_condition_with_surrogates(
+        primary,
+        surrogates,
+        is_left_child,
+        majority_left
+      )
+    } else {
+      cond <- build_condition_simple(primary, is_left_child)
+    }
     conditions <- c(conditions, list(cond))
   }
 
   rev(conditions)
 }
 
-# Build a simple condition with NOT NULL check (for usesurrogate=0)
-build_simple_condition <- function(primary, go_left) {
+# Build condition with surrogate fallbacks (for usesurrogate=2)
+build_condition_with_surrogates <- function(
+  primary,
+  surrogates,
+  go_left,
+  majority_left
+) {
+  primary_cond <- build_split_condition(primary, go_left)
+
+  surr_conds <- map(surrogates, function(s) {
+    # If surrogate needs_swap, it goes opposite of primary
+    surr_go_left <- if (s$needs_swap) !go_left else go_left
+    build_split_condition(s, surr_go_left)
+  })
+
+  # Does this direction match where majority goes?
+  majority_match <- (go_left && majority_left) || (!go_left && !majority_left)
+
+  type <- if (primary$is_categorical) {
+    "set_with_surrogates"
+  } else {
+    "conditional_with_surrogates"
+  }
+
+  list(
+    type = type,
+    primary = primary_cond,
+    surrogates = surr_conds,
+    majority_match = majority_match
+  )
+}
+
+# Build simple condition with !is.na check (for usesurrogate=0)
+build_condition_simple <- function(primary, go_left) {
   if (primary$is_categorical) {
     list(
       type = "set_not_na",
@@ -313,112 +355,21 @@ build_simple_condition <- function(primary, go_left) {
   }
 }
 
-# Build path from leaf to root with surrogate information
-get_rpart_path <- function(leaf_id, info, child_info) {
-  # Trace path from leaf to root
-  path_nodes <- leaf_id
-  current <- leaf_id
-  while (current >= 0 && (current + 1) <= length(child_info)) {
-    parent <- child_info[current + 1]
-    if (parent < 0) {
-      break
-    }
-    path_nodes <- c(path_nodes, parent)
-    current <- parent
-  }
-
-  if (length(path_nodes) <= 1) {
-    return(list())
-  }
-
-  # Build conditions for each step (child -> parent)
-  conditions <- list()
-  for (i in seq_len(length(path_nodes) - 1)) {
-    child_node <- path_nodes[i]
-    parent_node <- path_nodes[i + 1]
-
-    # Find parent's index
-    parent_idx <- which(info$nodeID == parent_node)
-
-    # Is child the left or right child of parent?
-    is_left_child <- info$leftChild[parent_idx] == child_node
-
-    # Get split info for this node
-    split_info <- info$node_splits[[parent_idx]]
-    if (is.null(split_info)) {
-      next
-    }
-
-    primary <- split_info$primary
-    surrogates <- split_info$surrogates
-    majority_left <- info$majority_left[parent_idx]
-
-    # Create condition with surrogates
-    cond <- build_rpart_condition(
-      primary,
-      surrogates,
-      is_left_child,
-      majority_left
-    )
-    conditions <- c(conditions, list(cond))
-  }
-
-  rev(conditions)
-}
-
-# Build a single condition with surrogate fallbacks
-build_rpart_condition <- function(primary, surrogates, go_left, majority_left) {
-  # Always use surrogate-style condition to handle NAs correctly
-  # Even without surrogates, NAs go to majority child
-  primary_cond <- if (primary$is_categorical) {
+# Build a split condition structure (used by both surrogate and simple paths)
+build_split_condition <- function(split, go_left) {
+  if (split$is_categorical) {
     list(
-      col = primary$col,
-      vals = primary$vals,
+      col = split$col,
+      vals = split$vals,
       op = if (go_left) "in" else "not-in"
     )
   } else {
     list(
-      col = primary$col,
-      val = primary$val,
+      col = split$col,
+      val = split$val,
       op = if (go_left) "less-equal" else "more"
     )
   }
-
-  surr_conds <- map(surrogates, function(s) {
-    # Determine surrogate direction
-    # If surrogate needs_swap is TRUE, it goes opposite of primary
-    surr_go_left <- if (s$needs_swap) !go_left else go_left
-
-    if (s$is_categorical) {
-      list(
-        col = s$col,
-        vals = s$vals,
-        op = if (surr_go_left) "in" else "not-in"
-      )
-    } else {
-      list(
-        col = s$col,
-        val = s$val,
-        op = if (surr_go_left) "less-equal" else "more"
-      )
-    }
-  })
-
-  # majority_match: does this direction match where majority goes?
-  majority_match <- (go_left && majority_left) || (!go_left && !majority_left)
-
-  type <- if (primary$is_categorical) {
-    "set_with_surrogates"
-  } else {
-    "conditional_with_surrogates"
-  }
-
-  list(
-    type = type,
-    primary = primary_cond,
-    surrogates = surr_conds,
-    majority_match = majority_match
-  )
 }
 
 #' @export
@@ -445,6 +396,7 @@ tidypredict_test.rpart <- function(
   df = model$model,
   threshold = 0.000000000001,
   include_intervals = FALSE,
+
   max_rows = NULL,
   xg_df = NULL
 ) {
@@ -452,15 +404,15 @@ tidypredict_test.rpart <- function(
     df <- head(df, max_rows)
   }
 
-  # rpart uses "vector" for regression, "class" for classification
+  # rpart uses type = "vector" for regression, type = "class" for classification
   pred_type <- if (model$method == "class") "class" else "vector"
-  preds <- predict(model, df, type = pred_type)
+  base <- predict(model, df, type = pred_type)
 
-  if (pred_type == "class") {
-    preds <- as.character(preds)
+  # For classification, threshold should be 0 (exact match)
+  if (model$method == "class") {
+    threshold <- 0
+    base <- as.character(base)
   }
-
-  base <- data.frame(fit = as.vector(preds), row.names = NULL)
 
   te <- tidypredict_to_column(
     df,
@@ -468,17 +420,14 @@ tidypredict_test.rpart <- function(
     add_interval = FALSE,
     vars = c("fit_te", "upr_te", "lwr_te")
   )
-  te <- data.frame(fit_te = te[, "fit_te"])
 
-  raw_results <- cbind(base, te)
-
-  if (pred_type == "class") {
-    raw_results$fit_diff <- raw_results$fit != raw_results$fit_te
-    raw_results$fit_threshold <- raw_results$fit_diff
+  raw_results <- data.frame(fit = base, fit_te = te$fit_te)
+  raw_results$fit_diff <- if (model$method == "class") {
+    as.numeric(raw_results$fit != raw_results$fit_te)
   } else {
-    raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
-    raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
+    raw_results$fit - raw_results$fit_te
   }
+  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
 
   rowid <- seq_len(nrow(raw_results))
   raw_results <- cbind(data.frame(rowid), raw_results)
@@ -494,22 +443,14 @@ tidypredict_test.rpart <- function(
   )
 
   if (alert) {
-    if (pred_type == "class") {
-      message <- paste0(
-        message,
-        "\nMismatched predictions: ",
-        threshold_df$fit_threshold
-      )
-    } else {
-      difference <- data.frame(fit_diff = max(abs(raw_results$fit_diff)))
-      message <- paste0(
-        message,
-        "\nFitted records above the threshold: ",
-        threshold_df$fit_threshold,
-        "\n\nMax difference: ",
-        difference$fit_diff
-      )
-    }
+    difference <- max(abs(raw_results$fit_diff))
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ",
+      threshold_df$fit_threshold,
+      "\n\nMax difference: ",
+      difference
+    )
   } else {
     message <- paste0(
       message,
@@ -556,26 +497,24 @@ tidypredict_test.rpart <- function(
   probs <- yval2[, prob_cols, drop = FALSE]
   colnames(probs) <- ylevels
 
-  # Get tree structure
-  tree_info <- rpart_tree_info(model)
+  # Get tree structure with surrogate handling
+  tree_info <- rpart_tree_info_full(model)
+  parent_map <- build_parent_map(tree_info)
+  terminal_ids <- tree_info$nodeID[tree_info$terminal]
 
-  generate_one_tree <- function(tree_info) {
-    paths <- tree_info$nodeID[tree_info[, "terminal"]]
-    child_info <- get_child_info(tree_info)
-
-    paths <- map(
-      paths,
-      \(x) {
-        prediction <- tree_info$prediction[tree_info$nodeID == x]
-        if (is.null(prediction)) {
-          cli::cli_abort("Prediction column not found.")
-        }
-        list(
-          prediction = prediction,
-          path = get_ra_path(x, tree_info, child_info, FALSE)
+  generate_one_tree <- function(predictions) {
+    paths <- map(terminal_ids, function(node_id) {
+      node_idx <- which(tree_info$nodeID == node_id)
+      list(
+        prediction = predictions[node_idx],
+        path = build_rpart_path(
+          node_id,
+          tree_info,
+          parent_map,
+          use_surrogates = TRUE
         )
-      }
-    )
+      )
+    })
 
     pm <- list()
     pm$general$model <- "rpart"
@@ -591,8 +530,7 @@ tidypredict_test.rpart <- function(
 
   res <- list()
   for (i in seq_len(ncol(probs))) {
-    tree_info$prediction <- probs[, i]
-    res[[i]] <- generate_one_tree(tree_info)
+    res[[i]] <- generate_one_tree(probs[, i])
   }
   res
 }
