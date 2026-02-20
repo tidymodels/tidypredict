@@ -22,6 +22,7 @@
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
+    <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
@@ -58,12 +59,15 @@
 <h2 class="pkg-version" data-toc-text="development version" id="tidypredict-development-version">tidypredict (development version)<a class="anchor" aria-label="anchor" href="#tidypredict-development-version"></a></h2>
 <div class="section level3">
 <h3 id="new-model-supports-development-version">New Model Supports<a class="anchor" aria-label="anchor" href="#new-model-supports-development-version"></a></h3>
-<ul><li>Added support for CatBoost models (<code>catboost.Model</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/187" class="external-link">#187</a>, <a href="https://github.com/tidymodels/tidypredict/issues/188" class="external-link">#188</a>)
+<ul><li><p>Added support for rpart decision tree models (<code>rpart</code>). (<a href="https://github.com/tidymodels/tidypredict/issues/226" class="external-link">#226</a>)</p></li>
+<li>
+<p>Added support for CatBoost models (<code>catboost.Model</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/187" class="external-link">#187</a>, <a href="https://github.com/tidymodels/tidypredict/issues/188" class="external-link">#188</a>)</p>
 <ul><li>Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh, Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.</li>
 <li>Tree types: oblivious (default <code>SymmetricTree</code>) and non-oblivious (<code>Depthwise</code> or <code>Lossguide</code> grow policy).</li>
 <li>Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use <code><a href="../reference/set_catboost_categories.html">set_catboost_categories()</a></code>.</li>
 </ul></li>
-<li>Added support for LightGBM models (<code>lgb.Booster</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/186" class="external-link">#186</a>)
+<li>
+<p>Added support for LightGBM models (<code>lgb.Booster</code>). (#TBD, <a href="https://github.com/tidymodels/tidypredict/issues/186" class="external-link">#186</a>)</p>
 <ul><li>Objectives: regression, binary classification, and multiclass classification.</li>
 <li>Supports categorical features.</li>
 <li>Supports linear trees (<code>linear_tree = TRUE</code>), which fit a linear model at each leaf instead of a constant.</li>

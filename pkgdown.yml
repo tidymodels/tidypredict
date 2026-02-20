@@ -13,11 +13,12 @@ articles:
   ranger: ranger.html
   regression: regression.html
   rf: rf.html
+  rpart: rpart.html
   save: save.html
   sql: sql.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-02-19T22:48Z
+last_built: 2026-02-20T02:47Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

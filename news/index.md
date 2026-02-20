@@ -4,9 +4,13 @@
 
 ### New Model Supports
 
+- Added support for rpart decision tree models (`rpart`).
+  ([\#226](https://github.com/tidymodels/tidypredict/issues/226))
+
 - Added support for CatBoost models (`catboost.Model`). (#TBD,
   [\#187](https://github.com/tidymodels/tidypredict/issues/187),
   [\#188](https://github.com/tidymodels/tidypredict/issues/188))
+
   - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh,
     Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and
     MultiClassOneVsAll.
@@ -15,8 +19,10 @@
   - Categorical features are handled automatically for parsnip/bonsai
     models; for raw CatBoost models use
     [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md).
+
 - Added support for LightGBM models (`lgb.Booster`). (#TBD,
   [\#186](https://github.com/tidymodels/tidypredict/issues/186))
+
   - Objectives: regression, binary classification, and multiclass
     classification.
   - Supports categorical features.

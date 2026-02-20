@@ -22,6 +22,8 @@
 - [Create a regression spec - version
   2](https://tidypredict.tidymodels.org/articles/regression.md):
 - [Random Forest](https://tidypredict.tidymodels.org/articles/rf.md):
+- [Decision trees, using
+  rpart](https://tidypredict.tidymodels.org/articles/rpart.md):
 - [Save and re-load
   models](https://tidypredict.tidymodels.org/articles/save.md):
 - [Database

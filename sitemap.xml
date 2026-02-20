@@ -15,6 +15,7 @@
 <url><loc>https://tidypredict.tidymodels.org/articles/ranger.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/regression.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/rf.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/rpart.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/save.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/sql.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/tree.html</loc></url>
@@ -33,6 +34,7 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rpart_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_tree_node.html</loc></url>
