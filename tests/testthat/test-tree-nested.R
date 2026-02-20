@@ -187,3 +187,71 @@ test_that("na_handling validates input", {
     "must be one of"
   )
 })
+
+# Deep tree tests
+
+test_that("generate_nested_case_when_tree works for deep trees (depth 6+)", {
+  skip_if_not_installed("rpart")
+
+  ctrl <- rpart::rpart.control(cp = 0.001, minsplit = 2, maxdepth = 10)
+  model <- rpart::rpart(
+    Sepal.Length ~ Sepal.Width + Petal.Length + Petal.Width,
+    data = iris,
+    control = ctrl
+  )
+
+  tree_info <- rpart_tree_info_full(model)
+  n_nodes <- length(tree_info$nodeID)
+  expect_gt(n_nodes, 10)
+
+  nested_expr <- generate_nested_case_when_tree(tree_info)
+  nested_pred <- dplyr::mutate(iris, pred = !!nested_expr)$pred
+  original_pred <- predict(model, iris)
+
+  expect_equal(nested_pred, unname(original_pred))
+})
+
+# Nested vs flat comparison tests
+
+test_that("nested and flat produce identical predictions for rpart regression", {
+  skip_if_not_installed("rpart")
+
+  model <- rpart::rpart(mpg ~ ., data = mtcars)
+
+  flat_expr <- tidypredict_fit(model, nested = FALSE)
+  nested_expr <- tidypredict_fit(model, nested = TRUE)
+
+  flat_pred <- dplyr::mutate(mtcars, pred = !!flat_expr)$pred
+  nested_pred <- dplyr::mutate(mtcars, pred = !!nested_expr)$pred
+
+  expect_equal(nested_pred, flat_pred)
+})
+
+test_that("nested and flat produce identical predictions for rpart classification", {
+  skip_if_not_installed("rpart")
+
+  model <- rpart::rpart(Species ~ ., data = iris, method = "class")
+
+  flat_expr <- tidypredict_fit(model, nested = FALSE)
+  nested_expr <- tidypredict_fit(model, nested = TRUE)
+
+  flat_pred <- dplyr::mutate(iris, pred = !!flat_expr)$pred
+  nested_pred <- dplyr::mutate(iris, pred = !!nested_expr)$pred
+
+  expect_equal(nested_pred, flat_pred)
+})
+
+test_that("nested expression is more compact than flat for deep trees", {
+  skip_if_not_installed("rpart")
+
+  ctrl <- rpart::rpart.control(cp = 0.01, minsplit = 2)
+  model <- rpart::rpart(Sepal.Length ~ ., data = iris, control = ctrl)
+
+  flat_expr <- tidypredict_fit(model, nested = FALSE)
+  nested_expr <- tidypredict_fit(model, nested = TRUE)
+
+  flat_chars <- nchar(rlang::expr_deparse(flat_expr, width = Inf))
+  nested_chars <- nchar(rlang::expr_deparse(nested_expr, width = Inf))
+
+  expect_lt(nested_chars, flat_chars)
+})
