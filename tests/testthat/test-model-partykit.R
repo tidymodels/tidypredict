@@ -161,3 +161,18 @@ test_that(".extract_partykit_classprob with nested = TRUE matches flat", {
 
   expect_equal(nested_probs, flat_probs)
 })
+
+test_that(".partykit_tree_info_full is exported and works", {
+  model <- partykit::ctree(mpg ~ cyl + wt, data = mtcars)
+
+  tree_info <- .partykit_tree_info_full(model)
+
+  expect_type(tree_info, "list")
+  expect_named(
+    tree_info,
+    c(
+      "nodeID", "leftChild", "rightChild", "splitvarName", "terminal",
+      "prediction", "node_splits", "majority_left", "use_surrogates"
+    )
+  )
+})

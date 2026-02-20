@@ -1,3 +1,15 @@
+# For {orbital}
+#' Extract comprehensive tree info for rpart models
+#'
+#' Returns tree structure in format needed by nested case_when generator.
+#' For use in orbital package.
+#' @param model An rpart model object
+#' @keywords internal
+#' @export
+.rpart_tree_info_full <- function(model) {
+  rpart_tree_info_full(model)
+}
+
 # Extract comprehensive tree info including surrogate splits
 rpart_tree_info_full <- function(model) {
   frame <- model$frame

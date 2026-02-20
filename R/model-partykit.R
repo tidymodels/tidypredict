@@ -1,3 +1,15 @@
+# For {orbital}
+#' Extract comprehensive tree info for partykit models
+#'
+#' Returns tree structure in format needed by nested case_when generator.
+#' For use in orbital package.
+#' @param model A partykit model object
+#' @keywords internal
+#' @export
+.partykit_tree_info_full <- function(model) {
+  partykit_tree_info_full(model)
+}
+
 # Convert partykit tree info to the format needed by nested generator
 partykit_tree_info_full <- function(model) {
   tree_df <- partykit_tree_info(model)
