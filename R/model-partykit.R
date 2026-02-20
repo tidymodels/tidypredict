@@ -1,3 +1,54 @@
+# Convert partykit tree info to the format needed by nested generator
+partykit_tree_info_full <- function(model) {
+  tree_df <- partykit_tree_info(model)
+
+  # Build node_splits list in the format expected by nested generator
+  node_splits <- vector("list", nrow(tree_df))
+
+  for (i in seq_len(nrow(tree_df))) {
+    if (!tree_df$terminal[i]) {
+      var_name <- tree_df$splitvarName[i]
+
+      if (!is.na(tree_df$splitclass[i])) {
+        # Categorical split
+        vals <- strsplit(tree_df$splitclass[i], ", ")[[1]]
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            vals = as.list(vals),
+            is_categorical = TRUE,
+            needs_swap = FALSE
+          ),
+          surrogates = list()
+        )
+      } else {
+        # Continuous split
+        node_splits[[i]] <- list(
+          primary = list(
+            col = var_name,
+            val = tree_df$splitval[i],
+            is_categorical = FALSE,
+            needs_swap = FALSE
+          ),
+          surrogates = list()
+        )
+      }
+    }
+  }
+
+  list(
+    nodeID = tree_df$nodeID,
+    leftChild = tree_df$leftChild,
+    rightChild = tree_df$rightChild,
+    splitvarName = tree_df$splitvarName,
+    terminal = tree_df$terminal,
+    prediction = tree_df$prediction,
+    node_splits = node_splits,
+    majority_left = rep(NA, nrow(tree_df)),
+    use_surrogates = FALSE
+  )
+}
+
 partykit_tree_info <- function(model) {
   model_nodes <- map(seq_along(model), ~ model[[.x]])
   is_split <- map_lgl(model_nodes, ~ class(.x$node[1]) == "partynode")
@@ -118,20 +169,32 @@ parse_model.party <- function(model) {
 # Fit formula -----------------------------------
 
 #' @export
-tidypredict_fit.party <- function(model) {
-  parsedmodel <- parse_model(model)
-  tree <- parsedmodel$trees[[1]]
-  mode <- parsedmodel$general$mode
-  generate_case_when_tree(tree, mode)
+tidypredict_fit.party <- function(model, nested = FALSE, na_handling = "none") {
+  if (nested) {
+    tree_info <- partykit_tree_info_full(model)
+    generate_nested_case_when_tree(tree_info, na_handling = na_handling)
+  } else {
+    parsedmodel <- parse_model(model)
+    tree <- parsedmodel$trees[[1]]
+    mode <- parsedmodel$general$mode
+    generate_case_when_tree(tree, mode)
+  }
 }
 
 # For {orbital}
 #' Extract classprob trees for partykit models
 #'
 #' For use in orbital package.
+#' @param model A partykit model object
+#' @param nested Logical, whether to use nested case_when (default FALSE)
+#' @param na_handling How to handle NA values when nested = TRUE
 #' @keywords internal
 #' @export
-.extract_partykit_classprob <- function(model) {
+.extract_partykit_classprob <- function(
+  model,
+  nested = FALSE,
+  na_handling = "none"
+) {
   if (!inherits(model, "party")) {
     cli::cli_abort(
       "{.arg model} must be {.cls party}, not {.obj_type_friendly {model}}."
@@ -159,47 +222,62 @@ tidypredict_fit.party <- function(model) {
     dimnames = list(NULL, names(preds[[1]]))
   )
 
-  generate_one_tree <- function(tree_info) {
-    paths <- tree_info$nodeID[tree_info[, "terminal"]]
+  if (nested) {
+    tree_info_full <- partykit_tree_info_full(model)
 
-    child_info <- get_child_info(tree_info)
+    res <- list()
+    for (i in seq_len(ncol(preds))) {
+      tree_info_copy <- tree_info_full
+      tree_info_copy$prediction <- preds[, i]
+      res[[i]] <- generate_nested_case_when_tree(
+        tree_info_copy,
+        na_handling = na_handling
+      )
+    }
+    res
+  } else {
+    generate_one_tree_flat <- function(tree_info) {
+      paths <- tree_info$nodeID[tree_info[, "terminal"]]
 
-    paths <- map(
-      paths,
-      ~ {
-        prediction <- tree_info$prediction[tree_info$nodeID == .x]
-        if (is.null(prediction)) {
-          cli::cli_abort("Prediction column not found.")
+      child_info <- get_child_info(tree_info)
+
+      paths <- map(
+        paths,
+        ~ {
+          prediction <- tree_info$prediction[tree_info$nodeID == .x]
+          if (is.null(prediction)) {
+            cli::cli_abort("Prediction column not found.")
+          }
+          if (is.factor(prediction)) {
+            prediction <- as.character(prediction)
+          }
+          list(
+            prediction = prediction,
+            path = get_ra_path(.x, tree_info, child_info, FALSE)
+          )
         }
-        if (is.factor(prediction)) {
-          prediction <- as.character(prediction)
-        }
-        list(
-          prediction = prediction,
-          path = get_ra_path(.x, tree_info, child_info, FALSE)
-        )
-      }
-    )
+      )
 
-    classes <- attr(model$terms, "dataClasses")
-    pm <- list()
-    pm$general$model <- "party"
-    pm$general$type <- "tree"
-    pm$general$version <- 2
-    pm$trees <- list(paths)
-    parsedmodel <- as_parsed_model(pm)
+      classes <- attr(model$terms, "dataClasses")
+      pm <- list()
+      pm$general$model <- "party"
+      pm$general$type <- "tree"
+      pm$general$version <- 2
+      pm$trees <- list(paths)
+      parsedmodel <- as_parsed_model(pm)
 
-    tree <- parsedmodel$trees[[1]]
-    mode <- parsedmodel$general$mode
-    generate_case_when_tree(tree, mode)
+      tree <- parsedmodel$trees[[1]]
+      mode <- parsedmodel$general$mode
+      generate_case_when_tree(tree, mode)
+    }
+
+    tree_info <- partykit_tree_info(model)
+
+    res <- list()
+    for (i in seq_len(ncol(preds))) {
+      tree_info$prediction <- preds[, i]
+      res[[i]] <- generate_one_tree_flat(tree_info)
+    }
+    res
   }
-
-  tree_info <- partykit_tree_info(model)
-
-  res <- list()
-  for (i in seq_len(ncol(preds))) {
-    tree_info$prediction <- preds[, i]
-    res[[i]] <- generate_one_tree(tree_info)
-  }
-  res
 }
