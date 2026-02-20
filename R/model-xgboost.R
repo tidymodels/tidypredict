@@ -30,6 +30,7 @@ get_xgb_path <- function(row_id, tree) {
 get_xgb_path_fun <- function(.x, .y, tree) {
   yes <- tree$Yes[[.y]]
   no <- tree$No[[.y]]
+
   missing <- tree$Missing[[.y]]
   if (yes %in% .x) {
     op <- "more-equal"
@@ -152,113 +153,7 @@ parse_model.xgb.Booster <- function(model) {
   as_parsed_model(pm)
 }
 
-# Fit model -----------------------------------------------
-
-get_xgb_case <- function(path, prediction) {
-  conditions <- map(path, get_xgb_case_fun)
-  cl <- combine_path_conditions(conditions)
-  expr(!!cl ~ !!prediction)
-}
-
-get_xgb_case_fun <- function(.x) {
-  if (.x$op == "less") {
-    if (.x$missing) {
-      i <- expr(
-        (!!as.name(.x$col) >= !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
-      )
-    } else {
-      i <- expr(!!as.name(.x$col) >= !!as.numeric(.x$val))
-    }
-  } else if (.x$op == "more-equal") {
-    if (.x$missing) {
-      i <- expr(
-        (!!as.name(.x$col) < !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
-      )
-    } else {
-      i <- expr(!!as.name(.x$col) < !!as.numeric(.x$val))
-    }
-  }
-  i
-}
-
-get_xgb_case_tree <- function(tree_no, parsedmodel) {
-  map(
-    parsedmodel$trees[[tree_no]],
-    ~ get_xgb_case(.x$path, .x$prediction)
-  )
-}
-
-build_fit_formula_xgb <- function(parsedmodel) {
-  f <- map(
-    seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
-  )
-
-  # Apply DART weight_drop if present
-  f <- apply_dart_weights(f, parsedmodel$general$weight_drop)
-
-  # additive model
-  f <- reduce_addition(f)
-
-  base_score <- parsedmodel$general$params$base_score
-  if (is.null(base_score)) {
-    base_score <- 0.5
-  }
-
-  objective <- parsedmodel$general$params$objective
-  assigned <- 0
-  if (is.null(objective)) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-    cli::cli_warn(
-      "If the objective is a custom function, 
-      please explicitly apply it to the output."
-    )
-  } else if (
-    objective %in%
-      c(
-        "reg:squarederror",
-        "reg:squaredlogerror",
-        "binary:logitraw"
-      )
-  ) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-  } else if (objective %in% c("binary:logistic", "reg:logistic")) {
-    assigned <- 1
-    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
-  } else if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
-    assigned <- 1
-    f <- expr(!!base_score * exp(!!f))
-  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-  } else if (objective == "binary:hinge") {
-    assigned <- 1
-    # binary:hinge returns 0 or 1 based on margin sign
-    f <- expr(as.numeric((!!f + !!base_score) >= 0))
-  }
-  if (assigned == 0) {
-    cli::cli_abort(
-      c(
-        "Objective {.val {objective}} is not supported.",
-        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
-        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
-        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
-        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
-        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
-        are not supported."
-      )
-    )
-  }
-  f
-}
+# Shared helpers -----------------------------------------------
 
 apply_dart_weights <- function(trees, weight_drop) {
   if (!is.null(weight_drop) && !all(weight_drop == 1)) {
@@ -295,12 +190,14 @@ get_xgb_json_params <- function(model) {
   )
 }
 
+# Fit model (nested) -----------------------------------------------
+
 #' @export
 tidypredict_fit.xgb.Booster <- function(model, ...) {
   build_fit_formula_xgb_nested(model)
 }
 
-# Build nested xgboost formula
+# Build nested xgboost formula (from model directly)
 build_fit_formula_xgb_nested <- function(model) {
   trees_nested <- extract_xgb_trees_nested(model)
 
@@ -319,53 +216,7 @@ build_fit_formula_xgb_nested <- function(model) {
   params <- attr(model, "param") %||% model$params
   objective <- params$objective
 
-  assigned <- 0
-  if (is.null(objective)) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-    cli::cli_warn(
-      "If the objective is a custom function,
-      please explicitly apply it to the output."
-    )
-  } else if (
-    objective %in%
-      c("reg:squarederror", "reg:squaredlogerror", "binary:logitraw")
-  ) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-  } else if (objective %in% c("binary:logistic", "reg:logistic")) {
-    assigned <- 1
-    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
-  } else if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
-    assigned <- 1
-    f <- expr(!!base_score * exp(!!f))
-  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-  } else if (objective == "binary:hinge") {
-    assigned <- 1
-    f <- expr(as.numeric((!!f + !!base_score) >= 0))
-  }
-  if (assigned == 0) {
-    cli::cli_abort(
-      c(
-        "Objective {.val {objective}} is not supported.",
-        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
-        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
-        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
-        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
-        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
-        are not supported."
-      )
-    )
-  }
-  f
+  apply_xgb_objective(f, objective, base_score)
 }
 
 # Build nested formula from parsed xgboost model (version 3)
@@ -389,9 +240,12 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
 
   objective <- parsedmodel$general$params$objective
 
-  assigned <- 0
+  apply_xgb_objective(f, objective, base_score)
+}
+
+# Apply xgboost objective transformation to formula
+apply_xgb_objective <- function(f, objective, base_score) {
   if (is.null(objective)) {
-    assigned <- 1
     if (base_score != 0) {
       f <- expr_addition(f, base_score)
     }
@@ -399,43 +253,51 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
       "If the objective is a custom function,
       please explicitly apply it to the output."
     )
-  } else if (
+    return(f)
+  }
+
+  if (
     objective %in%
       c("reg:squarederror", "reg:squaredlogerror", "binary:logitraw")
   ) {
-    assigned <- 1
     if (base_score != 0) {
       f <- expr_addition(f, base_score)
     }
-  } else if (objective %in% c("binary:logistic", "reg:logistic")) {
-    assigned <- 1
-    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
-  } else if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
-    assigned <- 1
-    f <- expr(!!base_score * exp(!!f))
-  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
-    assigned <- 1
-    if (base_score != 0) {
-      f <- expr_addition(f, base_score)
-    }
-  } else if (objective == "binary:hinge") {
-    assigned <- 1
-    f <- expr(as.numeric((!!f + !!base_score) >= 0))
+    return(f)
   }
-  if (assigned == 0) {
-    cli::cli_abort(
-      c(
-        "Objective {.val {objective}} is not supported.",
-        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
-        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
-        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
-        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
-        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
-        are not supported."
-      )
+
+  if (objective %in% c("binary:logistic", "reg:logistic")) {
+    return(expr(
+      1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score))))
+    ))
+  }
+
+  if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
+    return(expr(!!base_score * exp(!!f)))
+  }
+
+  if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+    return(f)
+  }
+
+  if (objective == "binary:hinge") {
+    return(expr(as.numeric((!!f + !!base_score) >= 0)))
+  }
+
+  cli::cli_abort(
+    c(
+      "Objective {.val {objective}} is not supported.",
+      i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
+      {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
+      {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
+      {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
+      i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
+      are not supported."
     )
-  }
-  f
+  )
 }
 
 # Build condition for xgboost nested generation from path element
@@ -541,7 +403,68 @@ build_nested_xgb_node <- function(node_idx, tree_df) {
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
-# For {orbital}
+# Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
+# These functions generate flat case_when expressions and are preserved for
+# backwards compatibility when loading parsed models saved with version < 3.
+
+get_xgb_case <- function(path, prediction) {
+  conditions <- map(path, get_xgb_case_fun)
+  cl <- combine_path_conditions(conditions)
+  expr(!!cl ~ !!prediction)
+}
+
+get_xgb_case_fun <- function(.x) {
+  if (.x$op == "less") {
+    if (.x$missing) {
+      i <- expr(
+        (!!as.name(.x$col) >= !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
+      )
+    } else {
+      i <- expr(!!as.name(.x$col) >= !!as.numeric(.x$val))
+    }
+  } else if (.x$op == "more-equal") {
+    if (.x$missing) {
+      i <- expr(
+        (!!as.name(.x$col) < !!as.numeric(.x$val) | is.na(!!as.name(.x$col)))
+      )
+    } else {
+      i <- expr(!!as.name(.x$col) < !!as.numeric(.x$val))
+    }
+  }
+  i
+}
+
+get_xgb_case_tree <- function(tree_no, parsedmodel) {
+  map(
+    parsedmodel$trees[[tree_no]],
+    ~ get_xgb_case(.x$path, .x$prediction)
+  )
+}
+
+build_fit_formula_xgb <- function(parsedmodel) {
+  f <- map(
+    seq_len(length(parsedmodel$trees)),
+    ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
+  )
+
+  # Apply DART weight_drop if present
+  f <- apply_dart_weights(f, parsedmodel$general$weight_drop)
+
+  # additive model
+  f <- reduce_addition(f)
+
+  base_score <- parsedmodel$general$params$base_score
+  if (is.null(base_score)) {
+    base_score <- 0.5
+  }
+
+  objective <- parsedmodel$general$params$objective
+
+  apply_xgb_objective(f, objective, base_score)
+}
+
+# For {orbital} -----------------------------------------------
+
 #' Extract processed xgboost trees
 #'
 #' For use in orbital package.

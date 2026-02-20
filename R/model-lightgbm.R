@@ -310,7 +310,72 @@ parse_lgb_categorical_threshold <- function(threshold) {
   as.integer(strsplit(threshold, "[|][|]")[[1]])
 }
 
-# Fit model -----------------------------------------------
+# Shared helpers -----------------------------------------------
+
+# Helper for sigmoid transformation
+lgb_sigmoid <- function(f) {
+  expr(1 / (1 + exp(-(!!f))))
+}
+
+# Build linear prediction formula: intercept + sum(coeff * feature)
+# LightGBM uses fallback leaf_value when ANY feature in the formula is NA
+build_lgb_linear_prediction <- function(linear) {
+  intercept <- linear$intercept
+  feature_names <- linear$feature_names
+  coefficients <- linear$coefficients
+  fallback <- linear$fallback
+
+  if (length(feature_names) == 0) {
+    # No features, just return intercept
+    return(intercept)
+  }
+
+  # Build the linear formula: intercept + sum(coeff * feature)
+  terms <- map(seq_along(feature_names), function(i) {
+    feat <- as.name(feature_names[i])
+    coef <- coefficients[i]
+    expr(!!coef * !!feat)
+  })
+  all_terms <- c(list(intercept), terms)
+  linear_formula <- reduce_addition(all_terms)
+
+  # Build condition: any feature is NA
+  na_checks <- map(feature_names, function(fn) {
+    feat <- as.name(fn)
+    expr(is.na(!!feat))
+  })
+  any_na <- if (length(na_checks) == 1) {
+    na_checks[[1]]
+  } else {
+    reduce_or(na_checks)
+  }
+
+  # If any feature is NA, use fallback; otherwise use linear formula
+  expr(ifelse(!!any_na, !!fallback, !!linear_formula))
+}
+
+# Apply lightgbm objective transformation to formula
+apply_lgb_objective <- function(f, objective, params) {
+  # RF boosting averages trees instead of summing
+  boosting <- params$boosting
+  if (!is.null(boosting) && boosting == "rf") {
+    # f is already averaged by caller
+  }
+
+  # Apply transformation
+  if (objective %in% lgb_exp_objectives) {
+    return(expr(exp(!!f)))
+  }
+
+  if (objective %in% lgb_sigmoid_objectives) {
+    return(lgb_sigmoid(f))
+  }
+
+  # Identity objectives - return as-is
+  f
+}
+
+# Fit model (nested) -----------------------------------------------
 
 #' @export
 tidypredict_fit.lgb.Booster <- function(model, ...) {
@@ -318,7 +383,92 @@ tidypredict_fit.lgb.Booster <- function(model, ...) {
   build_fit_formula_lgb_nested(parsedmodel, model)
 }
 
-# Nested formula builder for lightgbm (from parsed model)
+# Nested formula builder for lightgbm (from model directly)
+build_fit_formula_lgb_nested <- function(parsedmodel, model) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective %||% "regression"
+
+  if (!objective %in% lgb_supported_objectives) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
+      )
+    )
+  }
+
+  if (objective %in% lgb_multiclass_objectives) {
+    return(build_fit_formula_lgb_multiclass_nested(
+      parsedmodel,
+      model,
+      objective
+    ))
+  }
+
+  # Extract nested trees
+  trees <- extract_lgb_trees_nested(model)
+
+  # RF boosting averages trees instead of summing
+  boosting <- parsedmodel$general$params$boosting
+  if (!is.null(boosting) && boosting == "rf") {
+    f <- reduce_addition(trees)
+    f <- expr_division(f, n_trees)
+  } else {
+    f <- reduce_addition(trees)
+  }
+
+  apply_lgb_objective(f, objective, parsedmodel$general$params)
+}
+
+build_fit_formula_lgb_multiclass_nested <- function(
+  parsedmodel,
+  model,
+  objective
+) {
+  n_trees <- length(parsedmodel$trees)
+  num_class <- parsedmodel$general$num_class
+
+  if (is.null(num_class) || num_class < 2) {
+    cli::cli_abort("Multiclass model must have num_class >= 2.")
+  }
+
+  # Extract all nested trees
+  trees <- extract_lgb_trees_nested(model)
+
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  # Build raw score formula for each class
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+
+  # Apply transformation based on objective
+  if (objective == "multiclass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else if (objective == "multiclassova") {
+    # One-vs-all: sigmoid for each class independently
+    result <- map(raw_scores, lgb_sigmoid)
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
+# Nested formula builder for lightgbm (from parsed model, version 3)
 build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
   n_trees <- length(parsedmodel$trees)
 
@@ -355,14 +505,7 @@ build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
     f <- reduce_addition(trees)
   }
 
-  # Apply transformation
-  if (objective %in% lgb_exp_objectives) {
-    f <- expr(exp(!!f))
-  } else if (objective %in% lgb_sigmoid_objectives) {
-    f <- lgb_sigmoid(f)
-  }
-
-  f
+  apply_lgb_objective(f, objective, parsedmodel$general$params)
 }
 
 build_fit_formula_lgb_multiclass_from_parsed <- function(
@@ -416,121 +559,23 @@ build_lgb_nested_condition <- function(path_elem) {
 
   if (path_elem$type == "conditional") {
     val <- as.numeric(path_elem$val)
-    if (path_elem$op == "less-equal") {
-      if (missing) {
-        expr(!!col <= !!val | is.na(!!col))
-      } else {
-        expr(!!col <= !!val)
-      }
+    # For nested generation, we only build the left condition (less-equal)
+    if (missing) {
+      expr(!!col <= !!val | is.na(!!col))
     } else {
       expr(!!col <= !!val)
     }
   } else if (path_elem$type == "set") {
     vals <- unlist(path_elem$vals)
-    if (path_elem$op == "in") {
-      if (missing) {
-        expr(!!col %in% !!vals | is.na(!!col))
-      } else {
-        expr(!!col %in% !!vals)
-      }
+    # For nested generation, we only build the left condition (in)
+    if (missing) {
+      expr(!!col %in% !!vals | is.na(!!col))
     } else {
       expr(!!col %in% !!vals)
     }
   } else {
     cli::cli_abort("Unknown path element type: {.val {path_elem$type}}")
   }
-}
-
-# Nested formula builder for lightgbm (from model directly)
-build_fit_formula_lgb_nested <- function(parsedmodel, model) {
-  n_trees <- length(parsedmodel$trees)
-
-  if (n_trees == 0) {
-    cli::cli_abort("Model has no trees.")
-  }
-
-  objective <- parsedmodel$general$params$objective %||% "regression"
-
-  if (!objective %in% lgb_supported_objectives) {
-    cli::cli_abort(
-      c(
-        "Unsupported objective: {.val {objective}}.",
-        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
-      )
-    )
-  }
-
-  if (objective %in% lgb_multiclass_objectives) {
-    return(build_fit_formula_lgb_multiclass_nested(
-      parsedmodel,
-      model,
-      objective
-    ))
-  }
-
-  # Extract nested trees
-  trees <- extract_lgb_trees_nested(model)
-
-  # RF boosting averages trees instead of summing
-  boosting <- parsedmodel$general$params$boosting
-  if (!is.null(boosting) && boosting == "rf") {
-    f <- reduce_addition(trees)
-    f <- expr_division(f, n_trees)
-  } else {
-    f <- reduce_addition(trees)
-  }
-
-  # Apply transformation
-  if (objective %in% lgb_exp_objectives) {
-    f <- expr(exp(!!f))
-  } else if (objective %in% lgb_sigmoid_objectives) {
-    f <- lgb_sigmoid(f)
-  }
-
-  f
-}
-
-build_fit_formula_lgb_multiclass_nested <- function(
-  parsedmodel,
-  model,
-  objective
-) {
-  n_trees <- length(parsedmodel$trees)
-  num_class <- parsedmodel$general$num_class
-
-  if (is.null(num_class) || num_class < 2) {
-    cli::cli_abort("Multiclass model must have num_class >= 2.")
-  }
-
-  # Extract all nested trees
-  trees <- extract_lgb_trees_nested(model)
-
-  # Group trees by class: tree i belongs to class (i-1) %% num_class
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
-
-  # Build raw score formula for each class
-  raw_scores <- lapply(class_trees, function(indices) {
-    reduce_addition(trees[indices])
-  })
-
-  # Apply transformation based on objective
-  if (objective == "multiclass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else if (objective == "multiclassova") {
-    # One-vs-all: sigmoid for each class independently
-    result <- map(raw_scores, lgb_sigmoid)
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
 }
 
 # Extract trees in nested format
@@ -663,6 +708,10 @@ build_nested_lgb_node <- function(
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
+# Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
+# These functions generate flat case_when expressions and are preserved for
+# backwards compatibility when loading parsed models saved with version < 3.
+
 build_fit_formula_lgb <- function(parsedmodel) {
   n_trees <- length(parsedmodel$trees)
 
@@ -694,14 +743,7 @@ build_fit_formula_lgb <- function(parsedmodel) {
     f <- expr_division(f, n_trees)
   }
 
-  # Apply transformation
-  if (objective %in% lgb_exp_objectives) {
-    f <- expr(exp(!!f))
-  } else if (objective %in% lgb_sigmoid_objectives) {
-    f <- lgb_sigmoid(f)
-  }
-
-  f
+  apply_lgb_objective(f, objective, parsedmodel$general$params)
 }
 
 build_fit_formula_lgb_multiclass <- function(parsedmodel, objective) {
@@ -757,11 +799,6 @@ build_lgb_tree_sum <- function(tree_indices, parsedmodel) {
   reduce_addition(tree_formulas)
 }
 
-# Helper for sigmoid transformation
-lgb_sigmoid <- function(f) {
-  expr(1 / (1 + exp(-(!!f))))
-}
-
 get_lgb_case_tree <- function(tree_no, parsedmodel) {
   map(
     parsedmodel$trees[[tree_no]],
@@ -778,60 +815,6 @@ get_lgb_case <- function(path, prediction, linear = NULL) {
     prediction
   }
   expr(!!cl ~ !!pred_expr)
-}
-
-# Build linear prediction formula: intercept + sum(coeff * feature)
-# LightGBM uses fallback leaf_value when ANY feature in the formula is NA
-build_lgb_linear_prediction <- function(linear) {
-  intercept <- linear$intercept
-  feature_names <- linear$feature_names
-  coefficients <- linear$coefficients
-  fallback <- linear$fallback
-
-  if (length(feature_names) == 0) {
-    # No features, just return intercept
-    return(intercept)
-  }
-
-  # Build the linear formula: intercept + sum(coeff * feature)
-  terms <- map(seq_along(feature_names), function(i) {
-    feat <- as.name(feature_names[i])
-    coef <- coefficients[i]
-    expr(!!coef * !!feat)
-  })
-  all_terms <- c(list(intercept), terms)
-  linear_formula <- reduce_addition(all_terms)
-
-  # Build condition: any feature is NA
-  na_checks <- map(feature_names, function(fn) {
-    feat <- as.name(fn)
-    expr(is.na(!!feat))
-  })
-  any_na <- if (length(na_checks) == 1) {
-    na_checks[[1]]
-  } else {
-    reduce_or(na_checks)
-  }
-
-  # If any feature is NA, use fallback; otherwise use linear formula
-  expr(ifelse(!!any_na, !!fallback, !!linear_formula))
-}
-
-# For {orbital}
-#' Extract processed LightGBM trees
-#'
-#' For use in orbital package.
-#' @param model A LightGBM model object
-#' @keywords internal
-#' @export
-.extract_lgb_trees <- function(model) {
-  if (!inherits(model, "lgb.Booster")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
-    )
-  }
-
-  extract_lgb_trees_nested(model)
 }
 
 get_lgb_case_fun <- function(.x) {
@@ -882,4 +865,22 @@ add_missing_condition <- function(base_expr, col_name, include_missing) {
   } else {
     base_expr
   }
+}
+
+# For {orbital} -----------------------------------------------
+
+#' Extract processed LightGBM trees
+#'
+#' For use in orbital package.
+#' @param model A LightGBM model object
+#' @keywords internal
+#' @export
+.extract_lgb_trees <- function(model) {
+  if (!inherits(model, "lgb.Booster")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  extract_lgb_trees_nested(model)
 }

@@ -669,7 +669,41 @@ get_catboost_missing <- function(nan_treatment, op) {
   }
 }
 
-# Fit model -----------------------------------------------
+# Shared helpers -----------------------------------------------
+
+# Apply catboost scale and bias to formula
+apply_catboost_scale_bias <- function(formula, parsedmodel) {
+  scale <- parsedmodel$general$scale %||% 1
+  bias <- parsedmodel$general$bias %||% 0
+
+  if (scale != 1) {
+    formula <- expr(!!scale * (!!formula))
+  }
+  if (bias != 0) {
+    formula <- expr(!!formula + !!bias)
+  }
+  formula
+}
+
+# Build a combined hash -> category mapping from all categorical features
+get_catboost_cat_mapping <- function(parsedmodel) {
+  cat_features <- parsedmodel$general$cat_features
+  if (length(cat_features) == 0) {
+    return(list())
+  }
+
+  mapping <- list()
+  for (feat in cat_features) {
+    if (!is.null(feat$hash_to_category)) {
+      for (hash_str in names(feat$hash_to_category)) {
+        mapping[[hash_str]] <- feat$hash_to_category[[hash_str]]
+      }
+    }
+  }
+  mapping
+}
+
+# Fit model (nested) -----------------------------------------------
 
 #' @export
 tidypredict_fit.catboost.Model <- function(model, ...) {
@@ -727,55 +761,6 @@ build_catboost_parsnip_mapping_data <- function(xlevels, cat_feature_names) {
   }
 
   mapping_data
-}
-
-build_fit_formula_catboost <- function(parsedmodel) {
-  n_trees <- length(parsedmodel$trees)
-
-  if (n_trees == 0) {
-    cli::cli_abort("Model has no trees.")
-  }
-
-  objective <- parsedmodel$general$params$objective %||% "RMSE"
-
-  if (!objective %in% catboost_supported_objectives) {
-    cli::cli_abort(
-      c(
-        "Unsupported objective: {.val {objective}}.",
-        "i" = "Supported objectives: {.val {catboost_supported_objectives}}."
-      )
-    )
-  }
-
-  if (objective %in% catboost_multiclass_objectives) {
-    return(build_fit_formula_catboost_multiclass(parsedmodel, objective))
-  }
-
-  tree_formulas <- map(
-    seq_len(n_trees),
-    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
-  )
-  f <- reduce_addition(tree_formulas)
-  f <- apply_catboost_scale_bias(f, parsedmodel)
-
-  if (objective %in% catboost_sigmoid_objectives) {
-    f <- expr(1 / (1 + exp(-(!!f))))
-  }
-
-  f
-}
-
-apply_catboost_scale_bias <- function(formula, parsedmodel) {
-  scale <- parsedmodel$general$scale %||% 1
-  bias <- parsedmodel$general$bias %||% 0
-
-  if (scale != 1) {
-    formula <- expr(!!scale * (!!formula))
-  }
-  if (bias != 0) {
-    formula <- expr(!!formula + !!bias)
-  }
-  formula
 }
 
 # Nested formula builders for CatBoost -----------------------------------------
@@ -1064,6 +1049,46 @@ build_nested_catboost_categorical <- function(split_info, cat_mapping) {
   expr(!!col_name == !!category)
 }
 
+# Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
+# These functions generate flat case_when expressions and are preserved for
+# backwards compatibility when loading parsed models saved with version < 3.
+
+build_fit_formula_catboost <- function(parsedmodel) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective %||% "RMSE"
+
+  if (!objective %in% catboost_supported_objectives) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {catboost_supported_objectives}}."
+      )
+    )
+  }
+
+  if (objective %in% catboost_multiclass_objectives) {
+    return(build_fit_formula_catboost_multiclass(parsedmodel, objective))
+  }
+
+  tree_formulas <- map(
+    seq_len(n_trees),
+    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+  )
+  f <- reduce_addition(tree_formulas)
+  f <- apply_catboost_scale_bias(f, parsedmodel)
+
+  if (objective %in% catboost_sigmoid_objectives) {
+    f <- expr(1 / (1 + exp(-(!!f))))
+  }
+
+  f
+}
+
 build_fit_formula_catboost_multiclass <- function(parsedmodel, objective) {
   n_trees <- length(parsedmodel$trees)
   num_class <- parsedmodel$general$num_class
@@ -1116,24 +1141,6 @@ get_catboost_case_tree <- function(tree_no, parsedmodel) {
     parsedmodel$trees[[tree_no]],
     function(leaf) get_catboost_case(leaf$path, leaf$prediction, cat_mapping)
   )
-}
-
-# Build a combined hash -> category mapping from all categorical features
-get_catboost_cat_mapping <- function(parsedmodel) {
-  cat_features <- parsedmodel$general$cat_features
-  if (length(cat_features) == 0) {
-    return(list())
-  }
-
-  mapping <- list()
-  for (feat in cat_features) {
-    if (!is.null(feat$hash_to_category)) {
-      for (hash_str in names(feat$hash_to_category)) {
-        mapping[[hash_str]] <- feat$hash_to_category[[hash_str]]
-      }
-    }
-  }
-  mapping
 }
 
 get_catboost_case <- function(path, prediction, cat_mapping = list()) {
@@ -1217,7 +1224,8 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
   i
 }
 
-# For {orbital}
+# For {orbital} -----------------------------------------------
+
 #' Extract processed CatBoost trees
 #'
 #' For use in orbital package.

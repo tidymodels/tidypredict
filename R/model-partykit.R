@@ -143,6 +143,30 @@ partykit_tree_info <- function(model) {
   )
 }
 
+#' @export
+parse_model.party <- function(model) {
+  pm <- list()
+  pm$general$model <- "party"
+  pm$general$type <- "tree"
+  pm$general$version <- 3
+  pm$tree_info <- partykit_tree_info_full(model)
+  as_parsed_model(pm)
+}
+
+# Fit formula -----------------------------------
+
+#' @export
+tidypredict_fit.party <- function(model, ...) {
+  tree_info <- partykit_tree_info_full(model)
+  generate_nested_case_when_tree(tree_info)
+}
+
+# Legacy tree extraction (no longer used) ---------------------------
+# This function was used by the old approach to populate pm$trees in flat path
+# format. Now parse_model.party() uses partykit_tree_info_full() to populate
+# pm$tree_info instead. Uses get_ra_path() and get_child_info() from
+# model-ranger.R. Kept for reference.
+
 get_pk_tree <- function(model) {
   tree <- partykit_tree_info(model)
   paths <- tree$nodeID[tree[, "terminal"]]
@@ -165,24 +189,6 @@ get_pk_tree <- function(model) {
       )
     }
   )
-}
-
-#' @export
-parse_model.party <- function(model) {
-  pm <- list()
-  pm$general$model <- "party"
-  pm$general$type <- "tree"
-  pm$general$version <- 3
-  pm$tree_info <- partykit_tree_info_full(model)
-  as_parsed_model(pm)
-}
-
-# Fit formula -----------------------------------
-
-#' @export
-tidypredict_fit.party <- function(model, ...) {
-  tree_info <- partykit_tree_info_full(model)
-  generate_nested_case_when_tree(tree_info)
 }
 
 # For {orbital}
