@@ -1,0 +1,100 @@
+---
+title: "Decision trees, using rpart"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Decision trees, using rpart}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(dplyr)
+library(tidypredict)
+library(rpart)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |
+|`tidypredict_to_column()`                                      |
+|`tidypredict_test()`                                           |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |
+|`parsnip`                                                      |
+
+## How it works
+
+Here is a simple `rpart()` model using the `mtcars` dataset:
+
+```{r}
+library(dplyr)
+library(tidypredict)
+library(rpart)
+
+model <- rpart(mpg ~ ., data = mtcars)
+```
+
+## Under the hood
+
+The parser extracts the tree structure from the model's `frame` and `splits` components. It handles both numeric and categorical splits, as well as surrogate splits for missing value handling.
+
+```{r}
+model$frame |>
+  head()
+```
+
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula. The decision tree becomes a `dplyr::case_when()` statement.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+- Use directly inside `dplyr`,
+  `mutate(mtcars, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to a piped command set
+- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+
+## Classification
+
+`rpart` classification models are also supported:
+
+```{r}
+model_class <- rpart(Species ~ ., data = iris)
+tidypredict_fit(model_class)
+```
+
+## parsnip
+
+`tidypredict` also supports `rpart` model objects fitted via the `parsnip` package.
+
+```{r}
+library(parsnip)
+
+parsnip_model <- decision_tree(mode = "regression") |>
+  set_engine("rpart") |>
+  fit(mpg ~ ., data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```
+
+## Categorical predictors
+
+`rpart` handles categorical predictors natively. The generated formula uses `%in%` for categorical splits:
+```{r}
+mtcars2 <- mtcars
+mtcars2$cyl <- factor(mtcars2$cyl)
+
+model_cat <- rpart(mpg ~ cyl + wt + hp, data = mtcars2)
+tidypredict_fit(model_cat)
+```
+
+## Surrogate splits
+
+`rpart` uses surrogate splits to handle missing values during prediction. When the primary split variable is missing, the model uses surrogate variables (other variables that produce similar splits) to route the observation. This behavior is controlled by the `usesurrogate` parameter in `rpart.control()`.
