@@ -4,7 +4,14 @@
 \alias{.extract_partykit_classprob}
 \title{Extract classprob trees for partykit models}
 \usage{
-.extract_partykit_classprob(model)
+.extract_partykit_classprob(model, nested = FALSE, na_handling = "none")
+}
+\arguments{
+\item{model}{A partykit model object}
+
+\item{nested}{Logical, whether to use nested case_when (default FALSE)}
+
+\item{na_handling}{How to handle NA values when nested = TRUE}
 }
 \description{
 For use in orbital package.
