@@ -4,14 +4,13 @@
 #' Tidy Eval formula that can then be used inside a dplyr command.
 #'
 #' @param model An R model or a list with a parsed model.
-#' @param ... Additional arguments passed to methods.
 #'
 #' @examples
 #'
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 #' tidypredict_fit(model)
 #' @export
-tidypredict_fit <- function(model, ...) {
+tidypredict_fit <- function(model) {
   UseMethod("tidypredict_fit")
 }
 

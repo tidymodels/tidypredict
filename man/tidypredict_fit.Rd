@@ -4,12 +4,10 @@
 \alias{tidypredict_fit}
 \title{Returns a Tidy Eval formula to calculate fitted values}
 \usage{
-tidypredict_fit(model, ...)
+tidypredict_fit(model)
 }
 \arguments{
 \item{model}{An R model or a list with a parsed model.}
-
-\item{...}{Additional arguments passed to methods.}
 }
 \description{
 It parses a model or uses an already parsed model to return a
