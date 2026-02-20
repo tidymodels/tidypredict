@@ -300,13 +300,8 @@ get_base_score <- function(model) {
 }
 
 #' @export
-tidypredict_fit.xgb.Booster <- function(model, nested = FALSE, ...) {
-  if (nested) {
-    build_fit_formula_xgb_nested(model)
-  } else {
-    parsedmodel <- parse_model(model)
-    build_fit_formula_xgb(parsedmodel)
-  }
+tidypredict_fit.xgb.Booster <- function(model, ...) {
+  build_fit_formula_xgb_nested(model)
 }
 
 # Build nested xgboost formula
@@ -466,10 +461,9 @@ build_nested_xgb_node <- function(node_idx, tree_df) {
 #'
 #' For use in orbital package.
 #' @param model An xgb.Booster model
-#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_xgb_trees <- function(model, nested = FALSE) {
+.extract_xgb_trees <- function(model) {
   if (!inherits(model, "xgb.Booster")) {
     cli::cli_abort(
       "{.arg model} must be {.cls xgb.Booster}, not {.obj_type_friendly {model}}."
@@ -477,16 +471,6 @@ build_nested_xgb_node <- function(node_idx, tree_df) {
   }
 
   json_params <- get_xgb_json_params(model)
-
-  if (nested) {
-    trees <- extract_xgb_trees_nested(model)
-  } else {
-    parsedmodel <- parse_model(model)
-    trees <- map(
-      seq_len(length(parsedmodel$trees)),
-      ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
-    )
-  }
-
+  trees <- extract_xgb_trees_nested(model)
   apply_dart_weights(trees, json_params$weight_drop)
 }

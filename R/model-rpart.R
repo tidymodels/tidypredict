@@ -395,16 +395,9 @@ parse_model.rpart <- function(model) {
 }
 
 #' @export
-tidypredict_fit.rpart <- function(model, nested = FALSE, na_handling = "none") {
-  if (nested) {
-    tree_info <- rpart_tree_info_full(model)
-    generate_nested_case_when_tree(tree_info, na_handling = na_handling)
-  } else {
-    parsedmodel <- parse_model(model)
-    tree <- parsedmodel$trees[[1]]
-    mode <- parsedmodel$general$mode
-    generate_case_when_tree(tree, mode)
-  }
+tidypredict_fit.rpart <- function(model, na_handling = "none", ...) {
+  tree_info <- rpart_tree_info_full(model)
+  generate_nested_case_when_tree(tree_info, na_handling = na_handling)
 }
 
 #' @export
@@ -488,15 +481,10 @@ tidypredict_test.rpart <- function(
 #'
 #' For use in orbital package.
 #' @param model An rpart model object
-#' @param nested Logical, whether to use nested case_when (default FALSE)
-#' @param na_handling How to handle NA values when nested = TRUE
+#' @param na_handling How to handle NA values
 #' @keywords internal
 #' @export
-.extract_rpart_classprob <- function(
-  model,
-  nested = FALSE,
-  na_handling = "none"
-) {
+.extract_rpart_classprob <- function(model, na_handling = "none") {
   if (!inherits(model, "rpart")) {
     cli::cli_abort(
       "{.arg model} must be {.cls rpart}, not {.obj_type_friendly {model}}."
@@ -523,53 +511,14 @@ tidypredict_test.rpart <- function(
   # Get tree structure with surrogate handling
   tree_info <- rpart_tree_info_full(model)
 
-  if (nested) {
-    generate_one_tree_nested <- function(predictions) {
-      # Update predictions in tree_info
-      tree_info_copy <- tree_info
-      tree_info_copy$prediction <- predictions
-      generate_nested_case_when_tree(tree_info_copy, na_handling = na_handling)
-    }
-
-    res <- list()
-    for (i in seq_len(ncol(probs))) {
-      res[[i]] <- generate_one_tree_nested(probs[, i])
-    }
-    res
-  } else {
-    parent_map <- build_parent_map(tree_info)
-    terminal_ids <- tree_info$nodeID[tree_info$terminal]
-
-    generate_one_tree_flat <- function(predictions) {
-      paths <- map(terminal_ids, function(node_id) {
-        node_idx <- which(tree_info$nodeID == node_id)
-        list(
-          prediction = predictions[node_idx],
-          path = build_rpart_path(
-            node_id,
-            tree_info,
-            parent_map,
-            use_surrogates = TRUE
-          )
-        )
-      })
-
-      pm <- list()
-      pm$general$model <- "rpart"
-      pm$general$type <- "tree"
-      pm$general$version <- 2
-      pm$trees <- list(paths)
-      parsedmodel <- as_parsed_model(pm)
-
-      tree <- parsedmodel$trees[[1]]
-      mode <- parsedmodel$general$mode
-      generate_case_when_tree(tree, mode)
-    }
-
-    res <- list()
-    for (i in seq_len(ncol(probs))) {
-      res[[i]] <- generate_one_tree_flat(probs[, i])
-    }
-    res
+  res <- list()
+  for (i in seq_len(ncol(probs))) {
+    tree_info_copy <- tree_info
+    tree_info_copy$prediction <- probs[, i]
+    res[[i]] <- generate_nested_case_when_tree(
+      tree_info_copy,
+      na_handling = na_handling
+    )
   }
+  res
 }

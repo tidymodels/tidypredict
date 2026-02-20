@@ -84,13 +84,8 @@ parse_model.randomForest <- function(model) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.randomForest <- function(model, nested = FALSE, ...) {
-  if (nested) {
-    tidypredict_fit_rf_nested(model)
-  } else {
-    parsedmodel <- parse_model(model)
-    tidypredict_fit_randomForest(parsedmodel)
-  }
+tidypredict_fit.randomForest <- function(model, ...) {
+  tidypredict_fit_rf_nested(model)
 }
 
 tidypredict_fit_randomForest <- function(parsedmodel) {
@@ -175,10 +170,9 @@ build_nested_rf_node <- function(node_id, tree, term_labels) {
 #'
 #' For use in orbital package.
 #' @param model A randomForest model object
-#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_rf_classprob <- function(model, nested = FALSE) {
+.extract_rf_classprob <- function(model) {
   if (!inherits(model, "randomForest")) {
     cli::cli_abort(
       "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
@@ -199,35 +193,14 @@ build_nested_rf_node <- function(node_id, tree, term_labels) {
   lvls <- model$classes
   term_labels <- names(model$forest$ncat)
 
-  if (nested) {
-    # For each class, generate nested case_when expressions for all trees
-    res <- list()
-    for (lvl in lvls) {
-      tree_exprs <- map(seq_len(model$ntree), function(tree_no) {
-        build_nested_rf_vote_tree(model, tree_no, term_labels, lvl)
-      })
-      res[[lvl]] <- tree_exprs
-    }
-    return(res)
-  }
-
-  # Flat mode (original implementation)
-  parsedmodel <- parse_model(model)
+  # For each class, generate nested case_when expressions for all trees
   res <- list()
   for (lvl in lvls) {
-    tree_exprs <- map(parsedmodel$trees, function(tree) {
-      # Build nodes for this tree with 1 if predicted class matches, 0 otherwise
-      nodes <- map(tree, function(node) {
-        list(
-          prediction = if (node$prediction == lvl) 1 else 0,
-          path = node$path
-        )
-      })
-      .build_case_when_tree(nodes)
+    tree_exprs <- map(seq_len(model$ntree), function(tree_no) {
+      build_nested_rf_vote_tree(model, tree_no, term_labels, lvl)
     })
     res[[lvl]] <- tree_exprs
   }
-
   res
 }
 

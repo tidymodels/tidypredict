@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "case_when((!is.na(cyl) & cyl > 5 | is.na(cyl) & !is.na(am) & \n    am <= 0.5 | is.na(cyl) & is.na(am)) & (!is.na(cyl) & cyl > \n    7 | is.na(cyl) & !is.na(am) & am <= 0.5 | is.na(cyl) & is.na(am)) ~ \n    15.1, (!is.na(cyl) & cyl > 5 | is.na(cyl) & !is.na(am) & \n    am <= 0.5 | is.na(cyl) & is.na(am)) & (!is.na(cyl) & cyl <= \n    7 | is.na(cyl) & !is.na(am) & am > 0.5) ~ 19.7428571428571, \n    .default = 26.6636363636364)"
+      [1] "case_when(cyl <= 5 ~ 26.6636363636364, .default = case_when(cyl <= \n    7 ~ 19.7428571428571, .default = 15.1))"
 
 # formulas produce correct predictions - regression
 

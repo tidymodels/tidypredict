@@ -313,13 +313,9 @@ parse_lgb_categorical_threshold <- function(threshold) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.lgb.Booster <- function(model, nested = FALSE, ...) {
+tidypredict_fit.lgb.Booster <- function(model, ...) {
   parsedmodel <- parse_model(model)
-  if (nested) {
-    build_fit_formula_lgb_nested(parsedmodel, model)
-  } else {
-    build_fit_formula_lgb(parsedmodel)
-  }
+  build_fit_formula_lgb_nested(parsedmodel, model)
 }
 
 # Nested formula builder for lightgbm
@@ -703,25 +699,16 @@ build_lgb_linear_prediction <- function(linear) {
 #'
 #' For use in orbital package.
 #' @param model A LightGBM model object
-#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_lgb_trees <- function(model, nested = FALSE) {
+.extract_lgb_trees <- function(model) {
   if (!inherits(model, "lgb.Booster")) {
     cli::cli_abort(
       "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
     )
   }
 
-  if (nested) {
-    extract_lgb_trees_nested(model)
-  } else {
-    parsedmodel <- parse_model(model)
-    map(
-      seq_len(length(parsedmodel$trees)),
-      ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
-    )
-  }
+  extract_lgb_trees_nested(model)
 }
 
 get_lgb_case_fun <- function(.x) {

@@ -672,18 +672,14 @@ get_catboost_missing <- function(nan_treatment, op) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.catboost.Model <- function(model, nested = FALSE, ...) {
+tidypredict_fit.catboost.Model <- function(model, ...) {
   parsedmodel <- parse_model(model)
-  if (nested) {
-    build_fit_formula_catboost_nested(parsedmodel)
-  } else {
-    build_fit_formula_catboost(parsedmodel)
-  }
+  build_fit_formula_catboost_nested(parsedmodel)
 }
 
 # Internal function for parsnip model_fit objects with CatBoost
 # Called from tidymodels.R
-tidypredict_fit_catboost_parsnip <- function(model, nested = FALSE) {
+tidypredict_fit_catboost_parsnip <- function(model) {
   cb_model <- model$fit
   parsedmodel <- parse_model(cb_model)
 
@@ -692,11 +688,7 @@ tidypredict_fit_catboost_parsnip <- function(model, nested = FALSE) {
     parsedmodel <- setup_catboost_parsnip_categories(parsedmodel, model)
   }
 
-  if (nested) {
-    build_fit_formula_catboost_nested(parsedmodel)
-  } else {
-    build_fit_formula_catboost(parsedmodel)
-  }
+  build_fit_formula_catboost_nested(parsedmodel)
 }
 
 setup_catboost_parsnip_categories <- function(parsedmodel, model) {
@@ -1230,10 +1222,9 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
 #'
 #' For use in orbital package.
 #' @param model A CatBoost model object
-#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_catboost_trees <- function(model, nested = FALSE) {
+.extract_catboost_trees <- function(model) {
   if (!inherits(model, "catboost.Model")) {
     cli::cli_abort(
       "{.arg model} must be {.cls catboost.Model}, not {.obj_type_friendly {model}}."
@@ -1241,13 +1232,5 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
   }
 
   parsedmodel <- parse_model(model)
-
-  if (nested) {
-    extract_catboost_trees_nested(parsedmodel)
-  } else {
-    map(
-      seq_along(parsedmodel$trees),
-      function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
-    )
-  }
+  extract_catboost_trees_nested(parsedmodel)
 }

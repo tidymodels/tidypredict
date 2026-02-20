@@ -31,18 +31,14 @@ test_that("returns the right output", {
   expect_snapshot(rlang::expr_text(tf))
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("tidypredict_fit produces correct predictions", {
   model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
-  pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(pm, mp)
-  l <- yaml::read_yaml(mp)
-  pm <- as_parsed_model(l)
 
-  expect_identical(
-    round_print(tidypredict_fit(model)),
-    round_print(tidypredict_fit(pm))
-  )
+  fit_expr <- tidypredict_fit(model)
+  fit_pred <- dplyr::mutate(mtcars, pred = !!fit_expr)$pred
+  original_pred <- predict(model, mtcars)
+
+  expect_equal(fit_pred, unname(original_pred))
 })
 
 test_that("formulas produce correct predictions - regression", {
@@ -124,43 +120,41 @@ test_that(".extract_rpart_classprob errors on regression model", {
 
 # Nested case_when tests --------------------------------------------------
 
-test_that("tidypredict_fit with nested = TRUE matches flat predictions", {
+test_that("tidypredict_fit matches original model predictions", {
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
 
-  flat_expr <- tidypredict_fit(model, nested = FALSE)
-  nested_expr <- tidypredict_fit(model, nested = TRUE)
+  fit_expr <- tidypredict_fit(model)
+  fit_pred <- dplyr::mutate(mtcars, pred = !!fit_expr)$pred
+  original_pred <- predict(model, mtcars)
 
-  flat_pred <- dplyr::mutate(mtcars, pred = !!flat_expr)$pred
-  nested_pred <- dplyr::mutate(mtcars, pred = !!nested_expr)$pred
-
-  expect_equal(nested_pred, flat_pred)
+  expect_equal(fit_pred, unname(original_pred))
 })
 
-test_that("tidypredict_fit with nested = TRUE works for classification", {
+test_that("tidypredict_fit works for classification", {
   model <- rpart::rpart(Species ~ ., data = iris)
 
-  nested_expr <- tidypredict_fit(model, nested = TRUE)
-  nested_pred <- dplyr::mutate(iris, pred = !!nested_expr)$pred
+  fit_expr <- tidypredict_fit(model)
+  fit_pred <- dplyr::mutate(iris, pred = !!fit_expr)$pred
   original_pred <- as.character(predict(model, iris, type = "class"))
 
-  expect_equal(nested_pred, original_pred)
+  expect_equal(fit_pred, original_pred)
 })
 
-test_that(".extract_rpart_classprob with nested = TRUE matches flat", {
+test_that(".extract_rpart_classprob matches original model probabilities", {
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  flat_exprs <- .extract_rpart_classprob(model, nested = FALSE)
-  nested_exprs <- .extract_rpart_classprob(model, nested = TRUE)
+  exprs <- .extract_rpart_classprob(model)
 
   eval_env <- rlang::new_environment(
     data = as.list(iris),
     parent = asNamespace("dplyr")
   )
 
-  flat_probs <- lapply(flat_exprs, rlang::eval_tidy, env = eval_env)
-  nested_probs <- lapply(nested_exprs, rlang::eval_tidy, env = eval_env)
+  probs <- lapply(exprs, rlang::eval_tidy, env = eval_env)
+  combined <- do.call(cbind, probs)
+  native <- predict(model, type = "prob")
 
-  expect_equal(nested_probs, flat_probs)
+  expect_equal(unname(combined), unname(native))
 })
 
 test_that(".rpart_tree_info_full is exported and works", {

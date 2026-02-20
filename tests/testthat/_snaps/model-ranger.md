@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "(case_when(cyl <= 5 & hp <= 118 ~ 26.7, cyl > 5 & hp <= 118 ~ \n    21.1333333333333, hp <= 205 & hp > 118 ~ 17.48, .default = 14.5416666666667) + \n    case_when(hp <= 80.5 ~ 32.2333333333333, hp <= 118 & hp > \n        80.5 ~ 21.9545454545455, .default = 16.5722222222222) + \n    case_when(disp <= 101.55 ~ 31.9, cyl <= 7 & disp > 101.55 ~ \n        20.8384615384615, .default = 14.8785714285714))/3L"
+      [1] "(case_when(hp <= 118 ~ case_when(cyl <= 5 ~ 26.7, .default = 21.1333333333333), \n    .default = case_when(hp <= 205 ~ 17.48, .default = 14.5416666666667)) + \n    case_when(hp <= 80.5 ~ 32.2333333333333, .default = case_when(hp <= \n        118 ~ 21.9545454545455, .default = 16.5722222222222)) + \n    case_when(disp <= 101.55 ~ 31.9, .default = case_when(cyl <= \n        7 ~ 20.8384615384615, .default = 14.8785714285714)))/3"
 
 # formulas produces correct predictions
 
@@ -21,7 +21,7 @@
     Code
       tidypredict_fit(model)
     Condition
-      Error in `tidypredict_fit_ranger()`:
+      Error in `tidypredict_fit_ranger_nested()`:
       ! Classification models are not supported for ranger.
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.

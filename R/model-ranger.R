@@ -159,13 +159,8 @@ parse_model.ranger <- function(model) {
 # Fit formula -----------------------------------
 
 #' @export
-tidypredict_fit.ranger <- function(model, nested = FALSE, ...) {
-  if (nested) {
-    tidypredict_fit_ranger_nested(model)
-  } else {
-    parsedmodel <- parse_model(model)
-    tidypredict_fit_ranger(parsedmodel)
-  }
+tidypredict_fit.ranger <- function(model, ...) {
+  tidypredict_fit_ranger_nested(model)
 }
 
 tidypredict_fit_ranger <- function(parsedmodel) {
@@ -258,21 +253,20 @@ build_nested_ranger_node <- function(node_id, tree) {
 #'
 #' For use in orbital package.
 #' @param model A ranger model object fitted with `probability = TRUE`
-#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_ranger_classprob <- function(model, nested = FALSE) {
+.extract_ranger_classprob <- function(model) {
   if (!inherits(model, "ranger")) {
     cli::cli_abort(
       "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
     )
   }
 
-  parsedmodel <- parse_model(model)
+  # Get class levels from treeInfo
+  tree <- ranger::treeInfo(model, 1)
+  pred_cols <- grep("^pred\\.", names(tree), value = TRUE)
 
-  # Check if this is a classification model with probabilities
-  first_node <- parsedmodel$trees[[1]][[1]]
-  if (is.null(first_node$probs)) {
+  if (length(pred_cols) == 0) {
     cli::cli_abort(
       c(
         "Model does not contain probability information.",
@@ -281,37 +275,16 @@ build_nested_ranger_node <- function(node_id, tree) {
     )
   }
 
-  # Get class levels from the first node's probs
-  lvls <- names(first_node$probs)
+  lvls <- sub("^pred\\.", "", pred_cols)
 
-  if (nested) {
-    # For each class, generate nested case_when expressions for all trees
-    res <- list()
-    for (lvl in lvls) {
-      tree_exprs <- map(seq_len(model$num.trees), function(tree_no) {
-        build_nested_ranger_prob_tree(model, tree_no, lvl)
-      })
-      res[[lvl]] <- tree_exprs
-    }
-    return(res)
-  }
-
-  # Flat mode (original implementation)
+  # For each class, generate nested case_when expressions for all trees
   res <- list()
   for (lvl in lvls) {
-    tree_exprs <- map(parsedmodel$trees, function(tree) {
-      # Build nodes for this tree with probability of this class as prediction
-      nodes <- map(tree, function(node) {
-        list(
-          prediction = node$probs[[lvl]]$prob,
-          path = node$path
-        )
-      })
-      .build_case_when_tree(nodes)
+    tree_exprs <- map(seq_len(model$num.trees), function(tree_no) {
+      build_nested_ranger_prob_tree(model, tree_no, lvl)
     })
     res[[lvl]] <- tree_exprs
   }
-
   res
 }
 
