@@ -52,6 +52,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
+    <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -141,7 +142,7 @@
 <span><span class="co">#&gt;     (ifelse(parch &gt; 2, parch - 2, 0) * 13.0493891423278) + (ifelse(parch &gt; </span></span>
 <span><span class="co">#&gt;     4, parch - 4, 0) * -18.8998708031821) + (ifelse(sibsp &gt; 1, </span></span>
 <span><span class="co">#&gt;     sibsp - 1, 0) * -7.71566779782019) + (ifelse(sibsp &gt; 1, sibsp - </span></span>
-<span><span class="co">#&gt;     1, 0) * ifelse(parch &lt; 1, 1 - parch, 0) * 7.40395975552276) + </span></span>
+<span><span class="co">#&gt;     1, 0) * ifelse(parch &lt; 1, 1 - parch, 0) * 7.40395975552275) + </span></span>
 <span><span class="co">#&gt;     (ifelse(sibsp &gt; 1, sibsp - 1, 0) * ifelse(parch &gt; 1, parch - </span></span>
 <span><span class="co">#&gt;         1, 0) * 4.41874354843216)</span></span></code></pre></div>
 </li>
@@ -149,7 +150,7 @@
 <p>SQL output example</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; (((((22.2918960405404 + (CASE WHEN (`parch` &lt; 2.0) THEN (2.0 - `parch`) WHEN NOT (`parch` &lt; 2.0) THEN 0.0 END * 4.85356462114363)) + (CASE WHEN (`parch` &gt; 2.0) THEN (`parch` - 2.0) WHEN NOT (`parch` &gt; 2.0) THEN 0.0 END * 13.0493891423278)) + (CASE WHEN (`parch` &gt; 4.0) THEN (`parch` - 4.0) WHEN NOT (`parch` &gt; 4.0) THEN 0.0 END * -18.8998708031821)) + (CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * -7.71566779782019)) + ((CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * CASE WHEN (`parch` &lt; 1.0) THEN (1.0 - `parch`) WHEN NOT (`parch` &lt; 1.0) THEN 0.0 END) * 7.40395975552276)) + ((CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * CASE WHEN (`parch` &gt; 1.0) THEN (`parch` - 1.0) WHEN NOT (`parch` &gt; 1.0) THEN 0.0 END) * 4.41874354843216)</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; (((((22.2918960405404 + (CASE WHEN (`parch` &lt; 2.0) THEN (2.0 - `parch`) WHEN NOT (`parch` &lt; 2.0) THEN 0.0 END * 4.85356462114363)) + (CASE WHEN (`parch` &gt; 2.0) THEN (`parch` - 2.0) WHEN NOT (`parch` &gt; 2.0) THEN 0.0 END * 13.0493891423278)) + (CASE WHEN (`parch` &gt; 4.0) THEN (`parch` - 4.0) WHEN NOT (`parch` &gt; 4.0) THEN 0.0 END * -18.8998708031821)) + (CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * -7.71566779782019)) + ((CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * CASE WHEN (`parch` &lt; 1.0) THEN (1.0 - `parch`) WHEN NOT (`parch` &lt; 1.0) THEN 0.0 END) * 7.40395975552275)) + ((CASE WHEN (`sibsp` &gt; 1.0) THEN (`sibsp` - 1.0) WHEN NOT (`sibsp` &gt; 1.0) THEN 0.0 END * CASE WHEN (`parch` &gt; 1.0) THEN (`parch` - 1.0) WHEN NOT (`parch` &gt; 1.0) THEN 0.0 END) * 4.41874354843216)</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -197,11 +198,11 @@ well:</p>
 <span><span class="co">#&gt;     0) * -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * </span></span>
 <span><span class="co">#&gt;     ifelse(sex == "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == </span></span>
 <span><span class="co">#&gt;     "3rd", 1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", </span></span>
-<span><span class="co">#&gt;     1, 0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.618652747659846) + </span></span>
+<span><span class="co">#&gt;     1, 0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.618652747659845) + </span></span>
 <span><span class="co">#&gt;     (ifelse(pclass == "3rd", 1, 0) * ifelse(sex == "male", 1, </span></span>
 <span><span class="co">#&gt;         0) * 1.22269536265148) + (ifelse(sex == "male", 1, 0) * </span></span>
 <span><span class="co">#&gt;     -3.18562450248531) + (ifelse(sex == "male", 1, 0) * ifelse(age &lt; </span></span>
-<span><span class="co">#&gt;     16, 16 - age, 0) * 0.241814028713263)))</span></span></code></pre></div>
+<span><span class="co">#&gt;     16, 16 - age, 0) * 0.241814028713262)))</span></span></code></pre></div>
 <p>The spec sets the <code>is_glm</code> entry to 1, as well as the
 <code>family</code> and <code>link</code> entries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -242,7 +243,7 @@ well:</p>
 <span><span class="co">#&gt;     (ifelse(parch &gt; 2, parch - 2, 0) * 13.0493891423278) + (ifelse(parch &gt; </span></span>
 <span><span class="co">#&gt;     4, parch - 4, 0) * -18.8998708031821) + (ifelse(sibsp &gt; 1, </span></span>
 <span><span class="co">#&gt;     sibsp - 1, 0) * -7.71566779782019) + (ifelse(sibsp &gt; 1, sibsp - </span></span>
-<span><span class="co">#&gt;     1, 0) * ifelse(parch &lt; 1, 1 - parch, 0) * 7.40395975552276) + </span></span>
+<span><span class="co">#&gt;     1, 0) * ifelse(parch &lt; 1, 1 - parch, 0) * 7.40395975552275) + </span></span>
 <span><span class="co">#&gt;     (ifelse(sibsp &gt; 1, sibsp - 1, 0) * ifelse(parch &gt; 1, parch - </span></span>
 <span><span class="co">#&gt;         1, 0) * 4.41874354843216)</span></span></code></pre></div>
 </div>

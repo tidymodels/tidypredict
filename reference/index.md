@@ -9,7 +9,7 @@
 - [`generate_tree_node()`](https://tidypredict.tidymodels.org/reference/generate_tree_node.md)
   : Construct a single node of a tree
 - [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-  : Converts an R model object into a table.
+  : Converts an R model object into a parsed model
 - [`path_formula()`](https://tidypredict.tidymodels.org/reference/path_formula.md)
   : Turn a path object into an expression
 - [`path_formulas()`](https://tidypredict.tidymodels.org/reference/path_formulas.md)

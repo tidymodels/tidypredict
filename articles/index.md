@@ -28,6 +28,8 @@
   models](https://tidypredict.tidymodels.org/articles/save.md):
 - [Database
   write-back](https://tidypredict.tidymodels.org/articles/sql.md):
+- [How tidypredict generates tree
+  formulas](https://tidypredict.tidymodels.org/articles/tree-internals.md):
 - [Create a tree spec - version
   2](https://tidypredict.tidymodels.org/articles/tree.md):
 - [XGBoost

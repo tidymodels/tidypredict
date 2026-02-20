@@ -52,6 +52,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
+    <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -152,51 +153,41 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when((cyl &lt;= 7 | is.na(cyl)) ~ 122.371527777778, cyl &gt; 7 &amp; </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 15.1 | is.na(mpg)) &amp; (disp &lt;= 334 | is.na(disp)) ~ </span></span>
-<span><span class="co">#&gt;     240.84375, cyl &gt; 7 &amp; (mpg &lt;= 15.1 | is.na(mpg)) &amp; disp &gt; </span></span>
-<span><span class="co">#&gt;     334 ~ 187.34375, cyl &gt; 7 &amp; mpg &gt; 15.1 ~ 164.21875) + case_when((mpg &lt;= </span></span>
-<span><span class="co">#&gt;     20.35 | is.na(mpg)) &amp; (mpg &lt;= 15.1 | is.na(mpg)) ~ 24.7864583333333, </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 20.35 | is.na(mpg)) &amp; mpg &gt; 15.1 ~ 7.36516196529071, </span></span>
-<span><span class="co">#&gt;     mpg &gt; 20.35 &amp; (mpg &lt;= 23.6 | is.na(mpg)) ~ -9.47147832598005, </span></span>
-<span><span class="co">#&gt;     mpg &gt; 20.35 &amp; mpg &gt; 23.6 ~ -24.4000499589103) + case_when((mpg &lt;= </span></span>
-<span><span class="co">#&gt;     21.45 | is.na(mpg)) &amp; (mpg &lt;= 17.55 | is.na(mpg)) &amp; (mpg &lt;= </span></span>
-<span><span class="co">#&gt;     15.65 | is.na(mpg)) ~ 6.33150075541602, (mpg &lt;= 21.45 | is.na(mpg)) &amp; </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 17.55 | is.na(mpg)) &amp; mpg &gt; 15.65 ~ 18.2080434163411, </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 21.45 | is.na(mpg)) &amp; mpg &gt; 17.55 ~ 0.0642609119415283, </span></span>
-<span><span class="co">#&gt;     mpg &gt; 21.45 ~ -11.2250245332718) + case_when((disp &lt;= 334 | </span></span>
-<span><span class="co">#&gt;     is.na(disp)) &amp; (mpg &lt;= 15.1 | is.na(mpg)) ~ 31.5191459655761, </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 334 | is.na(disp)) &amp; mpg &gt; 15.1 ~ -4.16611832639445, </span></span>
-<span><span class="co">#&gt;     disp &gt; 334 &amp; (disp &lt;= 380 | is.na(disp)) ~ 16.3295566439629, </span></span>
-<span><span class="co">#&gt;     disp &gt; 334 &amp; disp &gt; 380 ~ -0.254162490367889) + case_when((disp &lt;= </span></span>
-<span><span class="co">#&gt;     78.85 | is.na(disp)) ~ -10.7901678085327, disp &gt; 78.85 &amp; </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 28.85 | is.na(mpg)) &amp; (disp &lt;= 334 | is.na(disp)) ~ </span></span>
-<span><span class="co">#&gt;     -0.749505842104554, disp &gt; 78.85 &amp; (mpg &lt;= 28.85 | is.na(mpg)) &amp; </span></span>
-<span><span class="co">#&gt;     disp &gt; 334 ~ 4.01884852349758, disp &gt; 78.85 &amp; mpg &gt; 28.85 ~ </span></span>
-<span><span class="co">#&gt;     15.2098321914673) + case_when((disp &lt;= 78.85 | is.na(disp)) ~ </span></span>
-<span><span class="co">#&gt;     -5.39508358637492, disp &gt; 78.85 &amp; (disp &lt;= 466 | is.na(disp)) &amp; </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 15.1 | is.na(mpg)) ~ 4.51956310272216, disp &gt; 78.85 &amp; </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 466 | is.na(disp)) &amp; mpg &gt; 15.1 ~ 0.0956797075012456, </span></span>
-<span><span class="co">#&gt;     disp &gt; 78.85 &amp; disp &gt; 466 ~ -8.61319732666016) + case_when((mpg &lt;= </span></span>
-<span><span class="co">#&gt;     21.45 | is.na(mpg)) &amp; (disp &lt;= 153.35 | is.na(disp)) &amp; (cyl &lt;= </span></span>
-<span><span class="co">#&gt;     5 | is.na(cyl)) ~ 0.427817046642302, (mpg &lt;= 21.45 | is.na(mpg)) &amp; </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 153.35 | is.na(disp)) &amp; cyl &gt; 5 ~ 25.0094966888427, </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 21.45 | is.na(mpg)) &amp; disp &gt; 153.35 ~ -0.436469084024429, </span></span>
-<span><span class="co">#&gt;     mpg &gt; 21.45 ~ -1.67079323530197) + case_when((disp &lt;= 334 | </span></span>
-<span><span class="co">#&gt;     is.na(disp)) &amp; (mpg &lt;= 15.1 | is.na(mpg)) ~ 14.0927782058715, </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 334 | is.na(disp)) &amp; mpg &gt; 15.1 &amp; (disp &lt;= 288.4 | </span></span>
-<span><span class="co">#&gt;         is.na(disp)) ~ -0.208523882286889, (disp &lt;= 334 | is.na(disp)) &amp; </span></span>
-<span><span class="co">#&gt;         mpg &gt; 15.1 &amp; disp &gt; 288.4 ~ -11.3294992446899, disp &gt; </span></span>
-<span><span class="co">#&gt;         334 ~ 1.61815292341635) + case_when((mpg &lt;= 13.8 | is.na(mpg)) ~ </span></span>
-<span><span class="co">#&gt;     -3.70564748346806, mpg &gt; 13.8 &amp; (mpg &lt;= 17.55 | is.na(mpg)) &amp; </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 334 | is.na(disp)) ~ -0.805894414583842, mpg &gt; 13.8 &amp; </span></span>
-<span><span class="co">#&gt;     (mpg &lt;= 17.55 | is.na(mpg)) &amp; disp &gt; 334 ~ 9.19054534534613, </span></span>
-<span><span class="co">#&gt;     mpg &gt; 13.8 &amp; mpg &gt; 17.55 ~ -0.580966327060014) + case_when((disp &lt;= </span></span>
-<span><span class="co">#&gt;     380 | is.na(disp)) &amp; (mpg &lt;= 17.55 | is.na(mpg)) ~ 1.89159697956509, </span></span>
-<span><span class="co">#&gt;     (disp &lt;= 380 | is.na(disp)) &amp; mpg &gt; 17.55 &amp; (mpg &lt;= 18.95 | </span></span>
-<span><span class="co">#&gt;         is.na(mpg)) ~ -6.20051162441571, (disp &lt;= 380 | is.na(disp)) &amp; </span></span>
-<span><span class="co">#&gt;         mpg &gt; 17.55 &amp; mpg &gt; 18.95 ~ 0.834156103432178, disp &gt; </span></span>
-<span><span class="co">#&gt;         380 ~ -2.94233404099941)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(cyl &lt;= 7 | is.na(cyl) ~ 122.371527777778, .default = case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;     15.1 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     240.84375, .default = 187.34375), .default = 164.21875)) + </span></span>
+<span><span class="co">#&gt;     case_when(mpg &lt;= 20.35 | is.na(mpg) ~ case_when(mpg &lt;= 15.1 | </span></span>
+<span><span class="co">#&gt;         is.na(mpg) ~ 24.7864583333333, .default = 7.36516196529071), </span></span>
+<span><span class="co">#&gt;         .default = case_when(mpg &lt;= 23.6 | is.na(mpg) ~ -9.47147832598005, </span></span>
+<span><span class="co">#&gt;             .default = -24.4000499589103)) + case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;     21.45 | is.na(mpg) ~ case_when(mpg &lt;= 17.55 | is.na(mpg) ~ </span></span>
+<span><span class="co">#&gt;     case_when(mpg &lt;= 15.65 | is.na(mpg) ~ 6.33150075541602, .default = 18.2080434163411), </span></span>
+<span><span class="co">#&gt;     .default = 0.0642609119415283), .default = -11.2250245332718) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt;= 334 | is.na(disp) ~ case_when(mpg &lt;= 15.1 | </span></span>
+<span><span class="co">#&gt;         is.na(mpg) ~ 31.5191459655761, .default = -4.16611832639445), </span></span>
+<span><span class="co">#&gt;         .default = case_when(disp &lt;= 380 | is.na(disp) ~ 16.3295566439629, </span></span>
+<span><span class="co">#&gt;             .default = -0.254162490367889)) + case_when(disp &lt;= </span></span>
+<span><span class="co">#&gt;     78.85 | is.na(disp) ~ -10.7901678085327, .default = case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;     28.85 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     -0.749505842104554, .default = 4.01884852349758), .default = 15.2098321914673)) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt;= 78.85 | is.na(disp) ~ -5.39508358637492, </span></span>
+<span><span class="co">#&gt;         .default = case_when(disp &lt;= 466 | is.na(disp) ~ case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;             15.1 | is.na(mpg) ~ 4.51956310272216, .default = 0.0956797075012456), </span></span>
+<span><span class="co">#&gt;             .default = -8.61319732666016)) + case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;     21.45 | is.na(mpg) ~ case_when(disp &lt;= 153.35 | is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     case_when(cyl &lt;= 5 | is.na(cyl) ~ 0.427817046642302, .default = 25.0094966888427), </span></span>
+<span><span class="co">#&gt;     .default = -0.436469084024429), .default = -1.67079323530197) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt;= 334 | is.na(disp) ~ case_when(mpg &lt;= 15.1 | </span></span>
+<span><span class="co">#&gt;         is.na(mpg) ~ 14.0927782058715, .default = case_when(disp &lt;= </span></span>
+<span><span class="co">#&gt;         288.4 | is.na(disp) ~ -0.208523882286889, .default = -11.3294992446899)), </span></span>
+<span><span class="co">#&gt;         .default = 1.61815292341635) + case_when(mpg &lt;= 13.8 | </span></span>
+<span><span class="co">#&gt;     is.na(mpg) ~ -3.70564748346806, .default = case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;     17.55 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + </span></span>
+<span><span class="co">#&gt;     case_when(disp &lt;= 380 | is.na(disp) ~ case_when(mpg &lt;= 17.55 | </span></span>
+<span><span class="co">#&gt;         is.na(mpg) ~ 1.89159697956509, .default = case_when(mpg &lt;= </span></span>
+<span><span class="co">#&gt;         18.95 | is.na(mpg) ~ -6.20051162441571, .default = 0.834156103432178)), </span></span>
+<span><span class="co">#&gt;         .default = -2.94233404099941)</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -392,10 +383,8 @@ marked as categorical, <code>tidypredict</code> generates appropriate
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cat_feat %in% 0:1 ~ 9.22111156962135, (!(cat_feat %in% </span></span>
-<span><span class="co">#&gt;     0:1) | is.na(cat_feat)) ~ -9.19527530561794) + case_when(cat_feat %in% </span></span>
-<span><span class="co">#&gt;     0:1 ~ 0.837108638881579, (!(cat_feat %in% 0:1) | is.na(cat_feat)) ~ </span></span>
-<span><span class="co">#&gt;     -0.837108347632668)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(cat_feat %in% 0:1 ~ 9.22111156962135, .default = -9.19527530561794) + </span></span>
+<span><span class="co">#&gt;     case_when(cat_feat %in% 0:1 ~ 0.837108638881579, .default = -0.837108347632668)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -435,7 +424,7 @@ package) are also supported by <code>tidypredict</code>:</p>
 <span><span class="co">#&gt;  $ general:List of 9</span></span>
 <span><span class="co">#&gt;   ..$ model                 : chr "lgb.Booster"</span></span>
 <span><span class="co">#&gt;   ..$ type                  : chr "lgb"</span></span>
-<span><span class="co">#&gt;   ..$ version               : num 1</span></span>
+<span><span class="co">#&gt;   ..$ version               : num 3</span></span>
 <span><span class="co">#&gt;   ..$ params                :List of 8</span></span>
 <span><span class="co">#&gt;   ..$ feature_names         : chr [1:3] "mpg" "cyl" "disp"</span></span>
 <span><span class="co">#&gt;   ..$ nfeatures             : int 3</span></span>

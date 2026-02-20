@@ -36,51 +36,41 @@ model <- lgb.train(
 
   ``` r
   tidypredict_fit(model)
-  #> case_when((cyl <= 7 | is.na(cyl)) ~ 122.371527777778, cyl > 7 & 
-  #>     (mpg <= 15.1 | is.na(mpg)) & (disp <= 334 | is.na(disp)) ~ 
-  #>     240.84375, cyl > 7 & (mpg <= 15.1 | is.na(mpg)) & disp > 
-  #>     334 ~ 187.34375, cyl > 7 & mpg > 15.1 ~ 164.21875) + case_when((mpg <= 
-  #>     20.35 | is.na(mpg)) & (mpg <= 15.1 | is.na(mpg)) ~ 24.7864583333333, 
-  #>     (mpg <= 20.35 | is.na(mpg)) & mpg > 15.1 ~ 7.36516196529071, 
-  #>     mpg > 20.35 & (mpg <= 23.6 | is.na(mpg)) ~ -9.47147832598005, 
-  #>     mpg > 20.35 & mpg > 23.6 ~ -24.4000499589103) + case_when((mpg <= 
-  #>     21.45 | is.na(mpg)) & (mpg <= 17.55 | is.na(mpg)) & (mpg <= 
-  #>     15.65 | is.na(mpg)) ~ 6.33150075541602, (mpg <= 21.45 | is.na(mpg)) & 
-  #>     (mpg <= 17.55 | is.na(mpg)) & mpg > 15.65 ~ 18.2080434163411, 
-  #>     (mpg <= 21.45 | is.na(mpg)) & mpg > 17.55 ~ 0.0642609119415283, 
-  #>     mpg > 21.45 ~ -11.2250245332718) + case_when((disp <= 334 | 
-  #>     is.na(disp)) & (mpg <= 15.1 | is.na(mpg)) ~ 31.5191459655761, 
-  #>     (disp <= 334 | is.na(disp)) & mpg > 15.1 ~ -4.16611832639445, 
-  #>     disp > 334 & (disp <= 380 | is.na(disp)) ~ 16.3295566439629, 
-  #>     disp > 334 & disp > 380 ~ -0.254162490367889) + case_when((disp <= 
-  #>     78.85 | is.na(disp)) ~ -10.7901678085327, disp > 78.85 & 
-  #>     (mpg <= 28.85 | is.na(mpg)) & (disp <= 334 | is.na(disp)) ~ 
-  #>     -0.749505842104554, disp > 78.85 & (mpg <= 28.85 | is.na(mpg)) & 
-  #>     disp > 334 ~ 4.01884852349758, disp > 78.85 & mpg > 28.85 ~ 
-  #>     15.2098321914673) + case_when((disp <= 78.85 | is.na(disp)) ~ 
-  #>     -5.39508358637492, disp > 78.85 & (disp <= 466 | is.na(disp)) & 
-  #>     (mpg <= 15.1 | is.na(mpg)) ~ 4.51956310272216, disp > 78.85 & 
-  #>     (disp <= 466 | is.na(disp)) & mpg > 15.1 ~ 0.0956797075012456, 
-  #>     disp > 78.85 & disp > 466 ~ -8.61319732666016) + case_when((mpg <= 
-  #>     21.45 | is.na(mpg)) & (disp <= 153.35 | is.na(disp)) & (cyl <= 
-  #>     5 | is.na(cyl)) ~ 0.427817046642302, (mpg <= 21.45 | is.na(mpg)) & 
-  #>     (disp <= 153.35 | is.na(disp)) & cyl > 5 ~ 25.0094966888427, 
-  #>     (mpg <= 21.45 | is.na(mpg)) & disp > 153.35 ~ -0.436469084024429, 
-  #>     mpg > 21.45 ~ -1.67079323530197) + case_when((disp <= 334 | 
-  #>     is.na(disp)) & (mpg <= 15.1 | is.na(mpg)) ~ 14.0927782058715, 
-  #>     (disp <= 334 | is.na(disp)) & mpg > 15.1 & (disp <= 288.4 | 
-  #>         is.na(disp)) ~ -0.208523882286889, (disp <= 334 | is.na(disp)) & 
-  #>         mpg > 15.1 & disp > 288.4 ~ -11.3294992446899, disp > 
-  #>         334 ~ 1.61815292341635) + case_when((mpg <= 13.8 | is.na(mpg)) ~ 
-  #>     -3.70564748346806, mpg > 13.8 & (mpg <= 17.55 | is.na(mpg)) & 
-  #>     (disp <= 334 | is.na(disp)) ~ -0.805894414583842, mpg > 13.8 & 
-  #>     (mpg <= 17.55 | is.na(mpg)) & disp > 334 ~ 9.19054534534613, 
-  #>     mpg > 13.8 & mpg > 17.55 ~ -0.580966327060014) + case_when((disp <= 
-  #>     380 | is.na(disp)) & (mpg <= 17.55 | is.na(mpg)) ~ 1.89159697956509, 
-  #>     (disp <= 380 | is.na(disp)) & mpg > 17.55 & (mpg <= 18.95 | 
-  #>         is.na(mpg)) ~ -6.20051162441571, (disp <= 380 | is.na(disp)) & 
-  #>         mpg > 17.55 & mpg > 18.95 ~ 0.834156103432178, disp > 
-  #>         380 ~ -2.94233404099941)
+  #> case_when(cyl <= 7 | is.na(cyl) ~ 122.371527777778, .default = case_when(mpg <= 
+  #>     15.1 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
+  #>     240.84375, .default = 187.34375), .default = 164.21875)) + 
+  #>     case_when(mpg <= 20.35 | is.na(mpg) ~ case_when(mpg <= 15.1 | 
+  #>         is.na(mpg) ~ 24.7864583333333, .default = 7.36516196529071), 
+  #>         .default = case_when(mpg <= 23.6 | is.na(mpg) ~ -9.47147832598005, 
+  #>             .default = -24.4000499589103)) + case_when(mpg <= 
+  #>     21.45 | is.na(mpg) ~ case_when(mpg <= 17.55 | is.na(mpg) ~ 
+  #>     case_when(mpg <= 15.65 | is.na(mpg) ~ 6.33150075541602, .default = 18.2080434163411), 
+  #>     .default = 0.0642609119415283), .default = -11.2250245332718) + 
+  #>     case_when(disp <= 334 | is.na(disp) ~ case_when(mpg <= 15.1 | 
+  #>         is.na(mpg) ~ 31.5191459655761, .default = -4.16611832639445), 
+  #>         .default = case_when(disp <= 380 | is.na(disp) ~ 16.3295566439629, 
+  #>             .default = -0.254162490367889)) + case_when(disp <= 
+  #>     78.85 | is.na(disp) ~ -10.7901678085327, .default = case_when(mpg <= 
+  #>     28.85 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
+  #>     -0.749505842104554, .default = 4.01884852349758), .default = 15.2098321914673)) + 
+  #>     case_when(disp <= 78.85 | is.na(disp) ~ -5.39508358637492, 
+  #>         .default = case_when(disp <= 466 | is.na(disp) ~ case_when(mpg <= 
+  #>             15.1 | is.na(mpg) ~ 4.51956310272216, .default = 0.0956797075012456), 
+  #>             .default = -8.61319732666016)) + case_when(mpg <= 
+  #>     21.45 | is.na(mpg) ~ case_when(disp <= 153.35 | is.na(disp) ~ 
+  #>     case_when(cyl <= 5 | is.na(cyl) ~ 0.427817046642302, .default = 25.0094966888427), 
+  #>     .default = -0.436469084024429), .default = -1.67079323530197) + 
+  #>     case_when(disp <= 334 | is.na(disp) ~ case_when(mpg <= 15.1 | 
+  #>         is.na(mpg) ~ 14.0927782058715, .default = case_when(disp <= 
+  #>         288.4 | is.na(disp) ~ -0.208523882286889, .default = -11.3294992446899)), 
+  #>         .default = 1.61815292341635) + case_when(mpg <= 13.8 | 
+  #>     is.na(mpg) ~ -3.70564748346806, .default = case_when(mpg <= 
+  #>     17.55 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
+  #>     -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + 
+  #>     case_when(disp <= 380 | is.na(disp) ~ case_when(mpg <= 17.55 | 
+  #>         is.na(mpg) ~ 1.89159697956509, .default = case_when(mpg <= 
+  #>         18.95 | is.na(mpg) ~ -6.20051162441571, .default = 0.834156103432178)), 
+  #>         .default = -2.94233404099941)
   ```
 
 - Add the prediction to the original table
@@ -269,10 +259,8 @@ model_cat <- lgb.train(
 )
 
 tidypredict_fit(model_cat)
-#> case_when(cat_feat %in% 0:1 ~ 9.22111156962135, (!(cat_feat %in% 
-#>     0:1) | is.na(cat_feat)) ~ -9.19527530561794) + case_when(cat_feat %in% 
-#>     0:1 ~ 0.837108638881579, (!(cat_feat %in% 0:1) | is.na(cat_feat)) ~ 
-#>     -0.837108347632668)
+#> case_when(cat_feat %in% 0:1 ~ 9.22111156962135, .default = -9.19527530561794) + 
+#>     case_when(cat_feat %in% 0:1 ~ 0.837108638881579, .default = -0.837108347632668)
 ```
 
 ## parsnip
@@ -314,7 +302,7 @@ str(pm, 2)
 #>  $ general:List of 9
 #>   ..$ model                 : chr "lgb.Booster"
 #>   ..$ type                  : chr "lgb"
-#>   ..$ version               : num 1
+#>   ..$ version               : num 3
 #>   ..$ params                :List of 8
 #>   ..$ feature_names         : chr [1:3] "mpg" "cyl" "disp"
 #>   ..$ nfeatures             : int 3

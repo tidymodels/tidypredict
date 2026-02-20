@@ -7,3 +7,9 @@ For use in orbital package.
 ``` r
 .extract_partykit_classprob(model)
 ```
+
+## Arguments
+
+- model:
+
+  A partykit model object

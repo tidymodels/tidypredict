@@ -7,3 +7,9 @@ For use in orbital package.
 ``` r
 .extract_xgb_trees(model)
 ```
+
+## Arguments
+
+- model:
+
+  An xgb.Booster model

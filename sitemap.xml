@@ -18,6 +18,7 @@
 <url><loc>https://tidypredict.tidymodels.org/articles/rpart.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/save.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/sql.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/tree-internals.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/xgboost.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/authors.html</loc></url>
@@ -25,8 +26,11 @@
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/acceptable_formula.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/build_nested_node.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/build_nested_split_condition.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_case_when_tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_linear_pred.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-build_nested_case_when_tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_catboost_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_earth_multiclass.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_glmnet_multiclass.html</loc></url>
@@ -36,7 +40,10 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rpart_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-partykit_tree_info_full.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-rpart_tree_info_full.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/generate_nested_case_when_tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_tree_node.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/knit_print.tidypredict_test.html</loc></url>

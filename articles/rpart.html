@@ -52,6 +52,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
+    <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -156,34 +157,8 @@ value handling.</p>
 a <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when((!is.na(cyl) &amp; cyl &gt; 5 | is.na(cyl) &amp; !is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     disp &gt; 142.9 | is.na(cyl) &amp; is.na(disp) &amp; !is.na(hp) &amp; hp &gt; </span></span>
-<span><span class="co">#&gt;     101 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 2.5425 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(qsec) &amp; qsec &lt;= 18.41 | is.na(cyl) &amp; is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(wt) &amp; is.na(qsec) &amp; !is.na(vs) &amp; vs &lt;= </span></span>
-<span><span class="co">#&gt;     0.5 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(vs)) &amp; (!is.na(hp) &amp; hp &gt; 192.5 | is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(disp) &amp; disp &gt; 334 | is.na(hp) &amp; is.na(disp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 4.66 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; !is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     qsec &lt;= 15.455 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(carb) &amp; carb &gt; 3.5 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(carb) &amp; !is.na(gear) &amp; gear &gt; 4.5) ~ </span></span>
-<span><span class="co">#&gt;     13.4142857142857, (!is.na(cyl) &amp; cyl &gt; 5 | is.na(cyl) &amp; !is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     disp &gt; 142.9 | is.na(cyl) &amp; is.na(disp) &amp; !is.na(hp) &amp; hp &gt; </span></span>
-<span><span class="co">#&gt;     101 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 2.5425 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(qsec) &amp; qsec &lt;= 18.41 | is.na(cyl) &amp; is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(wt) &amp; is.na(qsec) &amp; !is.na(vs) &amp; vs &lt;= </span></span>
-<span><span class="co">#&gt;     0.5 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(vs)) &amp; (!is.na(hp) &amp; hp &lt;= 192.5 | is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(disp) &amp; disp &lt;= 334 | is.na(hp) &amp; is.na(disp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &lt;= 4.66 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; !is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     qsec &gt; 15.455 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(carb) &amp; carb &lt;= 3.5 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(carb) &amp; !is.na(gear) &amp; gear &lt;= 4.5 | </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; is.na(carb) &amp; </span></span>
-<span><span class="co">#&gt;         is.na(gear)) ~ 18.2642857142857, .default = 26.6636363636364)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -203,24 +178,8 @@ statement</li>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_class</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(!is.na(Petal.Length) &amp; Petal.Length &lt;= 2.45 | is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(Petal.Width) &amp; Petal.Width &lt;= 0.8 | is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(Petal.Width) &amp; !is.na(Sepal.Length) &amp; Sepal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     5.45 | is.na(Petal.Length) &amp; is.na(Petal.Width) &amp; is.na(Sepal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(Sepal.Width) &amp; Sepal.Width &gt; 3.35 ~ "setosa", (!is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Length &gt; 2.45 | is.na(Petal.Length) &amp; !is.na(Petal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Width &gt; 0.8 | is.na(Petal.Length) &amp; is.na(Petal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(Sepal.Length) &amp; Sepal.Length &gt; 5.45 | is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(Petal.Width) &amp; is.na(Sepal.Length) &amp; !is.na(Sepal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     Sepal.Width &lt;= 3.35 | is.na(Petal.Length) &amp; is.na(Petal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(Sepal.Length) &amp; is.na(Sepal.Width)) &amp; (!is.na(Petal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Width &lt;= 1.75 | is.na(Petal.Width) &amp; !is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     Petal.Length &lt;= 4.75 | is.na(Petal.Width) &amp; is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(Sepal.Length) &amp; Sepal.Length &lt;= 6.15 | is.na(Petal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(Petal.Length) &amp; is.na(Sepal.Length) &amp; !is.na(Sepal.Width) &amp; </span></span>
-<span><span class="co">#&gt;     Sepal.Width &lt;= 2.95 | is.na(Petal.Width) &amp; is.na(Petal.Length) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(Sepal.Length) &amp; is.na(Sepal.Width)) ~ "versicolor", </span></span>
-<span><span class="co">#&gt;     .default = "virginica")</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(Petal.Length &lt;= 2.45 ~ "setosa", .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.75 ~ "versicolor", .default = "virginica"))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -235,34 +194,8 @@ objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when((!is.na(cyl) &amp; cyl &gt; 5 | is.na(cyl) &amp; !is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     disp &gt; 142.9 | is.na(cyl) &amp; is.na(disp) &amp; !is.na(hp) &amp; hp &gt; </span></span>
-<span><span class="co">#&gt;     101 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 2.5425 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(qsec) &amp; qsec &lt;= 18.41 | is.na(cyl) &amp; is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(wt) &amp; is.na(qsec) &amp; !is.na(vs) &amp; vs &lt;= </span></span>
-<span><span class="co">#&gt;     0.5 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(vs)) &amp; (!is.na(hp) &amp; hp &gt; 192.5 | is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(disp) &amp; disp &gt; 334 | is.na(hp) &amp; is.na(disp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 4.66 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; !is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     qsec &lt;= 15.455 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(carb) &amp; carb &gt; 3.5 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(carb) &amp; !is.na(gear) &amp; gear &gt; 4.5) ~ </span></span>
-<span><span class="co">#&gt;     13.4142857142857, (!is.na(cyl) &amp; cyl &gt; 5 | is.na(cyl) &amp; !is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     disp &gt; 142.9 | is.na(cyl) &amp; is.na(disp) &amp; !is.na(hp) &amp; hp &gt; </span></span>
-<span><span class="co">#&gt;     101 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 2.5425 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(qsec) &amp; qsec &lt;= 18.41 | is.na(cyl) &amp; is.na(disp) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(wt) &amp; is.na(qsec) &amp; !is.na(vs) &amp; vs &lt;= </span></span>
-<span><span class="co">#&gt;     0.5 | is.na(cyl) &amp; is.na(disp) &amp; is.na(hp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(vs)) &amp; (!is.na(hp) &amp; hp &lt;= 192.5 | is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(disp) &amp; disp &lt;= 334 | is.na(hp) &amp; is.na(disp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &lt;= 4.66 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; !is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     qsec &gt; 15.455 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(carb) &amp; carb &lt;= 3.5 | is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     is.na(qsec) &amp; is.na(carb) &amp; !is.na(gear) &amp; gear &lt;= 4.5 | </span></span>
-<span><span class="co">#&gt;     is.na(hp) &amp; is.na(disp) &amp; is.na(wt) &amp; is.na(qsec) &amp; is.na(carb) &amp; </span></span>
-<span><span class="co">#&gt;         is.na(gear)) ~ 18.2642857142857, .default = 26.6636363636364)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="categorical-predictors">Categorical predictors<a class="anchor" aria-label="anchor" href="#categorical-predictors"></a>
@@ -275,15 +208,8 @@ generated formula uses <code>%in%</code> for categorical splits:</p>
 <span></span>
 <span><span class="va">model_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when((!is.na(cyl) &amp; cyl %in% c("6", "8") | is.na(cyl) &amp; </span></span>
-<span><span class="co">#&gt;     !is.na(hp) &amp; hp &gt; 101 | is.na(cyl) &amp; is.na(hp) &amp; !is.na(wt) &amp; </span></span>
-<span><span class="co">#&gt;     wt &gt; 2.5425 | is.na(cyl) &amp; is.na(hp) &amp; is.na(wt)) &amp; (!is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;     hp &gt; 192.5 | is.na(hp) &amp; !is.na(wt) &amp; wt &gt; 4.66) ~ 13.4142857142857, </span></span>
-<span><span class="co">#&gt;     (!is.na(cyl) &amp; cyl %in% c("6", "8") | is.na(cyl) &amp; !is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;         hp &gt; 101 | is.na(cyl) &amp; is.na(hp) &amp; !is.na(wt) &amp; wt &gt; </span></span>
-<span><span class="co">#&gt;         2.5425 | is.na(cyl) &amp; is.na(hp) &amp; is.na(wt)) &amp; (!is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;         hp &lt;= 192.5 | is.na(hp) &amp; !is.na(wt) &amp; wt &lt;= 4.66 | is.na(hp) &amp; </span></span>
-<span><span class="co">#&gt;         is.na(wt)) ~ 18.2642857142857, .default = 26.6636363636364)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(cyl %in% c("6", "8") ~ case_when(hp &lt;= 192.5 ~ 18.2642857142857, </span></span>
+<span><span class="co">#&gt;     .default = 13.4142857142857), .default = 26.6636363636364)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="surrogate-splits">Surrogate splits<a class="anchor" aria-label="anchor" href="#surrogate-splits"></a>

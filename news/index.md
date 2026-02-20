@@ -31,6 +31,20 @@
 
 ### Improvements
 
+- Tree models (rpart, partykit, ranger, randomForest, xgboost, lightgbm,
+  catboost) now generate nested
+  [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
+  expressions that mirror the tree structure, instead of flat
+  expressions with all leaf conditions at the same level. This produces
+  more efficient SQL and R code because conditions are evaluated
+  hierarchically.
+  ([\#227](https://github.com/tidymodels/tidypredict/issues/227))
+
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now documents the parsed model version system (v1/v2/v3) and model
+  type classes in its help page.
+  ([\#227](https://github.com/tidymodels/tidypredict/issues/227))
+
 - [`earth()`](https://rdrr.io/pkg/earth/man/earth.html) models now
   support additional GLM families and link functions: Gamma,
   inverse.gaussian, probit, and cloglog.
