@@ -4,14 +4,11 @@
 \alias{.build_nested_case_when_tree}
 \title{Build nested case_when expression from tree info}
 \usage{
-.build_nested_case_when_tree(tree_info, na_handling = "none")
+.build_nested_case_when_tree(tree_info)
 }
 \arguments{
 \item{tree_info}{A tree info list with nodeID, leftChild, rightChild,
 splitvarName, terminal, prediction, and node_splits}
-
-\item{na_handling}{How to handle NA values: \code{"none"}, \code{"surrogate"}, or
-\code{"stop"}}
 }
 \description{
 Shared helper for building nested tree expressions. This is the nested

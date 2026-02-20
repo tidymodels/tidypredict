@@ -395,9 +395,9 @@ parse_model.rpart <- function(model) {
 }
 
 #' @export
-tidypredict_fit.rpart <- function(model, na_handling = "none", ...) {
+tidypredict_fit.rpart <- function(model, ...) {
   tree_info <- rpart_tree_info_full(model)
-  generate_nested_case_when_tree(tree_info, na_handling = na_handling)
+  generate_nested_case_when_tree(tree_info)
 }
 
 #' @export
@@ -481,10 +481,9 @@ tidypredict_test.rpart <- function(
 #'
 #' For use in orbital package.
 #' @param model An rpart model object
-#' @param na_handling How to handle NA values
 #' @keywords internal
 #' @export
-.extract_rpart_classprob <- function(model, na_handling = "none") {
+.extract_rpart_classprob <- function(model) {
   if (!inherits(model, "rpart")) {
     cli::cli_abort(
       "{.arg model} must be {.cls rpart}, not {.obj_type_friendly {model}}."
@@ -508,17 +507,14 @@ tidypredict_test.rpart <- function(
   probs <- yval2[, prob_cols, drop = FALSE]
   colnames(probs) <- ylevels
 
-  # Get tree structure with surrogate handling
+  # Get tree structure
   tree_info <- rpart_tree_info_full(model)
 
   res <- list()
   for (i in seq_len(ncol(probs))) {
     tree_info_copy <- tree_info
     tree_info_copy$prediction <- probs[, i]
-    res[[i]] <- generate_nested_case_when_tree(
-      tree_info_copy,
-      na_handling = na_handling
-    )
+    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
   }
   res
 }

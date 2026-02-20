@@ -4,14 +4,10 @@
 \alias{.extract_rpart_classprob}
 \title{Extract classprob trees for rpart models}
 \usage{
-.extract_rpart_classprob(model, nested = FALSE, na_handling = "none")
+.extract_rpart_classprob(model)
 }
 \arguments{
 \item{model}{An rpart model object}
-
-\item{nested}{Logical, whether to use nested case_when (default FALSE)}
-
-\item{na_handling}{How to handle NA values when nested = TRUE}
 }
 \description{
 For use in orbital package.

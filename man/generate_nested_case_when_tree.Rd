@@ -4,17 +4,10 @@
 \alias{generate_nested_case_when_tree}
 \title{Generate nested case_when trees}
 \usage{
-generate_nested_case_when_tree(tree_info, na_handling = "none")
+generate_nested_case_when_tree(tree_info)
 }
 \arguments{
 \item{tree_info}{A tree info list from \code{rpart_tree_info_full()} or similar}
-
-\item{na_handling}{How to handle NA values in split variables:
-\itemize{
-\item \code{"none"} (default): No NA handling, fastest and simplest
-\item \code{"surrogate"}: Use surrogate splits for NA handling (like rpart default)
-\item \code{"stop"}: Predict at first NA encountered (like \code{usesurrogate=0})
-}}
 }
 \description{
 These functions generate nested \code{case_when()} expressions for decision trees,
@@ -49,11 +42,15 @@ will be turned into the following nested \code{case_when()} statement:
   )
 )
 }\if{html}{\out{</div>}}
+
+NA values in predictor columns are not handled by the generated expression.
+Users should ensure that predictor columns do not contain NA values before
+using the generated expression, or the results will be NA for those rows.
 }
 \keyword{Generate}
+\keyword{a}
 \keyword{case_when}
 \keyword{for}
 \keyword{internal}
-\keyword{multiple}
 \keyword{nested}
-\keyword{trees}
+\keyword{tree}

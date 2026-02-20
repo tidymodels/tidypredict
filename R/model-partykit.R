@@ -181,9 +181,9 @@ parse_model.party <- function(model) {
 # Fit formula -----------------------------------
 
 #' @export
-tidypredict_fit.party <- function(model, na_handling = "none", ...) {
+tidypredict_fit.party <- function(model, ...) {
   tree_info <- partykit_tree_info_full(model)
-  generate_nested_case_when_tree(tree_info, na_handling = na_handling)
+  generate_nested_case_when_tree(tree_info)
 }
 
 # For {orbital}
@@ -191,10 +191,9 @@ tidypredict_fit.party <- function(model, na_handling = "none", ...) {
 #'
 #' For use in orbital package.
 #' @param model A partykit model object
-#' @param na_handling How to handle NA values
 #' @keywords internal
 #' @export
-.extract_partykit_classprob <- function(model, na_handling = "none") {
+.extract_partykit_classprob <- function(model) {
   if (!inherits(model, "party")) {
     cli::cli_abort(
       "{.arg model} must be {.cls party}, not {.obj_type_friendly {model}}."
@@ -228,10 +227,7 @@ tidypredict_fit.party <- function(model, na_handling = "none", ...) {
   for (i in seq_len(ncol(preds))) {
     tree_info_copy <- tree_info_full
     tree_info_copy$prediction <- preds[, i]
-    res[[i]] <- generate_nested_case_when_tree(
-      tree_info_copy,
-      na_handling = na_handling
-    )
+    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
   }
   res
 }

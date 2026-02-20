@@ -4,15 +4,13 @@
 \alias{build_nested_node}
 \title{Build a nested case_when expression for a single node}
 \usage{
-build_nested_node(node_id, tree_info, na_handling = "none")
+build_nested_node(node_id, tree_info)
 }
 \arguments{
 \item{node_id}{The node ID to build (0-indexed)}
 
 \item{tree_info}{Tree info list with nodeID, leftChild, rightChild,
 splitvarName, terminal, prediction, and node_splits}
-
-\item{na_handling}{How to handle NA values}
 }
 \description{
 Build a nested case_when expression for a single node

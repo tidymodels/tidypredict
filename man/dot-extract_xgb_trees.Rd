@@ -6,6 +6,9 @@
 \usage{
 .extract_xgb_trees(model)
 }
+\arguments{
+\item{model}{An xgb.Booster model}
+}
 \description{
 For use in orbital package.
 }
