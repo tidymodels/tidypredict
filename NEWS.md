@@ -2,6 +2,8 @@
 
 ## New Model Supports
 
+- Added support for rpart decision tree models (`rpart`). (#226)
+
 - Added support for CatBoost models (`catboost.Model`). (#TBD, #187, #188)
   - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh, Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.
   - Tree types: oblivious (default `SymmetricTree`) and non-oblivious (`Depthwise` or `Lossguide` grow policy).
