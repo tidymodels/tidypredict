@@ -672,14 +672,18 @@ get_catboost_missing <- function(nan_treatment, op) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.catboost.Model <- function(model) {
+tidypredict_fit.catboost.Model <- function(model, nested = FALSE, ...) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_catboost(parsedmodel)
+  if (nested) {
+    build_fit_formula_catboost_nested(parsedmodel)
+  } else {
+    build_fit_formula_catboost(parsedmodel)
+  }
 }
 
 # Internal function for parsnip model_fit objects with CatBoost
 # Called from tidymodels.R
-tidypredict_fit_catboost_parsnip <- function(model) {
+tidypredict_fit_catboost_parsnip <- function(model, nested = FALSE) {
   cb_model <- model$fit
   parsedmodel <- parse_model(cb_model)
 
@@ -688,7 +692,11 @@ tidypredict_fit_catboost_parsnip <- function(model) {
     parsedmodel <- setup_catboost_parsnip_categories(parsedmodel, model)
   }
 
-  build_fit_formula_catboost(parsedmodel)
+  if (nested) {
+    build_fit_formula_catboost_nested(parsedmodel)
+  } else {
+    build_fit_formula_catboost(parsedmodel)
+  }
 }
 
 setup_catboost_parsnip_categories <- function(parsedmodel, model) {
@@ -776,6 +784,292 @@ apply_catboost_scale_bias <- function(formula, parsedmodel) {
     formula <- expr(!!formula + !!bias)
   }
   formula
+}
+
+# Nested formula builders for CatBoost -----------------------------------------
+
+build_fit_formula_catboost_nested <- function(parsedmodel) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective %||% "RMSE"
+
+  if (!objective %in% catboost_supported_objectives) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {catboost_supported_objectives}}."
+      )
+    )
+  }
+
+  if (objective %in% catboost_multiclass_objectives) {
+    return(build_fit_formula_catboost_multiclass_nested(parsedmodel, objective))
+  }
+
+  # Extract nested trees
+  trees <- extract_catboost_trees_nested(parsedmodel)
+  f <- reduce_addition(trees)
+  f <- apply_catboost_scale_bias(f, parsedmodel)
+
+  if (objective %in% catboost_sigmoid_objectives) {
+    f <- expr(1 / (1 + exp(-(!!f))))
+  }
+
+  f
+}
+
+build_fit_formula_catboost_multiclass_nested <- function(
+  parsedmodel,
+  objective
+) {
+  n_trees <- length(parsedmodel$trees)
+  num_class <- parsedmodel$general$num_class
+
+  if (is.null(num_class) || num_class < 2) {
+    cli::cli_abort("Multiclass model must have num_class >= 2.")
+  }
+
+  # Extract all nested trees
+  trees <- extract_catboost_trees_nested(parsedmodel)
+
+  # Trees are stored round-robin by class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+  raw_scores <- lapply(raw_scores, apply_catboost_scale_bias, parsedmodel)
+
+  if (objective == "MultiClass") {
+    # Softmax
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else {
+    # MultiClassOneVsAll: sigmoid for each class
+    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
+# Extract trees in nested format
+extract_catboost_trees_nested <- function(parsedmodel) {
+  cat_mapping <- get_catboost_cat_mapping(parsedmodel)
+  tree_type <- parsedmodel$general$tree_type
+
+  map(parsedmodel$trees, function(tree) {
+    if (tree_type == "oblivious") {
+      build_nested_catboost_oblivious_tree(tree, cat_mapping)
+    } else {
+      build_nested_catboost_nonoblivious_tree(tree, cat_mapping)
+    }
+  })
+}
+
+# Build nested case_when for oblivious tree
+# Oblivious trees have a flat structure where all leaves share the same splits
+build_nested_catboost_oblivious_tree <- function(tree, cat_mapping) {
+  # tree is a list of (prediction, path) pairs indexed 0 to 2^n_splits - 1
+  # All paths have the same length (one condition per split level)
+  if (length(tree) == 0) {
+    cli::cli_abort("Empty tree.", .internal = TRUE)
+  }
+
+  # Single leaf (stump)
+  if (length(tree) == 1 && length(tree[[1]]$path) == 0) {
+    return(tree[[1]]$prediction)
+  }
+
+  # Extract unique splits (from any leaf, they all have same splits)
+  n_splits <- length(tree[[1]]$path)
+  if (n_splits == 0) {
+    return(tree[[1]]$prediction)
+  }
+
+  # Create leaf indices (0-indexed)
+  leaf_indices <- seq_len(length(tree)) - 1L
+
+  # Build nested structure recursively by split level
+  build_nested_oblivious_level(tree, leaf_indices, cat_mapping, split_level = 1)
+}
+
+build_nested_oblivious_level <- function(
+  tree,
+  leaf_indices,
+  cat_mapping,
+  split_level
+) {
+  n_splits <- length(tree[[1]]$path)
+
+  if (split_level > n_splits || length(leaf_indices) == 0) {
+    # Should have exactly one leaf
+    if (length(leaf_indices) == 1) {
+      return(tree[[leaf_indices + 1]]$prediction)
+    }
+    # nocov start
+    cli::cli_abort("Expected single leaf at bottom level.", .internal = TRUE)
+    # nocov end
+  }
+
+  if (length(leaf_indices) == 1) {
+    return(tree[[leaf_indices + 1]]$prediction)
+  }
+
+  # Group leaves by bit value at current split level
+  # bit=0 means "less-equal" (left), bit=1 means "more" (right)
+  bit_pos <- split_level - 1L
+  bit_values <- bitwAnd(bitwShiftR(leaf_indices, bit_pos), 1L)
+
+  left_indices <- leaf_indices[bit_values == 0L]
+  right_indices <- leaf_indices[bit_values == 1L]
+
+  # Get split info from any left leaf (they all have the "less-equal" condition)
+  # We use the first leaf from the left group
+  if (length(left_indices) > 0) {
+    split_info <- tree[[left_indices[1] + 1]]$path[[split_level]]
+  } else {
+    # All leaves go right - use the right leaf but with inverted condition
+    split_info <- tree[[right_indices[1] + 1]]$path[[split_level]]
+  }
+
+  # Build condition (for left branch)
+  condition <- build_nested_catboost_condition(split_info, cat_mapping)
+
+  # Recurse
+  left_subtree <- build_nested_oblivious_level(
+    tree,
+    left_indices,
+    cat_mapping,
+    split_level + 1
+  )
+  right_subtree <- build_nested_oblivious_level(
+    tree,
+    right_indices,
+    cat_mapping,
+    split_level + 1
+  )
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
+# Build nested case_when for non-oblivious tree
+build_nested_catboost_nonoblivious_tree <- function(tree, cat_mapping) {
+  # For non-oblivious trees, we need to reconstruct the tree structure
+  # from the flat list of (prediction, path) pairs
+  if (length(tree) == 0) {
+    cli::cli_abort("Empty tree.", .internal = TRUE)
+  }
+
+  # Single leaf (stump)
+  if (length(tree) == 1 && length(tree[[1]]$path) == 0) {
+    return(tree[[1]]$prediction)
+  }
+
+  # Build recursively from paths
+  build_nested_nonoblivious_node(tree, cat_mapping, path_depth = 1)
+}
+
+build_nested_nonoblivious_node <- function(leaves, cat_mapping, path_depth) {
+  if (length(leaves) == 1) {
+    # Single leaf - return prediction
+    return(leaves[[1]]$prediction)
+  }
+
+  # Group by condition at current depth
+  # Find the split that divides leaves at this depth
+  first_leaf <- leaves[[1]]
+  if (path_depth > length(first_leaf$path)) {
+    # All remaining paths are shorter, return first prediction
+    return(first_leaf$prediction)
+  }
+
+  # Get condition from first leaf
+  split_info <- first_leaf$path[[path_depth]]
+
+  # Partition leaves based on their condition at this depth
+  # "less-equal" or "equal" go left, "more" or "not-equal" go right
+  is_left_condition <- function(leaf) {
+    if (path_depth > length(leaf$path)) {
+      return(TRUE) # Default to left for shorter paths
+    }
+    op <- leaf$path[[path_depth]]$op
+    op %in% c("less-equal", "equal")
+  }
+
+  left_leaves <- Filter(is_left_condition, leaves)
+  right_leaves <- Filter(Negate(is_left_condition), leaves)
+
+  if (length(left_leaves) == 0 || length(right_leaves) == 0) {
+    # All leaves go to one side - continue deeper
+    return(build_nested_nonoblivious_node(leaves, cat_mapping, path_depth + 1))
+  }
+
+  # Build condition (use left condition)
+  condition <- build_nested_catboost_condition(split_info, cat_mapping)
+
+  left_subtree <- build_nested_nonoblivious_node(
+    left_leaves,
+    cat_mapping,
+    path_depth + 1
+  )
+  right_subtree <- build_nested_nonoblivious_node(
+    right_leaves,
+    cat_mapping,
+    path_depth + 1
+  )
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
+# Build condition expression for a split
+build_nested_catboost_condition <- function(split_info, cat_mapping) {
+  if (split_info$type == "categorical") {
+    build_nested_catboost_categorical(split_info, cat_mapping)
+  } else {
+    build_nested_catboost_comparison(split_info)
+  }
+}
+
+build_nested_catboost_comparison <- function(split_info) {
+  col_name <- rlang::sym(split_info$col)
+  val <- as.numeric(split_info$val)
+  include_missing <- split_info$missing
+
+  # For nested, we use the "left" condition (less-equal)
+  if (include_missing) {
+    expr(!!col_name <= !!val | is.na(!!col_name))
+  } else {
+    expr(!!col_name <= !!val)
+  }
+}
+
+build_nested_catboost_categorical <- function(split_info, cat_mapping) {
+  col_name <- rlang::sym(split_info$col)
+  hash_value <- split_info$hash_value
+  hash_str <- as.character(hash_value)
+
+  category <- cat_mapping[[hash_str]]
+  if (is.null(category) || is.na(category)) {
+    cli::cli_abort(
+      c(
+        "No category mapping found for hash {.val {hash_value}}.",
+        "i" = "For raw CatBoost models, use {.fn set_catboost_categories}."
+      )
+    )
+  }
+
+  # For nested, we use "equal" (left condition)
+  expr(!!col_name == !!category)
 }
 
 build_fit_formula_catboost_multiclass <- function(parsedmodel, objective) {
@@ -936,9 +1230,10 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
 #'
 #' For use in orbital package.
 #' @param model A CatBoost model object
+#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_catboost_trees <- function(model) {
+.extract_catboost_trees <- function(model, nested = FALSE) {
   if (!inherits(model, "catboost.Model")) {
     cli::cli_abort(
       "{.arg model} must be {.cls catboost.Model}, not {.obj_type_friendly {model}}."
@@ -947,8 +1242,12 @@ get_catboost_categorical_condition <- function(.x, cat_mapping) {
 
   parsedmodel <- parse_model(model)
 
-  map(
-    seq_along(parsedmodel$trees),
-    function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
-  )
+  if (nested) {
+    extract_catboost_trees_nested(parsedmodel)
+  } else {
+    map(
+      seq_along(parsedmodel$trees),
+      function(i) expr(case_when(!!!get_catboost_case_tree(i, parsedmodel)))
+    )
+  }
 }

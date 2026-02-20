@@ -171,8 +171,15 @@ test_that(".partykit_tree_info_full is exported and works", {
   expect_named(
     tree_info,
     c(
-      "nodeID", "leftChild", "rightChild", "splitvarName", "terminal",
-      "prediction", "node_splits", "majority_left", "use_surrogates"
+      "nodeID",
+      "leftChild",
+      "rightChild",
+      "splitvarName",
+      "terminal",
+      "prediction",
+      "node_splits",
+      "majority_left",
+      "use_surrogates"
     )
   )
 })

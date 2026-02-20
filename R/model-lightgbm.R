@@ -313,9 +313,235 @@ parse_lgb_categorical_threshold <- function(threshold) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.lgb.Booster <- function(model) {
+tidypredict_fit.lgb.Booster <- function(model, nested = FALSE, ...) {
   parsedmodel <- parse_model(model)
-  build_fit_formula_lgb(parsedmodel)
+  if (nested) {
+    build_fit_formula_lgb_nested(parsedmodel, model)
+  } else {
+    build_fit_formula_lgb(parsedmodel)
+  }
+}
+
+# Nested formula builder for lightgbm
+build_fit_formula_lgb_nested <- function(parsedmodel, model) {
+  n_trees <- length(parsedmodel$trees)
+
+  if (n_trees == 0) {
+    cli::cli_abort("Model has no trees.")
+  }
+
+  objective <- parsedmodel$general$params$objective %||% "regression"
+
+  if (!objective %in% lgb_supported_objectives) {
+    cli::cli_abort(
+      c(
+        "Unsupported objective: {.val {objective}}.",
+        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
+      )
+    )
+  }
+
+  if (objective %in% lgb_multiclass_objectives) {
+    return(build_fit_formula_lgb_multiclass_nested(
+      parsedmodel,
+      model,
+      objective
+    ))
+  }
+
+  # Extract nested trees
+  trees <- extract_lgb_trees_nested(model)
+
+  # RF boosting averages trees instead of summing
+  boosting <- parsedmodel$general$params$boosting
+  if (!is.null(boosting) && boosting == "rf") {
+    f <- reduce_addition(trees)
+    f <- expr_division(f, n_trees)
+  } else {
+    f <- reduce_addition(trees)
+  }
+
+  # Apply transformation
+  if (objective %in% lgb_exp_objectives) {
+    f <- expr(exp(!!f))
+  } else if (objective %in% lgb_sigmoid_objectives) {
+    f <- lgb_sigmoid(f)
+  }
+
+  f
+}
+
+build_fit_formula_lgb_multiclass_nested <- function(
+  parsedmodel,
+  model,
+  objective
+) {
+  n_trees <- length(parsedmodel$trees)
+  num_class <- parsedmodel$general$num_class
+
+  if (is.null(num_class) || num_class < 2) {
+    cli::cli_abort("Multiclass model must have num_class >= 2.")
+  }
+
+  # Extract all nested trees
+  trees <- extract_lgb_trees_nested(model)
+
+  # Group trees by class: tree i belongs to class (i-1) %% num_class
+  class_trees <- lapply(seq_len(num_class), function(class_idx) {
+    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
+  })
+
+  # Build raw score formula for each class
+  raw_scores <- lapply(class_trees, function(indices) {
+    reduce_addition(trees[indices])
+  })
+
+  # Apply transformation based on objective
+  if (objective == "multiclass") {
+    # Softmax: exp(raw_i) / sum(exp(raw_j))
+    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
+    denom <- reduce_addition(exp_raws)
+
+    result <- map(seq_len(num_class), function(i) {
+      expr(exp(!!raw_scores[[i]]) / (!!denom))
+    })
+  } else if (objective == "multiclassova") {
+    # One-vs-all: sigmoid for each class independently
+    result <- map(raw_scores, lgb_sigmoid)
+  }
+
+  names(result) <- paste0("class_", seq_len(num_class) - 1)
+  result
+}
+
+# Extract trees in nested format
+extract_lgb_trees_nested <- function(model) {
+  trees_df <- lightgbm::lgb.model.dt.tree(model)
+  trees_df <- as.data.frame(trees_df)
+
+  # Extract linear tree info
+  model_json <- jsonlite::fromJSON(model$dump_model())
+  feature_names <- model_json$feature_names
+  linear_info <- parse_lgb_linear_trees(model, feature_names)
+
+  trees_split <- split(trees_df, trees_df$tree_index)
+
+  map(names(trees_split), function(tree_idx) {
+    tree_df <- trees_split[[tree_idx]]
+    tree_linear <- linear_info[[tree_idx]]
+    build_nested_lgb_tree(tree_df, tree_linear)
+  })
+}
+
+# Build nested case_when for a single lightgbm tree
+build_nested_lgb_tree <- function(tree_df, linear_info = NULL) {
+  # Build children map
+  children_map <- get_lgb_children_map(tree_df)
+
+  # Find root node (split_index == 0)
+  root_row <- which(tree_df$split_index == 0)
+
+  if (length(root_row) == 0) {
+    # Single leaf tree - return leaf value
+    leaf_row <- which(!is.na(tree_df$leaf_index))
+    if (length(leaf_row) == 1) {
+      leaf_idx <- tree_df$leaf_index[[leaf_row]]
+      leaf_value <- tree_df$leaf_value[[leaf_row]]
+      if (
+        !is.null(linear_info) && as.character(leaf_idx) %in% names(linear_info)
+      ) {
+        return(build_lgb_linear_prediction(linear_info[[as.character(
+          leaf_idx
+        )]]))
+      }
+      return(leaf_value)
+    }
+    cli::cli_abort("Unable to find root or leaf node.", .internal = TRUE)
+  }
+
+  build_nested_lgb_node(root_row, tree_df, children_map, linear_info)
+}
+
+# Recursively build nested case_when node
+build_nested_lgb_node <- function(
+  node_row,
+  tree_df,
+  children_map,
+  linear_info
+) {
+  # Check if this is a leaf
+  if (!is.na(tree_df$leaf_index[[node_row]])) {
+    leaf_idx <- tree_df$leaf_index[[node_row]]
+    leaf_value <- tree_df$leaf_value[[node_row]]
+
+    # Check for linear leaf
+    if (
+      !is.null(linear_info) && as.character(leaf_idx) %in% names(linear_info)
+    ) {
+      leaf_linear <- linear_info[[as.character(leaf_idx)]]
+      leaf_linear$fallback <- leaf_value
+      return(build_lgb_linear_prediction(leaf_linear))
+    }
+
+    return(leaf_value)
+  }
+
+  # Internal node - get split info
+  split_index <- tree_df$split_index[[node_row]]
+  decision_type <- tree_df$decision_type[[node_row]]
+  col <- tree_df$split_feature[[node_row]]
+  threshold <- tree_df$threshold[[node_row]]
+  default_left <- tree_df$default_left[[node_row]] == "TRUE"
+
+  # Get children (first is LEFT, second is RIGHT)
+  children <- children_map[[as.character(split_index)]]
+  left_row <- children[1]
+  right_row <- children[2]
+
+  # Recurse
+  left_subtree <- build_nested_lgb_node(
+    left_row,
+    tree_df,
+    children_map,
+    linear_info
+  )
+  right_subtree <- build_nested_lgb_node(
+    right_row,
+    tree_df,
+    children_map,
+    linear_info
+  )
+
+  # Build condition
+  col_sym <- rlang::sym(col)
+
+  if (decision_type == "<=") {
+    # Numerical split: LEFT = (<= threshold), RIGHT = (> threshold)
+    if (default_left) {
+      # Missing goes left
+      condition <- expr(!!col_sym <= !!as.numeric(threshold) | is.na(!!col_sym))
+    } else {
+      # Missing goes right - condition is just <=
+      condition <- expr(!!col_sym <= !!as.numeric(threshold))
+    }
+  } else if (decision_type == "==") {
+    # Categorical split: LEFT = (in set), RIGHT = (not in set)
+    category_set <- parse_lgb_categorical_threshold(threshold)
+    if (default_left) {
+      condition <- expr(!!col_sym %in% !!category_set | is.na(!!col_sym))
+    } else {
+      condition <- expr(!!col_sym %in% !!category_set)
+    }
+  } else {
+    # nocov start
+    cli::cli_abort(
+      "Unsupported decision type: {.val {decision_type}}.",
+      .internal = TRUE
+    )
+    # nocov end
+  }
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
 build_fit_formula_lgb <- function(parsedmodel) {
@@ -477,21 +703,25 @@ build_lgb_linear_prediction <- function(linear) {
 #'
 #' For use in orbital package.
 #' @param model A LightGBM model object
+#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_lgb_trees <- function(model) {
+.extract_lgb_trees <- function(model, nested = FALSE) {
   if (!inherits(model, "lgb.Booster")) {
     cli::cli_abort(
       "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
     )
   }
 
-  parsedmodel <- parse_model(model)
-
-  map(
-    seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
-  )
+  if (nested) {
+    extract_lgb_trees_nested(model)
+  } else {
+    parsedmodel <- parse_model(model)
+    map(
+      seq_len(length(parsedmodel$trees)),
+      ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
+    )
+  }
 }
 
 get_lgb_case_fun <- function(.x) {

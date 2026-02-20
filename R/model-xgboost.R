@@ -300,30 +300,193 @@ get_base_score <- function(model) {
 }
 
 #' @export
-tidypredict_fit.xgb.Booster <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula_xgb(parsedmodel)
+tidypredict_fit.xgb.Booster <- function(model, nested = FALSE, ...) {
+  if (nested) {
+    build_fit_formula_xgb_nested(model)
+  } else {
+    parsedmodel <- parse_model(model)
+    build_fit_formula_xgb(parsedmodel)
+  }
+}
+
+# Build nested xgboost formula
+build_fit_formula_xgb_nested <- function(model) {
+  trees_nested <- extract_xgb_trees_nested(model)
+
+  # Apply DART weight_drop if present
+  json_params <- get_xgb_json_params(model)
+  trees_nested <- apply_dart_weights(trees_nested, json_params$weight_drop)
+
+  # Additive model
+  f <- reduce_addition(trees_nested)
+
+  base_score <- json_params$base_score
+  if (is.null(base_score)) {
+    base_score <- 0.5
+  }
+
+  params <- attr(model, "param") %||% model$params
+  objective <- params$objective
+
+  assigned <- 0
+  if (is.null(objective)) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+    cli::cli_warn(
+      "If the objective is a custom function,
+      please explicitly apply it to the output."
+    )
+  } else if (
+    objective %in%
+      c("reg:squarederror", "reg:squaredlogerror", "binary:logitraw")
+  ) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+  } else if (objective %in% c("binary:logistic", "reg:logistic")) {
+    assigned <- 1
+    f <- expr(1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score)))))
+  } else if (objective %in% c("count:poisson", "reg:tweedie", "reg:gamma")) {
+    assigned <- 1
+    f <- expr(!!base_score * exp(!!f))
+  } else if (objective %in% c("reg:pseudohubererror", "reg:absoluteerror")) {
+    assigned <- 1
+    if (base_score != 0) {
+      f <- expr_addition(f, base_score)
+    }
+  } else if (objective == "binary:hinge") {
+    assigned <- 1
+    f <- expr(as.numeric((!!f + !!base_score) >= 0))
+  }
+  if (assigned == 0) {
+    cli::cli_abort(
+      c(
+        "Objective {.val {objective}} is not supported.",
+        i = "Supported objectives: {.val binary:hinge}, {.val binary:logistic},
+        {.val binary:logitraw}, {.val count:poisson}, {.val reg:absoluteerror},
+        {.val reg:gamma}, {.val reg:logistic}, {.val reg:pseudohubererror},
+        {.val reg:squarederror}, {.val reg:squaredlogerror}, {.val reg:tweedie}.",
+        i = "Multiclass objectives ({.val multi:softmax}, {.val multi:softprob})
+        are not supported."
+      )
+    )
+  }
+  f
+}
+
+# Extract nested trees from xgboost model
+extract_xgb_trees_nested <- function(model) {
+  trees_df <- get_xgb_trees_df(model)
+  trees_split <- split(trees_df, trees_df$Tree)
+  map(trees_split, build_nested_xgb_tree)
+}
+
+# Get xgboost trees as data frame
+get_xgb_trees_df <- function(model) {
+  if (is.null(attr(model, "param"))) {
+    xd <- xgboost::xgb.dump(
+      model = model,
+      dump_format = "text",
+      with_stats = TRUE
+    )
+    feature_names <- model$feature_names
+    trees <- xgboost::xgb.model.dt.tree(text = xd)
+  } else {
+    feature_names <- xgboost::getinfo(model, "feature_name")
+    trees <- xgboost::xgb.model.dt.tree(model = model)
+  }
+  trees <- as.data.frame(trees)
+
+  # Map feature indices to names if needed
+  if (is.null(attr(model, "param"))) {
+    feature_names_tbl <- data.frame(
+      Feature = as.character(0:(length(feature_names) - 1)),
+      feature_name = feature_names,
+      stringsAsFactors = FALSE
+    )
+    trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
+  } else {
+    trees$feature_name <- ifelse(trees$Feature == "Leaf", NA, trees$Feature)
+  }
+
+  # Convert Yes/No/Missing to integer indices
+  trees[, c("Yes", "No", "Missing")] <- lapply(
+    trees[, c("Yes", "No", "Missing")],
+    function(x) as.integer(sub("^.*-", "", x)) + 1L
+  )
+
+  trees
+}
+
+# Build nested case_when for a single xgboost tree
+build_nested_xgb_tree <- function(tree_df) {
+  # tree_df has Node (0-indexed), Feature, Split, Yes, No, Missing, Quality/Gain
+  build_nested_xgb_node(1L, tree_df)
+}
+
+build_nested_xgb_node <- function(node_idx, tree_df) {
+  row <- tree_df[node_idx, ]
+
+  # Leaf node
+  if (row$Feature == "Leaf") {
+    return(row$Gain %||% row$Quality)
+  }
+
+  # Internal node
+  col <- rlang::sym(row$feature_name)
+  threshold <- row$Split
+  left_idx <- row$Yes
+  right_idx <- row$No
+  missing_idx <- row$Missing
+
+  left_subtree <- build_nested_xgb_node(left_idx, tree_df)
+  right_subtree <- build_nested_xgb_node(right_idx, tree_df)
+
+  # xgboost: Yes = left (< threshold), No = right (>= threshold)
+  # Missing can go either way
+  if (missing_idx == left_idx) {
+    # Missing goes left: (< threshold OR is.na)
+    condition <- expr(!!col < !!threshold | is.na(!!col))
+  } else if (missing_idx == right_idx) {
+    # Missing goes right: < threshold (no NA)
+    condition <- expr(!!col < !!threshold)
+  } else {
+    # No missing handling
+    condition <- expr(!!col < !!threshold)
+  }
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
 # For {orbital}
 #' Extract processed xgboost trees
 #'
 #' For use in orbital package.
+#' @param model An xgb.Booster model
+#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_xgb_trees <- function(model) {
+.extract_xgb_trees <- function(model, nested = FALSE) {
   if (!inherits(model, "xgb.Booster")) {
     cli::cli_abort(
       "{.arg model} must be {.cls xgb.Booster}, not {.obj_type_friendly {model}}."
     )
   }
 
-  parsedmodel <- parse_model(model)
+  json_params <- get_xgb_json_params(model)
 
-  trees <- map(
-    seq_len(length(parsedmodel$trees)),
-    ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
-  )
+  if (nested) {
+    trees <- extract_xgb_trees_nested(model)
+  } else {
+    parsedmodel <- parse_model(model)
+    trees <- map(
+      seq_len(length(parsedmodel$trees)),
+      ~ expr(case_when(!!!get_xgb_case_tree(.x, parsedmodel)))
+    )
+  }
 
-  apply_dart_weights(trees, parsedmodel$general$weight_drop)
+  apply_dart_weights(trees, json_params$weight_drop)
 }

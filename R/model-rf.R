@@ -84,9 +84,13 @@ parse_model.randomForest <- function(model) {
 # Fit model -----------------------------------------------
 
 #' @export
-tidypredict_fit.randomForest <- function(model) {
-  parsedmodel <- parse_model(model)
-  tidypredict_fit_randomForest(parsedmodel)
+tidypredict_fit.randomForest <- function(model, nested = FALSE, ...) {
+  if (nested) {
+    tidypredict_fit_rf_nested(model)
+  } else {
+    parsedmodel <- parse_model(model)
+    tidypredict_fit_randomForest(parsedmodel)
+  }
 }
 
 tidypredict_fit_randomForest <- function(parsedmodel) {
@@ -108,25 +112,81 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
   expr_division(res, n_trees)
 }
 
+# Nested formula builder for randomForest
+tidypredict_fit_rf_nested <- function(model) {
+  # Check if this is a classification model
+  if (!is.null(model$classes)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported for randomForest.",
+        i = "Only regression models can be converted to tidy formulas.",
+        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
+      )
+    )
+  }
+
+  n_trees <- model$ntree
+  term_labels <- names(model$forest$ncat)
+
+  tree_exprs <- map(seq_len(n_trees), function(tree_no) {
+    build_nested_rf_tree(model, tree_no, term_labels)
+  })
+
+  res <- reduce_addition(tree_exprs)
+  expr_division(res, n_trees)
+}
+
+# Build nested case_when for a single randomForest tree
+build_nested_rf_tree <- function(model, tree_no, term_labels) {
+  tree <- randomForest::getTree(model, tree_no)
+  build_nested_rf_node(1L, tree, term_labels)
+}
+
+# Recursively build nested case_when for randomForest node
+build_nested_rf_node <- function(node_id, tree, term_labels) {
+  row <- tree[node_id, ]
+
+  # Check if terminal (leaf) node - status == -1
+  if (row["status"] == -1) {
+    return(unname(row["prediction"]))
+  }
+
+  # Internal node - get split info
+  left_id <- unname(row["left daughter"])
+  right_id <- unname(row["right daughter"])
+  split_var <- unname(row["split var"])
+  split_val <- unname(row["split point"])
+
+  # Recurse
+  left_subtree <- build_nested_rf_node(left_id, tree, term_labels)
+  right_subtree <- build_nested_rf_node(right_id, tree, term_labels)
+
+  col_name <- term_labels[split_var]
+  col_sym <- rlang::sym(col_name)
+
+  # Numeric split: left = <= splitval, right = > splitval
+  condition <- expr(!!col_sym <= !!split_val)
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
 # For {orbital}
 #' Extract classification vote trees for randomForest models
 #'
 #' For use in orbital package.
 #' @param model A randomForest model object
+#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_rf_classprob <- function(model) {
+.extract_rf_classprob <- function(model, nested = FALSE) {
   if (!inherits(model, "randomForest")) {
     cli::cli_abort(
       "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
     )
   }
 
-  parsedmodel <- parse_model(model)
-
-  # Check if this is a classification model (string predictions)
-  first_pred <- parsedmodel$trees[[1]][[1]]$prediction
-  if (!is.character(first_pred)) {
+  # Check if this is a classification model
+  if (is.null(model$classes)) {
     cli::cli_abort(
       c(
         "Model is not a classification model.",
@@ -137,9 +197,22 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
 
   # Get class levels from the model
   lvls <- model$classes
+  term_labels <- names(model$forest$ncat)
 
-  # For each class, generate case_when expressions for all trees
-  # Each tree returns 1 if it predicts the class, 0 otherwise (voting)
+  if (nested) {
+    # For each class, generate nested case_when expressions for all trees
+    res <- list()
+    for (lvl in lvls) {
+      tree_exprs <- map(seq_len(model$ntree), function(tree_no) {
+        build_nested_rf_vote_tree(model, tree_no, term_labels, lvl)
+      })
+      res[[lvl]] <- tree_exprs
+    }
+    return(res)
+  }
+
+  # Flat mode (original implementation)
+  parsedmodel <- parse_model(model)
   res <- list()
   for (lvl in lvls) {
     tree_exprs <- map(parsedmodel$trees, function(tree) {
@@ -156,4 +229,63 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
   }
 
   res
+}
+
+# Build nested case_when for randomForest voting tree
+build_nested_rf_vote_tree <- function(
+  model,
+  tree_no,
+  term_labels,
+  class_level
+) {
+  tree <- randomForest::getTree(model, tree_no)
+  build_nested_rf_vote_node(1L, tree, term_labels, model$classes, class_level)
+}
+
+# Recursively build nested case_when for randomForest voting node
+build_nested_rf_vote_node <- function(
+  node_id,
+  tree,
+  term_labels,
+  classes,
+  class_level
+) {
+  row <- tree[node_id, ]
+
+  # Check if terminal (leaf) node - status == -1
+  if (row["status"] == -1) {
+    # Return 1 if prediction matches class_level, 0 otherwise
+    pred_class <- classes[unname(row["prediction"])]
+    return(if (pred_class == class_level) 1 else 0)
+  }
+
+  # Internal node - get split info
+  left_id <- unname(row["left daughter"])
+  right_id <- unname(row["right daughter"])
+  split_var <- unname(row["split var"])
+  split_val <- unname(row["split point"])
+
+  # Recurse
+  left_subtree <- build_nested_rf_vote_node(
+    left_id,
+    tree,
+    term_labels,
+    classes,
+    class_level
+  )
+  right_subtree <- build_nested_rf_vote_node(
+    right_id,
+    tree,
+    term_labels,
+    classes,
+    class_level
+  )
+
+  col_name <- term_labels[split_var]
+  col_sym <- rlang::sym(col_name)
+
+  # Numeric split: left = <= splitval, right = > splitval
+  condition <- expr(!!col_sym <= !!split_val)
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }

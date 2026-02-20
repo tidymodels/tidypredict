@@ -159,9 +159,13 @@ parse_model.ranger <- function(model) {
 # Fit formula -----------------------------------
 
 #' @export
-tidypredict_fit.ranger <- function(model) {
-  parsedmodel <- parse_model(model)
-  tidypredict_fit_ranger(parsedmodel)
+tidypredict_fit.ranger <- function(model, nested = FALSE, ...) {
+  if (nested) {
+    tidypredict_fit_ranger_nested(model)
+  } else {
+    parsedmodel <- parse_model(model)
+    tidypredict_fit_ranger(parsedmodel)
+  }
 }
 
 tidypredict_fit_ranger <- function(parsedmodel) {
@@ -183,14 +187,81 @@ tidypredict_fit_ranger <- function(parsedmodel) {
   expr_division(res, n_trees)
 }
 
+# Nested formula builder for ranger
+tidypredict_fit_ranger_nested <- function(model) {
+  # Check if this is a classification model
+  first_tree <- ranger::treeInfo(model, 1)
+  first_pred <- first_tree$prediction[first_tree$terminal][1]
+  if (is.character(first_pred) || is.factor(first_pred)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported for ranger.",
+        i = "Only regression models can be converted to tidy formulas.",
+        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
+      )
+    )
+  }
+
+  n_trees <- model$num.trees
+  tree_exprs <- map(seq_len(n_trees), function(tree_no) {
+    build_nested_ranger_tree(model, tree_no)
+  })
+
+  res <- reduce_addition(tree_exprs)
+  expr_division(res, n_trees)
+}
+
+# Build nested case_when for a single ranger tree
+build_nested_ranger_tree <- function(model, tree_no) {
+  tree <- ranger::treeInfo(model, tree_no)
+  build_nested_ranger_node(0L, tree)
+}
+
+# Recursively build nested case_when for ranger node
+build_nested_ranger_node <- function(node_id, tree) {
+  # node_id is 0-indexed in ranger
+  row <- tree[tree$nodeID == node_id, ]
+
+  # Check if terminal (leaf) node
+  if (row$terminal) {
+    return(row$prediction)
+  }
+
+  # Internal node - get split info
+  left_id <- row$leftChild
+  right_id <- row$rightChild
+  split_var <- row$splitvarName
+  split_val <- row$splitval
+
+  # Recurse
+  left_subtree <- build_nested_ranger_node(left_id, tree)
+  right_subtree <- build_nested_ranger_node(right_id, tree)
+
+  col_sym <- rlang::sym(as.character(split_var))
+
+  # Check if categorical split (splitval is NA for categorical)
+  if (is.na(split_val)) {
+    # Categorical split
+    split_class <- row$splitclass
+    cats <- strsplit(as.character(split_class), ", ")[[1]]
+    condition <- expr(!!col_sym %in% !!cats)
+  } else {
+    # Numeric split: left = <= splitval, right = > splitval
+    condition <- expr(!!col_sym <= !!split_val)
+  }
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
 # For {orbital}
 #' Extract classification probability trees for ranger models
 #'
 #' For use in orbital package.
 #' @param model A ranger model object fitted with `probability = TRUE`
+#' @param nested Logical, whether to use nested case_when (default FALSE)
 #' @keywords internal
 #' @export
-.extract_ranger_classprob <- function(model) {
+.extract_ranger_classprob <- function(model, nested = FALSE) {
   if (!inherits(model, "ranger")) {
     cli::cli_abort(
       "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
@@ -213,7 +284,19 @@ tidypredict_fit_ranger <- function(parsedmodel) {
   # Get class levels from the first node's probs
   lvls <- names(first_node$probs)
 
-  # For each class, generate case_when expressions for all trees
+  if (nested) {
+    # For each class, generate nested case_when expressions for all trees
+    res <- list()
+    for (lvl in lvls) {
+      tree_exprs <- map(seq_len(model$num.trees), function(tree_no) {
+        build_nested_ranger_prob_tree(model, tree_no, lvl)
+      })
+      res[[lvl]] <- tree_exprs
+    }
+    return(res)
+  }
+
+  # Flat mode (original implementation)
   res <- list()
   for (lvl in lvls) {
     tree_exprs <- map(parsedmodel$trees, function(tree) {
@@ -230,4 +313,48 @@ tidypredict_fit_ranger <- function(parsedmodel) {
   }
 
   res
+}
+
+# Build nested case_when for ranger probability tree
+build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
+  tree <- ranger::treeInfo(model, tree_no)
+  build_nested_ranger_prob_node(0L, tree, class_level)
+}
+
+# Recursively build nested case_when for ranger probability node
+build_nested_ranger_prob_node <- function(node_id, tree, class_level) {
+  # node_id is 0-indexed in ranger
+  row <- tree[tree$nodeID == node_id, ]
+
+  # Check if terminal (leaf) node
+  if (row$terminal) {
+    # Get probability for the specific class
+    prob_col <- paste0("pred.", class_level)
+    return(row[[prob_col]])
+  }
+
+  # Internal node - get split info
+  left_id <- row$leftChild
+  right_id <- row$rightChild
+  split_var <- row$splitvarName
+  split_val <- row$splitval
+
+  # Recurse
+  left_subtree <- build_nested_ranger_prob_node(left_id, tree, class_level)
+  right_subtree <- build_nested_ranger_prob_node(right_id, tree, class_level)
+
+  col_sym <- rlang::sym(as.character(split_var))
+
+  # Check if categorical split (splitval is NA for categorical)
+  if (is.na(split_val)) {
+    # Categorical split
+    split_class <- row$splitclass
+    cats <- strsplit(as.character(split_class), ", ")[[1]]
+    condition <- expr(!!col_sym %in% !!cats)
+  } else {
+    # Numeric split: left = <= splitval, right = > splitval
+    condition <- expr(!!col_sym <= !!split_val)
+  }
+
+  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
