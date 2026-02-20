@@ -2,7 +2,7 @@
 % Please edit documentation in R/tree-nested.R
 \name{build_nested_split_condition}
 \alias{build_nested_split_condition}
-\title{Build a split condition expression for nested trees}
+\title{Build a split condition expression for nested trees (left branch)}
 \usage{
 build_nested_split_condition(split)
 }
@@ -10,6 +10,6 @@ build_nested_split_condition(split)
 \item{split}{A split info list with col, val/vals, is_categorical}
 }
 \description{
-Build a split condition expression for nested trees
+Build a split condition expression for nested trees (left branch)
 }
 \keyword{internal}
