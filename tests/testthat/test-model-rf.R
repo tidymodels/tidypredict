@@ -65,6 +65,17 @@ test_that("split operator uses <= for left child (#192)", {
   expect_equal(native, tidy)
 })
 
+test_that("produced case_when uses .default", {
+  set.seed(1234)
+
+  model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 test_that("classification models error with clear message (#193)", {
   set.seed(123)
   model <- randomForest::randomForest(

@@ -219,6 +219,16 @@ test_that("tidypredict_fit works on parsed model", {
   expect_type(fit_formula, "language")
 })
 
+test_that("produced case_when uses .default", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model()
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 test_that("reg:squarederror predictions match native predict", {
   skip_if_not_installed("xgboost")
 

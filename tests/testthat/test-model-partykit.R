@@ -114,6 +114,15 @@ test_that("stump trees (no splits) work correctly (#196)", {
   expect_equal(fit, mean(mtcars$mpg))
 })
 
+test_that("produced case_when uses .default", {
+  model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 # Nested case_when tests --------------------------------------------------
 
 test_that("tidypredict_fit matches original model predictions", {

@@ -453,6 +453,16 @@ test_that("tidypredict_fit works on parsed model", {
   expect_type(fit_formula, "language")
 })
 
+test_that("produced case_when uses .default", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 test_that("regression predictions match native predict", {
   skip_if_not_installed("lightgbm")
 
