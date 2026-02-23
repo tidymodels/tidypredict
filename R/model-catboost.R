@@ -573,16 +573,58 @@ get_catboost_tree <- function(
     return(make_catboost_stump(leaf_values, class_idx, num_class))
   }
 
+  # Pre-extract split info once per tree (avoids repeated lookups per leaf)
+  split_info <- lapply(splits, function(split) {
+    split_type <- split$split_type %||% "FloatFeature"
+    if (split_type == "OneHotFeature") {
+      cat_feature_index <- split$cat_feature_index + 1L
+      cat_feature_info <- cat_features[[cat_feature_index]]
+      list(
+        type = "categorical",
+        col = cat_feature_info$feature_id %||%
+          paste0("cat_feature_", cat_feature_info$flat_feature_index),
+        hash_value = split$value,
+        is_categorical = TRUE
+      )
+    } else {
+      feature_index <- split$float_feature_index + 1L
+      feature_info <- float_features[[feature_index]]
+      list(
+        type = "conditional",
+        col = feature_info$feature_id %||%
+          paste0("feature_", feature_info$flat_feature_index),
+        val = split$border,
+        nan_treatment = feature_info$nan_value_treatment %||% "AsIs",
+        is_categorical = FALSE
+      )
+    }
+  })
+
   n_leaves <- 2^n_splits
   map(seq_len(n_leaves) - 1L, function(leaf_idx) {
     path <- lapply(seq_len(n_splits), function(split_idx) {
-      parse_catboost_split(
-        splits[[split_idx]],
-        leaf_idx,
-        split_idx,
-        float_features,
-        cat_features
-      )
+      info <- split_info[[split_idx]]
+      bit_val <- get_catboost_bit_value(leaf_idx, split_idx)
+
+      if (info$is_categorical) {
+        op <- if (bit_val == 0L) "not-equal" else "equal"
+        list(
+          type = "categorical",
+          col = info$col,
+          hash_value = info$hash_value,
+          op = op,
+          missing = FALSE
+        )
+      } else {
+        op <- if (bit_val == 1L) "more" else "less-equal"
+        list(
+          type = "conditional",
+          col = info$col,
+          val = info$val,
+          op = op,
+          missing = get_catboost_missing(info$nan_treatment, op)
+        )
+      }
     })
 
     list(

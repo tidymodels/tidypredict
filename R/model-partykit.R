@@ -62,34 +62,63 @@ partykit_tree_info_full <- function(model) {
 }
 
 partykit_tree_info <- function(model) {
-  model_nodes <- map(seq_along(model), ~ model[[.x]])
-  is_split <- map_lgl(model_nodes, ~ class(.x$node[1]) == "partynode")
-  if (is.numeric(model_nodes[[1]]$fitted[["(response)"]])) {
-    mean_resp <- map_dbl(model_nodes, ~ mean(.x$fitted[, "(response)"]))
-    prediction <- ifelse(!is_split, mean_resp, NA)
+  # Get all node IDs at once (avoids repeated tree traversals)
+  all_node_ids <- partykit::nodeids(model)
+  n_nodes <- length(all_node_ids)
+
+  # Extract all nodes at once using nodeapply with all IDs
+  all_nodes <- partykit::nodeapply(model, ids = all_node_ids, FUN = identity)
+
+  # Pre-extract node properties to avoid repeated list access
+  is_split <- logical(n_nodes)
+  splitvarID <- integer(n_nodes)
+  splitval <- numeric(n_nodes)
+  split_index <- vector("list", n_nodes)
+  left_child <- integer(n_nodes)
+  right_child <- integer(n_nodes)
+
+  for (i in seq_len(n_nodes)) {
+    node <- all_nodes[[i]]
+    is_split[i] <- !partykit::is.terminal(node)
+    if (is_split[i]) {
+      splitvarID[i] <- node$split$varid
+      splitval[i] <- node$split$breaks %||% NA_real_
+      split_index[[i]] <- node$split$index
+      kids <- partykit::kids_node(node)
+      left_child[i] <- partykit::id_node(kids[[1]])
+      right_child[i] <- partykit::id_node(kids[[2]])
+    } else {
+      splitvarID[i] <- NA_integer_
+      splitval[i] <- NA_real_
+      left_child[i] <- NA_integer_
+      right_child[i] <- NA_integer_
+    }
+  }
+
+  # Extract predictions from fitted data (only need to access once)
+  fitted_data <- model$fitted
+  response_col <- fitted_data[["(response)"]]
+  node_col <- fitted_data[["(fitted)"]]
+
+  if (is.numeric(response_col)) {
+    # Regression: compute mean per node
+    node_means <- tapply(response_col, node_col, mean)
+    prediction <- ifelse(!is_split, node_means[as.character(all_node_ids)], NA)
   } else {
+    # Classification: compute mode per node
     stat_mode <- function(x) {
       counts <- rev(sort(table(x)))
-      if (counts[[1]] == counts[[2]]) {
+      if (length(counts) > 1 && counts[[1]] == counts[[2]]) {
         ties <- counts[counts[1] == counts]
         return(names(rev(ties))[1])
       }
       names(counts)[1]
     }
-    mode_resp <- map_chr(model_nodes, ~ stat_mode(.x$fitted[, "(response)"]))
-    prediction <- ifelse(!is_split, mode_resp, NA)
+    node_modes <- tapply(response_col, node_col, stat_mode)
+    prediction <- ifelse(!is_split, node_modes[as.character(all_node_ids)], NA)
   }
 
-  party_nodes <- map(seq_along(model), ~ partykit::nodeapply(model, .x))
-
-  kids <- map(
-    party_nodes,
-    ~ {
-      if (length(.x[[1]]$kids)) {
-        map(.x[[1]]$kids, ~ .x$id)
-      }
-    }
-  )
+  # Get variable info
   vars <- as.character(attr(model$terms, "variables"))
   vars <- vars[2:length(vars)]
 
@@ -97,49 +126,41 @@ partykit_tree_info <- function(model) {
   var_class <- as.character(var_details)
   var_name <- names(var_details)
 
-  splitvarID <- map_int(
-    model_nodes,
-    ~ ifelse(is.null(.x$node$split$varid), NA, .x$node$split$varid)
-  )
-
+  # Build categorical split strings
   if (length(var_class) > 0) {
-    class_splits <- map_chr(
-      seq_along(splitvarID),
-      ~ {
-        if (is.na(splitvarID[.x])) {
-          return(NA)
-        }
-        v <- vars[splitvarID[.x]]
+    class_splits <- character(n_nodes)
+    for (i in seq_len(n_nodes)) {
+      if (is.na(splitvarID[i])) {
+        class_splits[i] <- NA_character_
+      } else {
+        v <- vars[splitvarID[i]]
         if (var_class[var_name == v] == "factor") {
           lvls <- levels(model$data[, colnames(model$data) == v])
-          pn <- party_nodes[[.x]][[1]]$split$index
+          pn <- split_index[[i]]
           pn <- ifelse(is.na(pn), 0, pn)
           if (any(pn == 3)) {
             cli::cli_abort("Three levels are not supported.")
           }
-          paste0(lvls[pn == 1], collapse = ", ")
+          class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
         } else {
-          NA
+          class_splits[i] <- NA_character_
         }
       }
-    )
+    }
   } else {
-    class_splits <- NA
+    class_splits <- rep(NA_character_, n_nodes)
   }
 
   data.frame(
-    nodeID = seq_along(is_split) - 1,
-    leftChild = map_int(kids, ~ ifelse(is.null(.x[[1]]), NA, .x[[1]])) - 1,
-    rightChild = map_int(kids, ~ ifelse(is.null(.x[[2]]), NA, .x[[2]])) - 1,
-    splitvarID,
+    nodeID = all_node_ids - 1L,
+    leftChild = left_child - 1L,
+    rightChild = right_child - 1L,
+    splitvarID = splitvarID,
     splitvarName = vars[splitvarID],
-    splitval = map_dbl(
-      model_nodes,
-      ~ ifelse(is.null(.x$node$split$breaks), NA, .x$node$split$breaks)
-    ),
+    splitval = splitval,
     splitclass = class_splits,
     terminal = !is_split,
-    prediction
+    prediction = prediction
   )
 }
 
