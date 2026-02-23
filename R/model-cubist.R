@@ -2,8 +2,16 @@
 parse_model.cubist <- function(model) {
   coefs <- model$coefficients
   splits <- model$splits
-  splits$variable <- as.character(splits$variable)
-  splits$dir <- as.character(splits$dir)
+  if (!is.null(splits)) {
+    splits$variable <- as.character(splits$variable)
+    splits$dir <- as.character(splits$dir)
+  }
+
+  # Pre-split data by committee and rule to avoid O(n) scans in nested loops
+  coefs_by_comm_rule <- split(coefs, list(coefs$committee, coefs$rule))
+  if (!is.null(splits)) {
+    splits_by_comm_rule <- split(splits, list(splits$committee, splits$rule))
+  }
 
   committees2 <- map(
     unique(coefs$committee),
@@ -12,19 +20,24 @@ parse_model.cubist <- function(model) {
       rules <- map(
         coefs$rule[coefs$committee == comm],
         ~ {
-          cc <- coefs[coefs$rule == .x & coefs$committee == comm, ]
+          key <- paste(comm, .x, sep = ".")
+          cc <- coefs_by_comm_rule[[key]]
           if (!is.null(model$splits)) {
-            cs <- splits[splits$rule == .x & splits$committee == comm, ]
-            tcs <- transpose(cs)
-            mcs <- map(
-              tcs,
-              ~ list(
-                type = "conditional",
-                col = .x$variable,
-                val = .x$value,
-                op = ifelse(.x$dir == ">", "more", "less-equal")
+            cs <- splits_by_comm_rule[[key]]
+            if (!is.null(cs) && nrow(cs) > 0) {
+              tcs <- transpose(cs)
+              mcs <- map(
+                tcs,
+                ~ list(
+                  type = "conditional",
+                  col = .x$variable,
+                  val = .x$value,
+                  op = ifelse(.x$dir == ">", "more", "less-equal")
+                )
               )
-            )
+            } else {
+              mcs <- list(list(type = "all"))
+            }
           } else {
             mcs <- list(list(type = "all"))
           }

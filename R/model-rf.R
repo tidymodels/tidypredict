@@ -107,35 +107,42 @@ tidypredict_fit_rf_nested <- function(model) {
 # Build nested case_when for a single randomForest tree
 build_nested_rf_tree <- function(model, tree_no, term_labels) {
   tree <- randomForest::getTree(model, tree_no)
-  build_nested_rf_node(1L, tree, term_labels)
-}
 
-# Recursively build nested case_when for randomForest node
-build_nested_rf_node <- function(node_id, tree, term_labels) {
-  row <- tree[node_id, ]
+  # Pre-extract columns as vectors for fast indexing (avoids slow row access)
+  # Use unname() once here instead of on every recursive call
+  status <- unname(tree[, "status"])
+  prediction <- unname(tree[, "prediction"])
+  left_daughter <- unname(tree[, "left daughter"])
+  right_daughter <- unname(tree[, "right daughter"])
+  split_var <- unname(tree[, "split var"])
+  split_point <- unname(tree[, "split point"])
 
-  # Check if terminal (leaf) node - status == -1
-  if (row["status"] == -1) {
-    return(unname(row["prediction"]))
+  build_node <- function(node_id) {
+    # Check if terminal (leaf) node - status == -1
+    if (status[node_id] == -1) {
+      return(prediction[node_id])
+    }
+
+    # Internal node - get split info
+    left_id <- left_daughter[node_id]
+    right_id <- right_daughter[node_id]
+    var_idx <- split_var[node_id]
+    split_val <- split_point[node_id]
+
+    # Recurse
+    left_subtree <- build_node(left_id)
+    right_subtree <- build_node(right_id)
+
+    col_name <- term_labels[var_idx]
+    col_sym <- rlang::sym(col_name)
+
+    # Numeric split: left = <= splitval, right = > splitval
+    condition <- expr(!!col_sym <= !!split_val)
+
+    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
 
-  # Internal node - get split info
-  left_id <- unname(row["left daughter"])
-  right_id <- unname(row["right daughter"])
-  split_var <- unname(row["split var"])
-  split_val <- unname(row["split point"])
-
-  # Recurse
-  left_subtree <- build_nested_rf_node(left_id, tree, term_labels)
-  right_subtree <- build_nested_rf_node(right_id, tree, term_labels)
-
-  col_name <- term_labels[split_var]
-  col_sym <- rlang::sym(col_name)
-
-  # Numeric split: left = <= splitval, right = > splitval
-  condition <- expr(!!col_sym <= !!split_val)
-
-  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+  build_node(1L)
 }
 
 # Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
@@ -285,53 +292,43 @@ build_nested_rf_vote_tree <- function(
   class_level
 ) {
   tree <- randomForest::getTree(model, tree_no)
-  build_nested_rf_vote_node(1L, tree, term_labels, model$classes, class_level)
-}
+  classes <- model$classes
 
-# Recursively build nested case_when for randomForest voting node
-build_nested_rf_vote_node <- function(
-  node_id,
-  tree,
-  term_labels,
-  classes,
-  class_level
-) {
-  row <- tree[node_id, ]
+  # Pre-extract columns as vectors for fast indexing (avoids slow row access)
+  # Use unname() once here instead of on every recursive call
+  status <- unname(tree[, "status"])
+  prediction <- unname(tree[, "prediction"])
+  left_daughter <- unname(tree[, "left daughter"])
+  right_daughter <- unname(tree[, "right daughter"])
+  split_var <- unname(tree[, "split var"])
+  split_point <- unname(tree[, "split point"])
 
-  # Check if terminal (leaf) node - status == -1
-  if (row["status"] == -1) {
-    # Return 1 if prediction matches class_level, 0 otherwise
-    pred_class <- classes[unname(row["prediction"])]
-    return(if (pred_class == class_level) 1 else 0)
+  build_node <- function(node_id) {
+    # Check if terminal (leaf) node - status == -1
+    if (status[node_id] == -1) {
+      # Return 1 if prediction matches class_level, 0 otherwise
+      pred_class <- classes[prediction[node_id]]
+      return(if (pred_class == class_level) 1L else 0L)
+    }
+
+    # Internal node - get split info
+    left_id <- left_daughter[node_id]
+    right_id <- right_daughter[node_id]
+    var_idx <- split_var[node_id]
+    split_val <- split_point[node_id]
+
+    # Recurse
+    left_subtree <- build_node(left_id)
+    right_subtree <- build_node(right_id)
+
+    col_name <- term_labels[var_idx]
+    col_sym <- rlang::sym(col_name)
+
+    # Numeric split: left = <= splitval, right = > splitval
+    condition <- expr(!!col_sym <= !!split_val)
+
+    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
 
-  # Internal node - get split info
-  left_id <- unname(row["left daughter"])
-  right_id <- unname(row["right daughter"])
-  split_var <- unname(row["split var"])
-  split_val <- unname(row["split point"])
-
-  # Recurse
-  left_subtree <- build_nested_rf_vote_node(
-    left_id,
-    tree,
-    term_labels,
-    classes,
-    class_level
-  )
-  right_subtree <- build_nested_rf_vote_node(
-    right_id,
-    tree,
-    term_labels,
-    classes,
-    class_level
-  )
-
-  col_name <- term_labels[split_var]
-  col_sym <- rlang::sym(col_name)
-
-  # Numeric split: left = <= splitval, right = > splitval
-  condition <- expr(!!col_sym <= !!split_val)
-
-  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+  build_node(1L)
 }

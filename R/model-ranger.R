@@ -106,43 +106,46 @@ tidypredict_fit_ranger_nested <- function(model) {
 # Build nested case_when for a single ranger tree
 build_nested_ranger_tree <- function(model, tree_no) {
   tree <- ranger::treeInfo(model, tree_no)
-  build_nested_ranger_node(0L, tree)
-}
 
-# Recursively build nested case_when for ranger node
-build_nested_ranger_node <- function(node_id, tree) {
-  # node_id is 0-indexed in ranger
-  row <- tree[tree$nodeID == node_id, ]
+  # Pre-extract columns as vectors for fast indexing (avoids slow df[i,] access)
+  nodeID <- tree$nodeID
+  leftChild <- tree$leftChild
+  rightChild <- tree$rightChild
+  splitvarName <- as.character(tree$splitvarName)
+  splitval <- tree$splitval
+  terminal <- tree$terminal
+  prediction <- tree$prediction
+  splitclass <- tree$splitclass
 
-  # Check if terminal (leaf) node
-  if (row$terminal) {
-    return(row$prediction)
+  build_node <- function(node_id) {
+    # node_id is 0-indexed, convert to 1-indexed for vector access
+    idx <- node_id + 1L
+
+    if (terminal[idx]) {
+      return(prediction[idx])
+    }
+
+    left_id <- leftChild[idx]
+    right_id <- rightChild[idx]
+    split_var <- splitvarName[idx]
+    split_val <- splitval[idx]
+
+    left_subtree <- build_node(left_id)
+    right_subtree <- build_node(right_id)
+
+    col_sym <- rlang::sym(split_var)
+
+    if (is.na(split_val)) {
+      cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
+      condition <- expr(!!col_sym %in% !!cats)
+    } else {
+      condition <- expr(!!col_sym <= !!split_val)
+    }
+
+    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
 
-  # Internal node - get split info
-  left_id <- row$leftChild
-  right_id <- row$rightChild
-  split_var <- row$splitvarName
-  split_val <- row$splitval
-
-  # Recurse
-  left_subtree <- build_nested_ranger_node(left_id, tree)
-  right_subtree <- build_nested_ranger_node(right_id, tree)
-
-  col_sym <- rlang::sym(as.character(split_var))
-
-  # Check if categorical split (splitval is NA for categorical)
-  if (is.na(split_val)) {
-    # Categorical split
-    split_class <- row$splitclass
-    cats <- strsplit(as.character(split_class), ", ")[[1]]
-    condition <- expr(!!col_sym %in% !!cats)
-  } else {
-    # Numeric split: left = <= splitval, right = > splitval
-    condition <- expr(!!col_sym <= !!split_val)
-  }
-
-  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+  build_node(0L)
 }
 
 # Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
@@ -364,43 +367,45 @@ get_ra_trees <- function(model) {
 # Build nested case_when for ranger probability tree
 build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
   tree <- ranger::treeInfo(model, tree_no)
-  build_nested_ranger_prob_node(0L, tree, class_level)
-}
 
-# Recursively build nested case_when for ranger probability node
-build_nested_ranger_prob_node <- function(node_id, tree, class_level) {
-  # node_id is 0-indexed in ranger
-  row <- tree[tree$nodeID == node_id, ]
+  # Pre-extract columns as vectors for fast indexing (avoids slow df[i,] access)
+  nodeID <- tree$nodeID
+  leftChild <- tree$leftChild
+  rightChild <- tree$rightChild
+  splitvarName <- as.character(tree$splitvarName)
+  splitval <- tree$splitval
+  terminal <- tree$terminal
+  splitclass <- tree$splitclass
+  prob_col <- paste0("pred.", class_level)
+  prob_vals <- tree[[prob_col]]
 
-  # Check if terminal (leaf) node
-  if (row$terminal) {
-    # Get probability for the specific class
-    prob_col <- paste0("pred.", class_level)
-    return(row[[prob_col]])
+  build_node <- function(node_id) {
+    # node_id is 0-indexed, convert to 1-indexed for vector access
+    idx <- node_id + 1L
+
+    if (terminal[idx]) {
+      return(prob_vals[idx])
+    }
+
+    left_id <- leftChild[idx]
+    right_id <- rightChild[idx]
+    split_var <- splitvarName[idx]
+    split_val <- splitval[idx]
+
+    left_subtree <- build_node(left_id)
+    right_subtree <- build_node(right_id)
+
+    col_sym <- rlang::sym(split_var)
+
+    if (is.na(split_val)) {
+      cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
+      condition <- expr(!!col_sym %in% !!cats)
+    } else {
+      condition <- expr(!!col_sym <= !!split_val)
+    }
+
+    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
 
-  # Internal node - get split info
-  left_id <- row$leftChild
-  right_id <- row$rightChild
-  split_var <- row$splitvarName
-  split_val <- row$splitval
-
-  # Recurse
-  left_subtree <- build_nested_ranger_prob_node(left_id, tree, class_level)
-  right_subtree <- build_nested_ranger_prob_node(right_id, tree, class_level)
-
-  col_sym <- rlang::sym(as.character(split_var))
-
-  # Check if categorical split (splitval is NA for categorical)
-  if (is.na(split_val)) {
-    # Categorical split
-    split_class <- row$splitclass
-    cats <- strsplit(as.character(split_class), ", ")[[1]]
-    condition <- expr(!!col_sym %in% !!cats)
-  } else {
-    # Numeric split: left = <= splitval, right = > splitval
-    condition <- expr(!!col_sym <= !!split_val)
-  }
-
-  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+  build_node(0L)
 }
