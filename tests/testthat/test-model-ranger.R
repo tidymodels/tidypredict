@@ -112,6 +112,26 @@ test_that("predictions are averaged not summed (#190)", {
   expect_equal(native, tidy)
 })
 
+test_that("produced case_when uses .default", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 100,
+    num.threads = 2
+  )
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 test_that("classification models error with clear message (#191)", {
   skip_on_cran()
   skip_on_os("windows")

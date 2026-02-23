@@ -511,6 +511,16 @@ test_that("tidypredict_fit works on parsed model", {
   expect_type(result, "language")
 })
 
+test_that("produced case_when uses .default", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 test_that("regression predictions match catboost.predict", {
   skip_if_not_installed("catboost")
   model <- make_catboost_model()

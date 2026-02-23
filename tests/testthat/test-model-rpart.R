@@ -81,6 +81,15 @@ test_that("stump trees work correctly", {
   expect_equal(fit, mean(mtcars$mpg))
 })
 
+test_that("produced case_when uses .default", {
+  model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
+
+  fit <- tidypredict_fit(model)
+  fit_text <- rlang::expr_text(fit)
+
+  expect_match(fit_text, "\\.default")
+})
+
 # .extract_rpart_classprob tests ------------------------------------------
 
 test_that(".extract_rpart_classprob returns list of expressions", {
