@@ -280,3 +280,74 @@ test_that(".extract_ranger_classprob works with single tree", {
   # Each class should have 1 expression
   expect_length(result[[1]], 1)
 })
+
+# Tests for .extract_ranger_trees() (regression)
+
+test_that(".extract_ranger_trees returns correct structure", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    num.trees = 5,
+    max.depth = 2,
+    seed = 100,
+    num.threads = 2
+  )
+
+  result <- .extract_ranger_trees(model)
+
+  expect_type(result, "list")
+  expect_length(result, 5)
+  expect_all_true(vapply(result, is.language, logical(1)))
+})
+
+test_that(".extract_ranger_trees errors on non-ranger model", {
+  model <- lm(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_ranger_trees(model))
+})
+
+test_that(".extract_ranger_trees errors on classification model", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 3,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 2
+  )
+
+  expect_snapshot(error = TRUE, .extract_ranger_trees(model))
+})
+
+test_that(".extract_ranger_trees produces correct predictions when averaged", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  model <- ranger::ranger(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    num.trees = 5,
+    max.depth = 3,
+    seed = 123,
+    num.threads = 2
+  )
+
+  trees <- .extract_ranger_trees(model)
+  n_trees <- length(trees)
+
+  tree_preds <- sapply(trees, function(e) rlang::eval_tidy(e, mtcars))
+  avg_pred <- rowMeans(tree_preds)
+
+  native <- predict(model, mtcars)$predictions
+
+  expect_equal(avg_pred, native)
+})

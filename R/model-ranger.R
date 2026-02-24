@@ -409,3 +409,34 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
 
   build_node(0L)
 }
+
+#' Extract regression trees for ranger models
+#'
+#' For use in orbital package.
+#' @param model A ranger model object (regression)
+#' @keywords internal
+#' @export
+.extract_ranger_trees <- function(model) {
+  if (!inherits(model, "ranger")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  # Check if this is a classification model
+  first_tree <- ranger::treeInfo(model, 1)
+  first_pred <- first_tree$prediction[first_tree$terminal][1]
+  if (is.character(first_pred) || is.factor(first_pred)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported.",
+        i = "Use {.fn .extract_ranger_classprob} for classification models."
+      )
+    )
+  }
+
+  n_trees <- model$num.trees
+  map(seq_len(n_trees), function(tree_no) {
+    build_nested_ranger_tree(model, tree_no)
+  })
+}

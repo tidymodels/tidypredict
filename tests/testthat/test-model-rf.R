@@ -179,3 +179,56 @@ test_that(".extract_rf_classprob works with single tree", {
   # Each class should have 1 expression
   expect_length(result[[1]], 1)
 })
+
+# Tests for .extract_rf_trees() (regression)
+
+test_that(".extract_rf_trees returns correct structure", {
+  set.seed(123)
+  model <- randomForest::randomForest(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    ntree = 5
+  )
+
+  result <- .extract_rf_trees(model)
+
+  expect_type(result, "list")
+  expect_length(result, 5)
+  expect_all_true(vapply(result, is.language, logical(1)))
+})
+
+test_that(".extract_rf_trees errors on non-randomForest model", {
+  model <- lm(mpg ~ ., data = mtcars)
+
+  expect_snapshot(error = TRUE, .extract_rf_trees(model))
+})
+
+test_that(".extract_rf_trees errors on classification model", {
+  set.seed(123)
+  model <- randomForest::randomForest(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    ntree = 3
+  )
+
+  expect_snapshot(error = TRUE, .extract_rf_trees(model))
+})
+
+test_that(".extract_rf_trees produces correct predictions when averaged", {
+  set.seed(123)
+  model <- randomForest::randomForest(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    ntree = 5
+  )
+
+  trees <- .extract_rf_trees(model)
+  n_trees <- length(trees)
+
+  tree_preds <- sapply(trees, function(e) rlang::eval_tidy(e, mtcars))
+  avg_pred <- rowMeans(tree_preds)
+
+  native <- as.numeric(predict(model, mtcars))
+
+  expect_equal(avg_pred, native)
+})
