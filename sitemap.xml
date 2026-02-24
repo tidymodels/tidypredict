@@ -37,7 +37,9 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_lgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_classprob.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rpart_classprob.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-partykit_tree_info_full.html</loc></url>
