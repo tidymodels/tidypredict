@@ -43,3 +43,20 @@
       ! Model is not a classification model.
       i Use `tidypredict_fit()` for regression models.
 
+# .extract_rf_trees errors on non-randomForest model
+
+    Code
+      .extract_rf_trees(model)
+    Condition
+      Error in `.extract_rf_trees()`:
+      ! `model` must be <randomForest>, not a <lm> object.
+
+# .extract_rf_trees errors on classification model
+
+    Code
+      .extract_rf_trees(model)
+    Condition
+      Error in `.extract_rf_trees()`:
+      ! Classification models are not supported.
+      i Use `.extract_rf_classprob()` for classification models.
+

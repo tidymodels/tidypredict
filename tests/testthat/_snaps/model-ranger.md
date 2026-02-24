@@ -43,3 +43,20 @@
       ! Model does not contain probability information.
       i Fit the ranger model with `probability = TRUE`.
 
+# .extract_ranger_trees errors on non-ranger model
+
+    Code
+      .extract_ranger_trees(model)
+    Condition
+      Error in `.extract_ranger_trees()`:
+      ! `model` must be <ranger>, not a <lm> object.
+
+# .extract_ranger_trees errors on classification model
+
+    Code
+      .extract_ranger_trees(model)
+    Condition
+      Error in `.extract_ranger_trees()`:
+      ! Classification models are not supported.
+      i Use `.extract_ranger_classprob()` for classification models.
+

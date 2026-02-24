@@ -332,3 +332,34 @@ build_nested_rf_vote_tree <- function(
 
   build_node(1L)
 }
+
+#' Extract regression trees for randomForest models
+#'
+#' For use in orbital package.
+#' @param model A randomForest model object (regression)
+#' @keywords internal
+#' @export
+.extract_rf_trees <- function(model) {
+  if (!inherits(model, "randomForest")) {
+    cli::cli_abort(
+      "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
+    )
+  }
+
+  # Check if this is a classification model
+  if (!is.null(model$classes)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported.",
+        i = "Use {.fn .extract_rf_classprob} for classification models."
+      )
+    )
+  }
+
+  n_trees <- model$ntree
+  term_labels <- names(model$forest$ncat)
+
+  map(seq_len(n_trees), function(tree_no) {
+    build_nested_rf_tree(model, tree_no, term_labels)
+  })
+}
