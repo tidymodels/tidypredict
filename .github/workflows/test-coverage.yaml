@@ -27,6 +27,13 @@ jobs:
           extra-packages: any::covr, any::xml2
           needs: coverage
 
+      - name: Install catboost
+        run: |
+          install.packages('remotes')
+          url <- 'https://github.com/catboost/catboost/releases/download/v1.2.8/catboost-R-Linux-1.2.8.tgz'
+          remotes::install_url(url, INSTALL_opts = c("--no-multiarch", "--no-test-load", "--no-staged-install"))
+        shell: Rscript {0}
+
       - name: Test coverage
         run: |
           cov <- covr::package_coverage(
