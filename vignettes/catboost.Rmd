@@ -234,3 +234,4 @@ str(pm$trees[1])
 ## Limitations
 
 - Prediction intervals are not supported
+- CatBoost uses 32-bit floats for split thresholds, which may cause prediction discrepancies at exact split boundaries. See the [float precision](float-precision.html) article for details.

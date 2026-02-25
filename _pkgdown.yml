@@ -46,6 +46,8 @@ navbar:
       href: articles/save.html
     - text: How tree formulas work
       href: articles/tree-internals.html
+    - text: Float precision at split boundaries
+      href: articles/float-precision.html
     - text: '-------'
     - text: Non-R models
       href: articles/non-r.html

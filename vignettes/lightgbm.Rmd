@@ -246,3 +246,4 @@ str(pm$trees[1])
 - Ranking objectives (`lambdarank`, `rank_xendcg`) are not supported
 - Prediction intervals are not supported
 - `tidypredict_test()` does not support multiclass models
+- LightGBM uses 32-bit floats for split thresholds, which may cause prediction discrepancies at exact split boundaries. See the [float precision](float-precision.html) article for details.
