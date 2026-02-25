@@ -46,7 +46,7 @@ Suggests:
     partykit,
     randomForest,
     ranger (>= 0.14.1),
-    rpart,
+    rpart (>= 4.1.0),
     rmarkdown,
     RSQLite,
     survival,
