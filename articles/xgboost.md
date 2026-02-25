@@ -134,11 +134,13 @@ model <- xgboost::xgb.train(
   #> Upper max difference:7.11972936162653e-08
   ```
 
-Please be aware that xgboost converts data into 32-bit floats
-internally. This could possibly lead to splits being done incorrectly.
-Always verify that the predictions match up with model predictions. [See
-this issue](https://github.com/tidymodels/tidypredict/issues/45) for
-more information.
+Please be aware that XGBoost converts data into 32-bit floats
+internally. This could lead to prediction discrepancies at exact split
+boundaries. Always verify that predictions match using
+[`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md).
+See the [float
+precision](https://tidypredict.tidymodels.org/articles/float-precision.md)
+article for more details.
 
 ## parsnip
 

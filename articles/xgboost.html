@@ -53,6 +53,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
     <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
+    <li><a class="dropdown-item" href="../articles/float-precision.html">Float precision at split boundaries</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -249,10 +250,11 @@ expects the <code>xgb.DMatrix</code> data set.</p>
 <span><span class="co">#&gt; Upper max difference:7.11972936162653e-08</span></span></code></pre></div>
 </li>
 </ul>
-<p>Please be aware that xgboost converts data into 32-bit floats
-internally. This could possibly lead to splits being done incorrectly.
-Always verify that the predictions match up with model predictions. <a href="https://github.com/tidymodels/tidypredict/issues/45" class="external-link">See this
-issue</a> for more information.</p>
+<p>Please be aware that XGBoost converts data into 32-bit floats
+internally. This could lead to prediction discrepancies at exact split
+boundaries. Always verify that predictions match using
+<code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>. See the <a href="float-precision.html">float precision</a> article for more
+details.</p>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>

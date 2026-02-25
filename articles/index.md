@@ -6,6 +6,8 @@
   models](https://tidypredict.tidymodels.org/articles/catboost.md):
 - [Cubist
   models](https://tidypredict.tidymodels.org/articles/cubist.md):
+- [Float precision at split
+  boundaries](https://tidypredict.tidymodels.org/articles/float-precision.md):
 - [Generalized Linear
   Regression](https://tidypredict.tidymodels.org/articles/glm.md):
 - [glmnet

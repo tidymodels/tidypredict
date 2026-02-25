@@ -53,6 +53,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
     <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
+    <li><a class="dropdown-item" href="../articles/float-precision.html">Float precision at split boundaries</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -249,6 +250,18 @@ in Cubist.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt;  NULL</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+</h2>
+<ul>
+<li>
+<code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> is not supported</li>
+<li>Prediction intervals are not supported</li>
+<li>Cubist uses 32-bit floats internally, which may cause prediction
+discrepancies at exact split boundaries. See the <a href="float-precision.html">float precision</a> article for
+details.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

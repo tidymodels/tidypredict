@@ -137,3 +137,13 @@ str(pm, 2)
 str(pm$terms[1:2])
 #>  NULL
 ```
+
+## Limitations
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported
+- Prediction intervals are not supported
+- Cubist uses 32-bit floats internally, which may cause prediction
+  discrepancies at exact split boundaries. See the [float
+  precision](https://tidypredict.tidymodels.org/articles/float-precision.md)
+  article for details.

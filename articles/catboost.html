@@ -53,6 +53,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/save.html">Save/Reload</a></li>
     <li><a class="dropdown-item" href="../articles/tree-internals.html">How tree formulas work</a></li>
+    <li><a class="dropdown-item" href="../articles/float-precision.html">Float precision at split boundaries</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><a class="dropdown-item" href="../articles/non-r.html">Non-R models</a></li>
     <li><a class="dropdown-item" href="../articles/regression.html">Regression spec</a></li>
@@ -337,6 +338,9 @@ hash-to-category mapping:</p>
 </h2>
 <ul>
 <li>Prediction intervals are not supported</li>
+<li>CatBoost uses 32-bit floats for split thresholds, which may cause
+prediction discrepancies at exact split boundaries. See the <a href="float-precision.html">float precision</a> article for
+details.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
