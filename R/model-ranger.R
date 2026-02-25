@@ -39,6 +39,7 @@ ranger_tree_info_full <- function(model, tree_no) {
 
       if (is.na(split_val)) {
         # Categorical split
+        # Unreachable with ranger >= 0.14.1: factor splits use numeric indices
         split_class <- tree$splitclass[i]
         cats <- strsplit(as.character(split_class), ", ")[[1]]
         node_splits[[i]] <- list(
@@ -136,6 +137,7 @@ build_nested_ranger_tree <- function(model, tree_no) {
     col_sym <- rlang::sym(split_var)
 
     if (is.na(split_val)) {
+      # Unreachable with ranger >= 0.14.1: factor splits use numeric indices
       cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
       condition <- expr(!!col_sym %in% !!cats)
     } else {
@@ -235,6 +237,7 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
       lc <- leftChild[.y + 1] == .x
       lr <- rightChild[.y + 1] == .x
       if (is.na(splitval[.y + 1])) {
+        # Unreachable with ranger >= 0.14.1: factor splits use numeric indices
         if (lc) {
           op <- "in"
         }
@@ -398,6 +401,7 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
     col_sym <- rlang::sym(split_var)
 
     if (is.na(split_val)) {
+      # Unreachable with ranger >= 0.14.1: factor splits use numeric indices
       cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
       condition <- expr(!!col_sym %in% !!cats)
     } else {
