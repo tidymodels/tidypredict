@@ -18,6 +18,16 @@ test_that("rpart_tree_info returns correct structure", {
   )
 })
 
+test_that("rpart_tree_info handles categorical predictors", {
+  mtcars2 <- mtcars
+  mtcars2$cyl <- factor(mtcars2$cyl)
+  model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars2)
+  tree_info <- rpart_tree_info(model)
+
+  # Should have splitclass values for categorical splits
+  expect_true(any(!is.na(tree_info$splitclass)))
+})
+
 test_that("returns the right output", {
   model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
   tf <- tidypredict_fit(model)
@@ -48,6 +58,24 @@ test_that("formulas produce correct predictions - regression", {
       mtcars
     )
   )
+})
+
+test_that("tidypredict_test.rpart max_rows parameter works", {
+  model <- rpart::rpart(mpg ~ am + cyl + wt, data = mtcars)
+  result <- tidypredict_test(model, mtcars, max_rows = 10)
+
+  expect_equal(nrow(result$raw_results), 10)
+})
+
+test_that("tidypredict_test.rpart alert message works", {
+  model <- rpart::rpart(mpg ~ am + cyl + wt, data = mtcars)
+
+  # Use negative threshold to trigger alert
+  result <- tidypredict_test(model, mtcars, threshold = -1)
+
+  expect_true(result$alert)
+  expect_match(result$message, "Fitted records above the threshold")
+  expect_match(result$message, "Max difference")
 })
 
 test_that("formulas produce correct predictions - classification", {
