@@ -45,7 +45,7 @@ Suggests:
     parsnip,
     partykit,
     randomForest,
-    ranger,
+    ranger (>= 0.14.1),
     rpart,
     rmarkdown,
     RSQLite,

@@ -509,12 +509,20 @@ test_that("legacy get_ra_path with default_op = TRUE", {
   terminal_nodes <- tree$nodeID[tree$terminal]
 
   # Test with default_op = TRUE (uses "less" and "more-equal")
-  path <- tidypredict:::get_ra_path(terminal_nodes[1], tree, child_info, TRUE)
-  expect_type(path, "list")
-  if (length(path) > 0) {
-    ops <- vapply(path, function(x) x$op, character(1))
-    expect_true(all(ops %in% c("less", "more-equal")))
+  # Test all terminal nodes to exercise both left and right child paths
+  all_ops <- character(0)
+  for (node in terminal_nodes) {
+    path <- tidypredict:::get_ra_path(node, tree, child_info, TRUE)
+    expect_type(path, "list")
+    if (length(path) > 0) {
+      ops <- vapply(path, function(x) x$op, character(1))
+      expect_true(all(ops %in% c("less", "more-equal")))
+      all_ops <- c(all_ops, ops)
+    }
   }
+  # Ensure both operators are used across all paths
+  expect_true("less" %in% all_ops)
+  expect_true("more-equal" %in% all_ops)
 })
 
 test_that("parse_model.ranger errors on classification", {
@@ -532,6 +540,29 @@ test_that("parse_model.ranger errors on classification", {
   )
 
   expect_snapshot(parse_model(model), error = TRUE)
+})
+
+test_that("legacy get_ra_tree converts factor predictions to character", {
+  skip_on_cran()
+  skip_on_os("windows")
+  skip_on_os("linux")
+
+  # Non-probability classification model returns factor predictions
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 1,
+    max.depth = 2,
+    seed = 123,
+    num.threads = 1,
+    probability = FALSE
+  )
+
+  tree <- tidypredict:::get_ra_tree(1, model)
+
+  expect_type(tree, "list")
+  # Predictions should be converted to character
+  expect_type(tree[[1]]$prediction, "character")
 })
 
 test_that("legacy get_ra_tree handles probability predictions", {
