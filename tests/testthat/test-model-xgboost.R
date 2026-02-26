@@ -1080,6 +1080,232 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", 
   expect_equal(combined, fit_result)
 })
 
+# v1 backwards compatibility tests -------------------------------------------
+
+test_that("gblinear booster is detected by get_xgb_json_params", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- xgboost::xgb.DMatrix(
+    as.matrix(mtcars[, -9]),
+    label = mtcars$am
+  )
+
+  model <- xgboost::xgb.train(
+    params = list(
+      booster = "gblinear",
+      objective = "reg:squarederror"
+    ),
+    data = xgb_data,
+    nrounds = 3L,
+    verbose = 0
+  )
+
+  # get_xgb_json_params works even though parse_model/tidypredict_fit fail
+  params <- tidypredict:::get_xgb_json_params(model)
+
+  expect_equal(params$booster_name, "gblinear")
+})
+
+test_that("v1 parsed xgboost model produces correct predictions", {
+  skip_if_not_installed("xgboost")
+
+  pm <- readRDS(test_path("backwards-compat", "xgb-v2-regression.rds"))
+
+  expect_equal(pm$general$version %||% 1, 1)
+  expect_true(!is.null(pm$trees))
+
+  fit <- tidypredict_fit(pm)
+  expect_type(fit, "language")
+
+  # Verify predictions can be generated
+  pred <- rlang::eval_tidy(fit, mtcars)
+  expect_type(pred, "double")
+  expect_length(pred, nrow(mtcars))
+})
+
+test_that("NULL base_score in v1 parsed model defaults to 0.5", {
+  skip_if_not_installed("xgboost")
+
+  # v1 format goes through build_fit_formula_xgb (legacy flat case_when)
+  pm <- list(
+    general = list(
+      params = list(objective = "reg:squarederror"),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(list(prediction = 1.0, path = list())))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  fit <- tidypredict_fit(pm)
+  result <- rlang::eval_tidy(fit, data.frame(x = 1))
+
+  # 1.0 + 0.5 base_score = 1.5
+  expect_equal(result, 1.5)
+})
+
+test_that("NULL objective with non-zero base_score warns user", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(base_score = 0.3),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(list(prediction = 1.0, path = list())))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  expect_snapshot(fit <- tidypredict_fit(pm))
+  result <- rlang::eval_tidy(fit, data.frame(x = 1))
+
+  expect_equal(result, 1.3)
+})
+
+test_that("v1 parsed model with splits produces predictions", {
+  skip_if_not_installed("xgboost")
+
+  # v1 format with actual path conditions - tests get_xgb_case_fun
+  pm <- list(
+    general = list(
+      params = list(objective = "reg:squarederror", base_score = 0),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(
+      list(
+        prediction = 10.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "more-equal",
+            missing = FALSE
+          )
+        )
+      ),
+      list(
+        prediction = 30.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "less",
+            missing = FALSE
+          )
+        )
+      )
+    ))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  fit <- tidypredict_fit(pm)
+  expect_type(fit, "language")
+
+  # Test predictions - more-equal generates <, less generates >=
+  test_data <- data.frame(mpg = c(15, 25))
+  pred <- rlang::eval_tidy(fit, test_data)
+
+  expect_equal(pred, c(10.0, 30.0))
+})
+
+test_that("v1 parsed model with missing=TRUE uses is.na", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "reg:squarederror", base_score = 0),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(
+      list(
+        prediction = 10.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "more-equal",
+            missing = TRUE
+          )
+        )
+      ),
+      list(
+        prediction = 30.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "less",
+            missing = FALSE
+          )
+        )
+      )
+    ))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  fit <- tidypredict_fit(pm)
+
+  # With missing=TRUE on more-equal, NA should match that condition
+  test_data <- data.frame(mpg = c(15, NA, 25))
+  pred <- rlang::eval_tidy(fit, test_data)
+
+  expect_equal(pred, c(10.0, 10.0, 30.0))
+})
+
+test_that("v1 parsed model with missing=TRUE on less op", {
+  skip_if_not_installed("xgboost")
+
+  pm <- list(
+    general = list(
+      params = list(objective = "reg:squarederror", base_score = 0),
+      model = "xgb.Booster",
+      type = "xgb"
+    ),
+    trees = list(list(
+      list(
+        prediction = 10.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "more-equal",
+            missing = FALSE
+          )
+        )
+      ),
+      list(
+        prediction = 30.0,
+        path = list(
+          list(
+            type = "conditional",
+            col = "mpg",
+            val = 20,
+            op = "less",
+            missing = TRUE
+          )
+        )
+      )
+    ))
+  )
+  class(pm) <- c("pm_xgb", "parsed_model", "list")
+
+  fit <- tidypredict_fit(pm)
+
+  # With missing=TRUE on less, NA should match that condition (>= with is.na)
+  test_data <- data.frame(mpg = c(15, NA, 25))
+  pred <- rlang::eval_tidy(fit, test_data)
+
+  expect_equal(pred, c(10.0, 30.0, 30.0))
+})
+
 # YAML serialization tests ---------------------------------------------------
 
 test_that("parsed model can be saved and loaded via YAML", {

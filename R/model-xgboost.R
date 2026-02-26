@@ -70,6 +70,7 @@ get_xgb_trees <- function(model) {
     with_stats = TRUE
   )
   if (is.null(attr(model, "param"))) {
+    # Old xgboost API (< 2.0) - kept for backwards compatibility
     xd <- xgboost::xgb.dump(
       model = model,
       dump_format = "text",
@@ -84,7 +85,7 @@ get_xgb_trees <- function(model) {
 }
 
 get_xgb_trees_character <- function(x, feature_names) {
-  # To deal with new agboost version
+  # Old xgboost API (< 2.0) - kept for backwards compatibility with old models
   if (is.character(x)) {
     trees <- xgboost::xgb.model.dt.tree(text = x)
   } else {
@@ -131,6 +132,7 @@ parse_model.xgb.Booster <- function(model) {
   pm$general$params <- wosilent
 
   if (old) {
+    # Old xgboost API (< 2.0) - kept for backwards compatibility
     pm$general$feature_names <- model$feature_names
     pm$general$niter <- model$niter
     pm$general$nfeatures <- model$nfeatures
@@ -190,7 +192,7 @@ get_xgb_json_params <- function(model) {
     )
     base_score <- as.numeric(strsplit(base_score_str, ",")[[1]])
   } else {
-    base_score <- 0.5
+    base_score <- 0.5 # nocov
   }
 
   # Extract booster name using fixed string matching
@@ -243,7 +245,7 @@ build_fit_formula_xgb_nested <- function(model) {
 
   base_score <- json_params$base_score
   if (is.null(base_score)) {
-    base_score <- 0.5
+    base_score <- 0.5 # nocov
   }
 
   params <- attr(model, "param") %||% model$params
@@ -268,7 +270,7 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
 
   base_score <- parsedmodel$general$params$base_score
   if (is.null(base_score)) {
-    base_score <- 0.5
+    base_score <- 0.5 # nocov
   }
 
   objective <- parsedmodel$general$params$objective
@@ -333,7 +335,11 @@ apply_xgb_objective <- function(f, objective, base_score) {
   )
 }
 
+# nocov start
 # Build condition for xgboost nested generation from path element
+# Note: This function is currently not called due to how build_nested_from_flat_paths
+# partitions leaves - xgboost's op naming doesn't match the expected convention.
+# Kept for potential future use when the partitioning logic is updated.
 build_xgb_nested_condition <- function(path_elem) {
   col <- rlang::sym(path_elem$col)
   val <- as.numeric(path_elem$val)
@@ -351,6 +357,7 @@ build_xgb_nested_condition <- function(path_elem) {
     expr(!!col >= !!val)
   }
 }
+# nocov end
 
 # Extract nested trees from xgboost model
 extract_xgb_trees_nested <- function(model) {
@@ -362,6 +369,7 @@ extract_xgb_trees_nested <- function(model) {
 # Get xgboost trees as data frame
 get_xgb_trees_df <- function(model) {
   if (is.null(attr(model, "param"))) {
+    # Old xgboost API (< 2.0) - kept for backwards compatibility
     xd <- xgboost::xgb.dump(
       model = model,
       dump_format = "text",
@@ -430,7 +438,7 @@ build_nested_xgb_tree <- function(tree_df) {
     # Missing can go either way
     if (missing_idx == left_idx) {
       # Missing goes left: (< threshold OR is.na)
-      condition <- expr(!!col < !!threshold | is.na(!!col))
+      condition <- expr(!!col < !!threshold | is.na(!!col)) # nocov
     } else {
       # Missing goes right or no missing: < threshold (no NA)
       condition <- expr(!!col < !!threshold)

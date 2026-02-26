@@ -34,3 +34,11 @@
       Error in `.extract_xgb_trees()`:
       ! `model` must be <xgb.Booster>, not an empty list.
 
+# NULL objective with non-zero base_score warns user
+
+    Code
+      fit <- tidypredict_fit(pm)
+    Condition
+      Warning:
+      If the objective is a custom function, please explicitly apply it to the output.
+
