@@ -280,13 +280,24 @@ tidypredict_test._xgb.Booster <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
+  # If this is also a model_fit (parsnip), delegate to that method
+  if (inherits(model, "model_fit")) {
+    return(tidypredict_test.model_fit(
+      model = model,
+      df = df,
+      threshold = threshold,
+      include_intervals = include_intervals,
+      max_rows = max_rows,
+      xg_df = xg_df
+    ))
+  }
   xgb_booster(
     model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
     max_rows = max_rows,
-    xg_df = df
+    xg_df = xg_df %||% df
   )
 }
 
