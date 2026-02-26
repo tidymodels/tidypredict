@@ -4,9 +4,11 @@ output: github_document
 
 # tidypredict <a href="https://tidypredict.tidymodels.org"><img src="man/figures/logo.png" align="right" height="138" alt="tidypredict website" /></a>
 
-[![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
-[![Codecov test coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict?branch=main)
+[![R-CMD-check](https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml)
+[![CRAN status](https://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
+[![Downloads](https://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
+[![Codecov test coverage](https://codecov.io/gh/tidymodels/tidypredict/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 
 ```{r pre, include = FALSE}
 if (!rlang::is_installed("randomForest")) {
@@ -58,7 +60,7 @@ remotes::install_github("tidymodels/tidypredict")
 |`tidypredict_fit()`          | Returns an R formula that calculates the prediction                            |
 |`tidypredict_sql()`          | Returns a SQL query based on the formula from `tidypredict_fit()`              |
 |`tidypredict_to_column()`    | Adds a new column using the formula from `tidypredict_fit()`                   |
-|`tidypredict_test()`         | Tests `tidyverse` predictions against the model's native `predict()` function  |
+|`tidypredict_test()`         | Tests `tidypredict` predictions against the model's native `predict()` function  |
 |`tidypredict_interval()`     | Same as `tidypredict_fit()` but for intervals (only works with `lm` and `glm`) |
 |`tidypredict_sql_interval()` | Same as `tidypredict_sql()` but for intervals (only works with `lm` and `glm`) |
 |`parse_model()`              | Creates a list spec based on the R model                                       |
@@ -90,11 +92,14 @@ The following models are supported by `tidypredict`:
 
 - Linear Regression - `lm()`
 - Generalized Linear model - `glm()`
+- Elastic net models - `glmnet::glmnet()`
 - Random Forest models - `randomForest::randomForest()`
 - Random Forest models, via `ranger` - `ranger::ranger()`
 - MARS models - `earth::earth()`
-- XGBoost models - `xgboost::xgb.Booster.complete()`
-- LightGBM models - `lightgbm::lgb.Booster()`
+- Decision tree models - `rpart::rpart()`
+- XGBoost models - `xgboost::xgb.Booster`
+- LightGBM models - `lightgbm::lgb.Booster`
+- CatBoost models - `catboost::catboost.Model`
 - Cubist models - `Cubist::cubist()`
 - Tree models, via `partykit` - `partykit::ctree()` 
 
@@ -103,10 +108,14 @@ The following models are supported by `tidypredict`:
 `tidypredict` supports models fitted via the `parsnip` interface. The ones confirmed currently work in `tidypredict` are:
 
 - `lm()` - `parsnip`: `linear_reg()` with *"lm"* as the engine.
+- `glmnet::glmnet()` - `parsnip`: `linear_reg()` or `logistic_reg()` with *"glmnet"* as the engine.
 - `randomForest::randomForest()` - `parsnip`: `rand_forest()` with *"randomForest"* as the engine.
 - `ranger::ranger()` - `parsnip`: `rand_forest()` with *"ranger"* as the engine.
-- `earth::earth()`  - `parsnip`: `mars()` with *"earth"* as the engine.
-- `lightgbm::lgb.Booster()` - `parsnip`: `boost_tree()` with *"lightgbm"* as the engine (via `bonsai`).
+- `earth::earth()` - `parsnip`: `mars()` with *"earth"* as the engine.
+- `rpart::rpart()` - `parsnip`: `decision_tree()` with *"rpart"* as the engine.
+- `xgboost::xgb.Booster` - `parsnip`: `boost_tree()` with *"xgboost"* as the engine.
+- `lightgbm::lgb.Booster` - `parsnip`: `boost_tree()` with *"lightgbm"* as the engine (via `bonsai`).
+- `catboost::catboost.Model` - `parsnip`: `boost_tree()` with *"catboost"* as the engine (via `bonsai`).
 
 ### `broom`
 
