@@ -21,7 +21,14 @@ test_that("Intervals returns list", {
   )
 })
 
-test_that("alert triggered with threshold = 0", {
+test_that("alert triggered with threshold = 0 (mocked)", {
+  local_mocked_bindings(
+    tidypredict_to_column = function(df, model, ...) {
+      df$fit_te <- rep(999, nrow(df))
+      df
+    }
+  )
+
   t <- tidypredict_test(
     lm(mpg ~ wt + cyl, data = mtcars),
     threshold = 0
@@ -30,7 +37,16 @@ test_that("alert triggered with threshold = 0", {
   expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
-test_that("alert with intervals", {
+test_that("alert with intervals (mocked)", {
+  local_mocked_bindings(
+    tidypredict_to_column = function(df, model, ...) {
+      df$fit_te <- rep(999, nrow(df))
+      df$upr_te <- rep(999, nrow(df))
+      df$lwr_te <- rep(999, nrow(df))
+      df
+    }
+  )
+
   t <- tidypredict_test(
     lm(mpg ~ wt + cyl + disp + hp + drat, data = mtcars),
     threshold = 0,

@@ -1,4 +1,4 @@
-# alert triggered with threshold = 0
+# alert triggered with threshold = 0 (mocked)
 
     Code
       cat(t$message)
@@ -6,13 +6,13 @@
       tidypredict test results
       Difference threshold: 0
       
-      Fitted records above the threshold: 13
+      Fitted records above the threshold: 32
       
       Fit max  difference:
       Lower max difference:
-      Upper max difference:<number>
+      Upper max difference:-<number>
 
-# alert with intervals
+# alert with intervals (mocked)
 
     Code
       cat(t$message)
@@ -20,13 +20,13 @@
       tidypredict test results
       Difference threshold: 0
       
-      Fitted records above the threshold: 16
-      Lower interval records above the threshold: 15
-      Upper interval records above the threshold: 11
+      Fitted records above the threshold: 32
+      Lower interval records above the threshold: 32
+      Upper interval records above the threshold: 32
       
       Fit max  difference:<number>
       Lower max difference:<number>
-      Upper max difference:<number>
+      Upper max difference:-<number>
 
 # xgboost alert branch
 
