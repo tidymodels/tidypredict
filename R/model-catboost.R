@@ -1024,8 +1024,8 @@ build_nested_catboost_categorical <- function(split_info, cat_mapping) {
     )
   }
 
-  # For nested, we use "equal" (left condition)
-  expr(!!col_name == !!category)
+  # For nested oblivious trees, the left branch (bit=0) is the "not-equal" case
+  expr(!!col_name != !!category)
 }
 
 # For {orbital} -----------------------------------------------
