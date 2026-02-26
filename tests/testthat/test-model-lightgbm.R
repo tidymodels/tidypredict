@@ -1438,7 +1438,10 @@ test_that("build_lgb_nested_condition errors on unknown type", {
     missing = FALSE
   )
 
-  expect_snapshot(tidypredict:::build_lgb_nested_condition(condition), error = TRUE)
+  expect_snapshot(
+    tidypredict:::build_lgb_nested_condition(condition),
+    error = TRUE
+  )
 })
 
 # Categorical feature tests -------------------------------------------------

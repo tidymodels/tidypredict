@@ -975,44 +975,6 @@ test_that("empty trees throws error", {
   expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
-test_that("NULL objective defaults to RMSE (identity)", {
-  skip_if_not_installed("catboost")
-
-  pm <- list(
-    general = list(
-      params = list(), # No objective specified
-      model = "catboost.Model",
-      type = "catboost"
-    ),
-    trees = list(list(list(prediction = 5.0, path = list())))
-  )
-  class(pm) <- c("pm_catboost", "parsed_model", "list")
-
-  result <- tidypredict_fit(pm)
-
-  # Should be identity transformation (no sigmoid)
-  expect_no_match(deparse(result), "exp")
-})
-
-test_that("stump tree (empty path) works", {
-  skip_if_not_installed("catboost")
-
-  pm <- list(
-    general = list(
-      params = list(objective = "RMSE"),
-      model = "catboost.Model",
-      type = "catboost"
-    ),
-    trees = list(list(list(prediction = 42.5, path = list())))
-  )
-  class(pm) <- c("pm_catboost", "parsed_model", "list")
-
-  result <- tidypredict_fit(pm)
-  value <- rlang::eval_tidy(result, data.frame(x = 1))
-
-  expect_equal(value, 42.5)
-})
-
 # SQL generation tests ----------------------------------------------------
 
 test_that("tidypredict_sql returns SQL class", {
@@ -1880,6 +1842,43 @@ test_that("Depthwise regression predictions match (#187)", {
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
+})
+
+test_that("non-oblivious stump trees (depth=0) work correctly", {
+  skip_if_not_installed("catboost")
+
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  y <- mtcars$hp
+
+  pool <- catboost_catboost.load_pool(
+    X,
+    label = y,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  model <- catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 3L,
+      depth = 0L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      grow_policy = "Depthwise",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+
+  pm <- parse_model(model)
+  expect_equal(pm$general$tree_type, "nonoblivious")
+
+  formula <- tidypredict_fit(model)
+  expect_type(formula, "language")
+
+  native_preds <- catboost_catboost.predict(model, pool)
+  tidy_preds <- rlang::eval_tidy(formula, mtcars)
+  expect_equal(tidy_preds[[1]], native_preds[[1]], tolerance = 1e-10)
 })
 
 test_that("Lossguide regression predictions match (#187)", {

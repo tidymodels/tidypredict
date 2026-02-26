@@ -3,7 +3,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_catboost()`:
+      Error in `build_fit_formula_catboost_nested()`:
       ! Unsupported objective: "UnsupportedObjective".
       i Supported objectives: "RMSE", "MAE", "Quantile", "MAPE", "Poisson", "Huber", "LogCosh", "Expectile", "Tweedie", "Logloss", "CrossEntropy", "MultiClass", and "MultiClassOneVsAll".
 
@@ -12,7 +12,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_catboost()`:
+      Error in `build_fit_formula_catboost_nested()`:
       ! Model has no trees.
 
 # tidypredict_test requires matrix
@@ -37,7 +37,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_catboost_multiclass()`:
+      Error in `build_fit_formula_catboost_multiclass_nested()`:
       ! Multiclass model must have num_class >= 2.
 
 # set_catboost_categories validates parsed_model argument

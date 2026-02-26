@@ -74,12 +74,5 @@ tidypredict_fit.pm_lgb <- function(model) {
 
 #' @export
 tidypredict_fit.pm_catboost <- function(model) {
-  version <- model$general$version %||% 1
-
-  if (version >= 3) {
-    return(build_fit_formula_catboost_nested(model))
-  }
-
-  # Version 1/2: flat case_when (backwards compatibility)
-  build_fit_formula_catboost(model)
+  build_fit_formula_catboost_nested(model)
 }
