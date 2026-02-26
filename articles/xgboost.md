@@ -129,9 +129,7 @@ model <- xgboost::xgb.train(
   #> 
   #> Fitted records above the threshold: 5
   #> 
-  #> Fit max  difference:
-  #> Lower max difference:
-  #> Upper max difference:7.11972936162653e-08
+  #> Max difference: 7.11972936162653e-08
   ```
 
 Please be aware that XGBoost converts data into 32-bit floats
@@ -161,9 +159,7 @@ tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
 #> 
 #> Fitted records above the threshold: 12
 #> 
-#> Fit max  difference:
-#> Lower max difference:
-#> Upper max difference:1.04374733855828e-07
+#> Max difference: 1.04374733855828e-07
 ```
 
 ## Parse model spec
