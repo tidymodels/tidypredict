@@ -85,10 +85,12 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
     pm$general$family <- model$family$family
     pm$general$link <- model$family$link
   } else {
+    # nocov start
     cli::cli_abort(
-      "Model fit with this {.arg family} is not supported."
+      "Model fit with this {.arg family} is not supported.",
+      .internal = TRUE
     )
-  }
+  } # nocov end
 
   as_parsed_model(pm)
 }
