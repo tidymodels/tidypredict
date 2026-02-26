@@ -1,5 +1,11 @@
 skip_if_not_installed("randomForest")
 
+# Helper to normalize floating-point numbers in snapshot output
+# Replaces scientific notation numbers with "<number>" to avoid platform differences
+scrub_floats <- function(x) {
+  gsub("[0-9]+\\.?[0-9]*e[+-]?[0-9]+|[0-9]+\\.[0-9]{10,}", "<number>", x)
+}
+
 test_that("Tester returns warning", {
   t <- tidypredict_test(
     lm(mpg ~ wt, data = mtcars),
@@ -21,7 +27,7 @@ test_that("alert triggered with threshold = 0", {
     threshold = 0
   )
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
 test_that("alert with intervals", {
@@ -31,7 +37,7 @@ test_that("alert with intervals", {
     include_intervals = TRUE
   )
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
 test_that("max_rows limits data", {
@@ -70,7 +76,7 @@ test_that("xgboost alert branch", {
   )
   t <- tidypredict_test(model, df = df, threshold = 0, xg_df = xg_mat)
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
 test_that("glmnet alert branch (mocked)", {
@@ -88,7 +94,7 @@ test_that("glmnet alert branch (mocked)", {
 
   t <- tidypredict_test(model, df = df, threshold = 0)
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
 test_that("lightgbm alert branch (mocked)", {
@@ -120,7 +126,7 @@ test_that("lightgbm alert branch (mocked)", {
 
   t <- tidypredict_test(model, df = df, threshold = 0, xg_df = lgb_mat)
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })
 
 test_that("catboost max_rows", {
@@ -176,5 +182,5 @@ test_that("catboost alert branch (mocked)", {
 
   t <- tidypredict_test(model, df = df, threshold = 0, xg_df = cb_mat)
   expect_true(t$alert)
-  expect_snapshot(cat(t$message))
+  expect_snapshot(cat(t$message), transform = scrub_floats)
 })

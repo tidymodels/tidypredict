@@ -10,7 +10,7 @@
       
       Fit max  difference:
       Lower max difference:
-      Upper max difference:3.5527136788005e-15
+      Upper max difference:<number>
 
 # alert with intervals
 
@@ -24,9 +24,9 @@
       Lower interval records above the threshold: 15
       Upper interval records above the threshold: 11
       
-      Fit max  difference:7.105427357601e-15
-      Lower max difference:7.105427357601e-15
-      Upper max difference:3.5527136788005e-15
+      Fit max  difference:<number>
+      Lower max difference:<number>
+      Upper max difference:<number>
 
 # xgboost alert branch
 
@@ -38,7 +38,7 @@
       
       Fitted records above the threshold: 18
       
-      Max difference: 8.40138671520663e-07
+      Max difference: <number>
 
 # glmnet alert branch (mocked)
 
@@ -50,7 +50,7 @@
       
       Fitted records above the threshold: 2368
       
-      Max difference: -969.880981369456
+      Max difference: -<number>
 
 # lightgbm alert branch (mocked)
 
@@ -62,7 +62,7 @@
       
       Fitted records above the threshold: 32
       
-      Max difference: 983.714176060289
+      Max difference: <number>
 
 # catboost alert branch (mocked)
 
@@ -74,5 +74,5 @@
       
       Fitted records above the threshold: 32
       
-      Max difference: 982.713951655463
+      Max difference: <number>
 
