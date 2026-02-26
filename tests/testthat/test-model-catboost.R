@@ -1360,7 +1360,6 @@ test_that("set_catboost_categories errors when column is not a factor", {
 
 test_that("categorical predictions match catboost.predict", {
   skip_if_not_installed("catboost")
-  skip("one_hot_max_size categorical handling needs investigation")
 
   set.seed(42)
   df <- data.frame(
@@ -1565,8 +1564,6 @@ test_that("parsnip/bonsai catboost with categorical features works automatically
   skip_if_not_installed("catboost")
   skip_if_not_installed("parsnip")
   skip_if_not_installed("bonsai")
-  # TODO: one_hot_max_size handling needs investigation with nested case_when
-  skip("one_hot_max_size categorical handling needs investigation")
 
   set.seed(42)
   train_data <- data.frame(
@@ -1644,8 +1641,6 @@ test_that("multiple categorical features work correctly", {
   skip_if_not_installed("catboost")
   skip_if_not_installed("parsnip")
   skip_if_not_installed("bonsai")
-  # TODO: one_hot_max_size handling needs investigation with nested case_when
-  skip("one_hot_max_size categorical handling needs investigation")
 
   set.seed(42)
   df <- data.frame(
@@ -1690,8 +1685,6 @@ test_that("parsnip categorical predictions match parsnip predictions", {
   skip_if_not_installed("catboost")
   skip_if_not_installed("parsnip")
   skip_if_not_installed("bonsai")
-  # TODO: one_hot_max_size handling needs investigation with nested case_when
-  skip("one_hot_max_size categorical handling needs investigation")
 
   set.seed(42)
   train_data <- data.frame(
@@ -1765,8 +1758,6 @@ test_that("model with only categorical features works", {
   skip_if_not_installed("catboost")
   skip_if_not_installed("parsnip")
   skip_if_not_installed("bonsai")
-  # TODO: one_hot_max_size handling needs investigation with nested case_when
-  skip("one_hot_max_size categorical handling needs investigation")
 
   set.seed(42)
   df <- data.frame(
