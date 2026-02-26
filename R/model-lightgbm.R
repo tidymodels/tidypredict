@@ -517,9 +517,6 @@ build_fit_formula_lgb_multiclass_nested <- function(
   objective
 ) {
   num_class <- parsedmodel$general$num_class
-  if (is.null(num_class) || num_class < 2) {
-    cli::cli_abort("Multiclass model must have num_class >= 2.")
-  }
 
   trees <- extract_lgb_trees_nested(model, parsedmodel$general$feature_names)
   apply_lgb_multiclass_transformation(trees, num_class, objective)
@@ -643,7 +640,6 @@ build_nested_lgb_tree <- function(tree_df, linear_info = NULL) {
   root_row <- which(tree_df$split_index == 0)
 
   if (length(root_row) == 0) {
-    # Single leaf tree - return leaf value
     leaf_row <- which(!is.na(tree_df$leaf_index))
     if (length(leaf_row) == 1) {
       leaf_idx <- tree_df$leaf_index[[leaf_row]]
@@ -743,165 +739,6 @@ build_nested_lgb_node <- function(
   }
 
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
-}
-
-# Legacy flat case_when (for v1/v2 parsed model compatibility) ----------------
-# These functions generate flat case_when expressions and are preserved for
-# backwards compatibility when loading parsed models saved with version < 3.
-
-build_fit_formula_lgb <- function(parsedmodel) {
-  n_trees <- length(parsedmodel$trees)
-
-  if (n_trees == 0) {
-    cli::cli_abort("Model has no trees.")
-  }
-
-  objective <- parsedmodel$general$params$objective %||% "regression"
-
-  if (!objective %in% lgb_supported_objectives) {
-    cli::cli_abort(
-      c(
-        "Unsupported objective: {.val {objective}}.",
-        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
-      )
-    )
-  }
-
-  if (objective %in% lgb_multiclass_objectives) {
-    return(build_fit_formula_lgb_multiclass(parsedmodel, objective))
-  }
-
-  # Single output objectives: sum all trees
-  f <- build_lgb_tree_sum(seq_len(n_trees), parsedmodel)
-
-  # RF boosting averages trees instead of summing
-  boosting <- parsedmodel$general$params$boosting
-  if (!is.null(boosting) && boosting == "rf") {
-    f <- expr_division(f, n_trees)
-  }
-
-  apply_lgb_objective(f, objective, parsedmodel$general$params)
-}
-
-build_fit_formula_lgb_multiclass <- function(parsedmodel, objective) {
-  n_trees <- length(parsedmodel$trees)
-  num_class <- parsedmodel$general$num_class
-
-  if (is.null(num_class) || num_class < 2) {
-    cli::cli_abort("Multiclass model must have num_class >= 2.")
-  }
-
-  # Group trees by class: tree i belongs to class (i-1) %% num_class
-  # (trees are 1-indexed in our list, but LightGBM uses 0-indexed tree_index)
-  class_trees <- lapply(seq_len(num_class), function(class_idx) {
-    which((seq_len(n_trees) - 1) %% num_class == (class_idx - 1))
-  })
-
-  # Build raw score formula for each class
-  raw_scores <- lapply(
-    class_trees,
-    build_lgb_tree_sum,
-    parsedmodel = parsedmodel
-  )
-
-  # Apply transformation based on objective
-  if (objective == "multiclass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
-  } else if (objective == "multiclassova") {
-    # One-vs-all: sigmoid for each class independently
-    result <- map(raw_scores, lgb_sigmoid)
-  }
-
-  names(result) <- paste0("class_", seq_len(num_class) - 1)
-  result
-}
-
-# Helper to build sum of tree predictions for given indices
-build_lgb_tree_sum <- function(tree_indices, parsedmodel) {
-  if (length(tree_indices) == 0) {
-    # nocov start
-    cli::cli_abort("No trees found for tree indices.", .internal = TRUE)
-    # nocov end
-  }
-  tree_formulas <- map(
-    tree_indices,
-    ~ expr(case_when(!!!get_lgb_case_tree(.x, parsedmodel)))
-  )
-  reduce_addition(tree_formulas)
-}
-
-get_lgb_case_tree <- function(tree_no, parsedmodel) {
-  map(
-    parsedmodel$trees[[tree_no]],
-    ~ get_lgb_case(.x$path, .x$prediction, .x$linear)
-  )
-}
-
-get_lgb_case <- function(path, prediction, linear = NULL) {
-  conditions <- map(path, get_lgb_case_fun)
-  cl <- combine_path_conditions(conditions)
-  pred_expr <- if (!is.null(linear)) {
-    build_lgb_linear_prediction(linear)
-  } else {
-    prediction
-  }
-  expr(!!cl ~ !!pred_expr)
-}
-
-get_lgb_case_fun <- function(.x) {
-  if (.x$type == "conditional") {
-    build_lgb_conditional_expr(.x$col, .x$op, .x$val, .x$missing)
-  } else if (.x$type == "set") {
-    build_lgb_set_expr(.x$col, .x$op, .x$vals, .x$missing)
-  } else {
-    cli::cli_abort("Unknown condition type: {.val {(.x$type)}}")
-  }
-}
-
-build_lgb_conditional_expr <- function(col, op, val, include_missing) {
-  col_name <- as.name(col)
-  val <- as.numeric(val)
-
-  base_expr <- switch(
-    op,
-    "less-equal" = expr(!!col_name <= !!val),
-    "more" = expr(!!col_name > !!val),
-    # nocov start
-    cli::cli_abort(
-      "Unknown operator for conditional: {.val {op}}.",
-      .internal = TRUE
-    )
-    # nocov end
-  )
-
-  add_missing_condition(base_expr, col_name, include_missing)
-}
-
-build_lgb_set_expr <- function(col, op, vals, include_missing) {
-  col_name <- as.name(col)
-
-  base_expr <- switch(
-    op,
-    "in" = expr(!!col_name %in% !!vals),
-    "not-in" = expr(!(!!col_name %in% !!vals)),
-    cli::cli_abort("Unknown operator for set: {.val {op}}")
-  )
-
-  add_missing_condition(base_expr, col_name, include_missing)
-}
-
-add_missing_condition <- function(base_expr, col_name, include_missing) {
-  if (include_missing) {
-    expr((!!base_expr | is.na(!!col_name)))
-  } else {
-    base_expr
-  }
 }
 
 # For {orbital} -----------------------------------------------

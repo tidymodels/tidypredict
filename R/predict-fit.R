@@ -69,14 +69,7 @@ tidypredict_fit.pm_xgb <- function(model) {
 
 #' @export
 tidypredict_fit.pm_lgb <- function(model) {
-  version <- model$general$version %||% 1
-
-  if (version >= 3) {
-    return(build_fit_formula_lgb_from_parsed(model))
-  }
-
-  # Version 1/2: flat case_when (backwards compatibility)
-  build_fit_formula_lgb(model)
+  build_fit_formula_lgb_from_parsed(model)
 }
 
 #' @export
