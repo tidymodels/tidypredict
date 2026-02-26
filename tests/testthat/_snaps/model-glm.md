@@ -84,3 +84,11 @@
       
        All results are within the difference threshold
 
+# tidypredict_interval errors for non-gaussian glm
+
+    Code
+      tidypredict_interval(model)
+    Condition
+      Error in `te_interval_glm()`:
+      ! Combination of family and link are not supported for prediction intervals.
+

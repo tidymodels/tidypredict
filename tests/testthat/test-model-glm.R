@@ -102,3 +102,17 @@ test_that("tidypredict works when variable names are subset of other variables",
     )
   )
 })
+
+test_that("tidypredict_interval works for gaussian glm", {
+  model <- glm(mpg ~ wt + cyl, data = mtcars, family = "gaussian")
+  interval <- tidypredict_interval(model)
+  expect_type(interval, "language")
+})
+
+test_that("tidypredict_interval errors for non-gaussian glm", {
+  model <- glm(am ~ wt + cyl, data = mtcars, family = "binomial")
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_interval(model)
+  )
+})
