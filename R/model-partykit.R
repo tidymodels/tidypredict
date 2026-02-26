@@ -127,28 +127,21 @@ partykit_tree_info <- function(model) {
   var_name <- names(var_details)
 
   # Build categorical split strings
-  if (length(var_class) > 0) {
-    class_splits <- character(n_nodes)
-    for (i in seq_len(n_nodes)) {
-      if (is.na(splitvarID[i])) {
-        class_splits[i] <- NA_character_
+  class_splits <- character(n_nodes)
+  for (i in seq_len(n_nodes)) {
+    if (is.na(splitvarID[i])) {
+      class_splits[i] <- NA_character_
+    } else {
+      v <- vars[splitvarID[i]]
+      if (var_class[var_name == v] == "factor") {
+        lvls <- levels(model$data[, colnames(model$data) == v])
+        pn <- split_index[[i]]
+        pn <- ifelse(is.na(pn), 0, pn)
+        class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
       } else {
-        v <- vars[splitvarID[i]]
-        if (var_class[var_name == v] == "factor") {
-          lvls <- levels(model$data[, colnames(model$data) == v])
-          pn <- split_index[[i]]
-          pn <- ifelse(is.na(pn), 0, pn)
-          if (any(pn == 3)) {
-            cli::cli_abort("Three levels are not supported.")
-          }
-          class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
-        } else {
-          class_splits[i] <- NA_character_
-        }
+        class_splits[i] <- NA_character_
       }
     }
-  } else {
-    class_splits <- rep(NA_character_, n_nodes)
   }
 
   data.frame(
@@ -180,36 +173,6 @@ parse_model.party <- function(model) {
 tidypredict_fit.party <- function(model, ...) {
   tree_info <- partykit_tree_info_full(model)
   generate_nested_case_when_tree(tree_info)
-}
-
-# Legacy tree extraction (no longer used) ---------------------------
-# This function was used by the old approach to populate pm$trees in flat path
-# format. Now parse_model.party() uses partykit_tree_info_full() to populate
-# pm$tree_info instead. Uses get_ra_path() and get_child_info() from
-# model-ranger.R. Kept for reference.
-
-get_pk_tree <- function(model) {
-  tree <- partykit_tree_info(model)
-  paths <- tree$nodeID[tree[, "terminal"]]
-
-  child_info <- get_child_info(tree)
-
-  map(
-    paths,
-    ~ {
-      prediction <- tree$prediction[tree$nodeID == .x]
-      if (is.null(prediction)) {
-        cli::cli_abort("Prediction column not found.")
-      }
-      if (is.factor(prediction)) {
-        prediction <- as.character(prediction)
-      }
-      list(
-        prediction = prediction,
-        path = get_ra_path(.x, tree, child_info, FALSE)
-      )
-    }
-  )
 }
 
 # For {orbital}
