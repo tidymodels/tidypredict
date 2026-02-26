@@ -26,6 +26,26 @@
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.
 
+# parse_model errors on classification model
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! Classification models are not supported for randomForest.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
+
+# v2 parsed classification model errors
+
+    Code
+      tidypredict_fit(pm)
+    Condition
+      Error in `tidypredict_fit_randomForest()`:
+      ! Classification models are not supported for randomForest.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
+
 # .extract_rf_classprob errors on non-randomForest model
 
     Code
