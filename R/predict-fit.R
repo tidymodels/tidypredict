@@ -40,7 +40,7 @@ tidypredict_fit.pm_tree <- function(model) {
     }
   }
 
-  # Version 1/2: flat case_when format (backwards compatibility)
+  # Version 1/2: flat case_when format (backwards compatibility with saved models)
   if (model$general$model == "cubist") {
     return(tidypredict_fit_cubist(model))
   }
@@ -50,9 +50,6 @@ tidypredict_fit.pm_tree <- function(model) {
   if (model$general$model == "ranger") {
     return(tidypredict_fit_ranger(model))
   }
-
-  res <- generate_case_when_trees(model)
-  reduce_addition(res)
 }
 
 #' @export
