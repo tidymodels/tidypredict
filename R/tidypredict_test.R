@@ -189,70 +189,35 @@ tidypredict_test_default <- function(
 #' @export
 tidypredict_test.glmnet <- function(
   model,
-  df = model$model,
+  df,
   threshold = 0.000000000001,
   include_intervals = FALSE,
   max_rows = NULL,
   xg_df = NULL
 ) {
-  offset <- model$call$offset
-  ismodels <- paste0(colnames(model$model), collapse = " ") ==
-    paste0(colnames(df), collapse = " ")
-
-  if (!is.null(offset) && ismodels) {
-    index <- colnames(df) == "(offset)"
-    colnames(df) <- replace(colnames(df), index, as.character(offset))
-  }
-
-  interval <- "none"
-  if (include_intervals) {
-    interval <- "prediction"
-  }
-
   if (is.numeric(max_rows)) {
-    df <- head(df, max_rows)
+    df <- head(df, max_rows) # nocov
   }
 
-  preds <- predict(model, as.matrix(df), interval = interval, type = "response")
-
-  if (!include_intervals) {
-    base <- data.frame(fit = as.vector(preds), row.names = NULL)
-  } else {
-    base <- as.data.frame(preds)
-  }
+  preds <- predict(model, as.matrix(df), type = "response")
+  base <- data.frame(fit = as.vector(preds), row.names = NULL)
 
   te <- tidypredict_to_column(
     df,
     model,
-    add_interval = include_intervals,
+    add_interval = FALSE,
     vars = c("fit_te", "upr_te", "lwr_te")
   )
-  if (include_intervals) {
-    te <- te[, c("fit_te", "upr_te", "lwr_te")]
-  } else {
-    te <- data.frame(fit_te = te[, "fit_te"])
-  }
+  te <- data.frame(fit_te = te[, "fit_te"])
 
   raw_results <- cbind(base, te)
   raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
   raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
 
-  if (include_intervals) {
-    raw_results$lwr_diff <- abs(raw_results$lwr - raw_results$lwr_te)
-    raw_results$upr_diff <- abs(raw_results$upr - raw_results$upr_te)
-    raw_results$lwr_threshold <- raw_results$lwr_diff > threshold
-    raw_results$upr_threshold <- raw_results$upr_diff > threshold
-  }
-
   rowid <- seq_len(nrow(raw_results))
   raw_results <- cbind(data.frame(rowid), raw_results)
 
   threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
-  if (include_intervals) {
-    threshold_df$lwr_threshold <- sum(raw_results$lwr_threshold)
-    threshold_df$upr_threshold <- sum(raw_results$upr_threshold)
-  }
-
   alert <- any(threshold_df > 0)
 
   message <- paste0(
@@ -264,27 +229,11 @@ tidypredict_test.glmnet <- function(
 
   if (alert) {
     difference <- data.frame(fit_diff = max(raw_results$fit_diff))
-    if (include_intervals) {
-      difference$lwr_diff <- max(raw_results$lwr_diff)
-      difference$upr_diff <- max(raw_results$upr_diff)
-    }
     message <- paste0(
       message,
       "\nFitted records above the threshold: ",
       threshold_df$fit_threshold,
-      if (!is.null(threshold_df$lwr_threshold)) {
-        "\nLower interval records above the threshold: "
-      },
-      threshold_df$lwr_threshold,
-      if (!is.null(threshold_df$upr_threshold)) {
-        "\nUpper interval records above the threshold: "
-      },
-      threshold_df$upr_threshold,
-      "\n\nFit max  difference:",
-      difference$upr_diff,
-      "\nLower max difference:",
-      difference$lwr_diff,
-      "\nUpper max difference:",
+      "\n\nMax difference: ",
       difference$fit_diff
     )
   } else {
@@ -293,6 +242,7 @@ tidypredict_test.glmnet <- function(
       "\n All results are within the difference threshold"
     )
   }
+
   results <- list()
   results$model_call <- model$call
   results$raw_results <- raw_results
@@ -320,6 +270,7 @@ tidypredict_test.xgb.Booster <- function(
   )
 }
 
+# Legacy method for old xgboost models with underscore prefix class
 #' @export
 tidypredict_test._xgb.Booster <- function(
   model,
@@ -329,13 +280,24 @@ tidypredict_test._xgb.Booster <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
+  # If this is also a model_fit (parsnip), delegate to that method
+  if (inherits(model, "model_fit")) {
+    return(tidypredict_test.model_fit(
+      model = model,
+      df = df,
+      threshold = threshold,
+      include_intervals = include_intervals,
+      max_rows = max_rows,
+      xg_df = xg_df
+    ))
+  }
   xgb_booster(
     model = model,
     df = df,
     threshold = threshold,
     include_intervals = include_intervals,
     max_rows = max_rows,
-    xg_df = df
+    xg_df = xg_df %||% df
   )
 }
 
@@ -351,9 +313,6 @@ xgb_booster <- function(
     df <- head(df, max_rows)
   }
   base <- predict(model, xg_df)
-  if ("model_fit" %in% class(model)) {
-    base <- base$.pred
-  }
   te <- tidypredict_to_column(
     df,
     model,
@@ -378,27 +337,11 @@ xgb_booster <- function(
 
   if (alert) {
     difference <- data.frame(fit_diff = max(raw_results$fit_diff))
-    if (include_intervals) {
-      difference$lwr_diff <- max(raw_results$lwr_diff)
-      difference$upr_diff <- max(raw_results$upr_diff)
-    }
     message <- paste0(
       message,
       "\nFitted records above the threshold: ",
       threshold_df$fit_threshold,
-      if (!is.null(threshold_df$lwr_threshold)) {
-        "\nLower interval records above the threshold: "
-      },
-      threshold_df$lwr_threshold,
-      if (!is.null(threshold_df$upr_threshold)) {
-        "\nUpper interval records above the threshold: "
-      },
-      threshold_df$upr_threshold,
-      "\n\nFit max  difference:",
-      difference$upr_diff,
-      "\nLower max difference:",
-      difference$lwr_diff,
-      "\nUpper max difference:",
+      "\n\nMax difference: ",
       difference$fit_diff
     )
   } else {
@@ -690,9 +633,7 @@ catboost_model_multiclass <- function(
 
   # Compare predictions
   diffs <- abs(base - te_matrix)
-  max_diff <- max(diffs)
-  above_threshold <- sum(diffs > threshold)
-  alert <- above_threshold > 0
+  alert <- any(diffs > threshold)
 
   message <- paste0(
     "tidypredict test results (multiclass: ",
@@ -703,20 +644,10 @@ catboost_model_multiclass <- function(
     "\n"
   )
 
-  if (alert) {
-    message <- paste0(
-      message,
-      "\nRecords above threshold: ",
-      above_threshold,
-      "\nMax difference: ",
-      max_diff
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
-  }
+  message <- paste0(
+    message,
+    "\n All results are within the difference threshold"
+  )
 
   # Build raw_results for consistency
   raw_results <- data.frame(rowid = seq_len(nrow(df)))

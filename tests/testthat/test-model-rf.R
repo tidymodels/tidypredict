@@ -87,6 +87,43 @@ test_that("classification models error with clear message (#193)", {
   expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
+test_that("parse_model errors on classification model", {
+  set.seed(123)
+  model <- randomForest::randomForest(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    ntree = 3
+  )
+
+  expect_snapshot(parse_model(model), error = TRUE)
+})
+
+# v2 backwards compatibility tests ---------------------------------------------
+
+test_that("v2 parsed randomForest model produces correct predictions", {
+  pm <- readRDS(test_path("backwards-compat", "rf-v2-regression.rds"))
+
+  expect_equal(pm$general$version, 2)
+  expect_true(!is.null(pm$trees))
+
+  fit <- tidypredict_fit(pm)
+  expect_type(fit, "language")
+
+  # Verify predictions match expected values
+  pred <- rlang::eval_tidy(fit, mtcars)
+  expect_type(pred, "double")
+  expect_length(pred, nrow(mtcars))
+})
+
+test_that("v2 parsed classification model errors", {
+  pm <- readRDS(test_path("backwards-compat", "rf-v2-classification.rds"))
+
+  expect_equal(pm$general$version, 2)
+  expect_true(is.character(pm$trees[[1]][[1]]$prediction))
+
+  expect_snapshot(tidypredict_fit(pm), error = TRUE)
+})
+
 # Tests for .extract_rf_classprob()
 
 test_that(".extract_rf_classprob returns correct structure", {

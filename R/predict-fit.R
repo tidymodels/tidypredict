@@ -40,7 +40,7 @@ tidypredict_fit.pm_tree <- function(model) {
     }
   }
 
-  # Version 1/2: flat case_when format (backwards compatibility)
+  # Version 1/2: flat case_when format (backwards compatibility with saved models)
   if (model$general$model == "cubist") {
     return(tidypredict_fit_cubist(model))
   }
@@ -50,9 +50,6 @@ tidypredict_fit.pm_tree <- function(model) {
   if (model$general$model == "ranger") {
     return(tidypredict_fit_ranger(model))
   }
-
-  res <- generate_case_when_trees(model)
-  reduce_addition(res)
 }
 
 #' @export
@@ -69,24 +66,10 @@ tidypredict_fit.pm_xgb <- function(model) {
 
 #' @export
 tidypredict_fit.pm_lgb <- function(model) {
-  version <- model$general$version %||% 1
-
-  if (version >= 3) {
-    return(build_fit_formula_lgb_from_parsed(model))
-  }
-
-  # Version 1/2: flat case_when (backwards compatibility)
-  build_fit_formula_lgb(model)
+  build_fit_formula_lgb_from_parsed(model)
 }
 
 #' @export
 tidypredict_fit.pm_catboost <- function(model) {
-  version <- model$general$version %||% 1
-
-  if (version >= 3) {
-    return(build_fit_formula_catboost_nested(model))
-  }
-
-  # Version 1/2: flat case_when (backwards compatibility)
-  build_fit_formula_catboost(model)
+  build_fit_formula_catboost_nested(model)
 }

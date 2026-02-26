@@ -61,13 +61,6 @@ generate_case_when_trees <- function(parsedmodel, default = TRUE) {
 generate_case_when_tree <- function(tree, mode, default = TRUE) {
   nodes <- generate_tree_nodes(tree, mode)
 
-  # Handle stump trees (single node with no conditions, returns simple value)
-  if (
-    length(nodes) == 1 && (is.numeric(nodes[[1]]) || is.character(nodes[[1]]))
-  ) {
-    return(nodes[[1]])
-  }
-
   if (default) {
     default <- nodes[[length(nodes)]]
     default <- rlang::f_rhs(default)
@@ -216,20 +209,6 @@ path_formula <- function(x) {
     i <- build_comparison_expr(x$col, x$val, x$op)
   } else if (type == "set") {
     i <- build_set_expr(x$col, x$vals, x$op)
-  } else if (
-    type == "conditional_with_surrogates" || type == "set_with_surrogates"
-  ) {
-    i <- build_surrogate_condition(x)
-  } else if (type == "na_check") {
-    i <- expr(is.na(!!as.name(x$col)))
-  } else if (type == "conditional_not_na") {
-    col <- as.name(x$col)
-    cond <- build_comparison_expr(x$col, x$val, x$op)
-    i <- expr(!is.na(!!col) & !!cond)
-  } else if (type == "set_not_na") {
-    col <- as.name(x$col)
-    cond <- build_set_expr(x$col, x$vals, x$op)
-    i <- expr(!is.na(!!col) & !!cond)
   } else {
     cli::cli_abort(
       "{.field type} has unsupported value of {.value {x$type}}.",
@@ -272,67 +251,6 @@ build_set_expr <- function(col, vals, op) {
       .internal = TRUE
     )
   }
-}
-
-# Build condition with surrogate fallbacks for rpart
-# Structure of x:
-# - primary: list(col, val, op) or list(col, vals, op) for sets
-# - surrogates: list of lists, each with (col, val, op) or (col, vals, op)
-# - majority_match: logical, TRUE if all-NA case should match this direction
-build_surrogate_condition <- function(x) {
-  primary <- x$primary
-  surrogates <- x$surrogates
-  majority_match <- x$majority_match
-
-  # Build the primary condition with NOT NULL check
-  primary_col <- as.name(primary$col)
-  primary_cond <- build_single_condition(primary)
-  primary_expr <- expr(!is.na(!!primary_col) & !!primary_cond)
-
-  # Start collecting all the OR terms
-  all_terms <- list(primary_expr)
-
-  # Track NA checks for each level
-  na_checks <- list(expr(is.na(!!primary_col)))
-
-  # Add surrogate conditions
-  for (surr in surrogates) {
-    surr_col <- as.name(surr$col)
-    surr_cond <- build_single_condition(surr)
-
-    # This surrogate is used when all previous vars are NA
-    prev_na <- reduce_and(na_checks)
-    surr_expr <- expr(!!prev_na & !is.na(!!surr_col) & !!surr_cond)
-
-    all_terms <- c(all_terms, list(surr_expr))
-    na_checks <- c(na_checks, list(expr(is.na(!!surr_col))))
-  }
-
-  # Add majority case if this direction matches majority
-  if (isTRUE(majority_match)) {
-    all_na <- reduce_and(na_checks)
-    all_terms <- c(all_terms, list(all_na))
-  }
-
-  # Combine with OR
-  reduce_or(all_terms)
-}
-
-# Build a single condition expression (without NA check)
-build_single_condition <- function(cond) {
-  if (!is.null(cond$vals)) {
-    build_set_expr(cond$col, cond$vals, cond$op)
-  } else {
-    build_comparison_expr(cond$col, cond$val, cond$op)
-  }
-}
-
-# Reduce expressions with OR
-reduce_or <- function(exprs) {
-  if (length(exprs) == 1) {
-    return(exprs[[1]])
-  }
-  reduce(exprs, function(a, b) expr(!!a | !!b))
 }
 
 # For {orbital}

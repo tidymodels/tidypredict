@@ -37,27 +37,13 @@ ranger_tree_info_full <- function(model, tree_no) {
       var_name <- as.character(tree$splitvarName[i])
       split_val <- tree$splitval[i]
 
-      if (is.na(split_val)) {
-        # Categorical split
-        split_class <- tree$splitclass[i]
-        cats <- strsplit(as.character(split_class), ", ")[[1]]
-        node_splits[[i]] <- list(
-          primary = list(
-            col = var_name,
-            vals = as.list(cats),
-            is_categorical = TRUE
-          )
+      node_splits[[i]] <- list(
+        primary = list(
+          col = var_name,
+          val = split_val,
+          is_categorical = FALSE
         )
-      } else {
-        # Numeric split
-        node_splits[[i]] <- list(
-          primary = list(
-            col = var_name,
-            val = split_val,
-            is_categorical = FALSE
-          )
-        )
-      }
+      )
     }
   }
 
@@ -115,7 +101,6 @@ build_nested_ranger_tree <- function(model, tree_no) {
   splitval <- tree$splitval
   terminal <- tree$terminal
   prediction <- tree$prediction
-  splitclass <- tree$splitclass
 
   build_node <- function(node_id) {
     # node_id is 0-indexed, convert to 1-indexed for vector access
@@ -134,13 +119,7 @@ build_nested_ranger_tree <- function(model, tree_no) {
     right_subtree <- build_node(right_id)
 
     col_sym <- rlang::sym(split_var)
-
-    if (is.na(split_val)) {
-      cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
-      condition <- expr(!!col_sym %in% !!cats)
-    } else {
-      condition <- expr(!!col_sym <= !!split_val)
-    }
+    condition <- expr(!!col_sym <= !!split_val)
 
     expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
@@ -208,7 +187,6 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
   rightChild <- tree$rightChild
 
   splitval <- tree$splitval
-  splitclass <- tree$splitclass
   splitvarName <- tree$splitvarName
 
   # Handle stump trees (no splits) - return empty path
@@ -234,43 +212,27 @@ get_ra_path <- function(node_id, tree, child_info, default_op = TRUE) {
     ~ {
       lc <- leftChild[.y + 1] == .x
       lr <- rightChild[.y + 1] == .x
-      if (is.na(splitval[.y + 1])) {
+      if (default_op) {
         if (lc) {
-          op <- "in"
+          op <- "less"
         }
         if (lr) {
-          op <- "not-in"
+          op <- "more-equal"
         }
-        vals <- strsplit(as.character(splitclass[.y + 1]), ", ")[[1]]
-        list(
-          type = "set",
-          col = as.character(splitvarName[.y + 1]),
-          vals = map(vals, ~.x),
-          op = op
-        )
       } else {
-        if (default_op) {
-          if (lc) {
-            op <- "less"
-          }
-          if (lr) {
-            op <- "more-equal"
-          }
-        } else {
-          if (lc) {
-            op <- "less-equal"
-          }
-          if (lr) {
-            op <- "more"
-          }
+        if (lc) {
+          op <- "less-equal"
         }
-        list(
-          type = "conditional",
-          col = as.character(splitvarName[.y + 1]),
-          val = splitval[.y + 1],
-          op = op
-        )
+        if (lr) {
+          op <- "more"
+        }
       }
+      list(
+        type = "conditional",
+        col = as.character(splitvarName[.y + 1]),
+        val = splitval[.y + 1],
+        op = op
+      )
     }
   )
 }
@@ -375,7 +337,6 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
   splitvarName <- as.character(tree$splitvarName)
   splitval <- tree$splitval
   terminal <- tree$terminal
-  splitclass <- tree$splitclass
   prob_col <- paste0("pred.", class_level)
   prob_vals <- tree[[prob_col]]
 
@@ -396,13 +357,7 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
     right_subtree <- build_node(right_id)
 
     col_sym <- rlang::sym(split_var)
-
-    if (is.na(split_val)) {
-      cats <- strsplit(as.character(splitclass[idx]), ", ")[[1]]
-      condition <- expr(!!col_sym %in% !!cats)
-    } else {
-      condition <- expr(!!col_sym <= !!split_val)
-    }
+    condition <- expr(!!col_sym <= !!split_val)
 
     expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }

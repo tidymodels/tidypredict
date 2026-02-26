@@ -60,3 +60,23 @@
       ! Classification models are not supported.
       i Use `.extract_ranger_classprob()` for classification models.
 
+# v2 parsed classification model errors
+
+    Code
+      tidypredict_fit(pm)
+    Condition
+      Error in `tidypredict_fit_ranger()`:
+      ! Classification models are not supported for ranger.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
+
+# parse_model.ranger errors on classification
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! Classification models are not supported for ranger.
+      i Only regression models can be converted to tidy formulas.
+      i Classification requires a voting mechanism that cannot be expressed as a single formula.
+

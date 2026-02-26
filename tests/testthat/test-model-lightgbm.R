@@ -1218,7 +1218,7 @@ test_that("empty trees throws error", {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-  pm$general$version <- 1
+  pm$general$version <- 3
   pm$general$params <- list(objective = "regression")
   pm$trees <- list()
   class(pm) <- c("pm_lgb", "parsed_model", "list")
@@ -1230,7 +1230,7 @@ test_that("multiclass with num_class < 2 throws error", {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-  pm$general$version <- 1
+  pm$general$version <- 3
   pm$general$params <- list(objective = "multiclass")
   pm$general$num_class <- 1
   pm$trees <- list(list(list(prediction = 1, path = list())))
@@ -1243,7 +1243,7 @@ test_that("multiclass with NULL num_class throws error", {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-  pm$general$version <- 1
+  pm$general$version <- 3
   pm$general$params <- list(objective = "multiclass")
   pm$general$num_class <- NULL
   pm$trees <- list(list(list(prediction = 1, path = list())))
@@ -1252,95 +1252,196 @@ test_that("multiclass with NULL num_class throws error", {
   expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
-test_that("NULL objective defaults to regression", {
+test_that("RF boosting in from_parsed averages trees", {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-
-  pm$general$version <- 1
-  pm$general$params <- list() # No objective set
-  pm$trees <- list(list(list(prediction = 42, path = list())))
-  class(pm) <- c("pm_lgb", "parsed_model", "list")
-
-  fit_formula <- tidypredict_fit(pm)
-
-  expect_type(fit_formula, "language")
-  # Should produce identity transform (no exp/sigmoid)
-  expect_no_match(deparse(fit_formula), "exp")
-})
-
-test_that("stump tree formula generation works (empty path)", {
-  pm <- list()
-  pm$general$model <- "lgb.Booster"
-  pm$general$type <- "lgb"
-  pm$general$version <- 1
-  pm$general$params <- list(objective = "regression")
-  pm$trees <- list(list(list(prediction = 42.5, path = list())))
-  class(pm) <- c("pm_lgb", "parsed_model", "list")
-
-  fit_formula <- tidypredict_fit(pm)
-
-  expect_type(fit_formula, "language")
-  # Should contain TRUE ~ 42.5 for the stump
-  formula_str <- deparse(fit_formula)
-  expect_match(formula_str, "TRUE")
-  expect_match(formula_str, "42.5")
-})
-
-test_that("categorical with missing=TRUE for 'in' operator", {
-  pm <- list()
-  pm$general$model <- "lgb.Booster"
-  pm$general$type <- "lgb"
-  pm$general$version <- 1
-  pm$general$params <- list(objective = "regression")
-  pm$trees <- list(list(
+  pm$general$version <- 3
+  pm$general$params <- list(objective = "regression", boosting = "rf")
+  pm$trees <- list(
     list(
-      prediction = 10,
-      path = list(list(
-        type = "set",
-        col = "cat_feat",
-        vals = c(0L, 1L),
-        op = "in",
-        missing = TRUE
-      ))
+      list(
+        prediction = 10,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "less-equal",
+          missing = FALSE
+        ))
+      ),
+      list(
+        prediction = 20,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "more",
+          missing = FALSE
+        ))
+      )
+    ),
+    list(
+      list(
+        prediction = 30,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "less-equal",
+          missing = FALSE
+        ))
+      ),
+      list(
+        prediction = 40,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "more",
+          missing = FALSE
+        ))
+      )
     )
-  ))
+  )
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  formula_str <- paste(deparse(fit_formula), collapse = "")
+  expect_match(formula_str, "/2")
+})
+
+test_that("from_parsed handles set type with missing", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 3
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list(
+    list(
+      list(
+        prediction = 10,
+        path = list(list(
+          type = "set",
+          col = "cat_feat",
+          vals = c(0L, 1L),
+          op = "in",
+          missing = TRUE
+        ))
+      ),
+      list(
+        prediction = 20,
+        path = list(list(
+          type = "set",
+          col = "cat_feat",
+          vals = c(0L, 1L),
+          op = "not-in",
+          missing = FALSE
+        ))
+      )
+    )
+  )
   class(pm) <- c("pm_lgb", "parsed_model", "list")
 
   fit_formula <- tidypredict_fit(pm)
 
   formula_str <- deparse(fit_formula)
-  # Should contain %in% and is.na for missing handling
   expect_match(formula_str, "%in%")
   expect_match(formula_str, "is.na")
 })
 
-test_that("categorical with missing=FALSE for 'not-in' operator", {
+test_that("from_parsed handles set type without missing", {
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
-  pm$general$version <- 1
+  pm$general$version <- 3
   pm$general$params <- list(objective = "regression")
-  pm$trees <- list(list(
+  pm$trees <- list(
     list(
-      prediction = -10,
-      path = list(list(
-        type = "set",
-        col = "cat_feat",
-        vals = c(0L, 1L),
-        op = "not-in",
-        missing = FALSE
-      ))
+      list(
+        prediction = 10,
+        path = list(list(
+          type = "set",
+          col = "cat_feat",
+          vals = c(0L, 1L),
+          op = "in",
+          missing = FALSE
+        ))
+      ),
+      list(
+        prediction = 20,
+        path = list(list(
+          type = "set",
+          col = "cat_feat",
+          vals = c(0L, 1L),
+          op = "not-in",
+          missing = FALSE
+        ))
+      )
     )
-  ))
+  )
   class(pm) <- c("pm_lgb", "parsed_model", "list")
 
   fit_formula <- tidypredict_fit(pm)
 
   formula_str <- deparse(fit_formula)
-  # Should contain !(...%in%...) but NOT is.na
   expect_match(formula_str, "%in%")
   expect_no_match(formula_str, "is.na")
+})
+
+test_that("from_parsed handles conditional without missing", {
+  pm <- list()
+  pm$general$model <- "lgb.Booster"
+  pm$general$type <- "lgb"
+  pm$general$version <- 3
+  pm$general$params <- list(objective = "regression")
+  pm$trees <- list(
+    list(
+      list(
+        prediction = 10,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "less-equal",
+          missing = FALSE
+        ))
+      ),
+      list(
+        prediction = 20,
+        path = list(list(
+          type = "conditional",
+          col = "x",
+          val = 5,
+          op = "more",
+          missing = FALSE
+        ))
+      )
+    )
+  )
+  class(pm) <- c("pm_lgb", "parsed_model", "list")
+
+  fit_formula <- tidypredict_fit(pm)
+
+  formula_str <- deparse(fit_formula)
+  expect_match(formula_str, "<=")
+  expect_no_match(formula_str, "is.na")
+})
+
+test_that("build_lgb_nested_condition errors on unknown type", {
+  condition <- list(
+    type = "unknown_type",
+    col = "x",
+    val = 1,
+    op = "less-equal",
+    missing = FALSE
+  )
+
+  expect_snapshot(
+    tidypredict:::build_lgb_nested_condition(condition),
+    error = TRUE
+  )
 })
 
 # Categorical feature tests -------------------------------------------------
@@ -1649,30 +1750,6 @@ test_that("categorical with many categories works", {
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
-})
-
-test_that("get_lgb_case_fun errors on unknown type", {
-  condition <- list(
-    type = "unknown_type",
-    col = "x",
-    val = 1,
-    op = "less-equal",
-    missing = FALSE
-  )
-
-  expect_snapshot(get_lgb_case_fun(condition), error = TRUE)
-})
-
-test_that("get_lgb_case_fun errors on unknown set operator", {
-  condition <- list(
-    type = "set",
-    col = "x",
-    vals = c(1, 2),
-    op = "unknown_op",
-    missing = FALSE
-  )
-
-  expect_snapshot(get_lgb_case_fun(condition), error = TRUE)
 })
 
 test_that("parsed model can be saved and loaded via YAML", {

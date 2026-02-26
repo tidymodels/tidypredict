@@ -12,7 +12,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb()`:
+      Error in `build_fit_formula_lgb_from_parsed()`:
       ! Model has no trees.
 
 # multiclass with num_class < 2 throws error
@@ -20,7 +20,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_multiclass()`:
+      Error in `build_fit_formula_lgb_multiclass_from_parsed()`:
       ! Multiclass model must have num_class >= 2.
 
 # multiclass with NULL num_class throws error
@@ -28,24 +28,16 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_multiclass()`:
+      Error in `build_fit_formula_lgb_multiclass_from_parsed()`:
       ! Multiclass model must have num_class >= 2.
 
-# get_lgb_case_fun errors on unknown type
+# build_lgb_nested_condition errors on unknown type
 
     Code
-      get_lgb_case_fun(condition)
+      tidypredict:::build_lgb_nested_condition(condition)
     Condition
-      Error in `get_lgb_case_fun()`:
-      ! Unknown condition type: "unknown_type"
-
-# get_lgb_case_fun errors on unknown set operator
-
-    Code
-      get_lgb_case_fun(condition)
-    Condition
-      Error in `build_lgb_set_expr()`:
-      ! Unknown operator for set: "unknown_op"
+      Error in `tidypredict:::build_lgb_nested_condition()`:
+      ! Unknown path element type: "unknown_type"
 
 # tidypredict_test errors for multiclass model
 
