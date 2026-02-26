@@ -47,6 +47,17 @@ test_that("print method works", {
   expect_output(print(t), "tidypredict test results")
 })
 
+test_that("knit_print method works", {
+  t <- tidypredict_test(lm(mpg ~ wt, data = mtcars))
+  expect_match(knitr::knit_print(t), "tidypredict test results")
+})
+
+test_that("offset handling in tidypredict_test", {
+  model <- lm(mpg ~ wt + cyl, offset = am, data = mtcars)
+  t <- tidypredict_test(model)
+  expect_false(t$alert)
+})
+
 test_that("xgboost alert branch", {
   skip_if_not_installed("xgboost")
   df <- mtcars[, c("wt", "cyl", "disp")]
@@ -111,6 +122,30 @@ test_that("lightgbm alert branch (mocked)", {
   expect_true(t$alert)
   expect_snapshot(cat(t$message))
 })
+
+test_that("catboost max_rows", {
+  skip_if_not_installed("catboost")
+  df <- mtcars[, c("wt", "cyl", "disp")]
+  cb_mat <- as.matrix(df)
+  pool <- catboost::catboost.load_pool(
+    cb_mat,
+    label = mtcars$mpg,
+    feature_names = as.list(colnames(df))
+  )
+  model <- catboost::catboost.train(
+    pool,
+    params = list(
+      iterations = 3,
+      depth = 2,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+  t <- tidypredict_test(model, df = df, xg_df = cb_mat, max_rows = 5)
+  expect_equal(nrow(t$raw_results), 5)
+})
+
 
 test_that("catboost alert branch (mocked)", {
   skip_if_not_installed("catboost")

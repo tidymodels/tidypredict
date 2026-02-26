@@ -38,9 +38,7 @@
       
       Fitted records above the threshold: 18
       
-      Fit max  difference:
-      Lower max difference:
-      Upper max difference:8.40138671520663e-07
+      Max difference: 8.40138671520663e-07
 
 # glmnet alert branch (mocked)
 
@@ -52,9 +50,7 @@
       
       Fitted records above the threshold: 2368
       
-      Fit max  difference:
-      Lower max difference:
-      Upper max difference:-969.880981369456
+      Max difference: -969.880981369456
 
 # lightgbm alert branch (mocked)
 
