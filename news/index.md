@@ -1,13 +1,16 @@
 # Changelog
 
-## tidypredict (development version)
+## tidypredict 1.1.0
+
+CRAN release: 2026-02-27
 
 ### New Model Supports
 
 - Added support for rpart decision tree models (`rpart`).
   ([\#226](https://github.com/tidymodels/tidypredict/issues/226))
 
-- Added support for CatBoost models (`catboost.Model`). (#TBD,
+- Added support for CatBoost models (`catboost.Model`).
+  ([\#179](https://github.com/tidymodels/tidypredict/issues/179),
   [\#187](https://github.com/tidymodels/tidypredict/issues/187),
   [\#188](https://github.com/tidymodels/tidypredict/issues/188))
 
@@ -20,7 +23,8 @@
     models; for raw CatBoost models use
     [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md).
 
-- Added support for LightGBM models (`lgb.Booster`). (#TBD,
+- Added support for LightGBM models (`lgb.Booster`).
+  ([\#177](https://github.com/tidymodels/tidypredict/issues/177),
   [\#186](https://github.com/tidymodels/tidypredict/issues/186))
 
   - Objectives: regression, binary classification, and multiclass
@@ -72,13 +76,16 @@
   `reg:squaredlogerror`.
   ([\#184](https://github.com/tidymodels/tidypredict/issues/184))
 
+- Added a vignette on floating-point precision issues with tree-based
+  models.
+  ([\#231](https://github.com/tidymodels/tidypredict/issues/231))
+
 ### Bug Fixes
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now correctly incorporates `base_score` for xgboost models with
-  `count:poisson` and `reg:tweedie` objectives. Previously, predictions
-  were incorrect when `base_score` was not the default value.
-  ([\#184](https://github.com/tidymodels/tidypredict/issues/184))
+  now correctly handles xgboost models with stump trees (single leaf, no
+  splits).
+  ([\#182](https://github.com/tidymodels/tidypredict/issues/182))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now correctly handles xgboost DART booster models with
@@ -87,14 +94,15 @@
   ([\#183](https://github.com/tidymodels/tidypredict/issues/183))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now correctly handles xgboost models with stump trees (single leaf, no
-  splits).
-  ([\#182](https://github.com/tidymodels/tidypredict/issues/182))
+  now correctly incorporates `base_score` for xgboost models with
+  `count:poisson` and `reg:tweedie` objectives. Previously, predictions
+  were incorrect when `base_score` was not the default value.
+  ([\#184](https://github.com/tidymodels/tidypredict/issues/184))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now uses the correct split operator (`<=` instead of `<`) for
-  randomForest models.
-  ([\#192](https://github.com/tidymodels/tidypredict/issues/192))
+  now correctly averages tree predictions for LightGBM models with
+  `boosting="rf"` instead of summing them.
+  ([\#185](https://github.com/tidymodels/tidypredict/issues/185))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now uses the correct split operator (`<=` instead of `<`) for ranger
@@ -108,19 +116,19 @@
   large. ([\#190](https://github.com/tidymodels/tidypredict/issues/190))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now correctly averages tree predictions for LightGBM models with
-  `boosting="rf"` instead of summing them.
-  ([\#185](https://github.com/tidymodels/tidypredict/issues/185))
-
-- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-  now correctly handles partykit stump trees (models with no splits).
-  ([\#196](https://github.com/tidymodels/tidypredict/issues/196))
-
-- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now throws a clear error for ranger and randomForest classification
   models, which are not supported.
   ([\#191](https://github.com/tidymodels/tidypredict/issues/191),
   [\#193](https://github.com/tidymodels/tidypredict/issues/193))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now uses the correct split operator (`<=` instead of `<`) for
+  randomForest models.
+  ([\#192](https://github.com/tidymodels/tidypredict/issues/192))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now correctly handles partykit stump trees (models with no splits).
+  ([\#196](https://github.com/tidymodels/tidypredict/issues/196))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with

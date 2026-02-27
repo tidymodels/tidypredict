@@ -26,7 +26,7 @@
 
     <a class="navbar-brand me-2" href="index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -86,7 +86,7 @@
 <a class="anchor" aria-label="anchor" href="#tidypredict-"></a>
 </h1>
 </div>
-<p><a href="https://github.com/tidymodels/tidypredict/actions" class="external-link"><img src="https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg" alt="R-CMD-check"></a> <a href="https://CRAN.r-project.org/package=tidypredict" class="external-link"><img src="http://www.r-pkg.org/badges/version/tidypredict" alt="CRAN_Status_Badge"></a> <a href="https://app.codecov.io/gh/tidymodels/tidypredict?branch=main" class="external-link"><img src="https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg" alt="Codecov test coverage"></a></p>
+<p><a href="https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a> <a href="https://CRAN.R-project.org/package=tidypredict" class="external-link"><img src="https://www.r-pkg.org/badges/version/tidypredict" alt="CRAN status"></a> <a href="https://CRAN.R-project.org/package=tidypredict" class="external-link"><img src="https://cranlogs.r-pkg.org/badges/tidypredict" alt="Downloads"></a> <a href="https://app.codecov.io/gh/tidymodels/tidypredict" class="external-link"><img src="https://codecov.io/gh/tidymodels/tidypredict/graph/badge.svg" alt="Codecov test coverage"></a> <a href="https://lifecycle.r-lib.org/articles/stages.html" class="external-link"><img src="https://img.shields.io/badge/lifecycle-stable-brightgreen.svg" alt="lifecycle"></a></p>
 <p>The main goal of <code>tidypredict</code> is to enable running predictions inside databases. It reads the model, extracts the components needed to calculate the prediction, and then creates an R formula that can be translated into SQL. In other words, it is able to parse a model such as this one:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
@@ -135,7 +135,7 @@
 </tr>
 <tr class="even">
 <td><code><a href="reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>Tests <code>tidyverse</code> predictions against the model’s native <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function</td>
+<td>Tests <code>tidypredict</code> predictions against the model’s native <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> function</td>
 </tr>
 <tr class="odd">
 <td><code><a href="reference/tidypredict_interval.html">tidypredict_interval()</a></code></td>
@@ -196,15 +196,21 @@
 </li>
 <li>Generalized Linear model - <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code>
 </li>
+<li>Elastic net models - <code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code>
+</li>
 <li>Random Forest models - <code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest::randomForest()</a></code>
 </li>
 <li>Random Forest models, via <code>ranger</code> - <code><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger::ranger()</a></code>
 </li>
 <li>MARS models - <code><a href="https://rdrr.io/pkg/earth/man/earth.html" class="external-link">earth::earth()</a></code>
 </li>
-<li>XGBoost models - <code>xgboost::xgb.Booster.complete()</code>
+<li>Decision tree models - <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code>
 </li>
-<li>LightGBM models - <code>lightgbm::lgb.Booster()</code>
+<li>XGBoost models - <code>xgboost::xgb.Booster</code>
+</li>
+<li>LightGBM models - <code>lightgbm::lgb.Booster</code>
+</li>
+<li>CatBoost models - <code>catboost::catboost.Model</code>
 </li>
 <li>Cubist models - <code><a href="http://topepo.github.io/Cubist/reference/cubist.default.html" class="external-link">Cubist::cubist()</a></code>
 </li>
@@ -220,13 +226,21 @@
 <li>
 <code><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> with <em>“lm”</em> as the engine.</li>
 <li>
+<code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code> - <code>parsnip</code>: <code>linear_reg()</code> or <code>logistic_reg()</code> with <em>“glmnet”</em> as the engine.</li>
+<li>
 <code><a href="https://rdrr.io/pkg/randomForest/man/randomForest.html" class="external-link">randomForest::randomForest()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“randomForest”</em> as the engine.</li>
 <li>
 <code><a href="http://imbs-hl.github.io/ranger/reference/ranger.html" class="external-link">ranger::ranger()</a></code> - <code>parsnip</code>: <code>rand_forest()</code> with <em>“ranger”</em> as the engine.</li>
 <li>
 <code><a href="https://rdrr.io/pkg/earth/man/earth.html" class="external-link">earth::earth()</a></code> - <code>parsnip</code>: <code>mars()</code> with <em>“earth”</em> as the engine.</li>
 <li>
-<code>lightgbm::lgb.Booster()</code> - <code>parsnip</code>: <code>boost_tree()</code> with <em>“lightgbm”</em> as the engine (via <code>bonsai</code>).</li>
+<code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> - <code>parsnip</code>: <code>decision_tree()</code> with <em>“rpart”</em> as the engine.</li>
+<li>
+<code>xgboost::xgb.Booster</code> - <code>parsnip</code>: <code>boost_tree()</code> with <em>“xgboost”</em> as the engine.</li>
+<li>
+<code>lightgbm::lgb.Booster</code> - <code>parsnip</code>: <code>boost_tree()</code> with <em>“lightgbm”</em> as the engine (via <code>bonsai</code>).</li>
+<li>
+<code>catboost::catboost.Model</code> - <code>parsnip</code>: <code>boost_tree()</code> with <em>“catboost”</em> as the engine (via <code>bonsai</code>).</li>
 </ul>
 </div>
 <div class="section level3">

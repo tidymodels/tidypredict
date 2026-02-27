@@ -1,9 +1,12 @@
 # tidypredict
 
-[![R-CMD-check](https://github.com/tidymodels/tidypredict/workflows/R-CMD-check/badge.svg)](https://github.com/tidymodels/tidypredict/actions)
-[![CRAN_Status_Badge](http://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.r-project.org/package=tidypredict)
+[![R-CMD-check](https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/tidymodels/tidypredict/actions/workflows/R-CMD-check.yaml)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
+[![Downloads](https://cranlogs.r-pkg.org/badges/tidypredict)](https://CRAN.R-project.org/package=tidypredict)
 [![Codecov test
-coverage](https://codecov.io/gh/tidymodels/tidypredict/branch/main/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict?branch=main)
+coverage](https://codecov.io/gh/tidymodels/tidypredict/graph/badge.svg)](https://app.codecov.io/gh/tidymodels/tidypredict)
+[![lifecycle](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html)
 
 The main goal of `tidypredict` is to enable running predictions inside
 databases. It reads the model, extracts the components needed to
@@ -53,7 +56,7 @@ to support.
 | [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   | Returns an R formula that calculates the prediction                                                                                               |
 | [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)                   | Returns a SQL query based on the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)              |
 | [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)       | Adds a new column using the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                 | Tests `tidyverse` predictions against the model’s native [`predict()`](https://rdrr.io/r/stats/predict.html) function                             |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                 | Tests `tidypredict` predictions against the model’s native [`predict()`](https://rdrr.io/r/stats/predict.html) function                           |
 | [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)         | Same as [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) but for intervals (only works with `lm` and `glm`) |
 | [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | Same as [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) but for intervals (only works with `lm` and `glm`) |
 | [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)                           | Creates a list spec based on the R model                                                                                                          |
@@ -96,14 +99,19 @@ The following models are supported by `tidypredict`:
 
 - Linear Regression - [`lm()`](https://rdrr.io/r/stats/lm.html)
 - Generalized Linear model - [`glm()`](https://rdrr.io/r/stats/glm.html)
+- Elastic net models -
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
 - Random Forest models -
   [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
 - Random Forest models, via `ranger` -
   [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
 - MARS models -
   [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html)
-- XGBoost models - `xgboost::xgb.Booster.complete()`
-- LightGBM models - `lightgbm::lgb.Booster()`
+- Decision tree models -
+  [`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html)
+- XGBoost models - `xgboost::xgb.Booster`
+- LightGBM models - `lightgbm::lgb.Booster`
+- CatBoost models - `catboost::catboost.Model`
 - Cubist models -
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
 - Tree models, via `partykit` -
@@ -116,14 +124,23 @@ ones confirmed currently work in `tidypredict` are:
 
 - [`lm()`](https://rdrr.io/r/stats/lm.html) - `parsnip`: `linear_reg()`
   with *“lm”* as the engine.
+- [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) -
+  `parsnip`: `linear_reg()` or `logistic_reg()` with *“glmnet”* as the
+  engine.
 - [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html) -
   `parsnip`: `rand_forest()` with *“randomForest”* as the engine.
 - [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md) -
   `parsnip`: `rand_forest()` with *“ranger”* as the engine.
 - [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html) -
   `parsnip`: `mars()` with *“earth”* as the engine.
-- `lightgbm::lgb.Booster()` - `parsnip`: `boost_tree()` with
-  *“lightgbm”* as the engine (via `bonsai`).
+- [`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) -
+  `parsnip`: `decision_tree()` with *“rpart”* as the engine.
+- `xgboost::xgb.Booster` - `parsnip`: `boost_tree()` with *“xgboost”* as
+  the engine.
+- `lightgbm::lgb.Booster` - `parsnip`: `boost_tree()` with *“lightgbm”*
+  as the engine (via `bonsai`).
+- `catboost::catboost.Model` - `parsnip`: `boost_tree()` with
+  *“catboost”* as the engine (via `bonsai`).
 
 ### `broom`
 
