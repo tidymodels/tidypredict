@@ -1,15 +1,17 @@
 # tidypredict (development version)
 
+# tidypredict 1.1.0
+
 ## New Model Supports
 
 - Added support for rpart decision tree models (`rpart`). (#226)
 
-- Added support for CatBoost models (`catboost.Model`). (#TBD, #187, #188)
+- Added support for CatBoost models (`catboost.Model`). (#179, #187, #188)
   - Objectives: RMSE, MAE, Quantile, MAPE, Poisson, Huber, LogCosh, Expectile, Tweedie, Logloss, CrossEntropy, MultiClass, and MultiClassOneVsAll.
   - Tree types: oblivious (default `SymmetricTree`) and non-oblivious (`Depthwise` or `Lossguide` grow policy).
   - Categorical features are handled automatically for parsnip/bonsai models; for raw CatBoost models use `set_catboost_categories()`.
 
-- Added support for LightGBM models (`lgb.Booster`). (#TBD, #186)
+- Added support for LightGBM models (`lgb.Booster`). (#177, #186)
   - Objectives: regression, binary classification, and multiclass classification.
   - Supports categorical features.
   - Supports linear trees (`linear_tree = TRUE`), which fit a linear model at each leaf instead of a constant.
@@ -28,25 +30,27 @@
 
 - xgboost support now includes additional objectives: `binary:hinge`, `reg:absoluteerror`, `reg:gamma`, `reg:pseudohubererror`, and `reg:squaredlogerror`. (#184)
 
+- Added a vignette on floating-point precision issues with tree-based models. (#231)
+
 ## Bug Fixes
-
-- `tidypredict_fit()` now correctly incorporates `base_score` for xgboost models with `count:poisson` and `reg:tweedie` objectives. Previously, predictions were incorrect when `base_score` was not the default value. (#184)
-
-- `tidypredict_fit()` now correctly handles xgboost DART booster models with `rate_drop > 0`. DART uses tree weight normalization during training, and these weights are now properly applied to each tree's predictions. (#183)
 
 - `tidypredict_fit()` now correctly handles xgboost models with stump trees (single leaf, no splits). (#182)
 
-- `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for randomForest models. (#192)
+- `tidypredict_fit()` now correctly handles xgboost DART booster models with `rate_drop > 0`. DART uses tree weight normalization during training, and these weights are now properly applied to each tree's predictions. (#183)
+
+- `tidypredict_fit()` now correctly incorporates `base_score` for xgboost models with `count:poisson` and `reg:tweedie` objectives. Previously, predictions were incorrect when `base_score` was not the default value. (#184)
+
+- `tidypredict_fit()` now correctly averages tree predictions for LightGBM models with `boosting="rf"` instead of summing them. (#185)
 
 - `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for ranger models. Previously, predictions were incorrect when data values exactly matched split values. (#189)
 
 - `tidypredict_fit()` now correctly averages tree predictions for ranger models instead of summing them. Previously, predictions were `num.trees` times too large. (#190)
 
-- `tidypredict_fit()` now correctly averages tree predictions for LightGBM models with `boosting="rf"` instead of summing them. (#185)
+- `tidypredict_fit()` now throws a clear error for ranger and randomForest classification models, which are not supported. (#191, #193)
+
+- `tidypredict_fit()` now uses the correct split operator (`<=` instead of `<`) for randomForest models. (#192)
 
 - `tidypredict_fit()` now correctly handles partykit stump trees (models with no splits). (#196)
-
-- `tidypredict_fit()` now throws a clear error for ranger and randomForest classification models, which are not supported. (#191, #193)
 
 - `tidypredict_fit()` now works with `glmnet()` models that use family function syntax (e.g., `family = gaussian()`) instead of string syntax (e.g., `family = "gaussian"`). (#197)
 
