@@ -77,6 +77,39 @@ test_that("works with logistic_reg() and the LiblineaR engine", {
   }
 })
 
+test_that("works with decision_tree() and the rpart engine", {
+  skip_if_not_installed("rpart")
+
+  # Regression
+  reg <- parsnip::fit(
+    parsnip::set_mode(
+      parsnip::set_engine(parsnip::decision_tree(), "rpart"),
+      "regression"
+    ),
+    mpg ~ wt + cyl,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+  expect_snapshot(tidypredict_test(reg, df = mtcars))
+
+  # Classification
+  df <- mtcars
+  df$am <- factor(df$am)
+  cls <- parsnip::fit(
+    parsnip::set_mode(
+      parsnip::set_engine(parsnip::decision_tree(), "rpart"),
+      "classification"
+    ),
+    am ~ mpg + cyl + hp,
+    data = df
+  )
+
+  expect_type(tidypredict_fit(cls), "language")
+  expect_s3_class(tidypredict_sql(cls, dbplyr::simulate_dbi()), "sql")
+})
+
 test_that("works with linear_reg() and the quantreg engine", {
   skip_if_not_installed("quantreg")
 
