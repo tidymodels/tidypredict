@@ -37,6 +37,7 @@ Suggests:
     dbplyr,
     earth (>= 5.1.2),
     glmnet,
+    LiblineaR,
     lightgbm,
     methods,
     mlbench,

@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for `LiblineaR::LiblineaR()` binary logistic regression models, including `logistic_reg()` parsnip models fitted with the `"LiblineaR"` engine. (#232)
+
 - Added support for `linear_reg()` parsnip models fitted with the `"glm"` engine. (#232)
 
 - Added support for `quantreg::rq()` quantile regression models, including `linear_reg()` parsnip models fitted with the `"quantreg"` engine. Models fitted with multiple quantiles return one fit expression per quantile, named by the quantile level. (#232)

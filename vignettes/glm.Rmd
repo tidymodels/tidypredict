@@ -105,3 +105,15 @@ parsnip_model <- linear_reg() %>%
 
 tidypredict_fit(parsnip_model)
 ```
+
+## LiblineaR
+
+Binary logistic regression models fitted with `LiblineaR::LiblineaR()` are also supported, including `logistic_reg()` models fitted via `parsnip` with the `"LiblineaR"` engine. As with `glm()` binomial models, predictions are on the 0-to-1 probability scale for the second factor level of the outcome.
+
+```{r, eval = requireNamespace("LiblineaR", quietly = TRUE)}
+liblinear_model <- logistic_reg(penalty = 0.1) %>%
+  set_engine("LiblineaR") %>%
+  fit(factor(am) ~ mpg + cyl, data = mtcars)
+
+tidypredict_fit(liblinear_model)
+```
