@@ -7,6 +7,15 @@
   parsnip models fitted with the `"glm"` engine.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- Added support for
+  [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html) quantile
+  regression models, including
+  [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
+  parsnip models fitted with the `"quantreg"` engine. Models fitted with
+  multiple quantiles return one fit expression per quantile, named by
+  the quantile level.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 ## tidypredict 1.1.0
 
 CRAN release: 2026-02-27

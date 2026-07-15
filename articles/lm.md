@@ -230,3 +230,21 @@ parsnip_model <- linear_reg() %>%
 tidypredict_fit(parsnip_model)
 #> 39.686261480253 + (wt * -3.19097213898375) + (cyl * -1.5077949682598)
 ```
+
+## Quantile regression
+
+`tidypredict` also supports quantile regression models fitted with
+[`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html), as well as
+[`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
+models fitted via `parsnip` with the `"quantreg"` engine.
+
+``` r
+
+library(quantreg)
+#> Loading required package: SparseM
+
+rq_model <- rq(mpg ~ wt + cyl, data = mtcars)
+
+tidypredict_fit(rq_model)
+#> 38.8714285714286 + (wt * -2.67857142857143) + (cyl * -1.74285714285714)
+```

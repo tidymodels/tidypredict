@@ -59,7 +59,8 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="development version" id="tidypredict-development-version">tidypredict (development version)<a class="anchor" aria-label="anchor" href="#tidypredict-development-version"></a></h2>
-<ul><li>Added support for <code><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg()</a></code> parsnip models fitted with the <code>"glm"</code> engine. (<a href="https://github.com/tidymodels/tidypredict/issues/232" class="external-link">#232</a>)</li>
+<ul><li><p>Added support for <code><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg()</a></code> parsnip models fitted with the <code>"glm"</code> engine. (<a href="https://github.com/tidymodels/tidypredict/issues/232" class="external-link">#232</a>)</p></li>
+<li><p>Added support for <code><a href="https://rdrr.io/pkg/quantreg/man/rq.html" class="external-link">quantreg::rq()</a></code> quantile regression models, including <code><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg()</a></code> parsnip models fitted with the <code>"quantreg"</code> engine. Models fitted with multiple quantiles return one fit expression per quantile, named by the quantile level. (<a href="https://github.com/tidymodels/tidypredict/issues/232" class="external-link">#232</a>)</p></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="tidypredict-110">tidypredict 1.1.0<a class="anchor" aria-label="anchor" href="#tidypredict-110"></a></h2><p class="text-muted">CRAN release: 2026-02-27</p>
