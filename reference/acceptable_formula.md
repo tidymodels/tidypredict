@@ -21,6 +21,7 @@ acceptable_formula(model)
 ## Examples
 
 ``` r
+
 model <- lm(mpg ~ wt, mtcars)
 acceptable_formula(model)
 ```

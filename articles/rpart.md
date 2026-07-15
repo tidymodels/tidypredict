@@ -1,12 +1,12 @@
 # Decision trees, using rpart
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |       |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             |       |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       |       |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     |       |
-| `parsnip`                                                                                                                                                                                                                                                      |       |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |  |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) |  |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) |  |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) |  |
+| `parsnip` |  |
 
 ## How it works
 
@@ -14,6 +14,7 @@ Here is a simple [`rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html)
 model using the `mtcars` dataset:
 
 ``` r
+
 library(dplyr)
 library(tidypredict)
 library(rpart)
@@ -28,6 +29,7 @@ The parser extracts the tree structure from the model’s `frame` and
 well as surrogate splits for missing value handling.
 
 ``` r
+
 model$frame |>
   head()
 #>      var  n wt        dev     yval complexity ncompete nsurrogate
@@ -46,6 +48,7 @@ tree becomes a
 statement.
 
 ``` r
+
 tidypredict_fit(model)
 #> case_when(cyl <= 5 ~ 26.6636363636364, .default = case_when(hp <= 
 #>     192.5 ~ 18.2642857142857, .default = 13.4142857142857))
@@ -64,6 +67,7 @@ operated. `tidypredict` provides three paths:
 `rpart` classification models are also supported:
 
 ``` r
+
 model_class <- rpart(Species ~ ., data = iris)
 tidypredict_fit(model_class)
 #> case_when(Petal.Length <= 2.45 ~ "setosa", .default = case_when(Petal.Width <= 
@@ -76,6 +80,7 @@ tidypredict_fit(model_class)
 `parsnip` package.
 
 ``` r
+
 library(parsnip)
 
 parsnip_model <- decision_tree(mode = "regression") |>
@@ -93,6 +98,7 @@ tidypredict_fit(parsnip_model)
 uses `%in%` for categorical splits:
 
 ``` r
+
 mtcars2 <- mtcars
 mtcars2$cyl <- factor(mtcars2$cyl)
 

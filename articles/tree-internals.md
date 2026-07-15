@@ -27,6 +27,7 @@ This tree has three leaves with predictions “low”, “med”, and “high”
 The flat approach lists every leaf path as a separate condition:
 
 ``` r
+
 case_when(
   x <= 5 & y <= 3 ~ "low",
   x <= 5 & y > 3  ~ "med",
@@ -43,6 +44,7 @@ joined by `&`.
 The nested approach mirrors the tree structure:
 
 ``` r
+
 case_when(
   x <= 5 ~ case_when(
     y <= 3 ~ "low",

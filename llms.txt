@@ -15,6 +15,7 @@ translated into SQL. In other words, it is able to parse a model such as
 this one:
 
 ``` r
+
 model <- lm(mpg ~ wt + cyl, data = mtcars)
 ```
 
@@ -23,6 +24,7 @@ database. Because it uses `dplyr`’s database interface, it works with
 several databases back-ends, such as MS SQL:
 
 ``` r
+
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
@@ -35,12 +37,14 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 Install `tidypredict` from CRAN using:
 
 ``` r
+
 install.packages("tidypredict")
 ```
 
 Or install the **development version** using `devtools` as follows:
 
 ``` r
+
 install.packages("remotes")
 remotes::install_github("tidymodels/tidypredict")
 ```
@@ -51,16 +55,16 @@ remotes::install_github("tidymodels/tidypredict")
 number to grow much. The main focus at this time is to add more models
 to support.
 
-| Function                                                                                                 | Description                                                                                                                                       |
-|----------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   | Returns an R formula that calculates the prediction                                                                                               |
-| [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)                   | Returns a SQL query based on the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)              |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)       | Adds a new column using the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)                   |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                 | Tests `tidypredict` predictions against the model’s native [`predict()`](https://rdrr.io/r/stats/predict.html) function                           |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)         | Same as [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) but for intervals (only works with `lm` and `glm`) |
+| Function | Description |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) | Returns an R formula that calculates the prediction |
+| [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) | Returns a SQL query based on the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | Adds a new column using the formula from [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | Tests `tidypredict` predictions against the model’s native [`predict()`](https://rdrr.io/r/stats/predict.html) function |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md) | Same as [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md) but for intervals (only works with `lm` and `glm`) |
 | [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | Same as [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) but for intervals (only works with `lm` and `glm`) |
-| [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)                           | Creates a list spec based on the R model                                                                                                          |
-| [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)                   | Prepares an object to be recognized as a parsed model                                                                                             |
+| [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | Creates a list spec based on the R model |
+| [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md) | Prepares an object to be recognized as a parsed model |
 
 ## How it works
 
@@ -100,7 +104,7 @@ The following models are supported by `tidypredict`:
 - Linear Regression - [`lm()`](https://rdrr.io/r/stats/lm.html)
 - Generalized Linear model - [`glm()`](https://rdrr.io/r/stats/glm.html)
 - Elastic net models -
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
 - Random Forest models -
   [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
 - Random Forest models, via `ranger` -
@@ -124,7 +128,7 @@ ones confirmed currently work in `tidypredict` are:
 
 - [`lm()`](https://rdrr.io/r/stats/lm.html) - `parsnip`: `linear_reg()`
   with *“lm”* as the engine.
-- [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) -
+- [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) -
   `parsnip`: `linear_reg()` or `logistic_reg()` with *“glmnet”* as the
   engine.
 - [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html) -
@@ -148,6 +152,7 @@ The [`tidy()`](https://generics.r-lib.org/reference/tidy.html) function
 from broom works with linear models parsed via `tidypredict`
 
 ``` r
+
 pm <- parse_model(lm(wt ~ ., mtcars))
 tidy(pm)
 ```

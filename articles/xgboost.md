@@ -1,16 +1,17 @@
 # XGBoost models
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔     |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             | ✔     |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       | ✔     |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     | ✗     |
-| `parsnip`                                                                                                                                                                                                                                                      | ✔     |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✔ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✔ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## `tidypredict_` functions
 
 ``` r
+
 library(xgboost)
 
 logregobj <- function(preds, dtrain) {
@@ -36,6 +37,7 @@ model <- xgboost::xgb.train(
 - Create the R formula
 
   ``` r
+
   tidypredict_fit(model)
   #> 1 - 1/(1 + exp(case_when(wt < 3.19000006 ~ case_when(qsec < 19.4400005 ~ 
   #>     0.428571463, .default = 0), .default = -0.436363667) + case_when(wt < 
@@ -97,6 +99,7 @@ model <- xgboost::xgb.train(
 - Add the prediction to the original table
 
   ``` r
+
   library(dplyr)
 
   mtcars %>%
@@ -123,6 +126,7 @@ model <- xgboost::xgb.train(
   `xg_df` argument expects the `xgb.DMatrix` data set.
 
   ``` r
+
   tidypredict_test(model, mtcars, xg_df = xgb_bin_data)
   #> tidypredict test results
   #> Difference threshold: 1e-12
@@ -145,6 +149,7 @@ article for more details.
 `parsnip` fitted models are also supported by `tidypredict`:
 
 ``` r
+
 library(parsnip)
 
 p_model <- boost_tree(mode = "regression") %>%
@@ -153,6 +158,7 @@ p_model <- boost_tree(mode = "regression") %>%
 ```
 
 ``` r
+
 tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
 #> tidypredict test results
 #> Difference threshold: 1e-12
@@ -167,6 +173,7 @@ tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
 Here is an example of the model spec:
 
 ``` r
+
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
@@ -234,6 +241,7 @@ str(pm, 2)
 ```
 
 ``` r
+
 str(pm$trees[1])
 #> List of 1
 #>  $ 0:List of 3

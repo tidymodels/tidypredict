@@ -14,6 +14,7 @@ First the data is prepared in memory. The article will use the
 data, with a couple of modifications
 
 ``` r
+
 library(dplyr)
 library(tidypredict)
 library(randomForest)
@@ -29,6 +30,7 @@ flights_table <- nycflights13::flights %>%
 A new database is created using `RSQLite`.
 
 ``` r
+
 library(DBI)
 
 con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
@@ -41,6 +43,7 @@ A sample is downloaded from the database for modeling. This example
 already selects the needed variables.
 
 ``` r
+
 df <- db_fligths %>%
   select(dep_delay, hour, distance) %>%
   head(1000) %>%
@@ -50,6 +53,7 @@ df <- db_fligths %>%
 A linear model is fitted using [`lm()`](https://rdrr.io/r/stats/lm.html)
 
 ``` r
+
 model <- lm(dep_delay ~ ., data = df)
 ```
 
@@ -64,6 +68,7 @@ so it’s easy to run a test.
 uses the model’s internal data set by default
 
 ``` r
+
 tidypredict_test(model)
 #> tidypredict test results
 #> Difference threshold: 1e-12
@@ -77,6 +82,7 @@ function returns an `alert` in case the threshold is exceeded, which can
 be used to fail the automated script.
 
 ``` r
+
 if (tidypredict_test(model)$alert) stop("Threshold exceeded!")
 ```
 
@@ -88,12 +94,13 @@ the table. For this example, the field is called `current_score`. The
 following SQL UPDATE statement should work in most databases:
 
 ``` r
+
 library(dbplyr)
 
 update_statement <- build_sql("UPDATE flights_table SET current_score  = ", tidypredict_sql(model, con = con), con = con)
 
 update_statement
-#> <SQL> UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
+#> <SQL> UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
 ```
 
 This statement can be then passed on to the database team, via
@@ -102,9 +109,10 @@ the responsibility to run the new SQL statement, or if R is being used
 to automate the scoring, the next line can be used:
 
 ``` r
+
 dbSendQuery(con, update_statement)
 #> <SQLiteResult>
-#>   SQL  UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
+#>   SQL  UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)
 #>   ROWS Fetched: 0 [complete]
 #>        Changed: 336776
 ```
@@ -112,12 +120,13 @@ dbSendQuery(con, update_statement)
 Here is a sample of the newly populated field:
 
 ``` r
+
 db_fligths %>%
   select(current_score) %>%
   head(10)
 #> Warning: Closing open result set, pending rows
-#> # Source:   SQL [?? x 1]
-#> # Database: sqlite 3.51.2 []
+#> # A query:  ?? x 1
+#> # Database: sqlite 3.53.3 []
 #>    current_score
 #>            <dbl>
 #>  1       -0.969 
@@ -147,6 +156,7 @@ best way to create an empty table, but it’ll do for the purposes of this
 example.
 
 ``` r
+
 dbWriteTable(
   con, "daily_scores",
   tibble(
@@ -171,6 +181,7 @@ is used to create the new fit field. The results are then transformed to
 match to the structure of the new `daily_scores` table.
 
 ``` r
+
 new_predictions <- db_fligths %>%
   filter(month == 12) %>%
   tidypredict_to_column(model, vars = "score") %>%
@@ -182,13 +193,14 @@ new_predictions <- db_fligths %>%
 ```
 
 ``` r
+
 insert_scores <- build_sql("INSERT INTO daily_scores ", sql_render(new_predictions, con = con), con = con)
 insert_scores
-#> <SQL> INSERT INTO daily_scores SELECT `q01`.*, '01/01/2018' AS `date`
+#> <SQL> INSERT INTO daily_scores SELECT *, '01/01/2018' AS `date`
 #> FROM (
 #>   SELECT
 #>     `flight_id`,
-#>     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
+#>     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
 #>   FROM `flights_table`
 #>   WHERE (`month` = 12.0)
 #> ) AS `q01`
@@ -200,13 +212,14 @@ the analyst has the responsibility to run the new SQL statement, or if R
 is being used to automate the scoring, the next line can be used:
 
 ``` r
+
 dbSendQuery(con, insert_scores)
 #> <SQLiteResult>
-#>   SQL  INSERT INTO daily_scores SELECT `q01`.*, '01/01/2018' AS `date`
+#>   SQL  INSERT INTO daily_scores SELECT *, '01/01/2018' AS `date`
 #> FROM (
 #>   SELECT
 #>     `flight_id`,
-#>     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
+#>     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`
 #>   FROM `flights_table`
 #>   WHERE (`month` = 12.0)
 #> ) AS `q01`
@@ -220,13 +233,14 @@ in order to only get the latest score. For this example, we simple
 filter on the same date we inserted
 
 ``` r
+
 tbl(con, "daily_scores") %>%
   inner_join(tbl(con, "flights_table"), by = "flight_id") %>%
   filter(date == "01/01/2018") %>%
   select(dep_delay, hour, distance, score, date)
 #> Warning: Closing open result set, pending rows
-#> # Source:   SQL [?? x 5]
-#> # Database: sqlite 3.51.2 []
+#> # A query:  ?? x 5
+#> # Database: sqlite 3.53.3 []
 #>    dep_delay  hour distance   score date      
 #>        <dbl> <dbl>    <dbl>   <dbl> <chr>     
 #>  1        14    23     1617 23.3    01/01/2018

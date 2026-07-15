@@ -21,6 +21,7 @@
 ## How it works
 
 ``` r
+
 library(dplyr)
 library(tidypredict)
 
@@ -38,9 +39,10 @@ categorical variable value. In most cases the resulting SQL is one short
 value, if one is provided.
 
 ``` r
+
 library(tidypredict)
 tidypredict_sql(model, dbplyr::simulate_mssql())
-#> <SQL> (((32.4105336886021 + (`wt` * -2.83243330448326)) + (IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * -4.26714873091281)) + (IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * -6.12588309683682)) + `am`
+#> <SQL> (((32.4105336886021 + ([wt] * -2.83243330448326)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * -4.26714873091281)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * -6.12588309683682)) + [am]
 ```
 
 Alternatively, use
@@ -48,6 +50,7 @@ Alternatively, use
 if the results are the be used or previewed in `dplyr`.
 
 ``` r
+
 df %>%
   tidypredict_to_column(model) %>%
   head(10)
@@ -72,8 +75,9 @@ to get the SQL query that operates the prediction interval. The
 `interval` defaults to 0.95
 
 ``` r
+
 tidypredict_sql_interval(model, dbplyr::simulate_mssql())
-#> <SQL> 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.63799055122669) + ((-0.590557271637747 + `wt` * 0.183559646169165) * (-0.590557271637747 + `wt` * 0.183559646169165)) * 6.63799055122669) + (((-0.126215672528828 + `wt` * 0.0101118696567173) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589) * ((-0.126215672528828 + `wt` * 0.0101118696567173) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589)) * 6.63799055122669) + ((((0.386215468111418 + `wt` * -0.230516217152034) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638) + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815) * (((0.386215468111418 + `wt` * -0.230516217152034) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638) + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815)) * 6.63799055122669) + 6.63799055122669)
+#> <SQL> 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.63799055122669) + ((-0.590557271637747 + [wt] * 0.183559646169165) * (-0.590557271637747 + [wt] * 0.183559646169165)) * 6.63799055122669) + (((-0.126215672528828 + [wt] * 0.0101118696567173) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.428266330860589) * ((-0.126215672528828 + [wt] * 0.0101118696567173) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.428266330860589)) * 6.63799055122669) + ((((0.386215468111418 + [wt] * -0.230516217152034) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.332336511639638) + CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 0.646203930513815) * (((0.386215468111418 + [wt] * -0.230516217152034) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.332336511639638) + CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 0.646203930513815)) * 6.63799055122669) + 6.63799055122669)
 ```
 
 Prediction intervals also works in the
@@ -81,6 +85,7 @@ Prediction intervals also works in the
 just set the `add_interval` argument to `TRUE`.
 
 ``` r
+
 df %>%
   tidypredict_to_column(model, add_interval = TRUE) %>%
   head(10)
@@ -112,6 +117,7 @@ part of the formula (call) of the model, if there were no offset in a
 given model, that line would not exist.
 
 ``` r
+
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
@@ -138,6 +144,7 @@ variables are operated using
 [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html).
 
 ``` r
+
 tidypredict_fit(model)
 #> 32.4105336886021 + (wt * -2.83243330448326) + (ifelse(char_cyl == 
 #>     "cyl6", 1, 0) * -4.26714873091281) + (ifelse(char_cyl == 
@@ -148,6 +155,7 @@ A function to put together the Tidy Eval interval formula is also
 supported
 
 ``` r
+
 tidypredict_interval(model)
 #> 2.04840714179524 * sqrt((-0.176776695296637) * (-0.176776695296637) * 
 #>     6.63799055122669 + (-0.590557271637747 + wt * 0.183559646169165) * 
@@ -186,6 +194,7 @@ to the results given by
 [`predict()`](https://rdrr.io/r/stats/predict.html)
 
 ``` r
+
 tidypredict_test(model)
 #> tidypredict test results
 #> Difference threshold: 1e-12
@@ -197,6 +206,7 @@ To run with prediction intervals set the `include_intervals` argument to
 `TRUE`
 
 ``` r
+
 tidypredict_test(model, include_intervals = TRUE)
 #> tidypredict test results
 #> Difference threshold: 1e-12
@@ -210,6 +220,7 @@ tidypredict_test(model, include_intervals = TRUE)
 model objects fitted via the `parsnip` package.
 
 ``` r
+
 library(parsnip)
 
 parsnip_model <- linear_reg() %>%

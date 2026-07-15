@@ -1,16 +1,17 @@
 # glmnet models
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔     |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             | ✔     |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       | ✔     |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     | ✗     |
-| `parsnip`                                                                                                                                                                                                                                                      | ✔     |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✔ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✔ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## `tidypredict_` functions
 
 ``` r
+
 library(glmnet)
 
 model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
@@ -19,6 +20,7 @@ model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 - Create the R formula
 
   ``` r
+
   tidypredict_fit(model)
   #> 35.3137765116027 + (cyl * -0.871451193824228) + (hp * -0.0101173960249783) + 
   #>     (wt * -2.59443677687505)
@@ -27,6 +29,7 @@ model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 - Add the prediction to the original table
 
   ``` r
+
   library(dplyr)
 
   mtcars %>%
@@ -52,6 +55,7 @@ model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
   [`predict()`](https://rdrr.io/r/stats/predict.html) results.
 
   ``` r
+
   tidypredict_test(model, mtcars[, -1])
   #> tidypredict test results
   #> Difference threshold: 1e-12
@@ -64,6 +68,7 @@ model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 `parsnip` fitted models are also supported by `tidypredict`:
 
 ``` r
+
 library(parsnip)
 
 p_model <- linear_reg(penalty = 1) %>%
@@ -72,6 +77,7 @@ p_model <- linear_reg(penalty = 1) %>%
 ```
 
 ``` r
+
 tidypredict_fit(p_model)
 #> 35.3140536966127 + (cyl * -0.871623418095165) + (hp * -0.0101157918502673) + 
 #>     (wt * -2.59426484734253)
@@ -82,6 +88,7 @@ tidypredict_fit(p_model)
 Here is an example of the model spec:
 
 ``` r
+
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
@@ -101,6 +108,7 @@ str(pm, 2)
 ```
 
 ``` r
+
 str(pm$trees[1])
 #>  NULL
 ```

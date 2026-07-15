@@ -7,8 +7,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Linear Regression • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -145,7 +145,7 @@ short <code>CASE WHEN</code> statement per coefficient. It appends the
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; (((32.4105336886021 + (`wt` * -2.83243330448326)) + (IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * -4.26714873091281)) + (IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * -6.12588309683682)) + `am`</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; (((32.4105336886021 + ([wt] * -2.83243330448326)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * -4.26714873091281)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * -6.12588309683682)) + [am]</span></span></code></pre></div>
 <p>Alternatively, use <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> if the
 results are the be used or previewed in <code>dplyr</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -172,7 +172,7 @@ operates the prediction interval. The <code>interval</code> defaults to
 0.95</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.63799055122669) + ((-0.590557271637747 + `wt` * 0.183559646169165) * (-0.590557271637747 + `wt` * 0.183559646169165)) * 6.63799055122669) + (((-0.126215672528828 + `wt` * 0.0101118696567173) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589) * ((-0.126215672528828 + `wt` * 0.0101118696567173) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.428266330860589)) * 6.63799055122669) + ((((0.386215468111418 + `wt` * -0.230516217152034) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638) + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815) * (((0.386215468111418 + `wt` * -0.230516217152034) + IIF(`char_cyl` = 'cyl6', 1.0, 0.0) * 0.332336511639638) + IIF(`char_cyl` = 'cyl8', 1.0, 0.0) * 0.646203930513815)) * 6.63799055122669) + 6.63799055122669)</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.63799055122669) + ((-0.590557271637747 + [wt] * 0.183559646169165) * (-0.590557271637747 + [wt] * 0.183559646169165)) * 6.63799055122669) + (((-0.126215672528828 + [wt] * 0.0101118696567173) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.428266330860589) * ((-0.126215672528828 + [wt] * 0.0101118696567173) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.428266330860589)) * 6.63799055122669) + ((((0.386215468111418 + [wt] * -0.230516217152034) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.332336511639638) + CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 0.646203930513815) * (((0.386215468111418 + [wt] * -0.230516217152034) + CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 0.332336511639638) + CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 0.646203930513815)) * 6.63799055122669) + 6.63799055122669)</span></span></code></pre></div>
 <p>Prediction intervals also works in the
 <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code>, just set the
 <code>add_interval</code> argument to <code>TRUE</code>.</p>
@@ -312,7 +312,7 @@ objects fitted via the <code>parsnip</code> package.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
   </div></footer>

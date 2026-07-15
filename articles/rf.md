@@ -1,12 +1,12 @@
 # Random Forest
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔     |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             | ✗     |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       | ✗     |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     | ✗     |
-| `parsnip`                                                                                                                                                                                                                                                      | ✔     |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✗ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✗ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## How it works
 
@@ -15,6 +15,7 @@ Here is a simple
 model using the `mtcars` dataset:
 
 ``` r
+
 library(dplyr)
 library(tidypredict)
 library(randomForest)
@@ -30,6 +31,7 @@ function. It will return as many decision paths as there are non-NA rows
 in the `prediction` field.
 
 ``` r
+
 getTree(model, labelVar = TRUE) %>%
   head()
 #>   left daughter right daughter split var split point status prediction
@@ -49,6 +51,7 @@ tree becomes one
 statement, which are then combined.
 
 ``` r
+
 tidypredict_fit(model)
 #> (case_when(carb <= 1.5 ~ case_when(gear <= 3.5 ~ 18.1, .default = case_when(hp <= 
 #>     65.5 ~ 33.9, .default = case_when(qsec <= 19.185 ~ 27.3, 
@@ -94,6 +97,7 @@ operated. `tidypredict` provides three paths:
 `parsnip` package.
 
 ``` r
+
 library(parsnip)
 
 parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%

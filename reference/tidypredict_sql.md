@@ -27,9 +27,9 @@ library(dbplyr)
 #> Attaching package: ‘dbplyr’
 #> The following objects are masked from ‘package:dplyr’:
 #> 
-#>     ident, sql
+#>     ident, sql, sql_escape_ident, sql_escape_string
 
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
 tidypredict_sql(model, simulate_dbi())
-#> <SQL> ((39.4179334351865 + (`wt` * -3.12514220026708)) + (`am` * 0.176493157719672)) + (`cyl` * -1.5102456624971)
+#> <SQL> ((39.4179334351865 + ("wt" * -3.12514220026708)) + ("am" * 0.176493157719672)) + ("cyl" * -1.5102456624971)
 ```

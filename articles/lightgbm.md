@@ -1,16 +1,17 @@
 # LightGBM models
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔     |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             | ✔     |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       | ✔     |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     | ✗     |
-| `parsnip`                                                                                                                                                                                                                                                      | ✔     |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✔ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✔ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## `tidypredict_` functions
 
 ``` r
+
 library(lightgbm)
 
 # Prepare data
@@ -35,6 +36,7 @@ model <- lgb.train(
 - Create the R formula
 
   ``` r
+
   tidypredict_fit(model)
   #> case_when(cyl <= 7 | is.na(cyl) ~ 122.371527777778, .default = case_when(mpg <= 
   #>     15.1 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
@@ -76,6 +78,7 @@ model <- lgb.train(
 - Add the prediction to the original table
 
   ``` r
+
   library(dplyr)
 
   mtcars %>%
@@ -102,6 +105,7 @@ model <- lgb.train(
   `xg_df` argument expects the matrix data set.
 
   ``` r
+
   tidypredict_test(model, xg_df = X)
   #> tidypredict test results
   #> Difference threshold: 1e-12
@@ -142,6 +146,7 @@ supported by `tidypredict`:
 ## Binary classification example
 
 ``` r
+
 X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y_bin <- mtcars$am
 
@@ -173,6 +178,7 @@ For multiclass models,
 returns a named list of formulas, one for each class:
 
 ``` r
+
 X_iris <- data.matrix(iris[, 1:4])
 colnames(X_iris) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
 y_iris <- as.integer(iris$Species) - 1L
@@ -200,6 +206,7 @@ names(fit_formulas)
 Each formula produces the predicted probability for that class:
 
 ``` r
+
 iris %>%
   mutate(
     prob_setosa = !!fit_formulas$class_0,
@@ -229,6 +236,7 @@ LightGBM supports native categorical features. When a feature is marked
 as categorical, `tidypredict` generates appropriate `%in%` conditions:
 
 ``` r
+
 set.seed(123)
 n <- 200
 cat_data <- data.frame(
@@ -269,6 +277,7 @@ tidypredict_fit(model_cat)
 `tidypredict`:
 
 ``` r
+
 library(parsnip)
 library(bonsai)
 
@@ -296,6 +305,7 @@ tidypredict_test(lgb_model, xg_df = X)
 Here is an example of the model spec:
 
 ``` r
+
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
@@ -324,6 +334,7 @@ str(pm, 2)
 ```
 
 ``` r
+
 str(pm$trees[1])
 #> List of 1
 #>  $ :List of 4

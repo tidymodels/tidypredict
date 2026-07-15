@@ -53,6 +53,7 @@ tidypredict_test(
 ## Examples
 
 ``` r
+
 model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)
 tidypredict_test(model)
 #> tidypredict test results

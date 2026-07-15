@@ -39,6 +39,7 @@ split by line, we use
 [`strsplit()`](https://rdrr.io/r/base/strsplit.html).
 
 ``` r
+
 library(yaml)
 
 sklearn_model <- strsplit("general:
@@ -91,6 +92,7 @@ terms:
 Now the model is converted to an R `list` using `yaml.load`.
 
 ``` r
+
 sklearn_model <- yaml.load(sklearn_model)
 
 str(sklearn_model, 2)
@@ -118,6 +120,7 @@ model. To do that, we use
 [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)
 
 ``` r
+
 library(tidypredict)
 
 spm <- as_parsed_model(sklearn_model)
@@ -131,6 +134,7 @@ The `spm` variable now works just as any parsed model inside R. Use
 to view the resulting formula.
 
 ``` r
+
 tidypredict_fit(spm)
 #> 152.764306916334 + (age * 0.303499549066043) + (sex * -237.639315333534) + 
 #>     (bmi * 510.530605436225) + (bp * 327.736980409347) + (s1 * 
@@ -140,8 +144,9 @@ tidypredict_fit(spm)
 Now, the model can run **inside a database**
 
 ``` r
+
 tidypredict_sql(spm, dbplyr::simulate_mssql())
-#> <SQL> ((((152.764306916334 + (`age` * 0.303499549066043)) + (`sex` * -237.639315333534)) + (`bmi` * 510.530605436225)) + (`bp` * 327.736980409347)) + (`s1` * -814.131709372539)
+#> <SQL> ((((152.764306916334 + ([age] * 0.303499549066043)) + ([sex] * -237.639315333534)) + ([bmi] * 510.530605436225)) + ([bp] * 327.736980409347)) + ([s1] * -814.131709372539)
 ```
 
 ## `broom`
@@ -152,6 +157,7 @@ function. This means that we are able to integrate a totally external
 model, with `broom`.
 
 ``` r
+
 tidy(spm)
 #> # A tibble: 6 × 2
 #>   term        estimate

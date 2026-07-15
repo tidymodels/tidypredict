@@ -1,16 +1,17 @@
 # catboost models
 
-| Function                                                                                                                                                                                                                                                       | Works |
-|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|-------|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |       |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)                                                                                                                                                             |       |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)                                                                                                                                                                       |       |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)                                                     |       |
-| `parsnip`                                                                                                                                                                                                                                                      |       |
+| Function | Works |
+|----|----|
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |  |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) |  |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) |  |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) |  |
+| `parsnip` |  |
 
 ## `tidypredict_` functions
 
 ``` r
+
 library(catboost)
 # Prepare data
 X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
@@ -72,6 +73,7 @@ supported by `tidypredict`:
 ## Binary classification example
 
 ``` r
+
 X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y_bin <- mtcars$am
 
@@ -99,6 +101,7 @@ tidypredict_test(model_bin, xg_df = X_bin)
 ## Multiclass classification example
 
 ``` r
+
 X_multi <- data.matrix(iris[, 1:4])
 y_multi <- as.integer(iris$Species) - 1L
 
@@ -128,6 +131,7 @@ names(formulas)
 Test multiclass predictions:
 
 ``` r
+
 tidypredict_test(model_multi, xg_df = X_multi)
 ```
 
@@ -141,6 +145,7 @@ When using parsnip/bonsai, categorical features are handled
 automatically:
 
 ``` r
+
 library(parsnip)
 library(bonsai)
 
@@ -166,6 +171,7 @@ For raw CatBoost models, you need to manually establish the
 hash-to-category mapping:
 
 ``` r
+
 pool_cat <- catboost.load_pool(
   df_cat[, c("num_feat", "cat_feat")],
   label = df_cat$target
@@ -197,11 +203,13 @@ tidypredict_fit(pm_cat)
 Here is an example of the model spec:
 
 ``` r
+
 pm <- parse_model(model)
 str(pm, 2)
 ```
 
 ``` r
+
 str(pm$trees[1])
 ```
 
