@@ -28,6 +28,16 @@
       
        All results are within the difference threshold
 
+# works with decision_tree() and the rpart engine
+
+    Code
+      tidypredict_test(reg, df = mtcars)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
 # works with linear_reg() and the quantreg engine
 
     Code
