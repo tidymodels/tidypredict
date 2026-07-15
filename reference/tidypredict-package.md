@@ -24,6 +24,8 @@ Useful links:
 
 Authors:
 
+- Emil Hvitfeldt <emil.hvitfeldt@posit.co>
+
 - Edgar Ruiz <edgar@posit.co>
 
 - Max Kuhn <max@posit.co>
