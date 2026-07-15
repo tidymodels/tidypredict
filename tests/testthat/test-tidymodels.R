@@ -44,6 +44,39 @@ test_that("works with linear_reg() and the glm engine", {
   )
 })
 
+test_that("works with logistic_reg() and the LiblineaR engine", {
+  skip_if_not_installed("LiblineaR")
+
+  df <- mtcars
+  df$am <- factor(df$am)
+
+  ridge <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::logistic_reg(penalty = 0.1, mixture = 0),
+      "LiblineaR"
+    ),
+    am ~ mpg + cyl + hp,
+    data = df
+  )
+  lasso <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::logistic_reg(penalty = 0.1, mixture = 1),
+      "LiblineaR"
+    ),
+    am ~ mpg + cyl + hp,
+    data = df
+  )
+
+  for (model in list(ridge, lasso)) {
+    expect_type(tidypredict_fit(model), "language")
+    expect_false(tidypredict_test(model, df = df)$alert)
+    expect_s3_class(
+      tidypredict_sql(model, dbplyr::simulate_dbi()),
+      "sql"
+    )
+  }
+})
+
 test_that("works with linear_reg() and the quantreg engine", {
   skip_if_not_installed("quantreg")
 
