@@ -5,6 +5,7 @@ test_that("returns the right output", {
   df$am <- factor(df$am)
   x <- as.matrix(df[, c("mpg", "cyl")])
   model <- LiblineaR::LiblineaR(data = x, target = df$am, type = 0)
+  model$W <- round(model$W, 7)
 
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)

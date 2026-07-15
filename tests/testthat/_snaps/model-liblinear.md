@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "1 - 1/(1 + exp(-0.252497620619991 + (mpg * 0.122920313238259) + \n    (cyl * -0.431327919124576)))"
+      [1] "1 - 1/(1 + exp(-0.2524976 + (mpg * 0.1229203) + (cyl * -0.4313279)))"
 
 # errors on non-logistic and multiclass models
 
