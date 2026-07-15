@@ -10,6 +10,11 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for
+  [`decision_tree()`](https://parsnip.tidymodels.org/reference/decision_tree.html)
+  parsnip models fitted with the `"rpart"` engine.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
   parsnip models fitted with the `"glm"` engine.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))

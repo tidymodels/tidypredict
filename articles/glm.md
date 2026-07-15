@@ -47,7 +47,7 @@ support the exponent function.
 
 library(tidypredict)
 tidypredict_sql(model, dbplyr::simulate_mssql())
-#> <SQL> 1.0 - 1.0 / (1.0 + EXP(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366098)))
+#> <SQL> 1.0 - 1.0 / (1.0 + EXP(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366097)))
 ```
 
 Alternatively, use
@@ -113,7 +113,7 @@ variables are operated using
 tidypredict_fit(model)
 #> 1 - 1/(1 + exp(20.8527831345691 + (wt * -7.85934263583836) + 
 #>     (ifelse(char_cyl == "cyl6", 1, 0) * 3.10462643177453) + (ifelse(char_cyl == 
-#>     "cyl8", 1, 0) * 5.37942092366098)))
+#>     "cyl8", 1, 0) * 5.37942092366097)))
 ```
 
 From there, the Tidy Eval formula can be used anywhere where it can be
@@ -183,6 +183,6 @@ liblinear_model <- logistic_reg(penalty = 0.1) %>%
   fit(factor(am) ~ mpg + cyl, data = mtcars)
 
 tidypredict_fit(liblinear_model)
-#> 1 - 1/(1 + exp(-1.78560849993736 + (mpg * 0.166363458887312) + 
-#>     (cyl * -0.324861381084944)))
+#> 1 - 1/(1 + exp(-1.78560849993735 + (mpg * 0.166363458887311) + 
+#>     (cyl * -0.324861381084945)))
 ```
