@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for `linear_reg()` parsnip models fitted with the `"glm"` engine. (#232)
+
 # tidypredict 1.1.0
 
 ## New Model Supports
