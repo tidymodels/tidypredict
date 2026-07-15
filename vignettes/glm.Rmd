@@ -91,3 +91,17 @@ Testing the `tidypredict` results is easy.  The `tidypredict_test()` function au
 ```{r}
 tidypredict_test(model)
 ```
+
+## parsnip
+
+`tidypredict` also supports `glm()` model objects fitted via the `parsnip` package, using `linear_reg()` with the `"glm"` engine.
+
+```{r}
+library(parsnip)
+
+parsnip_model <- linear_reg() %>%
+  set_engine("glm") %>%
+  fit(am ~ wt + cyl, data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```

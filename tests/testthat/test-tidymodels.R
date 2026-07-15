@@ -29,3 +29,17 @@ test_that("works with parsnip model specification", {
     )
   )
 })
+
+test_that("works with linear_reg() and the glm engine", {
+  model <- parsnip::fit(
+    parsnip::set_engine(parsnip::linear_reg(), "glm"),
+    mpg ~ wt + cyl,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(model), "language")
+
+  expect_snapshot(
+    tidypredict_test(model, df = mtcars)
+  )
+})
