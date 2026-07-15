@@ -20,14 +20,39 @@ acceptable_formula.rq <- function(model) {
 
 #' @export
 tidypredict_fit.rqs <- function(model) {
-  cli::cli_abort(
-    c(
-      "{.pkg tidypredict} does not support {.fn quantreg::rq} models fitted \\
-      with more than one quantile ({.arg tau}).",
-      i = "Fit a separate model for each quantile level instead."
-    )
+  models <- split_rqs(model)
+  set_names(
+    map(models, tidypredict_fit),
+    format(model$tau)
   )
 }
 
 #' @export
-parse_model.rqs <- function(model) tidypredict_fit.rqs(model)
+parse_model.rqs <- function(model) {
+  models <- split_rqs(model)
+  set_names(
+    map(models, parse_model),
+    format(model$tau)
+  )
+}
+
+#' @export
+acceptable_formula.rqs <- function(model) {
+  acceptable_lm(model)
+}
+
+# Split an `rqs` object (multiple quantiles) into a list of single-quantile
+# `rq` objects, one per column of the coefficient matrix.
+split_rqs <- function(model) {
+  coefs <- model$coefficients
+  map(
+    seq_along(model$tau),
+    ~ {
+      one <- model
+      class(one) <- "rq"
+      one$coefficients <- coefs[, .x]
+      one$tau <- model$tau[.x]
+      one
+    }
+  )
+}

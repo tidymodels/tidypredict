@@ -3,6 +3,7 @@
 S3method(acceptable_formula,glm)
 S3method(acceptable_formula,lm)
 S3method(acceptable_formula,rq)
+S3method(acceptable_formula,rqs)
 S3method(as_parsed_model,list)
 S3method(knit_print,tidypredict_test)
 S3method(parse_model,catboost.Model)

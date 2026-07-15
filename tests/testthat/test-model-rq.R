@@ -48,9 +48,17 @@ test_that("works with non-default tau, method, and weights", {
   )
 })
 
-test_that("errors for multiple quantiles", {
+test_that("returns one expression per quantile for multiple quantiles", {
   skip_if_not_installed("quantreg")
 
   model <- quantreg::rq(mpg ~ wt + cyl, data = mtcars, tau = c(0.25, 0.5, 0.75))
-  expect_snapshot(error = TRUE, tidypredict_fit(model))
+  tf <- tidypredict_fit(model)
+
+  expect_type(tf, "list")
+  expect_named(tf, c("0.25", "0.50", "0.75"))
+  expect_true(all(vapply(tf, is.language, logical(1))))
+
+  expect_snapshot(
+    lapply(tf, rlang::expr_text)
+  )
 })
