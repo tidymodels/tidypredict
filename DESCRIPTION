@@ -44,6 +44,7 @@ Suggests:
     nycflights13,
     parsnip,
     partykit,
+    quantreg,
     randomForest,
     ranger (>= 0.14.1),
     rpart (>= 4.1.0),

@@ -43,3 +43,23 @@ test_that("works with linear_reg() and the glm engine", {
     tidypredict_test(model, df = mtcars)
   )
 })
+
+test_that("works with linear_reg() and the quantreg engine", {
+  skip_if_not_installed("quantreg")
+
+  model <- parsnip::fit(
+    parsnip::set_mode(
+      parsnip::set_engine(parsnip::linear_reg(), "quantreg"),
+      "quantile regression",
+      quantile_levels = 0.5
+    ),
+    mpg ~ wt + cyl,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(model), "language")
+
+  expect_snapshot(
+    tidypredict_test(model, df = mtcars)
+  )
+})
