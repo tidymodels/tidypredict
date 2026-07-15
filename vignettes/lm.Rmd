@@ -131,3 +131,15 @@ parsnip_model <- linear_reg() %>%
 tidypredict_fit(parsnip_model)
 ```
 
+## Quantile regression
+
+`tidypredict` also supports quantile regression models fitted with `quantreg::rq()`, as well as `linear_reg()` models fitted via `parsnip` with the `"quantreg"` engine.
+
+```{r}
+library(quantreg)
+
+rq_model <- rq(mpg ~ wt + cyl, data = mtcars)
+
+tidypredict_fit(rq_model)
+```
+

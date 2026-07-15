@@ -152,6 +152,9 @@ parse_label_lm <- function(label, vars) {
 }
 
 parse_qr_lm <- function(label, qr) {
+  if (is.null(qr)) {
+    return(NULL)
+  }
   qrs <- qr[label == rownames(qr)]
   qrs <- set_names(
     as.list(qrs),
