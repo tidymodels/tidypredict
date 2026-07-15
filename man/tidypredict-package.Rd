@@ -24,6 +24,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Emil Hvitfeldt \email{emil.hvitfeldt@posit.co}
   \item Edgar Ruiz \email{edgar@posit.co}
   \item Max Kuhn \email{max@posit.co}
 }
