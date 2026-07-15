@@ -23,7 +23,7 @@ tidypredict_fit.rqs <- function(model) {
   models <- split_rqs(model)
   set_names(
     map(models, tidypredict_fit),
-    format(model$tau)
+    paste0("quantile_", format(model$tau))
   )
 }
 
@@ -32,7 +32,7 @@ parse_model.rqs <- function(model) {
   models <- split_rqs(model)
   set_names(
     map(models, parse_model),
-    format(model$tau)
+    paste0("quantile_", format(model$tau))
   )
 }
 

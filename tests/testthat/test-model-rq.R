@@ -55,7 +55,7 @@ test_that("returns one expression per quantile for multiple quantiles", {
   tf <- tidypredict_fit(model)
 
   expect_type(tf, "list")
-  expect_named(tf, c("0.25", "0.50", "0.75"))
+  expect_named(tf, c("quantile_0.25", "quantile_0.50", "quantile_0.75"))
   expect_true(all(vapply(tf, is.language, logical(1))))
 
   expect_snapshot(
