@@ -37,6 +37,8 @@
 #' using the generated expression, or the results will be NA for those rows.
 #'
 #' @keywords internal
+#' @noRd
+NULL
 
 #' Generate nested case_when for a tree
 #'

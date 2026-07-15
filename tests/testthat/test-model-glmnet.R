@@ -12,7 +12,7 @@ test_that("returns the right output", {
   expect_equal(pm$general$version, 1)
 
   expect_snapshot(
-    rlang::expr_text(tf)
+    round_print(tf)
   )
 })
 
@@ -121,7 +121,7 @@ test_that("glmnet are handeld neatly with parsnip", {
   expect_equal(pm$general$version, 1)
 
   expect_snapshot(
-    rlang::expr_text(tf)
+    round_print(tf)
   )
 })
 
@@ -140,7 +140,13 @@ test_that("Cox family works (#201)", {
   skip_if_not_installed("survival")
   x <- as.matrix(mtcars[, -c(1, 8)])
   y <- survival::Surv(mtcars$mpg, mtcars$vs)
-  model <- glmnet::glmnet(x, y, family = "cox", lambda = 0.1)
+  model <- glmnet::glmnet(
+    x,
+    y,
+    family = "cox",
+    lambda = 0.1,
+    cox.ties = "breslow"
+  )
 
   fit <- tidypredict_fit(model)
   native <- unname(predict(model, x, type = "link")[, 1])
