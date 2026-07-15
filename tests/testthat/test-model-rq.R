@@ -29,3 +29,28 @@ test_that("formulas produces correct predictions", {
     )
   )
 })
+
+test_that("works with non-default tau, method, and weights", {
+  skip_if_not_installed("quantreg")
+
+  expect_type(
+    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, tau = 0.9)),
+    "language"
+  )
+  expect_type(
+    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, method = "fn")),
+    "language"
+  )
+  w <- rep(c(1, 2), length.out = nrow(mtcars))
+  expect_type(
+    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, weights = w)),
+    "language"
+  )
+})
+
+test_that("errors for multiple quantiles", {
+  skip_if_not_installed("quantreg")
+
+  model <- quantreg::rq(mpg ~ wt + cyl, data = mtcars, tau = c(0.25, 0.5, 0.75))
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})

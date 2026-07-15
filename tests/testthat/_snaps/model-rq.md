@@ -18,3 +18,12 @@
       
        All results are within the difference threshold
 
+# errors for multiple quantiles
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit()`:
+      ! tidypredict does not support `quantreg::rq()` models fitted with more than one quantile (`tau`).
+      i Fit a separate model for each quantile level instead.
+
