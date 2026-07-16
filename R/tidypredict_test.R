@@ -55,6 +55,59 @@ tidypredict_test.party <- function(
 }
 
 #' @export
+tidypredict_test.C5.0 <- function(
+  model,
+  df = NULL,
+  threshold = 0,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+  }
+
+  base <- as.character(predict(model, df, type = "class"))
+  te <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+
+  raw_results <- data.frame(
+    rowid = seq_along(base),
+    fit = base,
+    fit_te = te
+  )
+  raw_results$fit_threshold <- raw_results$fit != raw_results$fit_te
+
+  n_off <- sum(raw_results$fit_threshold)
+  alert <- n_off > 0
+
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+  if (alert) {
+    message <- paste0(
+      message,
+      "\nFitted records that do not match: ",
+      n_off
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  results <- list()
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}
+
+#' @export
 tidypredict_test.default <- function(
   model,
   df = model$model,
