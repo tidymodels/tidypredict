@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for `C50::C5.0()` classification tree models, including `decision_tree()` parsnip models fitted with the `"C5.0"` engine. Boosted (`trials > 1`) and rule-based (`rules = TRUE`) models are not supported. (#232)
+
 - Added support for `LiblineaR::LiblineaR()` binary logistic regression models, including `logistic_reg()` parsnip models fitted with the `"LiblineaR"` engine. (#232)
 
 - Added support for `decision_tree()` parsnip models fitted with the `"rpart"` engine. (#232)

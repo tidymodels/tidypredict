@@ -30,6 +30,25 @@ test_that("works with parsnip model specification", {
   )
 })
 
+test_that("works with decision_tree() and the C5.0 engine", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- as.factor(df$vs)
+
+  model <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::decision_tree(mode = "classification"),
+      "C5.0"
+    ),
+    vs ~ wt + cyl + mpg,
+    data = df
+  )
+
+  expect_type(tidypredict_fit(model), "language")
+  expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
+  expect_snapshot(tidypredict_test(model, df = df))
+})
+
 test_that("works with linear_reg() and the glm engine", {
   model <- parsnip::fit(
     parsnip::set_engine(parsnip::linear_reg(), "glm"),

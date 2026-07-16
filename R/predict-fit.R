@@ -29,7 +29,7 @@ tidypredict_fit.pm_tree <- function(model) {
     if (model_type == "cubist") {
       return(tidypredict_fit_cubist(model))
     }
-    if (model_type %in% c("rpart", "party")) {
+    if (model_type %in% c("rpart", "party", "C5.0")) {
       return(generate_nested_case_when_tree(model$tree_info))
     }
     if (model_type %in% c("ranger", "randomForest")) {

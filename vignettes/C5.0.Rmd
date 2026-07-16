@@ -1,0 +1,89 @@
+---
+title: "Decision trees, using C5.0"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Decision trees, using C5.0}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(dplyr)
+library(tidypredict)
+library(C50)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |
+|`tidypredict_to_column()`                                      |
+|`tidypredict_test()`                                           |
+|`parsnip`                                                      |
+
+## How it works
+
+Here is a simple `C5.0()` classification model using the `mtcars` dataset:
+
+```{r}
+library(dplyr)
+library(tidypredict)
+library(C50)
+
+mtcars2 <- mtcars
+mtcars2$vs <- factor(mtcars2$vs)
+
+model <- C5.0(mtcars2[, c("wt", "cyl", "mpg")], mtcars2$vs)
+```
+
+## Under the hood
+
+C5.0 stores its fitted tree as text in the `tree` element of the model object. `tidypredict` parses that text directly, so the model can be translated even when it was fitted through the x/y interface (as `parsnip` does).
+
+The tree is transformed into a `dplyr`, a.k.a Tidy Eval, formula. The decision tree becomes a nested `dplyr::case_when()` statement.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+- Use directly inside `dplyr`,
+  `mutate(mtcars2, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to a piped command set
+- Use `tidypredict_sql(model)` to retrieve the SQL statement
+
+## Categorical predictors
+
+`C5.0` handles categorical predictors natively. The generated formula uses `%in%` for categorical splits, and multi-way splits become nested `case_when()` branches:
+
+```{r}
+mtcars3 <- mtcars2
+mtcars3$gear <- factor(mtcars3$gear)
+
+model_cat <- C5.0(mtcars3[, c("wt", "gear", "mpg")], mtcars3$vs)
+tidypredict_fit(model_cat)
+```
+
+## parsnip
+
+`tidypredict` also supports `C5.0` model objects fitted via the `parsnip` package.
+
+```{r}
+library(parsnip)
+
+parsnip_model <- decision_tree(mode = "classification") |>
+  set_engine("C5.0") |>
+  fit(vs ~ wt + cyl + mpg, data = mtcars2)
+
+tidypredict_fit(parsnip_model)
+```
+
+## Limitations
+
+Only single decision trees are supported. Boosted models (`trials > 1`) and rule-based models (`rules = TRUE`) cannot be translated and will raise an error.

@@ -118,9 +118,10 @@ partykit_tree_info <- function(model) {
     prediction <- ifelse(!is_split, node_modes[as.character(all_node_ids)], NA)
   }
 
-  # Get variable info
-  vars <- as.character(attr(model$terms, "variables"))
-  vars <- vars[2:length(vars)]
+  # Get variable info. partykit's varid indexes the columns of model$data,
+  # which is not always the same order as the terms (e.g. C5.0-converted
+  # parties place the response last), so map through the data column names.
+  vars <- names(model$data)
 
   var_details <- map_chr(model$data, class)
   var_class <- as.character(var_details)
