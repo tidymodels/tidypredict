@@ -159,6 +159,42 @@ test_that("works with rand_forest() and the partykit engine", {
   expect_snapshot(error = TRUE, tidypredict_fit(cls))
 })
 
+test_that("works with rand_forest() and the aorsf engine", {
+  skip_if_not_installed("bonsai")
+  skip_if_not_installed("aorsf")
+
+  set.seed(1)
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rand_forest(mode = "regression", trees = 20),
+      "aorsf"
+    ),
+    mpg ~ wt + cyl + disp,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+
+  # aorsf uses observed split values as cutpoints, so agreement is checked on
+  # jittered data to avoid exact training-row boundary ties.
+  set.seed(99)
+  nd <- mtcars
+  nd[] <- lapply(mtcars, function(x) x + rnorm(length(x), 0, 0.01))
+  expect_false(tidypredict_test(reg, df = nd)$alert)
+
+  # Classification is not supported
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rand_forest(mode = "classification", trees = 5),
+      "aorsf"
+    ),
+    Species ~ .,
+    data = iris
+  )
+  expect_snapshot(error = TRUE, tidypredict_fit(cls))
+})
+
 test_that("works with linear_reg() and the quantreg engine", {
   skip_if_not_installed("quantreg")
 
