@@ -129,6 +129,36 @@ test_that("works with decision_tree() and the rpart engine", {
   expect_s3_class(tidypredict_sql(cls, dbplyr::simulate_dbi()), "sql")
 })
 
+test_that("works with rand_forest() and the partykit engine", {
+  skip_if_not_installed("bonsai")
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rand_forest(mode = "regression", trees = 20),
+      "partykit"
+    ),
+    mpg ~ wt + cyl,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+  expect_snapshot(tidypredict_test(reg, df = mtcars))
+
+  # Classification is not supported
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rand_forest(mode = "classification", trees = 5),
+      "partykit"
+    ),
+    Species ~ .,
+    data = iris
+  )
+  expect_snapshot(error = TRUE, tidypredict_fit(cls))
+})
+
 test_that("works with linear_reg() and the quantreg engine", {
   skip_if_not_installed("quantreg")
 

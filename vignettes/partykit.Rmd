@@ -1,0 +1,86 @@
+---
+title: "Random Forest - partykit"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Random Forest - partykit}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r pre, include = FALSE}
+if (!rlang::is_installed("partykit")) {
+  knitr::opts_chunk$set(
+    eval = FALSE
+  )
+}
+```
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(dplyr)
+library(tidypredict)
+library(partykit)
+library(parsnip)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+Only regression models are supported. Classification `cforest()` models rely on
+a voting mechanism that cannot be expressed as a single formula.
+
+## How it works
+
+Here is a simple `cforest()` model using the `mtcars` dataset:
+
+```{r}
+library(dplyr)
+library(tidypredict)
+library(partykit)
+
+model <- cforest(mpg ~ wt + cyl, data = mtcars, ntree = 5)
+```
+
+## Under the hood
+
+Each tree in the forest is a `partykit` party tree. `tidypredict` turns every
+tree into a nested `dplyr::case_when()` statement using each terminal node's
+in-bag weighted mean, then averages the trees. This matches the default
+`predict()` behavior, which scales the per-tree weights before aggregating.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated.
+`tidypredict` provides three paths:
+
+  - Use directly inside `dplyr`, `mutate(mtcars, !!tidypredict_fit(model))`
+  - Use `tidypredict_to_column(model)` to a piped command set
+  - Use `tidypredict_sql(model, con)` to retrieve the SQL statement
+
+## parsnip
+
+`tidypredict` also supports `cforest` model objects fitted via the `parsnip`
+package with the `"partykit"` engine, which is provided by the `bonsai` package.
+
+```{r, eval = rlang::is_installed("bonsai")}
+library(bonsai)
+library(parsnip)
+
+parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%
+  set_engine("partykit") %>%
+  fit(mpg ~ wt + cyl, data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```

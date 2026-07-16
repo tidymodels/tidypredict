@@ -95,26 +95,32 @@ partykit_tree_info <- function(model) {
     }
   }
 
-  # Extract predictions from fitted data (only need to access once)
+  # Extract predictions from fitted data (only need to access once). The
+  # "(weights)" column is all ones for a single tree, but cforest trees are
+  # fit on in-bag subsamples, so node predictions must be weighted by it.
   fitted_data <- model$fitted
   response_col <- fitted_data[["(response)"]]
   node_col <- fitted_data[["(fitted)"]]
+  weight_col <- fitted_data[["(weights)"]] %||% rep(1, length(response_col))
 
   if (is.numeric(response_col)) {
-    # Regression: compute mean per node
-    node_means <- tapply(response_col, node_col, mean)
+    # Regression: compute weighted mean per node
+    node_sums <- tapply(weight_col * response_col, node_col, sum)
+    node_wts <- tapply(weight_col, node_col, sum)
+    node_means <- node_sums / node_wts
     prediction <- ifelse(!is_split, node_means[as.character(all_node_ids)], NA)
   } else {
-    # Classification: compute mode per node
-    stat_mode <- function(x) {
-      counts <- rev(sort(table(x)))
+    # Classification: compute weighted mode per node
+    stat_mode <- function(idx) {
+      counts <- rev(sort(tapply(weight_col[idx], response_col[idx], sum)))
+      counts <- counts[!is.na(counts) & counts > 0]
       if (length(counts) > 1 && counts[[1]] == counts[[2]]) {
         ties <- counts[counts[1] == counts]
         return(names(rev(ties))[1])
       }
       names(counts)[1]
     }
-    node_modes <- tapply(response_col, node_col, stat_mode)
+    node_modes <- tapply(seq_along(node_col), node_col, stat_mode)
     prediction <- ifelse(!is_split, node_modes[as.character(all_node_ids)], NA)
   }
 

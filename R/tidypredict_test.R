@@ -55,6 +55,69 @@ tidypredict_test.party <- function(
 }
 
 #' @export
+tidypredict_test.cforest <- function(
+  model,
+  df = model$data,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  if (is.numeric(max_rows)) {
+    df <- head(df, max_rows)
+  }
+
+  base <- data.frame(
+    fit = as.vector(predict(model, newdata = df, type = "response")),
+    row.names = NULL
+  )
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+  te <- data.frame(fit_te = te[, "fit_te"])
+
+  raw_results <- cbind(base, te)
+  raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
+  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
+
+  rowid <- seq_len(nrow(raw_results))
+  raw_results <- cbind(data.frame(rowid), raw_results)
+
+  alert <- sum(raw_results$fit_threshold) > 0
+
+  message <- paste0(
+    "tidypredict test results\n",
+    "Difference threshold: ",
+    threshold,
+    "\n"
+  )
+  if (alert) {
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ",
+      sum(raw_results$fit_threshold),
+      "\n\nMax difference: ",
+      max(abs(raw_results$fit_diff))
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
+  results <- list()
+  results$model_call <- model$call
+  results$raw_results <- raw_results
+  results$message <- message
+  results$alert <- alert
+  structure(results, class = c("tidypredict_test", "list"))
+}
+
+#' @export
 tidypredict_test.C5.0 <- function(
   model,
   df = NULL,
