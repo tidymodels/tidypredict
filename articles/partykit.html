@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Decision trees, using C5.0 • tidypredict</title>
+<title>Random Forest - partykit • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Decision trees, using C5.0">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Random Forest - partykit">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -84,11 +84,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Decision trees, using C5.0</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Random Forest - partykit</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/C5.0.Rmd" class="external-link"><code>vignettes/C5.0.Rmd</code></a></small>
-      <div class="d-none name"><code>C5.0.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/partykit.Rmd" class="external-link"><code>vignettes/partykit.Rmd</code></a></small>
+      <div class="d-none name"><code>partykit.Rmd</code></div>
     </div>
 
     
@@ -104,100 +104,93 @@
 <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>,
 <code><a href="../reference/parse_model.html">parse_model()</a></code>
 </td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
+<td>
+<code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>,
+<code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
+</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
 <td><code>parsnip</code></td>
-<td></td>
+<td>✔</td>
 </tr>
 </tbody>
 </table>
+<p>Only regression models are supported. Classification
+<code><a href="https://rdrr.io/pkg/partykit/man/cforest.html" class="external-link">cforest()</a></code> models rely on a voting mechanism that cannot be
+expressed as a single formula.</p>
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
-<p>Here is a simple <code><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C5.0()</a></code> classification model using the
+<p>Here is a simple <code><a href="https://rdrr.io/pkg/partykit/man/cforest.html" class="external-link">cforest()</a></code> model using the
 <code>mtcars</code> dataset:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://topepo.github.io/C5.0/" class="external-link">C50</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://codeberg.org/thothorn/partykit" class="external-link">partykit</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">mtcars2</span> <span class="op">&lt;-</span> <span class="va">mtcars</span></span>
-<span><span class="va">mtcars2</span><span class="op">$</span><span class="va">vs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars2</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C5.0</a></span><span class="op">(</span><span class="va">mtcars2</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="st">"cyl"</span>, <span class="st">"mpg"</span><span class="op">)</span><span class="op">]</span>, <span class="va">mtcars2</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/partykit/man/cforest.html" class="external-link">cforest</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span>, ntree <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="under-the-hood">Under the hood<a class="anchor" aria-label="anchor" href="#under-the-hood"></a>
 </h2>
-<p>C5.0 stores its fitted tree as text in the <code>tree</code> element
-of the model object. <code>tidypredict</code> parses that text directly,
-so the model can be translated even when it was fitted through the x/y
-interface (as <code>parsnip</code> does).</p>
-<p>The tree is transformed into a <code>dplyr</code>, a.k.a Tidy Eval,
-formula. The decision tree becomes a nested
-<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
+<p>Each tree in the forest is a <code>partykit</code> party tree.
+<code>tidypredict</code> turns every tree into a nested
+<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement using each terminal node’s
+in-bag weighted mean, then averages the trees. This matches the default
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> behavior, which scales the per-tree weights
+before aggregating.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 6 ~ case_when(cyl &lt;= 4 ~ "1", .default = case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;     2.875 ~ "0", .default = "1")), .default = "0")</span></span></code></pre></div>
+<span><span class="co">#&gt; (case_when(cyl &lt;= 6 ~ 22.08, .default = 15.17) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.78 ~ 27.5428571428571, .default = 17.1384615384615) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.15 ~ 23.7625, .default = 16.5083333333333) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.78 ~ 26.6285714285714, .default = 16.9076923076923) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.465 ~ 28.3857142857143, .default = 16.7769230769231))/5L</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>,
-<code>mutate(mtcars2, !! tidypredict_fit(model))</code>
+<code>mutate(mtcars, !!tidypredict_fit(model))</code>
 </li>
 <li>Use <code>tidypredict_to_column(model)</code> to a piped command
 set</li>
-<li>Use <code>tidypredict_sql(model)</code> to retrieve the SQL
+<li>Use <code>tidypredict_sql(model, con)</code> to retrieve the SQL
 statement</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="categorical-predictors">Categorical predictors<a class="anchor" aria-label="anchor" href="#categorical-predictors"></a>
-</h2>
-<p><code>C5.0</code> handles categorical predictors natively. The
-generated formula uses <code>%in%</code> for categorical splits, and
-multi-way splits become nested <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> branches:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mtcars3</span> <span class="op">&lt;-</span> <span class="va">mtcars2</span></span>
-<span><span class="va">mtcars3</span><span class="op">$</span><span class="va">gear</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">mtcars3</span><span class="op">$</span><span class="va">gear</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">model_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C5.0</a></span><span class="op">(</span><span class="va">mtcars3</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="st">"gear"</span>, <span class="st">"mpg"</span><span class="op">)</span><span class="op">]</span>, <span class="va">mtcars3</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(mpg &lt;= 21 ~ "0", .default = "1")</span></span></code></pre></div>
-</div>
-<div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
-<p><code>tidypredict</code> also supports <code>C5.0</code> model
-objects fitted via the <code>parsnip</code> package.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
+<p><code>tidypredict</code> also supports <code>cforest</code> model
+objects fitted via the <code>parsnip</code> package with the
+<code>"partykit"</code> engine, which is provided by the
+<code>bonsai</code> package.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bonsai.tidymodels.org/" class="external-link">bonsai</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/decision_tree.html" class="external-link">decision_tree</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"classification"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"C5.0"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">vs</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">mpg</span>, data <span class="op">=</span> <span class="va">mtcars2</span><span class="op">)</span></span>
+<span><span class="va">parsnip_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rand_forest.html" class="external-link">rand_forest</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, trees <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"partykit"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 6 ~ case_when(cyl &lt;= 4 ~ "1", .default = case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;     2.875 ~ "0", .default = "1")), .default = "0")</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
-</h2>
-<p>Only single decision trees are supported. Boosted models
-(<code>trials &gt; 1</code>) and rule-based models
-(<code>rules = TRUE</code>) cannot be translated and will raise an
-error.</p>
+<span><span class="co">#&gt; (case_when(cyl &lt;= 4 ~ 28.275, .default = 16.1) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.215 ~ 25.2555555555556, .default = 16.0272727272727) + </span></span>
+<span><span class="co">#&gt;     case_when(cyl &lt;= 4 ~ 25.775, .default = 16.675) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.15 ~ 25.1555555555556, .default = 16.1636363636364) + case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.875 ~ 25.9714285714286, .default = 17))/5L</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

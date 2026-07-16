@@ -12,6 +12,7 @@ articles:
   lm: lm.html
   mars: mars.html
   non-r: non-r.html
+  partykit: partykit.html
   ranger: ranger.html
   regression: regression.html
   rf: rf.html
@@ -21,7 +22,7 @@ articles:
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-07-16T00:53Z
+last_built: 2026-07-16T18:33Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

@@ -21,6 +21,8 @@
 - [MARS models via the \`earth\`
   package](https://tidypredict.tidymodels.org/articles/mars.md):
 - [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
+- [Random Forest -
+  partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
 - [Random Forest, using
   Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
 - [Create a regression spec - version

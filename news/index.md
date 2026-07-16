@@ -11,6 +11,14 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for
+  [`partykit::cforest()`](https://rdrr.io/pkg/partykit/man/cforest.html)
+  random forest regression models, including
+  [`rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html)
+  parsnip models fitted with the `"partykit"` engine. Classification is
+  not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html)
   binary logistic regression models, including
   [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html)
@@ -101,9 +109,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
-  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
-  models.
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -168,9 +176,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
-  use family function syntax (e.g., `family = gaussian()`) instead of
-  string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  that use family function syntax (e.g., `family = gaussian()`) instead
+  of string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
@@ -362,7 +370,8 @@ CRAN release: 2019-07-12
   [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)
   function. It adds the proper class components to the list.
 
-- Adds initial support for `partykit`’s `ctree()` model
+- Adds initial support for `partykit`’s
+  [`ctree()`](https://rdrr.io/pkg/partykit/man/ctree.html) model
 
 - Adds support for `parsnip` fitted models: `lm`, `randomForest`,
   `ranger`, and `earth`
