@@ -2,6 +2,8 @@
 
 ### All vignettes
 
+- [Decision trees, using
+  C5.0](https://tidypredict.tidymodels.org/articles/C5.0.md):
 - [catboost
   models](https://tidypredict.tidymodels.org/articles/catboost.md):
 - [Cubist

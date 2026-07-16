@@ -104,7 +104,7 @@ The following models are supported by `tidypredict`:
 - Linear Regression - [`lm()`](https://rdrr.io/r/stats/lm.html)
 - Generalized Linear model - [`glm()`](https://rdrr.io/r/stats/glm.html)
 - Elastic net models -
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
 - Random Forest models -
   [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
 - Random Forest models, via `ranger` -
@@ -128,7 +128,7 @@ ones confirmed currently work in `tidypredict` are:
 
 - [`lm()`](https://rdrr.io/r/stats/lm.html) - `parsnip`: `linear_reg()`
   with *“lm”* as the engine.
-- [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) -
+- [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) -
   `parsnip`: `linear_reg()` or `logistic_reg()` with *“glmnet”* as the
   engine.
 - [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html) -
