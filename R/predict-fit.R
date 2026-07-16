@@ -32,7 +32,7 @@ tidypredict_fit.pm_tree <- function(model) {
     if (model_type %in% c("rpart", "party", "C5.0")) {
       return(generate_nested_case_when_tree(model$tree_info))
     }
-    if (model_type %in% c("ranger", "randomForest", "cforest")) {
+    if (model_type %in% c("ranger", "randomForest", "cforest", "aorsf")) {
       # For forests, average all trees
       tree_exprs <- map(model$tree_info_list, generate_nested_case_when_tree)
       res <- reduce_addition(tree_exprs)

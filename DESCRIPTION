@@ -30,6 +30,7 @@ Imports:
     tibble,
     tidyr
 Suggests:
+    aorsf,
     bonsai,
     C50,
     covr,

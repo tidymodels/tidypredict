@@ -87,6 +87,17 @@ build_nested_node <- function(node_id, tree_info) {
 #' @param split A split info list with col, val/vals, is_categorical
 #' @keywords internal
 build_nested_split_condition <- function(split) {
+  if (isTRUE(split$is_oblique)) {
+    # Oblique split: sum(coef * col) <= threshold
+    terms <- map2(
+      split$coefs,
+      split$cols,
+      function(coef, col) expr_multiplication(coef, rlang::sym(col))
+    )
+    lincomb <- reduce_addition(terms)
+    return(expr(!!lincomb <= !!split$val))
+  }
+
   col <- rlang::sym(split$col)
 
   if (split$is_categorical) {
