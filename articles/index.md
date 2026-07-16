@@ -2,6 +2,8 @@
 
 ### All vignettes
 
+- [Oblique Random Forest, using
+  aorsf](https://tidypredict.tidymodels.org/articles/aorsf.md):
 - [Decision trees, using
   C5.0](https://tidypredict.tidymodels.org/articles/C5.0.md):
 - [catboost

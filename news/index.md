@@ -3,6 +3,14 @@
 ## tidypredict (development version)
 
 - Added support for
+  [`aorsf::orsf()`](https://docs.ropensci.org/aorsf/reference/orsf.html)
+  oblique random forest regression models, including
+  [`rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html)
+  parsnip models fitted with the `"aorsf"` engine. Only numeric
+  predictors are supported and classification is not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
   classification tree models, including
   [`decision_tree()`](https://parsnip.tidymodels.org/reference/decision_tree.html)
