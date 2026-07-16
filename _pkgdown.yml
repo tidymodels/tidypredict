@@ -30,6 +30,8 @@ navbar:
       href: articles/rf.html
     - text: Decision Tree - rpart()
       href: articles/rpart.html
+    - text: Decision Tree - C5.0()
+      href: articles/C5.0.html
     - text: MARS - earth()
       href: articles/mars.html
     - text: Cubist - cubist()
