@@ -28,6 +28,8 @@ navbar:
       href: articles/ranger.html
     - text: Random Forest - randomForest()
       href: articles/rf.html
+    - text: Random Forest - partykit - cforest()
+      href: articles/partykit.html
     - text: Decision Tree - rpart()
       href: articles/rpart.html
     - text: Decision Tree - C5.0()
