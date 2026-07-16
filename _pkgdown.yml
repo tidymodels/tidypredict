@@ -30,6 +30,8 @@ navbar:
       href: articles/rf.html
     - text: Random Forest - partykit - cforest()
       href: articles/partykit.html
+    - text: Oblique Random Forest - aorsf - orsf()
+      href: articles/aorsf.html
     - text: Decision Tree - rpart()
       href: articles/rpart.html
     - text: Decision Tree - C5.0()

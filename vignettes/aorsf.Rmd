@@ -1,0 +1,75 @@
+---
+title: "Oblique Random Forest, using aorsf"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Oblique Random Forest, using aorsf}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(dplyr)
+library(tidypredict)
+library(parsnip)
+library(aorsf)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+Only regression models with numeric predictors are supported. Classification requires a voting mechanism that cannot be expressed as a single formula, and oblique splits on categorical predictors operate on an internal encoding that is not reproduced here.
+
+## How it works
+
+Here is a simple `orsf()` model using the `mtcars` dataset:
+```{r}
+library(dplyr)
+library(tidypredict)
+library(aorsf)
+
+model <- orsf(mtcars, mpg ~ ., n_tree = 5)
+```
+
+## Under the hood
+
+Unlike axis-aligned forests, each split in an oblique random forest is a linear combination of (standardized) predictors compared against a cutpoint. `tidypredict` reads the trees stored in the fitted forest, folds the forest's centering and scaling into the split coefficients, and turns each tree into a nested `dplyr::case_when()` statement. The trees are then averaged.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+
+  - Use directly inside `dplyr`,  `mutate(mtcars, !! tidypredict_fit(model))`
+  - Use `tidypredict_to_column(model)` to a piped command set
+  - Use `tidypredict_sql(model)` to retrieve the SQL statement
+
+## A note on split boundaries
+
+`aorsf` uses observed linear-combination values from the training data as split cutpoints. A training row can therefore land exactly on a split boundary, where floating-point differences between `aorsf`'s internal traversal and the generated formula may send it down a different branch. This affects only rows that coincide with a training cutpoint; on new data the formula reproduces `predict()` exactly.
+
+## parsnip
+
+`tidypredict` also supports `aorsf` model objects fitted via the `parsnip` package (using the `bonsai` extension).
+
+```{r}
+library(parsnip)
+library(bonsai)
+
+parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%
+  set_engine("aorsf") %>%
+  fit(mpg ~ ., data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```
