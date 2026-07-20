@@ -222,6 +222,20 @@ c50_check_supported <- function(model) {
       "{.pkg tidypredict} does not support rule-based C5.0 models ({.code rules = TRUE})."
     )
   }
+  if (isTRUE(model$control$fuzzyThreshold)) {
+    # Fuzzy thresholds route cases near a split point partly down both branches,
+    # which cannot be expressed as a hard `<= cut` comparison.
+    cli::cli_abort(
+      "{.pkg tidypredict} does not support C5.0 models with fuzzy thresholds ({.code fuzzyThreshold = TRUE})."
+    )
+  }
+  if (!is.null(model$costMatrix)) {
+    # A cost matrix changes how the final class is chosen from the votes, which
+    # the generated argmax expression does not account for.
+    cli::cli_abort(
+      "{.pkg tidypredict} does not support C5.0 models fitted with a cost matrix ({.code costs})."
+    )
+  }
   invisible(model)
 }
 
