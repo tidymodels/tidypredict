@@ -8,16 +8,8 @@
 # errors on unsupported configurations
 
     Code
-      tidypredict_fit(boosted)
-    Condition
-      Error in `c50_tree_info_full()`:
-      ! tidypredict does not support boosted C5.0 models (`trials > 1`).
-
----
-
-    Code
       tidypredict_fit(rules)
     Condition
-      Error in `c50_tree_info_full()`:
+      Error in `c50_check_supported()`:
       ! tidypredict does not support rule-based C5.0 models (`rules = TRUE`).
 
