@@ -30,6 +30,9 @@ tidypredict_fit.pm_tree <- function(model) {
       return(tidypredict_fit_cubist(model))
     }
     if (model_type %in% c("rpart", "party", "C5.0")) {
+      if (model_type == "C5.0" && !is.null(model$tree_info_list)) {
+        return(c50_boosted_case_when(model$tree_info_list, model$classes))
+      }
       return(generate_nested_case_when_tree(model$tree_info))
     }
     if (model_type %in% c("ranger", "randomForest", "cforest", "aorsf")) {

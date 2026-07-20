@@ -31,11 +31,24 @@ parse_c50_attrs <- function(line) {
   attrs
 }
 
-# Parse `model$tree` into a nested list of split and leaf nodes.
-parse_c50_tree <- function(model) {
+# Parse `model$tree` into a list of nested trees (one per boosting trial). A
+# non-boosted model has a single tree; a boosted model (`trials > 1`) stores its
+# trials concatenated, with the count in the `entries=` header line. Leaf nodes
+# carry the confidence C5.0 uses when combining boosted trials: the Laplace ratio
+# `(n_predicted + 1) / (n_total + 2)` of the training frequencies at the leaf.
+parse_c50_trees <- function(model) {
   lines <- strsplit(model$tree, "\n")[[1]]
   lines <- lines[nzchar(lines)]
+
+  entries_line <- lines[grepl("^entries=", lines)]
+  n_trees <- if (length(entries_line) > 0) {
+    as.integer(parse_c50_attrs(entries_line[[1]])$entries)
+  } else {
+    1L
+  }
+
   lines <- lines[!grepl("^(id=|entries=)", lines)]
+  levels <- model$levels
 
   pos <- 1L
   read_node <- function() {
@@ -44,7 +57,21 @@ parse_c50_tree <- function(model) {
     type <- attrs$type
 
     if (type == "0") {
-      return(list(kind = "leaf", prediction = attrs$class))
+      freq <- if (!is.null(attrs$freq)) {
+        as.numeric(strsplit(attrs$freq, ",")[[1]])
+      } else {
+        NULL
+      }
+      confidence <- if (!is.null(freq)) {
+        (freq[match(attrs$class, levels)] + 1) / (sum(freq) + 2)
+      } else {
+        NA_real_
+      }
+      return(list(
+        kind = "leaf",
+        prediction = attrs$class,
+        confidence = confidence
+      ))
     }
 
     forks <- as.integer(attrs$forks)
@@ -75,7 +102,12 @@ parse_c50_tree <- function(model) {
     }
   }
 
-  read_node()
+  lapply(seq_len(n_trees), function(i) read_node())
+}
+
+# Parse a single (non-boosted) C5.0 tree into a nested list of nodes.
+parse_c50_tree <- function(model) {
+  parse_c50_trees(model)[[1]]
 }
 
 # Flatten the nested tree into the binary `tree_info` structure consumed by
@@ -110,6 +142,7 @@ c50_tree_info <- function(node) {
       splitvarName = col,
       terminal = FALSE,
       prediction = NA_character_,
+      confidence = NA_real_,
       split = list(
         primary = list(
           col = col,
@@ -132,6 +165,7 @@ c50_tree_info <- function(node) {
         splitvarName = NA_character_,
         terminal = TRUE,
         prediction = node$prediction,
+        confidence = node$confidence %||% NA_real_,
         split = list(NULL)
       ))
       return(id)
@@ -151,6 +185,7 @@ c50_tree_info <- function(node) {
       splitvarName = node$col,
       terminal = FALSE,
       prediction = NA_character_,
+      confidence = NA_real_,
       split = list(
         primary = list(
           col = node$col,
@@ -174,18 +209,24 @@ c50_tree_info <- function(node) {
     splitvarName = map_chr(rows, ~ .x$splitvarName),
     terminal = map_lgl(rows, ~ .x$terminal),
     prediction = map_chr(rows, ~ .x$prediction),
+    confidence = map_dbl(rows, ~ .x$confidence),
     node_splits = map(rows, ~ .x$split),
     majority_left = rep(NA, n),
     use_surrogates = FALSE
   )
 }
 
-c50_tree_info_full <- function(model) {
+c50_check_supported <- function(model) {
   if (isTRUE(model$rbm)) {
     cli::cli_abort(
       "{.pkg tidypredict} does not support rule-based C5.0 models ({.code rules = TRUE})."
     )
   }
+  invisible(model)
+}
+
+c50_tree_info_full <- function(model) {
+  c50_check_supported(model)
   if (as.integer(model$trials[["Actual"]]) > 1) {
     cli::cli_abort(
       "{.pkg tidypredict} does not support boosted C5.0 models ({.code trials > 1})."
@@ -194,22 +235,72 @@ c50_tree_info_full <- function(model) {
   c50_tree_info(parse_c50_tree(model))
 }
 
+# Build a nested case_when returning, at each leaf, the leaf confidence when the
+# leaf predicts `class` and 0 otherwise. Summed across trials this gives the
+# total confidence-weighted vote C5.0 assigns to `class`.
+c50_class_vote <- function(tree_info, class) {
+  value_info <- tree_info
+  value_info$prediction <- ifelse(
+    tree_info$terminal & tree_info$prediction == class,
+    tree_info$confidence,
+    0
+  )
+  generate_nested_case_when_tree(value_info)
+}
+
+# Combine boosted trials by confidence-weighted voting. C5.0 predicts the class
+# with the greatest total vote; ties resolve to the earliest class in
+# `classes`, matching `which.max()`. The cascade below reproduces that: class
+# `i` is chosen when its vote is at least as large as every later class's, since
+# earlier classes are only reached (and rejected) when they are not the maximum.
+c50_boosted_case_when <- function(tree_info_list, classes) {
+  votes <- lapply(classes, function(class) {
+    reduce_addition(lapply(tree_info_list, c50_class_vote, class = class))
+  })
+
+  n <- length(classes)
+  args <- list()
+  for (i in seq_len(n - 1L)) {
+    comparisons <- lapply(
+      seq.int(i + 1L, n),
+      function(j) expr(!!votes[[i]] >= !!votes[[j]])
+    )
+    condition <- combine_path_conditions(comparisons)
+    args[[i]] <- expr(!!condition ~ !!classes[[i]])
+  }
+  args$.default <- classes[[n]]
+  rlang::call2("case_when", !!!args)
+}
+
 # Predict ---------------------------------------
 
 #' @export
 tidypredict_fit.C5.0 <- function(model, ...) {
-  generate_nested_case_when_tree(c50_tree_info_full(model))
+  c50_check_supported(model)
+  trees <- parse_c50_trees(model)
+  if (length(trees) == 1) {
+    return(generate_nested_case_when_tree(c50_tree_info(trees[[1]])))
+  }
+  tree_info_list <- lapply(trees, c50_tree_info)
+  c50_boosted_case_when(tree_info_list, model$levels)
 }
 
 # Parse model --------------------------------------
 
 #' @export
 parse_model.C5.0 <- function(model) {
+  c50_check_supported(model)
   pm <- list()
   pm$general$model <- "C5.0"
   pm$general$type <- "tree"
   pm$general$version <- 3
-  pm$tree_info <- c50_tree_info_full(model)
+  trees <- parse_c50_trees(model)
+  if (length(trees) == 1) {
+    pm$tree_info <- c50_tree_info(trees[[1]])
+  } else {
+    pm$tree_info_list <- lapply(trees, c50_tree_info)
+    pm$classes <- model$levels
+  }
   as_parsed_model(pm)
 }
 
