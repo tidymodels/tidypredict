@@ -2,7 +2,7 @@
 
 - Added support for `aorsf::orsf()` oblique random forest regression models, including `rand_forest()` parsnip models fitted with the `"aorsf"` engine. Only numeric predictors are supported and classification is not supported. (#232)
 
-- Added support for `C50::C5.0()` classification tree models, including `decision_tree()` parsnip models fitted with the `"C5.0"` engine. Boosted (`trials > 1`) and rule-based (`rules = TRUE`) models are not supported. (#232)
+- Added support for `C50::C5.0()` classification tree models, including `decision_tree()` and `boost_tree()` parsnip models fitted with the `"C5.0"` engine. Boosted models (`trials > 1`) combine trials by confidence-weighted voting. Rule-based (`rules = TRUE`) models are not supported. (#232)
 
 - Added support for `partykit::cforest()` random forest regression models, including `rand_forest()` parsnip models fitted with the `"partykit"` engine. Classification is not supported. (#232)
 

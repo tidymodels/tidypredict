@@ -72,7 +72,7 @@ tidypredict_fit(model_cat)
 
 ## parsnip
 
-`tidypredict` also supports `C5.0` model objects fitted via the `parsnip` package.
+`tidypredict` also supports `C5.0` model objects fitted via the `parsnip` package, both as a `decision_tree()` and as a boosted `boost_tree()`.
 
 ```{r}
 library(parsnip)
@@ -84,6 +84,18 @@ parsnip_model <- decision_tree(mode = "classification") |>
 tidypredict_fit(parsnip_model)
 ```
 
+## Boosted models
+
+`C5.0` can boost several trees together, which `parsnip` exposes through `boost_tree()`. Each trial casts a confidence-weighted vote, and the class with the greatest total vote is predicted. `tidypredict` reproduces this by summing the per-trial votes and picking the winning class:
+
+```{r}
+boosted_model <- boost_tree(mode = "classification", trees = 5) |>
+  set_engine("C5.0") |>
+  fit(Species ~ ., data = iris)
+
+tidypredict_fit(boosted_model)
+```
+
 ## Limitations
 
-Only single decision trees are supported. Boosted models (`trials > 1`) and rule-based models (`rules = TRUE`) cannot be translated and will raise an error.
+Rule-based models (`rules = TRUE`) cannot be translated and will raise an error.
