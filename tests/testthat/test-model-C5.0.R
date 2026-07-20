@@ -122,8 +122,24 @@ test_that("errors on unsupported configurations", {
   df$vs <- factor(df$vs)
 
   rules <- C50::C5.0(df[, c("wt", "cyl")], df$vs, rules = TRUE)
+  fuzzy <- C50::C5.0(
+    df[, c("wt", "cyl")],
+    df$vs,
+    control = C50::C5.0Control(fuzzyThreshold = TRUE)
+  )
+  costs <- C50::C5.0(
+    df[, c("wt", "cyl")],
+    df$vs,
+    costs = matrix(
+      c(0, 1, 2, 0),
+      nrow = 2,
+      dimnames = list(levels(df$vs), levels(df$vs))
+    )
+  )
 
   expect_snapshot(tidypredict_fit(rules), error = TRUE)
+  expect_snapshot(tidypredict_fit(fuzzy), error = TRUE)
+  expect_snapshot(tidypredict_fit(costs), error = TRUE)
 })
 
 test_that("SQL translation works", {
