@@ -98,4 +98,4 @@ tidypredict_fit(boosted_model)
 
 ## Limitations
 
-Rule-based models (`rules = TRUE`) cannot be translated and will raise an error.
+Some options change how C5.0 predicts in ways that cannot be expressed as a hard-split `case_when()`, so they raise an error: rule-based models (`rules = TRUE`), fuzzy thresholds (`fuzzyThreshold = TRUE`), and models fitted with a cost matrix (`costs`).
