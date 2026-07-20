@@ -78,16 +78,68 @@ test_that("produced case_when uses .default", {
   expect_match(rlang::expr_text(tidypredict_fit(model)), "\\.default")
 })
 
+test_that("boosted models match predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs, trials = 5)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+  expect_equal(fit_pred, as.character(predict(model, df)))
+})
+
+test_that("boosted multiclass models match predict()", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, trials = 5)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), iris))
+  expect_equal(fit_pred, as.character(predict(model, iris)))
+})
+
+test_that("boosted models with categorical splits match predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  df$gear <- factor(df$gear)
+  model <- C50::C5.0(df[, c("wt", "gear", "mpg")], df$vs, trials = 5)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+  expect_equal(fit_pred, as.character(predict(model, df)))
+})
+
+test_that("boosted models round-trip through parse_model()", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, trials = 5)
+
+  pm <- parse_model(model)
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(pm), iris))
+  expect_equal(fit_pred, as.character(predict(model, iris)))
+})
+
 test_that("errors on unsupported configurations", {
   skip_if_not_installed("C50")
   df <- mtcars
   df$vs <- factor(df$vs)
 
-  boosted <- C50::C5.0(df[, c("wt", "cyl")], df$vs, trials = 5)
   rules <- C50::C5.0(df[, c("wt", "cyl")], df$vs, rules = TRUE)
+  fuzzy <- C50::C5.0(
+    df[, c("wt", "cyl")],
+    df$vs,
+    control = C50::C5.0Control(fuzzyThreshold = TRUE)
+  )
+  costs <- C50::C5.0(
+    df[, c("wt", "cyl")],
+    df$vs,
+    costs = matrix(
+      c(0, 1, 2, 0),
+      nrow = 2,
+      dimnames = list(levels(df$vs), levels(df$vs))
+    )
+  )
 
-  expect_snapshot(tidypredict_fit(boosted), error = TRUE)
   expect_snapshot(tidypredict_fit(rules), error = TRUE)
+  expect_snapshot(tidypredict_fit(fuzzy), error = TRUE)
+  expect_snapshot(tidypredict_fit(costs), error = TRUE)
 })
 
 test_that("SQL translation works", {

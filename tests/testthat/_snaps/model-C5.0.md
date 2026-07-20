@@ -8,16 +8,24 @@
 # errors on unsupported configurations
 
     Code
-      tidypredict_fit(boosted)
+      tidypredict_fit(rules)
     Condition
-      Error in `c50_tree_info_full()`:
-      ! tidypredict does not support boosted C5.0 models (`trials > 1`).
+      Error in `c50_check_supported()`:
+      ! tidypredict does not support rule-based C5.0 models (`rules = TRUE`).
 
 ---
 
     Code
-      tidypredict_fit(rules)
+      tidypredict_fit(fuzzy)
     Condition
-      Error in `c50_tree_info_full()`:
-      ! tidypredict does not support rule-based C5.0 models (`rules = TRUE`).
+      Error in `c50_check_supported()`:
+      ! tidypredict does not support C5.0 models with fuzzy thresholds (`fuzzyThreshold = TRUE`).
+
+---
+
+    Code
+      tidypredict_fit(costs)
+    Condition
+      Error in `c50_check_supported()`:
+      ! tidypredict does not support C5.0 models fitted with a cost matrix (`costs`).
 

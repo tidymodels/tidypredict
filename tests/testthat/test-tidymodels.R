@@ -49,6 +49,23 @@ test_that("works with decision_tree() and the C5.0 engine", {
   expect_snapshot(tidypredict_test(model, df = df))
 })
 
+test_that("works with boost_tree() and the C5.0 engine", {
+  skip_if_not_installed("C50")
+
+  model <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::boost_tree(mode = "classification", trees = 10),
+      "C5.0"
+    ),
+    Species ~ .,
+    data = iris
+  )
+
+  expect_type(tidypredict_fit(model), "language")
+  expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
+  expect_snapshot(tidypredict_test(model, df = iris))
+})
+
 test_that("works with linear_reg() and the glm engine", {
   model <- parsnip::fit(
     parsnip::set_engine(parsnip::linear_reg(), "glm"),
