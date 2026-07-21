@@ -8,10 +8,14 @@ vignette: >
 ---
 
 ```{r, include = FALSE}
-# H2O predictions require a running H2O cluster, so the chunks below are only
-# evaluated when h2o is installed and a cluster can be started.
+# H2O predictions require the h2o and agua packages to load and a running H2O
+# cluster, so the chunks below are only evaluated when all of that is available.
 h2o_available <- FALSE
-if (requireNamespace("h2o", quietly = TRUE)) {
+if (
+  requireNamespace("h2o", quietly = TRUE) &&
+    requireNamespace("agua", quietly = TRUE) &&
+    requireNamespace("parsnip", quietly = TRUE)
+) {
   h2o_available <- tryCatch(
     {
       suppressMessages(h2o::h2o.init())
