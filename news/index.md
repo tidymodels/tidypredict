@@ -2,6 +2,15 @@
 
 ## tidypredict (development version)
 
+- Added support for H2O gradient boosting models (`H2ORegressionModel`,
+  `H2OBinomialModel`, and `H2OMultinomialModel`), including
+  [`boost_tree()`](https://parsnip.tidymodels.org/reference/boost_tree.html)
+  parsnip models fitted with the `"h2o_gbm"` engine, for regression and
+  classification. Only GBM models are supported (not H2O’s XGBoost),
+  predictions require a running H2O cluster, and gaussian, bernoulli,
+  and multinomial distributions are supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for
   [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
   gradient boosting regression models, including
