@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for `mboost::blackboost()` gradient boosting regression models, including `boost_tree()` parsnip models fitted with the `"mboost"` engine. Only the `Gaussian()` family is supported. (#232)
+
 - Added support for `aorsf::orsf()` oblique random forest regression models, including `rand_forest()` parsnip models fitted with the `"aorsf"` engine. Only numeric predictors are supported and classification is not supported. (#232)
 
 - Added support for `C50::C5.0()` classification tree models, including `decision_tree()` and `boost_tree()` parsnip models fitted with the `"C5.0"` engine. Boosted models (`trials > 1`) combine trials by confidence-weighted voting. Rule-based models (`rules = TRUE`), fuzzy thresholds (`fuzzyThreshold = TRUE`), and cost matrices (`costs`) are not supported. (#232)
