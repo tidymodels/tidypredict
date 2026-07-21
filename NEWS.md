@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for H2O gradient boosting models (`H2ORegressionModel`, `H2OBinomialModel`, and `H2OMultinomialModel`), including `boost_tree()` parsnip models fitted with the `"h2o_gbm"` engine, for regression and classification. Only GBM models are supported (not H2O's XGBoost), predictions require a running H2O cluster, and gaussian, bernoulli, and multinomial distributions are supported. (#232)
+
 - Added support for `mboost::blackboost()` gradient boosting regression models, including `boost_tree()` parsnip models fitted with the `"mboost"` engine. Only the `Gaussian()` family is supported. (#232)
 
 - Added support for `aorsf::orsf()` oblique random forest regression models, including `rand_forest()` parsnip models fitted with the `"aorsf"` engine. Only numeric predictors are supported and classification is not supported. (#232)

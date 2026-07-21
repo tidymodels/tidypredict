@@ -1,0 +1,134 @@
+---
+title: "Gradient boosting, using H2O"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Gradient boosting, using H2O}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+# H2O predictions require the h2o and agua packages to load and a running H2O
+# cluster, so the chunks below are only evaluated when all of that is available.
+h2o_available <- FALSE
+if (
+  requireNamespace("h2o", quietly = TRUE) &&
+    requireNamespace("agua", quietly = TRUE) &&
+    requireNamespace("parsnip", quietly = TRUE)
+) {
+  h2o_available <- tryCatch(
+    {
+      suppressMessages(h2o::h2o.init())
+      h2o::h2o.no_progress()
+      TRUE
+    },
+    error = function(e) FALSE
+  )
+}
+
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = h2o_available
+)
+
+library(dplyr)
+library(tidypredict)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`                       |
+|`tidypredict_test()`                                           |
+|`parsnip`                                                      |
+
+## How it works
+
+`tidypredict` supports H2O gradient boosting models (GBM) fitted through the
+`parsnip` package with the `"h2o_gbm"` engine of `boost_tree()`, which is
+provided by the `agua` package. Both regression and classification are
+supported.
+
+```{r}
+library(parsnip)
+library(agua)
+
+model <- boost_tree(mode = "regression", trees = 10) |>
+  set_engine("h2o_gbm") |>
+  fit(mpg ~ wt + cyl + hp, data = mtcars)
+```
+
+## Under the hood
+
+An H2O model is a handle into a running H2O cluster. `tidypredict` pulls each
+boosted tree from the cluster with `h2o::h2o.getModelTree()` and turns it into a
+nested `dplyr::case_when()` statement. The individual tree contributions are
+added together (along with the model's initial value) to form the Tidy Eval
+formula. Because the trees live in the cluster, an active `h2o.init()`
+connection is required.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere it can be operated.
+`tidypredict` provides these paths:
+
+- Use directly inside `dplyr`, `mutate(mtcars, !! tidypredict_fit(model))`
+- Use `tidypredict_sql(model)` to retrieve the SQL statement
+
+```{r}
+tidypredict_sql(model, dbplyr::simulate_dbi())
+```
+
+## Categorical predictors
+
+H2O handles categorical predictors natively. The generated formula uses `%in%`
+for categorical splits.
+
+```{r}
+mtcars2 <- mtcars
+mtcars2$cyl <- factor(mtcars2$cyl)
+mtcars2$gear <- factor(mtcars2$gear)
+
+model_cat <- boost_tree(mode = "regression", trees = 10) |>
+  set_engine("h2o_gbm") |>
+  fit(mpg ~ cyl + gear + wt, data = mtcars2)
+
+tidypredict_fit(model_cat)
+```
+
+## Classification
+
+For binary classification, `tidypredict_fit()` returns the probability of the
+second (positive) outcome level via the logistic link.
+
+```{r}
+mtcars3 <- mtcars
+mtcars3$vs <- factor(mtcars3$vs)
+
+model_bin <- boost_tree(mode = "classification", trees = 10) |>
+  set_engine("h2o_gbm") |>
+  fit(vs ~ wt + cyl + hp, data = mtcars3)
+
+tidypredict_fit(model_bin)
+```
+
+For multiclass classification, `tidypredict_fit()` returns a named list with one
+softmax probability formula per class.
+
+```{r}
+model_multi <- boost_tree(mode = "classification", trees = 10) |>
+  set_engine("h2o_gbm") |>
+  fit(Species ~ ., data = iris)
+
+names(tidypredict_fit(model_multi))
+```
+
+## Limitations
+
+Only H2O's GBM models are supported, not H2O's XGBoost. The gaussian,
+bernoulli, and multinomial distributions are supported. Because predictions
+require a live H2O cluster, the parsed formula cannot be reused after the
+cluster is shut down.

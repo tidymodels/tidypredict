@@ -30,6 +30,7 @@ Imports:
     tibble,
     tidyr
 Suggests:
+    agua,
     aorsf,
     bonsai,
     C50,
@@ -39,6 +40,7 @@ Suggests:
     dbplyr,
     earth (>= 5.1.2),
     glmnet,
+    h2o,
     LiblineaR,
     lightgbm,
     mboost,
