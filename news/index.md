@@ -3,6 +3,14 @@
 ## tidypredict (development version)
 
 - Added support for
+  [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
+  gradient boosting regression models, including
+  [`boost_tree()`](https://parsnip.tidymodels.org/reference/boost_tree.html)
+  parsnip models fitted with the `"mboost"` engine. Only the
+  `Gaussian()` family is supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`aorsf::orsf()`](https://docs.ropensci.org/aorsf/reference/orsf.html)
   oblique random forest regression models, including
   [`rand_forest()`](https://parsnip.tidymodels.org/reference/rand_forest.html)
