@@ -295,13 +295,37 @@ summing the per-trial votes and picking the winning class:</p>
 <span><span class="co">#&gt;     .default = 0.742434886685921)) ~ "versicolor", .default = "virginica")</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="rule-based-models">Rule-based models<a class="anchor" aria-label="anchor" href="#rule-based-models"></a>
+</h2>
+<p>Instead of a tree, <code>C5.0</code> can produce an ordered set of
+rules (<code>rules = TRUE</code>), which <code>parsnip</code> exposes
+through <code><a href="https://parsnip.tidymodels.org/reference/C5_rules.html" class="external-link">C5_rules()</a></code>. Each rule that a case satisfies casts a
+confidence-weighted vote for its class, and the class with the greatest
+total vote is predicted (the default class wins ties and cases matched
+by no rule). <code>tidypredict</code> reproduces this by summing the
+per-rule votes and picking the winning class:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rule_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C5.0</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>, <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, rules <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">rule_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; case_when(dplyr::if_else(Petal.Length &lt;= 1.9, 0.9807692, 0) &gt;= </span></span>
+<span><span class="co">#&gt;     dplyr::if_else(Petal.Length &gt; 1.9 &amp; Petal.Length &lt;= 4.9000001 &amp; </span></span>
+<span><span class="co">#&gt;         Petal.Width &lt;= 1.7, 0.96, 0) &amp; dplyr::if_else(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.9, 0.9807692, 0) &gt;= dplyr::if_else(Petal.Width &gt; 1.7, 0.9583333, </span></span>
+<span><span class="co">#&gt;     0) + dplyr::if_else(Petal.Length &gt; 4.9000001, 0.9375, 0) ~ </span></span>
+<span><span class="co">#&gt;     "setosa", dplyr::if_else(Petal.Length &gt; 1.9 &amp; Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     4.9000001 &amp; Petal.Width &lt;= 1.7, 0.96, 0) &gt;= dplyr::if_else(Petal.Width &gt; </span></span>
+<span><span class="co">#&gt;     1.7, 0.9583333, 0) + dplyr::if_else(Petal.Length &gt; 4.9000001, </span></span>
+<span><span class="co">#&gt;     0.9375, 0) ~ "versicolor", .default = "virginica")</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
 </h2>
 <p>Some options change how C5.0 predicts in ways that cannot be
 expressed as a hard-split <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code>, so they raise an
-error: rule-based models (<code>rules = TRUE</code>), fuzzy thresholds
-(<code>fuzzyThreshold = TRUE</code>), and models fitted with a cost
-matrix (<code>costs</code>).</p>
+error: fuzzy thresholds (<code>fuzzyThreshold = TRUE</code>), models
+fitted with a cost matrix (<code>costs</code>), and boosted rule-based
+models (<code>rules = TRUE</code> with <code>trials &gt; 1</code>).</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
