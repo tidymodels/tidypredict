@@ -54,6 +54,7 @@ Suggests:
     randomForest,
     ranger (>= 0.14.1),
     rpart (>= 4.1.0),
+    rules,
     rmarkdown,
     RSQLite,
     survival,

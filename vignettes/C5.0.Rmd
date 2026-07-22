@@ -96,6 +96,16 @@ boosted_model <- boost_tree(mode = "classification", trees = 5) |>
 tidypredict_fit(boosted_model)
 ```
 
+## Rule-based models
+
+Instead of a tree, `C5.0` can produce an ordered set of rules (`rules = TRUE`), which `parsnip` exposes through `C5_rules()`. Each rule that a case satisfies casts a confidence-weighted vote for its class, and the class with the greatest total vote is predicted (the default class wins ties and cases matched by no rule). `tidypredict` reproduces this by summing the per-rule votes and picking the winning class:
+
+```{r}
+rule_model <- C5.0(iris[, 1:4], iris$Species, rules = TRUE)
+
+tidypredict_fit(rule_model)
+```
+
 ## Limitations
 
-Some options change how C5.0 predicts in ways that cannot be expressed as a hard-split `case_when()`, so they raise an error: rule-based models (`rules = TRUE`), fuzzy thresholds (`fuzzyThreshold = TRUE`), and models fitted with a cost matrix (`costs`).
+Some options change how C5.0 predicts in ways that cannot be expressed as a hard-split `case_when()`, so they raise an error: fuzzy thresholds (`fuzzyThreshold = TRUE`), models fitted with a cost matrix (`costs`), and boosted rule-based models (`rules = TRUE` with `trials > 1`).
