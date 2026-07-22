@@ -28,6 +28,16 @@
       
        All results are within the difference threshold
 
+# works with C5_rules() and the C5.0 engine
+
+    Code
+      tidypredict_test(model, df = iris)
+    Output
+      tidypredict test results
+      Difference threshold: 1e-12
+      
+       All results are within the difference threshold
+
 # works with boost_tree() and the C5.0 engine
 
     Code

@@ -121,7 +121,6 @@ test_that("errors on unsupported configurations", {
   df <- mtcars
   df$vs <- factor(df$vs)
 
-  rules <- C50::C5.0(df[, c("wt", "cyl")], df$vs, rules = TRUE)
   fuzzy <- C50::C5.0(
     df[, c("wt", "cyl")],
     df$vs,
@@ -137,7 +136,6 @@ test_that("errors on unsupported configurations", {
     )
   )
 
-  expect_snapshot(tidypredict_fit(rules), error = TRUE)
   expect_snapshot(tidypredict_fit(fuzzy), error = TRUE)
   expect_snapshot(tidypredict_fit(costs), error = TRUE)
 })
@@ -186,6 +184,116 @@ test_that("model can be saved and re-loaded", {
     rlang::expr_text(tidypredict_fit(pm)),
     rlang::expr_text(tidypredict_fit(pm2))
   )
+})
+
+test_that("rule-based models return the right output", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs, rules = TRUE)
+
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_type(tf, "language")
+
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "C5.0")
+  expect_equal(pm$general$version, 3)
+
+  expect_snapshot(rlang::expr_text(tf))
+})
+
+test_that("rule-based models with numeric predictors match predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs, rules = TRUE)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+  expect_equal(fit_pred, as.character(predict(model, df)))
+})
+
+test_that("rule-based models with categorical predictors match predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  df$gear <- factor(df$gear)
+  model <- C50::C5.0(df[, c("wt", "gear", "mpg")], df$vs, rules = TRUE)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+  expect_equal(fit_pred, as.character(predict(model, df)))
+})
+
+test_that("rule-based multiclass models match predict()", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), iris))
+  expect_equal(fit_pred, as.character(predict(model, iris)))
+})
+
+test_that("rule-based models with subset and equality conditions match predict()", {
+  skip_if_not_installed("C50")
+  skip_if_not_installed("modeldata")
+  data(attrition, package = "modeldata", envir = environment())
+  x <- attrition[, setdiff(names(attrition), "Attrition")]
+  model <- C50::C5.0(x, attrition$Attrition, rules = TRUE)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), attrition))
+  expect_equal(fit_pred, as.character(predict(model, attrition)))
+})
+
+test_that("rule-based models round-trip through parse_model()", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE)
+
+  pm <- parse_model(model)
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(pm), iris))
+  expect_equal(fit_pred, as.character(predict(model, iris)))
+})
+
+test_that("rule-based models can be saved and re-loaded", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE)
+
+  pm <- parse_model(model)
+  tmp <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, tmp)
+  pm2 <- as_parsed_model(yaml::read_yaml(tmp))
+
+  expect_equal(
+    rlang::expr_text(tidypredict_fit(pm)),
+    rlang::expr_text(tidypredict_fit(pm2))
+  )
+})
+
+test_that("boosted rule-based models are not supported", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE, trials = 3)
+
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
+})
+
+test_that("rule-based predictions round-trip through a SQLite database", {
+  skip_if_not_installed("C50")
+  skip_if_not_installed("DBI")
+  skip_if_not_installed("RSQLite")
+  skip_if_not_installed("dbplyr")
+
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs, rules = TRUE)
+
+  con <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
+  withr::defer(DBI::dbDisconnect(con))
+  dplyr::copy_to(con, df, "mt")
+  db_pred <- dplyr::tbl(con, "mt") |>
+    dplyr::mutate(pred = !!tidypredict_fit(model)) |>
+    dplyr::pull(pred)
+
+  expect_equal(as.character(db_pred), as.character(predict(model, df)))
 })
 
 test_that(".c50_tree_info_full is exported and works", {
