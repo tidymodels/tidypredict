@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Added support for `kernlab::ksvm()` linear support vector machine models (`vanilladot` kernel), including `svm_linear()` parsnip models fitted with the `"kernlab"` engine, for regression and binary classification. Non-linear kernels and multiclass classification are not supported, and classification requires a probability model (`prob.model = TRUE`). (#232)
+
 - Added support for H2O gradient boosting models (`H2ORegressionModel`, `H2OBinomialModel`, and `H2OMultinomialModel`), including `boost_tree()` parsnip models fitted with the `"h2o_gbm"` engine, for regression and classification. Only GBM models are supported (not H2O's XGBoost), predictions require a running H2O cluster, and gaussian, bernoulli, and multinomial distributions are supported. (#232)
 
 - Added support for `mboost::blackboost()` gradient boosting regression models, including `boost_tree()` parsnip models fitted with the `"mboost"` engine. Only the `Gaussian()` family is supported. (#232)
