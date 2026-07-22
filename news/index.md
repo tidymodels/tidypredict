@@ -2,6 +2,16 @@
 
 ## tidypredict (development version)
 
+- Added support for
+  [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) linear
+  support vector machine models (`vanilladot` kernel), including
+  [`svm_linear()`](https://parsnip.tidymodels.org/reference/svm_linear.html)
+  parsnip models fitted with the `"kernlab"` engine, for regression and
+  binary classification. Non-linear kernels and multiclass
+  classification are not supported, and classification requires a
+  probability model (`prob.model = TRUE`).
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for H2O gradient boosting models (`H2ORegressionModel`,
   `H2OBinomialModel`, and `H2OMultinomialModel`), including
   [`boost_tree()`](https://parsnip.tidymodels.org/reference/boost_tree.html)

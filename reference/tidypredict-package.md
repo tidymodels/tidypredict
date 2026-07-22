@@ -6,7 +6,7 @@ databases back-ends because it leverages 'dplyr' and 'dbplyr' for the
 final 'SQL' translation of the algorithm. It currently supports lm(),
 glm(), randomForest(), ranger(), rpart(), C5.0(), earth(),
 xgb.Booster.complete(), lgb.Booster(), catboost.Model(), cubist(),
-ctree(), and cforest() models.
+ctree(), cforest(), and ksvm() models.
 
 ## See also
 
