@@ -2,6 +2,17 @@
 
 ## tidypredict (development version)
 
+- Added support for multinomial
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  models (`family = "multinomial"`), including
+  [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
+  parsnip models fitted with the `"glmnet"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions (softmax), and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#198](https://github.com/tidymodels/tidypredict/issues/198))
+
 - Added support for
   [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) linear
   support vector machine models (`vanilladot` kernel), including
