@@ -14,7 +14,7 @@
 
 - Added support for `partykit::cforest()` random forest regression models, including `rand_forest()` parsnip models fitted with the `"partykit"` engine. Classification is not supported. (#232)
 
-- Added support for `LiblineaR::LiblineaR()` binary logistic regression models, including `logistic_reg()` parsnip models fitted with the `"LiblineaR"` engine. (#232)
+- Added support for `LiblineaR::LiblineaR()` binary logistic regression models (`type` 0, 6, 7), including `logistic_reg()` parsnip models fitted with the `"LiblineaR"` engine. Also added support for linear support vector machine models, including `svm_linear()` parsnip models fitted with the `"LiblineaR"` engine, for regression (`type` 11, 12, 13) and binary classification (`type` 1-5). Classification returns the SVM decision value rather than a probability. (#232)
 
 - Added support for `decision_tree()` parsnip models fitted with the `"rpart"` engine. (#232)
 
