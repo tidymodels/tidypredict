@@ -80,21 +80,55 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("errors on non-logistic and multiclass models", {
+test_that("predictions match predict() for SVM classification types", {
   skip_if_not_installed("LiblineaR")
 
   df <- mtcars
   df$am <- factor(df$am)
-  x <- as.matrix(df[, c("mpg", "cyl")])
-  svm <- LiblineaR::LiblineaR(data = x, target = df$am, type = 1)
-  expect_snapshot(tidypredict_fit(svm), error = TRUE)
+  x <- as.matrix(df[, c("mpg", "cyl", "hp")])
 
-  multi <- LiblineaR::LiblineaR(
+  for (type in 1:5) {
+    model <- LiblineaR::LiblineaR(data = x, target = df$am, type = type)
+    te <- rlang::eval_tidy(tidypredict_fit(model), df)
+    target <- as.character(model$ClassNames)[[1]]
+    base <- predict(model, x, decisionValues = TRUE)$decisionValues[, target]
+    expect_equal(te, unname(base), tolerance = 1e-10)
+    expect_false(tidypredict_test(model, df)$alert)
+  }
+})
+
+test_that("predictions match predict() for regression types", {
+  skip_if_not_installed("LiblineaR")
+
+  x <- as.matrix(mtcars[, c("wt", "hp", "disp")])
+
+  for (type in 11:13) {
+    model <- suppressWarnings(
+      LiblineaR::LiblineaR(data = x, target = mtcars$mpg, type = type)
+    )
+    te <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+    base <- predict(model, x)$predictions
+    expect_equal(te, unname(base), tolerance = 1e-10)
+    expect_false(tidypredict_test(model, mtcars)$alert)
+  }
+})
+
+test_that("errors on unsupported and multiclass models", {
+  skip_if_not_installed("LiblineaR")
+
+  multi_lr <- LiblineaR::LiblineaR(
     data = as.matrix(iris[, 1:4]),
     target = iris$Species,
     type = 0
   )
-  expect_snapshot(tidypredict_fit(multi), error = TRUE)
+  expect_snapshot(tidypredict_fit(multi_lr), error = TRUE)
+
+  multi_svm <- LiblineaR::LiblineaR(
+    data = as.matrix(iris[, 1:4]),
+    target = iris$Species,
+    type = 1
+  )
+  expect_snapshot(tidypredict_fit(multi_svm), error = TRUE)
 })
 
 test_that("SQL translation works", {
