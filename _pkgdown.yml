@@ -24,6 +24,8 @@ navbar:
       href: articles/glm.html
     - text: Regularized Regression - glmnet()
       href: articles/glmnet.html
+    - text: Multinomial Regression - multinom()
+      href: articles/multinom.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()
