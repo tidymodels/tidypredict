@@ -67,9 +67,15 @@
 
 - Added support for
   [`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html)
-  binary logistic regression models, including
+  binary logistic regression models (`type` 0, 6, 7), including
   [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html)
-  parsnip models fitted with the `"LiblineaR"` engine.
+  parsnip models fitted with the `"LiblineaR"` engine. Also added
+  support for linear support vector machine models, including
+  [`svm_linear()`](https://parsnip.tidymodels.org/reference/svm_linear.html)
+  parsnip models fitted with the `"LiblineaR"` engine, for regression
+  (`type` 11, 12, 13) and binary classification (`type` 1-5).
+  Classification returns the SVM decision value rather than a
+  probability.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for
