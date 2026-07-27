@@ -48,6 +48,7 @@ Suggests:
     methods,
     mlbench,
     modeldata,
+    nnet,
     nycflights13,
     parsnip,
     partykit,
