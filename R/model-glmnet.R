@@ -3,13 +3,7 @@
 #' @export
 tidypredict_fit.glmnet <- function(model) {
   if (inherits(model, "multnet")) {
-    cli::cli_abort(
-      c(
-        "Multinomial glmnet models are not supported.",
-        "i" = "Models fit with {.code family = \"multinomial\"} have multiple
-        outcome columns which is not supported."
-      )
-    )
+    return(build_fit_formula_multinom(parse_model(model)))
   }
   if (inherits(model, "mrelnet")) {
     cli::cli_abort(
@@ -28,6 +22,9 @@ tidypredict_fit.glmnet <- function(model) {
 
 #' @export
 parse_model.glmnet <- function(model) {
+  if (inherits(model, "multnet")) {
+    return(parse_model_glmnet_multinom(model))
+  }
   parse_model_glmnet(model)
 }
 
@@ -93,6 +90,69 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   } # nocov end
 
   as_parsed_model(pm)
+}
+
+glmnet_multinom_terms <- function(coefs) {
+  names <- names(coefs)
+  values <- as.vector(coefs)
+
+  terms <- map2(values, names, function(value, name) {
+    if (value == 0) {
+      return(NULL)
+    }
+    list(
+      label = name,
+      coef = value,
+      is_intercept = as.integer(name == "(Intercept)"),
+      fields = list(list(type = "ordinary", col = name))
+    )
+  })
+
+  purrr::discard(terms, is.null)
+}
+
+parse_model_glmnet_multinom <- function(model, call = rlang::caller_env()) {
+  if (length(model$lambda) != 1) {
+    cli::cli_abort(
+      "{.fn tidypredict_fit} requires that there are only 1 penalty selected,
+      {length(model$lambda)} were provided.",
+      call = call
+    )
+  }
+
+  classes <- model$classnames
+  a0 <- model$a0
+
+  class_terms <- lapply(classes, function(cl) {
+    beta <- model$beta[[cl]]
+    beta <- setNames(as.numeric(beta), rownames(beta))
+    coefs <- c("(Intercept)" = unname(a0[cl, ]), beta)
+    glmnet_multinom_terms(coefs)
+  })
+
+  pm <- list()
+  pm$general$model <- class(model)[[2]]
+  pm$general$version <- 1
+  pm$general$type <- "multiclass_regression"
+  pm$general$family <- "multinomial"
+  pm$classes <- classes
+  pm$class_terms <- class_terms
+
+  as_parsed_model(pm)
+}
+
+build_fit_formula_multinom <- function(parsedmodel) {
+  lps <- map(parsedmodel$class_terms, build_linear_predictor)
+  exp_lps <- map(lps, ~ expr(exp(!!.x)))
+  denom <- reduce_addition(exp_lps)
+  res <- map(lps, ~ expr(exp(!!.x) / (!!denom)))
+  names(res) <- parsedmodel$classes
+  res
+}
+
+#' @export
+tidypredict_fit.pm_multiclass_regression <- function(model) {
+  build_fit_formula_multinom(model)
 }
 
 # For {orbital}

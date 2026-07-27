@@ -155,15 +155,104 @@ test_that("Cox family works (#201)", {
   expect_equal(tidy, native)
 })
 
-test_that("multinomial family errors with helpful message (#198)", {
+test_that("multinomial family is supported (#198)", {
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
     family = "multinomial",
-    lambda = 0.5
+    lambda = 0.05
+  )
+
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_type(tf, "list")
+  expect_named(tf, levels(iris$Species))
+  expect_true(all(vapply(tf, is.language, logical(1))))
+
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 3)
+  expect_equal(pm$general$model, "glmnet")
+  expect_equal(pm$general$family, "multinomial")
+  expect_equal(pm$general$version, 1)
+
+  probs <- sapply(tf, function(f) rlang::eval_tidy(f, iris))
+  native <- predict(model, as.matrix(iris[, 1:4]), type = "response")[,, 1]
+
+  expect_equal(unname(probs), unname(native))
+  expect_equal(unname(rowSums(probs)), rep(1, nrow(iris)))
+
+  lps <- lapply(pm$class_terms, build_linear_predictor)
+  expect_snapshot(lapply(lps, round_print))
+})
+
+test_that("multinomial model can be saved and re-loaded", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.05
+  )
+
+  pm <- parse_model(model)
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(pm, mp)
+  pm <- as_parsed_model(yaml::read_yaml(mp))
+
+  from_model <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, iris))
+  from_pm <- sapply(tidypredict_fit(pm), \(f) rlang::eval_tidy(f, iris))
+
+  expect_equal(from_model, from_pm, tolerance = 1e-6)
+})
+
+test_that("multinomial errors with multiple penalties", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial"
   )
 
   expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
+test_that("tidypredict_test errors for multinomial models", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.05
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_test(model, iris[, 1:4]))
+})
+
+test_that("multinomial is handled with parsnip", {
+  spec <- parsnip::multinom_reg(engine = "glmnet", penalty = 0.05)
+  model <- parsnip::fit(spec, Species ~ ., iris)
+
+  tf <- tidypredict_fit(model)
+
+  expect_type(tf, "list")
+  expect_named(tf, levels(iris$Species))
+
+  probs <- sapply(tf, function(f) rlang::eval_tidy(f, iris))
+  native <- as.matrix(predict(model, iris, type = "prob"))
+
+  expect_equal(unname(probs), unname(native))
+})
+
+test_that("multinomial SQL translation works", {
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.05
+  )
+
+  sql <- tidypredict_sql(model, dbplyr::simulate_dbi())
+
+  expect_named(sql, levels(iris$Species))
+  expect_true(all(vapply(sql, \(x) inherits(x, "sql"), logical(1))))
 })
 
 test_that("mgaussian family errors with helpful message (#199)", {
