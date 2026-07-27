@@ -374,6 +374,15 @@ tidypredict_test.glmnet <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
+  if (inherits(model, "multnet")) {
+    cli::cli_abort(
+      c(
+        "{.fn tidypredict_test} does not support multinomial glmnet models.",
+        "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
+      )
+    )
+  }
+
   if (is.numeric(max_rows)) {
     df <- head(df, max_rows) # nocov
   }

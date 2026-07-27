@@ -26,6 +26,19 @@ parse_model.model_fit <- function(model) {
 # glmnet adjustment ------------------------------------------------------
 
 glmnet_set_lambda <- function(model) {
+  if (inherits(model$fit, "multnet")) {
+    penalty <- model$spec$args$penalty
+    coefs <- stats::coef(model$fit, s = penalty)
+
+    classes <- names(coefs)
+    a0 <- vapply(coefs, function(x) x["(Intercept)", 1], numeric(1))
+    model$fit$a0 <- matrix(a0, ncol = 1, dimnames = list(classes, NULL))
+    model$fit$beta <- lapply(coefs, function(x) {
+      x["(Intercept)" != rownames(x), , drop = FALSE]
+    })
+    model$fit$lambda <- penalty
+    return(model)
+  }
   if (inherits(model$fit, "glmnet")) {
     penalty <- model$spec$args$penalty
     coef <- glmnet::predict.glmnet(
