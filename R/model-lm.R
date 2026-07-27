@@ -7,8 +7,22 @@ tidypredict_fit.lm <- function(model) {
 }
 
 build_fit_formula <- function(parsedmodel) {
+  f <- build_linear_predictor(parsedmodel$terms)
+
+  if (!is.null(parsedmodel$general$offset)) {
+    f <- expr_addition(f, parsedmodel$general$offset)
+  }
+
+  if (parsedmodel$general$is_glm == 1) {
+    link <- parsedmodel$general$link
+    f <- apply_inverse_link(f, link)
+  }
+  f
+}
+
+build_linear_predictor <- function(terms) {
   parsed_f <- map(
-    parsedmodel$terms,
+    terms,
     ~ {
       if (.x$is_intercept == 0) {
         cols <- map(.x$fields, lm_constructor)
@@ -25,17 +39,11 @@ build_fit_formula <- function(parsedmodel) {
   )
   parsed_f <- purrr::discard(parsed_f, is.null)
 
-  f <- reduce_addition(parsed_f)
-
-  if (!is.null(parsedmodel$general$offset)) {
-    f <- expr_addition(f, parsedmodel$general$offset)
+  if (length(parsed_f) == 0) {
+    return(expr(0))
   }
 
-  if (parsedmodel$general$is_glm == 1) {
-    link <- parsedmodel$general$link
-    f <- apply_inverse_link(f, link)
-  }
-  f
+  reduce_addition(parsed_f)
 }
 
 apply_inverse_link <- function(f, link) {
