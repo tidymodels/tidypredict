@@ -11,17 +11,30 @@ tidypredict_fit.LiblineaR <- function(model) {
 #' @export
 parse_model.LiblineaR <- function(model) parse_model_liblinear(model)
 
+# LiblineaR `type` codes fall into three families: logistic-regression
+# classifiers (probabilities), SVM classifiers (a raw decision value), and
+# support-vector regression (a linear prediction).
+liblinear_lr_types <- c(0, 6, 7)
+liblinear_svm_class_types <- c(1, 2, 3, 4, 5)
+liblinear_regression_types <- c(11, 12, 13)
+
 parse_model_liblinear <- function(model, call = rlang::caller_env()) {
-  if (!model$Type %in% c(0, 6, 7)) {
+  is_lr <- model$Type %in% liblinear_lr_types
+  is_svm_class <- model$Type %in% liblinear_svm_class_types
+  is_regression <- model$Type %in% liblinear_regression_types
+
+  if (!is_lr && !is_svm_class && !is_regression) {
     cli::cli_abort(
       c(
-        "Only logistic regression {.pkg LiblineaR} models are supported.",
-        i = "The model {.arg type} must be one of 0, 6, or 7, not {model$Type}."
+        "This {.pkg LiblineaR} model {.arg type} is not supported.",
+        i = "The model {.arg type} must be one of {.val {c(liblinear_lr_types,
+          liblinear_svm_class_types, liblinear_regression_types)}}, not
+          {model$Type}."
       ),
       call = call
     )
   }
-  if (model$NbClass != 2) {
+  if ((is_lr || is_svm_class) && model$NbClass != 2) {
     cli::cli_abort(
       c(
         "Only binary classification {.pkg LiblineaR} models are supported.",
@@ -34,22 +47,32 @@ parse_model_liblinear <- function(model, call = rlang::caller_env()) {
   weights <- model$W[1, ]
   names(weights) <- colnames(model$W)
 
-  # The decision value corresponds to the first class in `ClassNames`, while
-  # tidypredict follows the glm convention of predicting the second factor
-  # level. Flip the sign when they disagree.
-  class_names <- as.character(model$ClassNames)
-  levs <- levels(model$ClassNames)
-  if (class_names[[1]] != levs[[2]]) {
-    weights <- -weights
+  if (is_lr) {
+    # The decision value corresponds to the first class in `ClassNames`, while
+    # tidypredict follows the glm convention of predicting the second factor
+    # level. Flip the sign when they disagree.
+    class_names <- as.character(model$ClassNames)
+    levs <- levels(model$ClassNames)
+    if (class_names[[1]] != levs[[2]]) {
+      weights <- -weights
+    }
   }
 
   pm <- list()
   pm$general$model <- "LiblineaR"
   pm$general$version <- 2
   pm$general$type <- "regression"
-  pm$general$is_glm <- 1
-  pm$general$family <- "binomial"
-  pm$general$link <- "logit"
+  if (is_lr) {
+    # Logistic regression exposes probabilities: reuse the glm logit machinery
+    # so `build_fit_formula()` emits `plogis(linear predictor)`.
+    pm$general$is_glm <- 1
+    pm$general$family <- "binomial"
+    pm$general$link <- "logit"
+  } else {
+    # SVM regression predictions and SVM classification decision values are both
+    # plain linear predictors.
+    pm$general$is_glm <- 0
+  }
 
   intercept <- 0
   if ("Bias" %in% names(weights) && model$Bias > 0) {
@@ -94,13 +117,21 @@ tidypredict_test.LiblineaR <- function(
   }
 
   features <- setdiff(colnames(model$W), "Bias")
-  preds <- predict(
-    model,
-    as.matrix(df[, features, drop = FALSE]),
-    proba = TRUE
-  )$probabilities
-  target <- levels(model$ClassNames)[[2]]
-  base <- data.frame(fit = as.vector(preds[, target]), row.names = NULL)
+  newx <- as.matrix(df[, features, drop = FALSE])
+
+  if (model$Type %in% liblinear_regression_types) {
+    preds <- predict(model, newx)$predictions
+  } else if (model$Type %in% liblinear_svm_class_types) {
+    # SVM classifiers only expose a decision value, oriented to the first class.
+    target <- as.character(model$ClassNames)[[1]]
+    preds <- predict(model, newx, decisionValues = TRUE)$decisionValues[,
+      target
+    ]
+  } else {
+    target <- levels(model$ClassNames)[[2]]
+    preds <- predict(model, newx, proba = TRUE)$probabilities[, target]
+  }
+  base <- data.frame(fit = as.vector(preds), row.names = NULL)
 
   te <- tidypredict_to_column(
     df,
