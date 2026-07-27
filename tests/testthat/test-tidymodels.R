@@ -161,6 +161,40 @@ test_that("works with logistic_reg() and the LiblineaR engine", {
   }
 })
 
+test_that("works with svm_linear() and the LiblineaR engine", {
+  skip_if_not_installed("LiblineaR")
+
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::svm_linear(mode = "regression"),
+      "LiblineaR"
+    ),
+    mpg ~ wt + hp + disp,
+    data = mtcars
+  )
+
+  df <- mtcars
+  df$am <- factor(ifelse(df$am == 1, "yes", "no"))
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::svm_linear(mode = "classification"),
+      "LiblineaR"
+    ),
+    am ~ wt + hp + disp,
+    data = df
+  )
+
+  for (model in list(reg, cls)) {
+    expect_type(tidypredict_fit(model), "language")
+    expect_s3_class(
+      tidypredict_sql(model, dbplyr::simulate_dbi()),
+      "sql"
+    )
+  }
+  expect_false(tidypredict_test(reg, df = mtcars)$alert)
+  expect_false(tidypredict_test(cls, df = df)$alert)
+})
+
 test_that("works with svm_linear() and the kernlab engine", {
   skip_if_not_installed("kernlab")
 
