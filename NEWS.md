@@ -20,6 +20,8 @@
 
 - Added support for `LiblineaR::LiblineaR()` binary logistic regression models (`type` 0, 6, 7), including `logistic_reg()` parsnip models fitted with the `"LiblineaR"` engine. Also added support for linear support vector machine models, including `svm_linear()` parsnip models fitted with the `"LiblineaR"` engine, for regression (`type` 11, 12, 13) and binary classification (`type` 1-5). Classification returns the SVM decision value rather than a probability. (#232)
 
+- Added support for `xrf::xrf()` rule-based models (RuleFit), including `rule_fit()` parsnip models fitted with the `"xrf"` engine, for regression (`family = "gaussian"`) and binary classification (`family = "binomial"`). Multinomial models are not supported. (#232)
+
 - Added support for `decision_tree()` parsnip models fitted with the `"rpart"` engine. (#232)
 
 - Added support for `linear_reg()` parsnip models fitted with the `"glm"` engine. (#232)
