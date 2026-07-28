@@ -8,6 +8,8 @@
 
 - Added support for H2O gradient boosting models (`H2ORegressionModel`, `H2OBinomialModel`, and `H2OMultinomialModel`), including `boost_tree()` parsnip models fitted with the `"h2o_gbm"` engine, for regression and classification. Only GBM models are supported (not H2O's XGBoost), predictions require a running H2O cluster, and gaussian, bernoulli, and multinomial distributions are supported. (#232)
 
+- Added support for H2O RuleFit models (`h2o::h2o.rulefit()`), including `rule_fit()` parsnip models fitted with the `"h2o"` engine, for regression and binary classification. Predictions require a running H2O cluster, and multiclass models are not supported because `h2o.rule_importance()` does not expose the per-class coefficients. (#232)
+
 - Added support for `mboost::blackboost()` gradient boosting regression models, including `boost_tree()` parsnip models fitted with the `"mboost"` engine. Only the `Gaussian()` family is supported. (#232)
 
 - Added support for `aorsf::orsf()` oblique random forest regression models, including `rand_forest()` parsnip models fitted with the `"aorsf"` engine. Only numeric predictors are supported and classification is not supported. (#232)

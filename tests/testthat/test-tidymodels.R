@@ -114,6 +114,29 @@ test_that("works with boost_tree() and the h2o_gbm engine", {
   expect_false(tidypredict_test(cls, df = df, threshold = 1e-6)$alert)
 })
 
+test_that("works with rule_fit() and the h2o engine", {
+  skip_if_no_h2o()
+
+  reg <- parsnip::fit(
+    parsnip::set_engine(parsnip::rule_fit(mode = "regression"), "h2o"),
+    mpg ~ wt + hp + disp,
+    data = mtcars
+  )
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+  expect_false(tidypredict_test(reg, df = mtcars, threshold = 1e-6)$alert)
+
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  cls <- parsnip::fit(
+    parsnip::set_engine(parsnip::rule_fit(mode = "classification"), "h2o"),
+    vs ~ wt + hp + disp + mpg,
+    data = df
+  )
+  expect_type(tidypredict_fit(cls), "language")
+  expect_false(tidypredict_test(cls, df = df, threshold = 1e-6)$alert)
+})
+
 test_that("works with linear_reg() and the glm engine", {
   model <- parsnip::fit(
     parsnip::set_engine(parsnip::linear_reg(), "glm"),

@@ -126,9 +126,28 @@ model_multi <- boost_tree(mode = "classification", trees = 10) |>
 names(tidypredict_fit(model_multi))
 ```
 
+## RuleFit models
+
+H2O's RuleFit models, available through the `"h2o"` engine of `rule_fit()`, are
+also supported for regression and binary classification. A RuleFit model is a
+lasso model over two kinds of terms: rules extracted from a tree ensemble, and
+the original predictors entered linearly. `tidypredict` reads both from
+`h2o::h2o.rule_importance()`, translates each rule into a
+`dplyr::case_when()` statement, and adds the terms together.
+
+```{r}
+model_rules <- rule_fit(mode = "regression") |>
+  set_engine("h2o") |>
+  fit(mpg ~ wt + hp + disp, data = mtcars)
+
+tidypredict_fit(model_rules)
+```
+
 ## Limitations
 
-Only H2O's GBM models are supported, not H2O's XGBoost. The gaussian,
-bernoulli, and multinomial distributions are supported. Because predictions
-require a live H2O cluster, the parsed formula cannot be reused after the
-cluster is shut down.
+Of H2O's tree ensembles, only GBM models are supported, not H2O's XGBoost. The
+gaussian, bernoulli, and multinomial distributions are supported. Multiclass
+RuleFit models are not supported, because `h2o::h2o.rule_importance()` does not
+expose the per-class coefficients needed to reproduce the predictions. Because
+predictions require a live H2O cluster, the parsed formula cannot be reused
+after the cluster is shut down.
