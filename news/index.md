@@ -100,6 +100,14 @@
   probability.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- Added support for [`xrf::xrf()`](https://rdrr.io/pkg/xrf/man/xrf.html)
+  rule-based models (RuleFit), including
+  [`rule_fit()`](https://parsnip.tidymodels.org/reference/rule_fit.html)
+  parsnip models fitted with the `"xrf"` engine, for regression
+  (`family = "gaussian"`) and binary classification
+  (`family = "binomial"`). Multinomial models are not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for
   [`decision_tree()`](https://parsnip.tidymodels.org/reference/decision_tree.html)
   parsnip models fitted with the `"rpart"` engine.
