@@ -347,3 +347,53 @@ test_that("works with linear_reg() and the quantreg engine", {
     tidypredict_test(model, df = mtcars)
   )
 })
+
+test_that("works with rule_fit() and the xrf engine", {
+  skip_if_not_installed("rules")
+  skip_if_not_installed("xrf")
+  # {rules} must be attached for parsnip's xrf prediction to resolve.
+  withr::local_package("rules")
+
+  df <- mtcars
+  df$cyl <- factor(df$cyl)
+
+  set.seed(1)
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rule_fit(mode = "regression", trees = 5, penalty = 0.1),
+      "xrf"
+    ),
+    mpg ~ wt + hp + cyl,
+    data = df
+  )
+
+  cls_df <- mtcars
+  cls_df$am <- factor(ifelse(cls_df$am == 1, "yes", "no"))
+  set.seed(1)
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::rule_fit(mode = "classification", trees = 5, penalty = 0.01),
+      "xrf"
+    ),
+    am ~ wt + hp + disp,
+    data = cls_df
+  )
+
+  for (model in list(reg, cls)) {
+    expect_type(tidypredict_fit(model), "language")
+    expect_s3_class(
+      tidypredict_sql(model, dbplyr::simulate_dbi()),
+      "sql"
+    )
+  }
+
+  # The tuned `penalty` is used, not the cross-validated minimum.
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(reg), df),
+    as.numeric(predict(reg, df)$.pred)
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(cls), cls_df),
+    predict(cls, cls_df, type = "prob")$.pred_yes
+  )
+})
