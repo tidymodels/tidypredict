@@ -1046,12 +1046,38 @@ a named list with one softmax probability formula per class.</p>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="rulefit-models">RuleFit models<a class="anchor" aria-label="anchor" href="#rulefit-models"></a>
+</h2>
+<p>H2O’s RuleFit models, available through the <code>"h2o"</code> engine
+of <code><a href="https://parsnip.tidymodels.org/reference/rule_fit.html" class="external-link">rule_fit()</a></code>, are also supported for regression and binary
+classification. A RuleFit model is a lasso model over two kinds of
+terms: rules extracted from a tree ensemble, and the original predictors
+entered linearly. <code>tidypredict</code> reads both from
+<code><a href="https://rdrr.io/pkg/h2o/man/h2o.rule_importance.html" class="external-link">h2o::h2o.rule_importance()</a></code>, translates each rule into a
+<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement, and adds the terms
+together.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">model_rules</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/rule_fit.html" class="external-link">rule_fit</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"h2o"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_rules</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 33.6849250683783 + (-2.98365666456681 * wt + case_when(wt &lt; 2.25968027114868 ~ </span></span>
+<span><span class="co">#&gt;     1.2692577001717, .default = 0) + case_when(disp &lt; 101.545547485352 ~ </span></span>
+<span><span class="co">#&gt;     0.054919226597745, .default = 0) + case_when(disp &lt; 97.7222671508789 &amp; </span></span>
+<span><span class="co">#&gt;     hp &lt; 118 ~ 0.0549192265955192, .default = 0) + -0.0243188365426766 * </span></span>
+<span><span class="co">#&gt;     hp + -0.0029605172817145 * disp)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
 </h2>
-<p>Only H2O’s GBM models are supported, not H2O’s XGBoost. The gaussian,
-bernoulli, and multinomial distributions are supported. Because
-predictions require a live H2O cluster, the parsed formula cannot be
-reused after the cluster is shut down.</p>
+<p>Of H2O’s tree ensembles, only GBM models are supported, not H2O’s
+XGBoost. The gaussian, bernoulli, and multinomial distributions are
+supported. Multiclass RuleFit models are not supported, because
+<code><a href="https://rdrr.io/pkg/h2o/man/h2o.rule_importance.html" class="external-link">h2o::h2o.rule_importance()</a></code> does not expose the per-class
+coefficients needed to reproduce the predictions. Because predictions
+require a live H2O cluster, the parsed formula cannot be reused after
+the cluster is shut down.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -950,9 +950,39 @@ names(tidypredict_fit(model_multi))
 #> [1] "setosa"     "versicolor" "virginica"
 ```
 
+## RuleFit models
+
+H2O’s RuleFit models, available through the `"h2o"` engine of
+[`rule_fit()`](https://parsnip.tidymodels.org/reference/rule_fit.html),
+are also supported for regression and binary classification. A RuleFit
+model is a lasso model over two kinds of terms: rules extracted from a
+tree ensemble, and the original predictors entered linearly.
+`tidypredict` reads both from
+[`h2o::h2o.rule_importance()`](https://rdrr.io/pkg/h2o/man/h2o.rule_importance.html),
+translates each rule into a
+[`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
+statement, and adds the terms together.
+
+``` r
+
+model_rules <- rule_fit(mode = "regression") |>
+  set_engine("h2o") |>
+  fit(mpg ~ wt + hp + disp, data = mtcars)
+
+tidypredict_fit(model_rules)
+#> 33.6849250683783 + (-2.98365666456681 * wt + case_when(wt < 2.25968027114868 ~ 
+#>     1.2692577001717, .default = 0) + case_when(disp < 101.545547485352 ~ 
+#>     0.054919226597745, .default = 0) + case_when(disp < 97.7222671508789 & 
+#>     hp < 118 ~ 0.0549192265955192, .default = 0) + -0.0243188365426766 * 
+#>     hp + -0.0029605172817145 * disp)
+```
+
 ## Limitations
 
-Only H2O’s GBM models are supported, not H2O’s XGBoost. The gaussian,
-bernoulli, and multinomial distributions are supported. Because
-predictions require a live H2O cluster, the parsed formula cannot be
-reused after the cluster is shut down.
+Of H2O’s tree ensembles, only GBM models are supported, not H2O’s
+XGBoost. The gaussian, bernoulli, and multinomial distributions are
+supported. Multiclass RuleFit models are not supported, because
+[`h2o::h2o.rule_importance()`](https://rdrr.io/pkg/h2o/man/h2o.rule_importance.html)
+does not expose the per-class coefficients needed to reproduce the
+predictions. Because predictions require a live H2O cluster, the parsed
+formula cannot be reused after the cluster is shut down.
