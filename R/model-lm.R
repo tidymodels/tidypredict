@@ -219,7 +219,15 @@ lm_constructor <- function(x) {
     f <- expr(!!as.name(x$col))
   }
   if (x$type == "conditional") {
-    f <- expr(ifelse(!!as.name(x$col) == !!x$val, 1, 0))
+    op <- x$op %||% "equal"
+    f <- switch(
+      op,
+      "equal" = expr(ifelse(!!as.name(x$col) == !!x$val, 1, 0)),
+      "not-equal" = expr(ifelse(!!as.name(x$col) != !!x$val, 1, 0)),
+      "less" = expr(ifelse(!!as.name(x$col) < !!x$val, 1, 0)),
+      "more-equal" = expr(ifelse(!!as.name(x$col) >= !!x$val, 1, 0)),
+      cli::cli_abort("Operation {.val {op}} is not supported.")
+    )
   }
   if (x$type == "operation") {
     if (x$op == "morethan") {
