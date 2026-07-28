@@ -18,6 +18,7 @@
   models](https://tidypredict.tidymodels.org/articles/glmnet.md):
 - [Gradient boosting, using
   H2O](https://tidypredict.tidymodels.org/articles/h2o.md):
+- [lda models](https://tidypredict.tidymodels.org/articles/lda.md):
 - [LightGBM
   models](https://tidypredict.tidymodels.org/articles/lightgbm.md):
 - [Linear
