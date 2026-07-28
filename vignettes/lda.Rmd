@@ -1,0 +1,97 @@
+---
+title: "lda models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{lda models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("MASS", quietly = TRUE)) {
+  library(tidypredict)
+  library(MASS)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`MASS::lda()` fits linear discriminant analysis models. Predicting with such a
+model projects the predictors onto the discriminant space and compares the
+result against each class centroid. That path is linear in the predictors, so it
+collapses into one linear predictor per outcome class, and the posterior
+probabilities are the softmax of those linear predictors.
+
+Because these models predict one probability per outcome class,
+`tidypredict_fit()` returns a *named list* of expressions, one for each class,
+rather than a single expression. Since the output is a list,
+`tidypredict_to_column()` and `tidypredict_test()` are not supported.
+
+## `tidypredict_` functions
+
+```{r}
+library(MASS)
+
+model <- lda(Species ~ ., data = iris)
+```
+
+- Create the R formulas, one per class
+    ```{r}
+fit <- tidypredict_fit(model)
+names(fit)
+fit[["setosa"]]
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+library(dplyr)
+
+iris %>%
+  mutate(!!!tidypredict_fit(model)) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
+all.equal(unname(probs), unname(predict(model, iris)$posterior))
+    ```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+library(discrim)
+
+p_model <- discrim_linear() %>%
+  set_engine("MASS") %>%
+  fit(Species ~ ., data = iris)
+```
+
+```{r}
+tidypredict_fit(p_model)[["virginica"]]
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```

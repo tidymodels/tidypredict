@@ -26,6 +26,8 @@ navbar:
       href: articles/glmnet.html
     - text: Multinomial Regression - multinom()
       href: articles/multinom.html
+    - text: Linear Discriminant Analysis - lda()
+      href: articles/lda.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()
