@@ -10,7 +10,6 @@ vignette: >
 ```{r setup, include = FALSE}
 if (requireNamespace("MASS", quietly = TRUE)) {
   library(tidypredict)
-  library(MASS)
   library(dplyr)
   eval_code <- TRUE
 } else {
@@ -44,10 +43,11 @@ rather than a single expression. Since the output is a list,
 
 ## `tidypredict_` functions
 
-```{r}
-library(MASS)
+Note that `MASS` is used with `::` below rather than attached, because attaching
+it would mask `dplyr::select()`.
 
-model <- lda(Species ~ ., data = iris)
+```{r}
+model <- MASS::lda(Species ~ ., data = iris)
 ```
 
 - Create the R formulas, one per class
