@@ -26,6 +26,8 @@ navbar:
       href: articles/glmnet.html
     - text: Multinomial Regression - multinom()
       href: articles/multinom.html
+    - text: Flexible Discriminant Analysis - fda()
+      href: articles/fda.html
     - text: Linear Discriminant Analysis - lda()
       href: articles/lda.html
     - text: Random Forest - Ranger - ranger()
