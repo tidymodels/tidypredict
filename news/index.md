@@ -14,6 +14,17 @@
   ([\#198](https://github.com/tidymodels/tidypredict/issues/198))
 
 - Added support for
+  [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html)
+  multinomial log-linear models, including
+  [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
+  parsnip models fitted with the `"nnet"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions (softmax), and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) linear
   support vector machine models (`vanilladot` kernel), including
   [`svm_linear()`](https://parsnip.tidymodels.org/reference/svm_linear.html)

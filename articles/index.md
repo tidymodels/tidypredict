@@ -24,6 +24,8 @@
   Regression](https://tidypredict.tidymodels.org/articles/lm.md):
 - [MARS models via the \`earth\`
   package](https://tidypredict.tidymodels.org/articles/mars.md):
+- [multinom
+  models](https://tidypredict.tidymodels.org/articles/multinom.md):
 - [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
 - [Random Forest -
   partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
