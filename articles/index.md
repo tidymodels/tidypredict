@@ -10,6 +10,7 @@
   models](https://tidypredict.tidymodels.org/articles/catboost.md):
 - [Cubist
   models](https://tidypredict.tidymodels.org/articles/cubist.md):
+- [fda models](https://tidypredict.tidymodels.org/articles/fda.md):
 - [Float precision at split
   boundaries](https://tidypredict.tidymodels.org/articles/float-precision.md):
 - [Generalized Linear
