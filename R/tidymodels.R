@@ -14,12 +14,23 @@ tidypredict_fit.model_fit <- function(model) {
     return(tidypredict_fit_catboost_parsnip(model))
   }
 
+  # `sda()` only sees the model matrix, so the formula is needed to map dummy
+  # columns back onto the original factors
+  if (inherits(model$fit, "sda")) {
+    return(build_fit_formula_multinom(parse_model(model)))
+  }
+
   tidypredict_fit(model$fit)
 }
 
 #' @export
 parse_model.model_fit <- function(model) {
   model <- glmnet_set_lambda(model)
+
+  if (inherits(model$fit, "sda")) {
+    return(parse_model_sda(model$fit, sda_parsnip_vars(model)))
+  }
+
   parse_model(model$fit)
 }
 
