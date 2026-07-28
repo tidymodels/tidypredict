@@ -72,6 +72,9 @@ h2o_tree_exprs <- function(model, tree_class = NA) {
 
 #' @export
 tidypredict_fit.H2ORegressionModel <- function(model, ...) {
+  if (identical(model@algorithm, "rulefit")) {
+    return(tidypredict_fit_h2o_rulefit_regression(model))
+  }
   f <- reduce_addition(h2o_tree_exprs(model))
   init_f <- model@model$init_f
   if (!is.null(init_f) && init_f != 0) {
@@ -82,6 +85,9 @@ tidypredict_fit.H2ORegressionModel <- function(model, ...) {
 
 #' @export
 tidypredict_fit.H2OBinomialModel <- function(model, ...) {
+  if (identical(model@algorithm, "rulefit")) {
+    return(tidypredict_fit_h2o_rulefit_binomial(model))
+  }
   f <- reduce_addition(h2o_tree_exprs(model))
   init_f <- model@model$init_f %||% 0
   # Probability of the second (positive) domain level: logistic link.
@@ -90,6 +96,9 @@ tidypredict_fit.H2OBinomialModel <- function(model, ...) {
 
 #' @export
 tidypredict_fit.H2OMultinomialModel <- function(model, ...) {
+  if (identical(model@algorithm, "rulefit")) {
+    return(tidypredict_fit_h2o_rulefit_multinomial(model))
+  }
   domain <- h2o_response_domain(model)
   init_f <- model@model$init_f %||% 0
 
