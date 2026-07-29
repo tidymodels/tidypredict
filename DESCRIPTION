@@ -13,7 +13,7 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
     earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
     cubist(), ctree(), cforest(), fda(), ksvm(), lda(), sda(), lda_diag(),
-    and xrf()
+    pls(), and xrf()
     models.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,
@@ -50,6 +50,7 @@ Suggests:
     MASS,
     mda,
     mboost,
+    mixOmics,
     methods,
     mlbench,
     modeldata,
