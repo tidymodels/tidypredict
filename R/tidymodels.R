@@ -20,6 +20,12 @@ tidypredict_fit.model_fit <- function(model) {
     return(build_fit_formula_multinom(parse_model(model)))
   }
 
+  # {mixOmics} models only see the model matrix, so the formula is needed to map
+  # dummy columns back onto the original factors
+  if (inherits(model$fit, mixomics_classes)) {
+    return(tidypredict_fit_mixomics(model$fit, mixomics_parsnip_vars(model)))
+  }
+
   tidypredict_fit(model$fit)
 }
 
@@ -36,6 +42,10 @@ parse_model.model_fit <- function(model) {
       model$fit,
       sparsediscrim_parsnip_vars(model)
     ))
+  }
+
+  if (inherits(model$fit, mixomics_classes)) {
+    return(parse_model_mixomics(model$fit, mixomics_parsnip_vars(model)))
   }
 
   parse_model(model$fit)

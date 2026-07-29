@@ -1,0 +1,132 @@
+---
+title: "mixOmics PLS models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{mixOmics PLS models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (
+  requireNamespace("mixOmics", quietly = TRUE) &&
+    requireNamespace("plsmod", quietly = TRUE)
+) {
+  library(tidypredict)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔* |
+|`tidypredict_test()`                                           |  ✔* |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+\* Only for regression models with a single outcome.
+
+`mixOmics` fits partial least squares models with `pls()` and `spls()`, and the
+discriminant analysis variants with `plsda()` and `splsda()`. All four collapse
+down to one set of regression coefficients per outcome, so the generated
+expression is a plain linear combination of the predictors.
+
+For a single-outcome regression model, `tidypredict_fit()` returns one
+expression. For a model with multiple outcome columns it returns a *named list*
+of expressions, one per outcome. For the discriminant variants it returns a
+named list of class-probability expressions (the softmax of the predicted dummy
+outcomes, matching what `plsmod` predicts). Since those two cases return a list,
+`tidypredict_to_column()` and `tidypredict_test()` only work for single-outcome
+regression models.
+
+The number of components (`ncomp`) is baked into the coefficients, and the
+sparse variants simply give the predictors that were not selected a coefficient
+of zero.
+
+## `tidypredict_` functions
+
+```{r}
+x <- as.matrix(mtcars[c("cyl", "disp", "hp", "drat")])
+model <- mixOmics::pls(x, mtcars$mpg, ncomp = 2)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the prediction to the original table
+    ```{r}
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+tidypredict_test(model, mtcars)
+    ```
+
+## Discriminant analysis
+
+`plsda()` and `splsda()` return one probability expression per class:
+
+```{r}
+da_model <- mixOmics::splsda(as.matrix(iris[1:4]), iris$Species, ncomp = 2)
+
+fit <- tidypredict_fit(da_model)
+names(fit)
+fit[["setosa"]]
+```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`. The `mixOmics`
+engine of `pls()` works for both regression and classification:
+
+```{r}
+library(parsnip)
+library(plsmod)
+
+p_model <- pls(num_comp = 2) %>%
+  set_engine("mixOmics") %>%
+  set_mode("regression") %>%
+  fit(mpg ~ disp + hp + drat, data = mtcars)
+
+tidypredict_fit(p_model)
+```
+
+`mixOmics` models are fit from a numeric matrix, so a model fit directly can
+only refer to the matrix columns it was given. Categorical predictors therefore
+work through the `parsnip` interface, which keeps the formula around and lets the
+dummy columns be written in terms of the original factors:
+
+```{r}
+cars <- transform(mtcars, gear = factor(gear))
+
+c_model <- pls(num_comp = 2) %>%
+  set_engine("mixOmics") %>%
+  set_mode("regression") %>%
+  fit(mpg ~ disp + hp + gear, data = cars)
+
+tidypredict_fit(c_model)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
