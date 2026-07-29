@@ -1,0 +1,121 @@
+---
+title: "sparsediscrim models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{sparsediscrim models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("sparsediscrim", quietly = TRUE)) {
+  library(tidypredict)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`sparsediscrim` fits regularized linear discriminant analysis models. The four
+supported functions are `lda_diag()`, `lda_shrink_mean()`, `lda_shrink_cov()`,
+and `lda_emp_bayes_eigen()`, which are the models behind the `"sparsediscrim"`
+engine of `discrim_linear()` (`regularization_method` values `"diagonal"`,
+`"shrink_mean"`, `"shrink_cov"`, and `"min_distance"`).
+
+All four share the same structure: one mean vector and prior per outcome class,
+plus a single pooled covariance shared by every class, and they only differ in
+how that covariance is regularized. The class posterior probabilities are
+therefore a softmax over one linear predictor per class, so `tidypredict_fit()`
+returns a *named list* of expressions, one for each class, rather than a single
+expression. Since the output is a list, `tidypredict_to_column()` and
+`tidypredict_test()` are not supported.
+
+## `tidypredict_` functions
+
+```{r}
+model <- sparsediscrim::lda_diag(Species ~ ., data = iris)
+```
+
+- Create the R formulas, one per class
+    ```{r}
+fit <- tidypredict_fit(model)
+names(fit)
+fit[["setosa"]]
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+library(dplyr)
+
+iris %>%
+  mutate(!!!tidypredict_fit(model)) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
+posterior <- predict(model, iris, type = "prob")
+all.equal(unname(probs), unname(as.matrix(posterior)))
+    ```
+
+Note that `predict()` with `type = "prob"` is not usable for
+`lda_emp_bayes_eigen()` (`regularization_method = "min_distance"`) models:
+`sparsediscrim` builds a rank-deficient covariance for them and returns `NaN`
+for every row. The expressions that `tidypredict_fit()` generates use the
+model's own pseudo-inverse of that covariance, so they agree with the model's
+`type = "class"` predictions.
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+library(discrim)
+
+p_model <- discrim_linear(regularization_method = "shrink_mean") %>%
+  set_engine("sparsediscrim") %>%
+  fit(Species ~ ., data = iris)
+```
+
+```{r}
+tidypredict_fit(p_model)[["virginica"]]
+```
+
+These models are fit from a numeric matrix, so a model fit with the `x`/`y`
+interface can only refer to the matrix columns it was given. Categorical
+predictors work through the formula interface and through `parsnip`, both of
+which keep the formula around and let the dummy columns be written in terms of
+the original factors:
+
+```{r}
+cars <- transform(mtcars, vs = factor(vs), gear = factor(gear))
+
+c_model <- discrim_linear() %>%
+  set_engine("sparsediscrim") %>%
+  fit(vs ~ mpg + gear + disp, data = cars)
+
+tidypredict_fit(c_model)[["1"]]
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
