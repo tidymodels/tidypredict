@@ -1,0 +1,99 @@
+---
+title: "NaiveBayes models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NaiveBayes models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("klaR", quietly = TRUE)) {
+  library(tidypredict)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✗  |
+|`tidypredict_test()`                                           |  ✗  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`klaR::NaiveBayes()` fits naive Bayes classifiers. Predicting with such a model
+multiplies the prior probability of each class by one conditional density per
+predictor, and then normalizes those products into posterior probabilities.
+Working on the log scale turns the products into sums, which makes the posterior
+probabilities the softmax of the summed log densities.
+
+Numeric predictors contribute a normal log density, and categorical predictors
+contribute a `case_when()` lookup of the conditional probability of the observed
+level. Only Gaussian densities can be expressed this way, so models fit with
+`usekernel = TRUE` are not supported.
+
+Because these models predict one probability per outcome class,
+`tidypredict_fit()` returns a *named list* of expressions, one for each class,
+rather than a single expression. Since the output is a list,
+`tidypredict_to_column()` and `tidypredict_test()` are not supported.
+
+## `tidypredict_` functions
+
+```{r}
+model <- klaR::NaiveBayes(Species ~ ., data = iris)
+```
+
+- Create the R formulas, one per class
+    ```{r}
+fit <- tidypredict_fit(model)
+names(fit)
+fit[["setosa"]]
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+library(dplyr)
+
+iris %>%
+  mutate(!!!tidypredict_fit(model)) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
+all.equal(unname(probs), unname(predict(model, iris)$posterior))
+    ```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+library(discrim)
+
+p_model <- naive_Bayes() %>%
+  set_engine("klaR", usekernel = FALSE) %>%
+  fit(Species ~ ., data = iris)
+```
+
+```{r}
+tidypredict_fit(p_model)[["virginica"]]
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
