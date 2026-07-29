@@ -2,6 +2,19 @@
 
 ## tidypredict (development version)
 
+- Added support for the partial least squares models in `mixOmics`
+  ([`pls()`](https://parsnip.tidymodels.org/reference/pls.html),
+  `spls()`, `plsda()`, and `splsda()`), including
+  [`pls()`](https://parsnip.tidymodels.org/reference/pls.html) parsnip
+  models fitted with the `"mixOmics"` engine, for regression and
+  classification. Single-outcome regression models return one
+  expression, multivariate outcomes return a named list of expressions,
+  and the discriminant variants return a named list of class-probability
+  expressions (softmax), for which
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for multinomial
   [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   models (`family = "multinomial"`), including

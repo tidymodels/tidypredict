@@ -43,6 +43,7 @@
     <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
     <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
     <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
+    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
     <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
@@ -1066,11 +1067,11 @@ together.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_rules</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 33.6849250683785 + (-2.98365666456689 * wt + case_when(wt &lt; 2.25968027114868 ~ </span></span>
-<span><span class="co">#&gt;     1.26925770017158, .default = 0) + case_when(disp &lt; 101.545547485352 ~ </span></span>
-<span><span class="co">#&gt;     0.0549192265974749, .default = 0) + case_when(disp &lt; 97.7222671508789 &amp; </span></span>
-<span><span class="co">#&gt;     hp &lt; 118 ~ 0.0549192265958709, .default = 0) + -0.0243188365426769 * </span></span>
-<span><span class="co">#&gt;     hp + -0.00296051728171432 * disp)</span></span></code></pre></div>
+<span><span class="co">#&gt; 33.6849250683784 + (-2.98365666456687 * wt + case_when(wt &lt; 2.25968027114868 ~ </span></span>
+<span><span class="co">#&gt;     1.26925770017166, .default = 0) + case_when(disp &lt; 101.545547485352 ~ </span></span>
+<span><span class="co">#&gt;     0.0549192265979581, .default = 0) + case_when(disp &lt; 97.7222671508789 &amp; </span></span>
+<span><span class="co">#&gt;     hp &lt; 118 ~ 0.0549192265953309, .default = 0) + -0.0243188365426768 * </span></span>
+<span><span class="co">#&gt;     hp + -0.00296051728171429 * disp)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>

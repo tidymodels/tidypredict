@@ -26,6 +26,8 @@
   Regression](https://tidypredict.tidymodels.org/articles/lm.md):
 - [MARS models via the \`earth\`
   package](https://tidypredict.tidymodels.org/articles/mars.md):
+- [mixOmics PLS
+  models](https://tidypredict.tidymodels.org/articles/mixOmics.md):
 - [multinom
   models](https://tidypredict.tidymodels.org/articles/multinom.md):
 - [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
