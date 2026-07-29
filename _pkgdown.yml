@@ -60,6 +60,8 @@ navbar:
       href: articles/catboost.html
     - text: H2O GBM - H2OModel
       href: articles/h2o.html
+    - text: Null Model - nullmodel()
+      href: articles/nullmodel.html
   - text: Articles
     menu:
     - text: Save/Reload
