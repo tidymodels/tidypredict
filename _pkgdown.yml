@@ -32,6 +32,8 @@ navbar:
       href: articles/lda.html
     - text: Shrinkage Discriminant Analysis - sda()
       href: articles/sda.html
+    - text: Regularized Discriminant Analysis - sparsediscrim
+      href: articles/sparsediscrim.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()

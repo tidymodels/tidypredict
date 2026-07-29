@@ -16,7 +16,7 @@ tidypredict_fit.model_fit <- function(model) {
 
   # `sda()` only sees the model matrix, so the formula is needed to map dummy
   # columns back onto the original factors
-  if (inherits(model$fit, "sda")) {
+  if (inherits(model$fit, c("sda", sparsediscrim_classes))) {
     return(build_fit_formula_multinom(parse_model(model)))
   }
 
@@ -29,6 +29,13 @@ parse_model.model_fit <- function(model) {
 
   if (inherits(model$fit, "sda")) {
     return(parse_model_sda(model$fit, sda_parsnip_vars(model)))
+  }
+
+  if (inherits(model$fit, sparsediscrim_classes)) {
+    return(parse_model_sparsediscrim(
+      model$fit,
+      sparsediscrim_parsnip_vars(model)
+    ))
   }
 
   parse_model(model$fit)
