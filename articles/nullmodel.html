@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>mixOmics PLS models • tidypredict</title>
+<title>nullmodel models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="mixOmics PLS models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="nullmodel models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -93,11 +93,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>mixOmics PLS models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>nullmodel models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/mixOmics.Rmd" class="external-link"><code>vignettes/mixOmics.Rmd</code></a></small>
-      <div class="d-none name"><code>mixOmics.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/nullmodel.Rmd" class="external-link"><code>vignettes/nullmodel.Rmd</code></a></small>
+      <div class="d-none name"><code>nullmodel.Rmd</code></div>
     </div>
 
     
@@ -117,11 +117,11 @@
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td>✔*</td>
+<td>✔</td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>✔*</td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td>
@@ -136,45 +136,31 @@
 </tr>
 </tbody>
 </table>
-<p>* Only for regression models with a single outcome.</p>
-<p><code>mixOmics</code> fits partial least squares models with
-<code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls()</a></code> and <code>spls()</code>, and the discriminant
-analysis variants with <code>plsda()</code> and <code>splsda()</code>.
-All four collapse down to one set of regression coefficients per
-outcome, so the generated expression is a plain linear combination of
-the predictors.</p>
-<p>For a single-outcome regression model, <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>
-returns one expression. For a model with multiple outcome columns it
-returns a <em>named list</em> of expressions, one per outcome. For the
-discriminant variants it returns a named list of class-probability
-expressions (the softmax of the predicted dummy outcomes, matching what
-<code>plsmod</code> predicts). Since those two cases return a list,
-<code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>
-only work for single-outcome regression models.</p>
-<p>The number of components (<code>ncomp</code>) is baked into the
-coefficients, and the sparse variants simply give the predictors that
-were not selected a coefficient of zero.</p>
+<p><code><a href="https://parsnip.tidymodels.org/reference/nullmodel.html" class="external-link">parsnip::nullmodel()</a></code> fits a model that ignores the
+predictors entirely. For regression it predicts the mean of the outcome,
+and for classification it predicts the observed class frequencies.
+Predictions are therefore constants, and <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>
+returns a plain number for regression and a <em>named list</em> of one
+constant per class for classification. Since the classification output
+is a list, <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and
+<code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> are only supported for regression.</p>
 <div class="section level2">
 <h2 id="tidypredict_-functions">
 <code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cyl"</span>, <span class="st">"disp"</span>, <span class="st">"hp"</span>, <span class="st">"drat"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">mixOmics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/pls.html" class="external-link">pls</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">parsnip</span><span class="fu">::</span><span class="fu"><a href="https://parsnip.tidymodels.org/reference/nullmodel.html" class="external-link">nullmodel</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 24.2937361352851 + (cyl * -0.889931447343478) + (disp * -0.0130565637350741) + </span></span>
-<span><span class="co">#&gt;     (hp * -0.0228109587521556) + (drat * 2.1303277985918)</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] 20.09062</span></span></code></pre></div>
 </li>
 <li>
-<p>Add the prediction to the original table</p>
+<p>Add the predictions to the original table</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 32</span></span>
@@ -190,7 +176,7 @@ were not selected a coefficient of zero.</p>
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.66417<span style="color: #949494;">, </span>22.66417<span style="color: #949494;">, </span>25.40424<span style="color: #949494;">, </span>19.63776<span style="color: #949494;">, </span>15.19254<span style="color: #949494;">, </span>19.500…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 20.09062<span style="color: #949494;">, </span>20.09062<span style="color: #949494;">, </span>20.09062<span style="color: #949494;">, </span>20.09062<span style="color: #949494;">, </span>20.09062<span style="color: #949494;">, </span>20.090…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that the results match the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
@@ -203,66 +189,34 @@ results</p>
 <span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
 </li>
 </ul>
-</div>
-<div class="section level2">
-<h2 id="discriminant-analysis">Discriminant analysis<a class="anchor" aria-label="anchor" href="#discriminant-analysis"></a>
-</h2>
-<p><code>plsda()</code> and <code>splsda()</code> return one probability
-expression per class:</p>
+<p>For classification, one expression per class is returned:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">da_model</span> <span class="op">&lt;-</span> <span class="fu">mixOmics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/splsda.html" class="external-link">splsda</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>, <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">c_model</span> <span class="op">&lt;-</span> <span class="fu">parsnip</span><span class="fu">::</span><span class="fu"><a href="https://parsnip.tidymodels.org/reference/nullmodel.html" class="external-link">nullmodel</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">iris</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">da_model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
-<span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(0.391460011724113 + (Sepal.Length * -0.118750531861652) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * 0.378311039737146) + (Petal.Length * -0.084556881358667) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -0.16933234787912))/(exp(0.391460011724113 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -0.118750531861652) + (Sepal.Width * 0.378311039737146) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -0.084556881358667) + (Petal.Width * -0.16933234787912)) + </span></span>
-<span><span class="co">#&gt;     exp(1.96606184899222 + (Sepal.Length * -0.0303959537594359) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -0.492023767406961) + (Petal.Length * </span></span>
-<span><span class="co">#&gt;         0.0179469395936271) + (Petal.Width * -0.0152407670638333)) + </span></span>
-<span><span class="co">#&gt;     exp(-1.35752186071634 + (Sepal.Length * 0.149146485621088) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * 0.113712727669814) + (Petal.Length * 0.06660994176504) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 0.184573114942953)))</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; $setosa</span></span>
+<span><span class="co">#&gt; [1] 0.3333333</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $versicolor</span></span>
+<span><span class="co">#&gt; [1] 0.3333333</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; $virginica</span></span>
+<span><span class="co">#&gt; [1] 0.3333333</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
 <p><code>parsnip</code> fitted models are also supported by
-<code>tidypredict</code>. The <code>mixOmics</code> engine of
-<code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls()</a></code> works for both regression and classification:</p>
+<code>tidypredict</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plsmod.tidymodels.org" class="external-link">plsmod</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">drat</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 18.9698741155116 + (disp * -0.0183282632913477) + (hp * -0.0323705835435153) + </span></span>
-<span><span class="co">#&gt;     (drat * 2.80763705068415)</span></span></code></pre></div>
-<p><code>mixOmics</code> models are fit from a numeric matrix, so a
-model fit directly can only refer to the matrix columns it was given.
-Categorical predictors therefore work through the <code>parsnip</code>
-interface, which keeps the formula around and lets the dummy columns be
-written in terms of the original factors:</p>
+<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/null_model.html" class="external-link">null_model</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"parsnip"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">mtcars</span>, gear <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">c_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">gear</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 28.3990491890354 + (disp * -0.0212765260717577) + (hp * -0.0321040699674561) + </span></span>
-<span><span class="co">#&gt;     (ifelse(gear == "4", 1, 0) * 1.89118556186025) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "5", 1, 0) * 3.84388465523581)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 20.09062</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
@@ -272,17 +226,12 @@ written in terms of the original factors:</p>
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
-<span><span class="co">#&gt;  $ general:List of 5</span></span>
-<span><span class="co">#&gt;   ..$ model  : chr "mixo_pls"</span></span>
+<span><span class="co">#&gt;  $ general:List of 4</span></span>
+<span><span class="co">#&gt;   ..$ model  : chr "nullmodel"</span></span>
 <span><span class="co">#&gt;   ..$ version: num 2</span></span>
 <span><span class="co">#&gt;   ..$ type   : chr "regression"</span></span>
 <span><span class="co">#&gt;   ..$ is_glm : num 0</span></span>
-<span><span class="co">#&gt;   ..$ ncomp  : num 2</span></span>
-<span><span class="co">#&gt;  $ terms  :List of 5</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
+<span><span class="co">#&gt;  $ terms  :List of 1</span></span>
 <span><span class="co">#&gt;   ..$ :List of 4</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
 </div>

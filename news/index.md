@@ -2,6 +2,18 @@
 
 ## tidypredict (development version)
 
+- Added support for
+  [`parsnip::nullmodel()`](https://parsnip.tidymodels.org/reference/nullmodel.html)
+  models, including
+  [`null_model()`](https://parsnip.tidymodels.org/reference/null_model.html)
+  parsnip models fitted with the `"parsnip"` engine. Regression models
+  return the outcome mean as a single expression, and classification
+  models return a named list of constant class-probability expressions,
+  for which
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for the partial least squares models in `mixOmics`
   ([`pls()`](https://parsnip.tidymodels.org/reference/pls.html),
   `spls()`, `plsda()`, and `splsda()`), including

@@ -31,6 +31,8 @@
 - [multinom
   models](https://tidypredict.tidymodels.org/articles/multinom.md):
 - [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
+- [nullmodel
+  models](https://tidypredict.tidymodels.org/articles/nullmodel.md):
 - [Random Forest -
   partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
 - [Random Forest, using
