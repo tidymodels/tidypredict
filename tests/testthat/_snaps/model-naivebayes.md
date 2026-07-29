@@ -1,9 +1,9 @@
 # a single predictor is handled
 
     Code
-      rlang::expr_text(tidypredict_fit(model)[["setosa"]])
+      round_print(tidypredict_fit(model)[["setosa"]])
     Output
-      [1] "exp(-1.09861228866811 + (2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + \n    (2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592))) + \n    exp(-1.09861228866811 + (1.620738119938 - ((Petal.Width - \n        1.326)^2/0.0782122448979591))) + exp(-1.09861228866811 + \n    (1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))"
+      [1] "exp(-1.098612 + (2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))/(exp(-1.098612 + (2.250129 - ((Petal.Width - 0.246)^2/0.02221224))) + exp(-1.098612 + (1.620738 - ((Petal.Width - 1.326)^2/0.07821224))) + exp(-1.098612 + (1.292258 - ((Petal.Width - 2.026)^2/0.1508653))))"
 
 # kernel density fits are rejected
 

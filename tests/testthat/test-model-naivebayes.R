@@ -101,7 +101,7 @@ test_that("a single predictor is handled", {
 
   model <- klaR::NaiveBayes(Species ~ Petal.Width, data = iris)
 
-  expect_snapshot(rlang::expr_text(tidypredict_fit(model)[["setosa"]]))
+  expect_snapshot(round_print(tidypredict_fit(model)[["setosa"]]))
 
   probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, iris))
 
