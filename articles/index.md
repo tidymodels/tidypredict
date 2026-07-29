@@ -41,6 +41,8 @@
 - [Save and re-load
   models](https://tidypredict.tidymodels.org/articles/save.md):
 - [sda models](https://tidypredict.tidymodels.org/articles/sda.md):
+- [sparsediscrim
+  models](https://tidypredict.tidymodels.org/articles/sparsediscrim.md):
 - [Database
   write-back](https://tidypredict.tidymodels.org/articles/sql.md):
 - [How tidypredict generates tree

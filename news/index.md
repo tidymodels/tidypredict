@@ -34,6 +34,18 @@
   is not supported for these multiclass models.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- Added support for the regularized linear discriminant analysis models
+  in `sparsediscrim` (`lda_diag()`, `lda_shrink_mean()`,
+  `lda_shrink_cov()`, and `lda_emp_bayes_eigen()`), including
+  [`discrim_linear()`](https://parsnip.tidymodels.org/reference/discrim_linear.html)
+  parsnip models fitted with the `"sparsediscrim"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions (softmax of the
+  per-class discriminant scores), and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html)
   flexible discriminant analysis models fit with a linear regression
   method ([`mda::polyreg()`](https://rdrr.io/pkg/mda/man/polyreg.html)

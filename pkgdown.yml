@@ -24,11 +24,12 @@ articles:
   rpart: rpart.html
   save: save.html
   sda: sda.html
+  sparsediscrim: sparsediscrim.html
   sql: sql.html
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-07-29T15:58Z
+last_built: 2026-07-29T16:51Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

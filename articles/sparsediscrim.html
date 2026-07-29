@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>fda models • tidypredict</title>
+<title>sparsediscrim models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="fda models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="sparsediscrim models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -91,11 +91,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>fda models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>sparsediscrim models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/fda.Rmd" class="external-link"><code>vignettes/fda.Rmd</code></a></small>
-      <div class="d-none name"><code>fda.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/sparsediscrim.Rmd" class="external-link"><code>vignettes/sparsediscrim.Rmd</code></a></small>
+      <div class="d-none name"><code>sparsediscrim.Rmd</code></div>
     </div>
 
     
@@ -134,31 +134,29 @@
 </tr>
 </tbody>
 </table>
-<p><code><a href="https://rdrr.io/pkg/mda/man/fda.html" class="external-link">mda::fda()</a></code> fits flexible discriminant analysis models.
-Predicting with such a model runs the predictors through a regression
-fit, projects the result onto the discriminant variates, and turns the
-distance to each class centroid into a posterior probability. When the
-regression fit is linear in the predictors, the whole path collapses
-into one linear predictor per outcome class and the posterior
-probabilities are the softmax of those linear predictors.</p>
-<p>That restricts support to the two linear regression methods:
-<code><a href="https://rdrr.io/pkg/mda/man/polyreg.html" class="external-link">mda::polyreg()</a></code> (the default) with <code>degree = 1</code>,
-and <code><a href="https://rdrr.io/pkg/mda/man/gen.ridge.html" class="external-link">mda::gen.ridge()</a></code>, which is what
-<code><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear()</a></code> uses. Higher polynomial degrees and the
-<code><a href="https://rdrr.io/pkg/mda/man/mars.html" class="external-link">mda::mars()</a></code> and <code><a href="https://rdrr.io/pkg/mda/man/bruto.html" class="external-link">mda::bruto()</a></code> methods are not
-supported, and neither are the mixture models from
-<code><a href="https://rdrr.io/pkg/mda/man/mda.html" class="external-link">mda::mda()</a></code>.</p>
-<p>Because these models predict one probability per outcome class,
-<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a <em>named list</em> of
-expressions, one for each class, rather than a single expression. Since
-the output is a list, <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and
-<code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> are not supported.</p>
+<p><code>sparsediscrim</code> fits regularized linear discriminant
+analysis models. The four supported functions are
+<code>lda_diag()</code>, <code>lda_shrink_mean()</code>,
+<code>lda_shrink_cov()</code>, and <code>lda_emp_bayes_eigen()</code>,
+which are the models behind the <code>"sparsediscrim"</code> engine of
+<code><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear()</a></code> (<code>regularization_method</code> values
+<code>"diagonal"</code>, <code>"shrink_mean"</code>,
+<code>"shrink_cov"</code>, and <code>"min_distance"</code>).</p>
+<p>All four share the same structure: one mean vector and prior per
+outcome class, plus a single pooled covariance shared by every class,
+and they only differ in how that covariance is regularized. The class
+posterior probabilities are therefore a softmax over one linear
+predictor per class, so <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a
+<em>named list</em> of expressions, one for each class, rather than a
+single expression. Since the output is a list,
+<code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>
+are not supported.</p>
 <div class="section level2">
 <h2 id="tidypredict_-functions">
 <code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">mda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mda/man/fda.html" class="external-link">fda</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">sparsediscrim</span><span class="fu">::</span><span class="fu"><a href="https://topepo.github.io/sparsediscrim/reference/lda_diag.html" class="external-link">lda_diag</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formulas, one per class</p>
@@ -167,16 +165,16 @@ the output is a list, <code><a href="../reference/tidypredict_to_column.html">ti
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-15.7712902867569 + (Sepal.Length * 6.44363108028106) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;     12.3870583475541) + (Petal.Length * -17.2922700522406) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -21.1939332574676))/(exp(-15.7712902867569 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 6.44363108028106) + (Sepal.Width * 12.3870583475541) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -17.2922700522406) + (Petal.Width * -21.1939332574676)) + </span></span>
-<span><span class="co">#&gt;     exp(-2.040818273459 + (Sepal.Length * -1.5624481512317) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -4.4653504874401) + (Petal.Length * 4.7914952101148) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 3.12508713229903)) + exp(-34.1997086671406 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.88118292904936) + (Sepal.Width * -7.92170786011395) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.5007748421258) + (Petal.Width * 18.0688461251685)))</span></span></code></pre></div>
+<span><span class="co">#&gt; exp(-107.930781085437 + (Sepal.Length * 19.2754940163568) + (Sepal.Width * </span></span>
+<span><span class="co">#&gt;     30.314821365405) + (Petal.Length * 8.05580657248022) + (Petal.Width * </span></span>
+<span><span class="co">#&gt;     5.99356787837443))/(exp(-107.930781085437 + (Sepal.Length * </span></span>
+<span><span class="co">#&gt;     19.2754940163568) + (Sepal.Width * 30.314821365405) + (Petal.Length * </span></span>
+<span><span class="co">#&gt;     8.05580657248022) + (Petal.Width * 5.99356787837443)) + exp(-174.280588008602 + </span></span>
+<span><span class="co">#&gt;     (Sepal.Length * 22.8564387696952) + (Sepal.Width * 24.4959320834807) + </span></span>
+<span><span class="co">#&gt;     (Petal.Length * 23.4731436380067) + (Petal.Width * 32.3067927102622)) + </span></span>
+<span><span class="co">#&gt;     exp(-258.692783489496 + (Sepal.Length * 25.3669505752614) + </span></span>
+<span><span class="co">#&gt;         (Sepal.Width * 26.2999646268129) + (Petal.Length * 30.5922285160124) + </span></span>
+<span><span class="co">#&gt;         (Petal.Width * 49.3616606568561)))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -194,18 +192,27 @@ the output is a list, <code><a href="../reference/tidypredict_to_column.html">ti
 <span><span class="co">#&gt; $ Petal.Width  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.4<span style="color: #949494;">, </span>0.3<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.1…</span></span>
 <span><span class="co">#&gt; $ Species      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>…</span></span>
 <span><span class="co">#&gt; $ setosa       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ versicolor   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1.424733e-22<span style="color: #949494;">, </span>3.225424e-18<span style="color: #949494;">, </span>6.041136e-20<span style="color: #949494;">, </span>6.0100…</span></span>
-<span><span class="co">#&gt; $ virginica    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3.699975e-43<span style="color: #949494;">, </span>9.159088e-38<span style="color: #949494;">, </span>7.720058e-40<span style="color: #949494;">, </span>7.0670…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ versicolor   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 8.524398e-19<span style="color: #949494;">, </span>7.641570e-18<span style="color: #949494;">, </span>2.495496e-19<span style="color: #949494;">, </span>6.8152…</span></span>
+<span><span class="co">#&gt; $ virginica    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2.418205e-41<span style="color: #949494;">, </span>5.323668e-41<span style="color: #949494;">, </span>7.407018e-43<span style="color: #949494;">, </span>5.4569…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that the results match the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 results</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fit</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">iris</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/all.equal.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">iris</span>, type <span class="op">=</span> <span class="st">"posterior"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">posterior</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">iris</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">posterior</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </li>
 </ul>
+<p>Note that <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> with <code>type = "prob"</code> is
+not usable for <code>lda_emp_bayes_eigen()</code>
+(<code>regularization_method = "min_distance"</code>) models:
+<code>sparsediscrim</code> builds a rank-deficient covariance for them
+and returns <code>NaN</code> for every row. The expressions that
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> generates use the model’s own
+pseudo-inverse of that covariance, so they agree with the model’s
+<code>type = "class"</code> predictions.</p>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -216,32 +223,55 @@ results</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/discrim" class="external-link">discrim</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mda"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear</a></span><span class="op">(</span>regularization_method <span class="op">=</span> <span class="st">"shrink_mean"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"sparsediscrim"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-33.2183837928001 + (Sepal.Length * -4.41029984072515) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * -6.75173810807853) + (Petal.Length * 12.0386389001351) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * 14.7915580954522))/(exp(-11.9575128198863 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 5.80316342827786) + (Sepal.Width * 10.8028995796442) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -16.5217691675753) + (Petal.Width * -17.3381617005553)) + </span></span>
-<span><span class="co">#&gt;     exp(-2.27975663240445 + (Sepal.Length * -1.3928635875527) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -4.05116147156568) + (Petal.Length * 4.48313026744016) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 2.5466036051031)) + exp(-33.2183837928001 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.41029984072515) + (Sepal.Width * -6.75173810807853) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954522)))</span></span></code></pre></div>
+<span><span class="co">#&gt; exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + (Sepal.Width * </span></span>
+<span><span class="co">#&gt;     26.3045842550727) + (Petal.Length * 30.5894466999551) + (Petal.Width * </span></span>
+<span><span class="co">#&gt;     49.3835915687182))/(exp(-107.926997081959 + (Sepal.Length * </span></span>
+<span><span class="co">#&gt;     19.2748057606989) + (Sepal.Width * 30.314250317313) + (Petal.Length * </span></span>
+<span><span class="co">#&gt;     8.05623454310998) + (Petal.Width * 5.99760378610459)) + exp(-174.286289444853 + </span></span>
+<span><span class="co">#&gt;     (Sepal.Length * 22.8540964892416) + (Sepal.Width * 24.4977601426385) + </span></span>
+<span><span class="co">#&gt;     (Petal.Length * 23.4721691446234) + (Petal.Width * 32.3208860491096)) + </span></span>
+<span><span class="co">#&gt;     exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + </span></span>
+<span><span class="co">#&gt;         (Sepal.Width * 26.3045842550727) + (Petal.Length * 30.5894466999551) + </span></span>
+<span><span class="co">#&gt;         (Petal.Width * 49.3835915687182)))</span></span></code></pre></div>
+<p>These models are fit from a numeric matrix, so a model fit with the
+<code>x</code>/<code>y</code> interface can only refer to the matrix
+columns it was given. Categorical predictors work through the formula
+interface and through <code>parsnip</code>, both of which keep the
+formula around and let the dummy columns be written in terms of the
+original factors:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">mtcars</span>, vs <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">vs</span><span class="op">)</span>, gear <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">c_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"sparsediscrim"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">vs</span> <span class="op">~</span> <span class="va">mpg</span> <span class="op">+</span> <span class="va">gear</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"1"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; exp(-19.1256693330579 + (mpg * 1.24829943936813) + (ifelse(gear == </span></span>
+<span><span class="co">#&gt;     "4", 1, 0) * 4.93150684931507) + (ifelse(gear == "5", 1, </span></span>
+<span><span class="co">#&gt;     0) * 0.565815324165029) + (disp * 0.0179710473492101))/(exp(-14.23117559104 + </span></span>
+<span><span class="co">#&gt;     (mpg * 0.844665676493137) + (ifelse(gear == "4", 1, 0) * </span></span>
+<span><span class="co">#&gt;     0.767123287671233) + (ifelse(gear == "5", 1, 0) * 1.76031434184676) + </span></span>
+<span><span class="co">#&gt;     (disp * 0.0416724011574301)) + exp(-19.1256693330579 + (mpg * </span></span>
+<span><span class="co">#&gt;     1.24829943936813) + (ifelse(gear == "4", 1, 0) * 4.93150684931507) + </span></span>
+<span><span class="co">#&gt;     (ifelse(gear == "5", 1, 0) * 0.565815324165029) + (disp * </span></span>
+<span><span class="co">#&gt;     0.0179710473492101)))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>
 <span><span class="co">#&gt;  $ general    :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ model  : chr "fda"</span></span>
+<span><span class="co">#&gt;   ..$ model  : chr "lda_diag"</span></span>
 <span><span class="co">#&gt;   ..$ version: num 2</span></span>
 <span><span class="co">#&gt;   ..$ type   : chr "multiclass_regression"</span></span>
 <span><span class="co">#&gt;   ..$ family : chr "multinomial"</span></span>
