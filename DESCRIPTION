@@ -13,7 +13,7 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
     earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
     cubist(), ctree(), cforest(), fda(), ksvm(), lda(), sda(), lda_diag(),
-    pls(), and xrf()
+    pls(), nullmodel(), and xrf()
     models.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,

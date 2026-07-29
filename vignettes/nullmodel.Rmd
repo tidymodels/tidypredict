@@ -1,0 +1,87 @@
+---
+title: "nullmodel models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nullmodel models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(tidypredict)
+library(dplyr)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`parsnip::nullmodel()` fits a model that ignores the predictors entirely. For
+regression it predicts the mean of the outcome, and for classification it
+predicts the observed class frequencies. Predictions are therefore constants, and
+`tidypredict_fit()` returns a plain number for regression and a *named list* of
+one constant per class for classification. Since the classification output is a
+list, `tidypredict_to_column()` and `tidypredict_test()` are only supported for
+regression.
+
+## `tidypredict_` functions
+
+```{r}
+model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+tidypredict_test(model, mtcars)
+    ```
+
+For classification, one expression per class is returned:
+
+```{r}
+c_model <- parsnip::nullmodel(iris[-5], iris$Species)
+
+tidypredict_fit(c_model)
+```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+
+p_model <- null_model(mode = "regression") %>%
+  set_engine("parsnip") %>%
+  fit(mpg ~ ., data = mtcars)
+```
+
+```{r}
+tidypredict_fit(p_model)
+```
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
