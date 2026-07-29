@@ -40,6 +40,7 @@
   rpart](https://tidypredict.tidymodels.org/articles/rpart.md):
 - [Save and re-load
   models](https://tidypredict.tidymodels.org/articles/save.md):
+- [sda models](https://tidypredict.tidymodels.org/articles/sda.md):
 - [Database
   write-back](https://tidypredict.tidymodels.org/articles/sql.md):
 - [How tidypredict generates tree
