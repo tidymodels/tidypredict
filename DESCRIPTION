@@ -58,6 +58,7 @@ Suggests:
     nycflights13,
     parsnip,
     partykit,
+    plsmod,
     quantreg,
     randomForest,
     ranger (>= 0.14.1),

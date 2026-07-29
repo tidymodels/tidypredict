@@ -8,7 +8,10 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("mixOmics", quietly = TRUE)) {
+if (
+  requireNamespace("mixOmics", quietly = TRUE) &&
+    requireNamespace("plsmod", quietly = TRUE)
+) {
   library(tidypredict)
   library(dplyr)
   eval_code <- TRUE
