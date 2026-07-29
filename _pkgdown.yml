@@ -30,6 +30,8 @@ navbar:
       href: articles/fda.html
     - text: Linear Discriminant Analysis - lda()
       href: articles/lda.html
+    - text: Shrinkage Discriminant Analysis - sda()
+      href: articles/sda.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()

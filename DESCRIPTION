@@ -12,7 +12,8 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     for the final 'SQL' translation of the algorithm. It currently
     supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
     earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
-    cubist(), ctree(), cforest(), fda(), ksvm(), lda(), and xrf() models.
+    cubist(), ctree(), cforest(), fda(), ksvm(), lda(), sda(), and xrf()
+    models.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,
     https://github.com/tidymodels/tidypredict
@@ -60,6 +61,7 @@ Suggests:
     ranger (>= 0.14.1),
     rpart (>= 4.1.0),
     rules,
+    sda,
     rmarkdown,
     RSQLite,
     survival,
