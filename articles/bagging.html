@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>mixOmics PLS models • tidypredict</title>
+<title>bagger models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="mixOmics PLS models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="bagger models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -97,11 +97,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>mixOmics PLS models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>bagger models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/mixOmics.Rmd" class="external-link"><code>vignettes/mixOmics.Rmd</code></a></small>
-      <div class="d-none name"><code>mixOmics.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/bagging.Rmd" class="external-link"><code>vignettes/bagging.Rmd</code></a></small>
+      <div class="d-none name"><code>bagging.Rmd</code></div>
     </div>
 
     
@@ -121,11 +121,11 @@
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td>✔*</td>
+<td>✔</td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>✔*</td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td>
@@ -140,45 +140,44 @@
 </tr>
 </tbody>
 </table>
-<p>* Only for regression models with a single outcome.</p>
-<p><code>mixOmics</code> fits partial least squares models with
-<code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls()</a></code> and <code>spls()</code>, and the discriminant
-analysis variants with <code>plsda()</code> and <code>splsda()</code>.
-All four collapse down to one set of regression coefficients per
-outcome, so the generated expression is a plain linear combination of
-the predictors.</p>
-<p>For a single-outcome regression model, <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>
-returns one expression. For a model with multiple outcome columns it
-returns a <em>named list</em> of expressions, one per outcome. For the
-discriminant variants it returns a named list of class-probability
-expressions (the softmax of the predicted dummy outcomes, matching what
-<code>plsmod</code> predicts). Since those two cases return a list,
-<code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>
-only work for single-outcome regression models.</p>
-<p>The number of components (<code>ncomp</code>) is baked into the
-coefficients, and the sparse variants simply give the predictors that
-were not selected a coefficient of zero.</p>
+<p><code><a href="https://baguette.tidymodels.org/reference/bagger.html" class="external-link">baguette::bagger()</a></code> fits an ensemble of models on
+bootstrap samples of the training data. Only the <code>"CART"</code>
+base model, which fits <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> trees, is supported.
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns one nested
+<code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> per tree, so the size of the returned
+expression grows with <code>times</code>.</p>
+<p>For regression models the fitted value is the mean of the individual
+tree predictions. For classification models the class probabilities of
+each tree are averaged, and the returned expression is the class with
+the largest average probability.</p>
 <div class="section level2">
 <h2 id="tidypredict_-functions">
 <code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cyl"</span>, <span class="st">"disp"</span>, <span class="st">"hp"</span>, <span class="st">"drat"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">mixOmics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/pls.html" class="external-link">pls</a></span><span class="op">(</span><span class="va">x</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">baguette</span><span class="fu">::</span><span class="fu"><a href="https://baguette.tidymodels.org/reference/bagger.html" class="external-link">bagger</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">mtcars</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Registered S3 method overwritten by 'butcher':</span></span>
+<span><span class="co">#&gt;   method                 from    </span></span>
+<span><span class="co">#&gt;   as.character.dev_topic generics</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 24.2937361352851 + (cyl * -0.889931447343478) + (disp * -0.0130565637350741) + </span></span>
-<span><span class="co">#&gt;     (hp * -0.0228109587521556) + (drat * 2.1303277985918)</span></span></code></pre></div>
+<span><span class="co">#&gt; (case_when(wt &lt; 2.975 ~ 23.0583333333333, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.545 ~ 16.9125, .default = 15.125)) + case_when(wt &lt; 3.16 ~ </span></span>
+<span><span class="co">#&gt;     24.3642857142857, .default = 15.7444444444444) + case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.26 ~ 30.0857142857143, .default = case_when(cyl &lt; 7 ~ 20.4428571428571, </span></span>
+<span><span class="co">#&gt;     .default = 14.6454545454545)) + case_when(disp &lt; 163.8 ~ </span></span>
+<span><span class="co">#&gt;     25.6733333333333, .default = 14.6764705882353) + case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.41 ~ 29.8, .default = case_when(disp &lt; 266.9 ~ 21.325, </span></span>
+<span><span class="co">#&gt;     .default = 14.6916666666667)))/5L</span></span></code></pre></div>
 </li>
 <li>
-<p>Add the prediction to the original table</p>
+<p>Add the predictions to the original table</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 32</span></span>
@@ -194,7 +193,7 @@ were not selected a coefficient of zero.</p>
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.66417<span style="color: #949494;">, </span>22.66417<span style="color: #949494;">, </span>25.40424<span style="color: #949494;">, </span>19.63776<span style="color: #949494;">, </span>15.19254<span style="color: #949494;">, </span>19.500…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.97276<span style="color: #949494;">, </span>22.97276<span style="color: #949494;">, </span>24.66776<span style="color: #949494;">, </span>17.82025<span style="color: #949494;">, </span>15.33411<span style="color: #949494;">, </span>17.820…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that the results match the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
@@ -206,89 +205,113 @@ results</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
 </li>
+<li>
+<p>Get the SQL translation</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((CASE</span></span>
+<span><span class="co">#&gt; WHEN ([wt] &lt; 2.975) THEN 23.0583333333333</span></span>
+<span><span class="co">#&gt; ELSE CASE WHEN ([wt] &lt; 3.545) THEN 16.9125 ELSE 15.125 END</span></span>
+<span><span class="co">#&gt; END + CASE WHEN ([wt] &lt; 3.16) THEN 24.3642857142857 ELSE 15.7444444444444 END) + CASE</span></span>
+<span><span class="co">#&gt; WHEN ([wt] &lt; 2.26) THEN 30.0857142857143</span></span>
+<span><span class="co">#&gt; ELSE CASE WHEN ([cyl] &lt; 7.0) THEN 20.4428571428571 ELSE 14.6454545454545 END</span></span>
+<span><span class="co">#&gt; END) + CASE WHEN ([disp] &lt; 163.8) THEN 25.6733333333333 ELSE 14.6764705882353 END) + CASE</span></span>
+<span><span class="co">#&gt; WHEN ([wt] &lt; 2.41) THEN 29.8</span></span>
+<span><span class="co">#&gt; ELSE CASE WHEN ([disp] &lt; 266.9) THEN 21.325 ELSE 14.6916666666667 END</span></span>
+<span><span class="co">#&gt; END) / 5</span></span></code></pre></div>
+</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="discriminant-analysis">Discriminant analysis<a class="anchor" aria-label="anchor" href="#discriminant-analysis"></a>
+<h2 id="classification">Classification<a class="anchor" aria-label="anchor" href="#classification"></a>
 </h2>
-<p><code>plsda()</code> and <code>splsda()</code> return one probability
-expression per class:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">da_model</span> <span class="op">&lt;-</span> <span class="fu">mixOmics</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/mixOmics/man/splsda.html" class="external-link">splsda</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>, <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, ncomp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">baguette</span><span class="fu">::</span><span class="fu"><a href="https://baguette.tidymodels.org/reference/bagger.html" class="external-link">bagger</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span>, times <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">da_model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
-<span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(0.391460011724113 + (Sepal.Length * -0.118750531861652) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * 0.378311039737146) + (Petal.Length * -0.084556881358667) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -0.16933234787912))/(exp(0.391460011724113 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -0.118750531861652) + (Sepal.Width * 0.378311039737146) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -0.084556881358667) + (Petal.Width * -0.16933234787912)) + </span></span>
-<span><span class="co">#&gt;     exp(1.96606184899222 + (Sepal.Length * -0.0303959537594359) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -0.492023767406961) + (Petal.Length * </span></span>
-<span><span class="co">#&gt;         0.0179469395936271) + (Petal.Width * -0.0152407670638333)) + </span></span>
-<span><span class="co">#&gt;     exp(-1.35752186071634 + (Sepal.Length * 0.149146485621088) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * 0.113712727669814) + (Petal.Length * 0.06660994176504) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 0.184573114942953)))</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">iris</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tidypredict test results</span></span>
+<span><span class="co">#&gt; Difference threshold: 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
-<p><code>parsnip</code> fitted models are also supported by
-<code>tidypredict</code>. The <code>mixOmics</code> engine of
-<code><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls()</a></code> works for both regression and classification:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://plsmod.tidymodels.org" class="external-link">plsmod</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">drat</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 18.9698741155116 + (disp * -0.0183282632913477) + (hp * -0.0323705835435153) + </span></span>
-<span><span class="co">#&gt;     (drat * 2.80763705068415)</span></span></code></pre></div>
-<p><code>mixOmics</code> models are fit from a numeric matrix, so a
-model fit directly can only refer to the matrix columns it was given.
-Categorical predictors therefore work through the <code>parsnip</code>
-interface, which keeps the formula around and lets the dummy columns be
-written in terms of the original factors:</p>
+<p>Models fit with <code><a href="https://parsnip.tidymodels.org/reference/bag_tree.html" class="external-link">parsnip::bag_tree()</a></code> and the
+<code>"rpart"</code> engine are supported as well.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">mtcars</span>, gear <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">c_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/pls.html" class="external-link">pls</a></span><span class="op">(</span>num_comp <span class="op">=</span> <span class="fl">2</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"mixOmics"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_args.html" class="external-link">set_mode</a></span><span class="op">(</span><span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">gear</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/bag_tree.html" class="external-link">bag_tree</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"rpart"</span>, times <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 28.3990491890354 + (disp * -0.0212765260717577) + (hp * -0.0321040699674561) + </span></span>
-<span><span class="co">#&gt;     (ifelse(gear == "4", 1, 0) * 1.89118556186025) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "5", 1, 0) * 3.84388465523581)</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
-</h2>
-<p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 2</span></span>
-<span><span class="co">#&gt;  $ general:List of 5</span></span>
-<span><span class="co">#&gt;   ..$ model  : chr "mixo_pls"</span></span>
-<span><span class="co">#&gt;   ..$ version: num 2</span></span>
-<span><span class="co">#&gt;   ..$ type   : chr "regression"</span></span>
-<span><span class="co">#&gt;   ..$ is_glm : num 0</span></span>
-<span><span class="co">#&gt;   ..$ ncomp  : num 2</span></span>
-<span><span class="co">#&gt;  $ terms  :List of 5</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
+<span><span class="co">#&gt; (case_when(wt &lt; 2.0775 ~ case_when(wt &lt; 1.674 ~ 30.4, .default = 33.9), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 2.975 ~ case_when(wt &lt; 2.3925 ~ </span></span>
+<span><span class="co">#&gt;         22.8, .default = case_when(cyl &lt; 5 ~ case_when(wt &lt; 2.6225 ~ </span></span>
+<span><span class="co">#&gt;         21.5, .default = 21.4), .default = case_when(disp &lt; 152.5 ~ </span></span>
+<span><span class="co">#&gt;         19.7, .default = 21))), .default = case_when(disp &lt; 450 ~ </span></span>
+<span><span class="co">#&gt;         case_when(disp &lt; 355.5 ~ case_when(disp &lt; 288.4 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;             3.9 ~ case_when(wt &lt; 3.595 ~ case_when(wt &lt; 3.45 ~ </span></span>
+<span><span class="co">#&gt;             17.8, .default = 18.1), .default = 17.3), .default = 16.4), </span></span>
+<span><span class="co">#&gt;             .default = case_when(disp &lt; 311 ~ case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;                 302.5 ~ 15, .default = 15.2), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;                 3.345 ~ 15.8, .default = 15.5))), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;             4.595 ~ case_when(wt &lt; 3.7075 ~ case_when(wt &lt; 3.505 ~ </span></span>
+<span><span class="co">#&gt;             18.7, .default = 14.3), .default = 19.2), .default = 14.7)), </span></span>
+<span><span class="co">#&gt;         .default = 10.4))) + case_when(wt &lt; 2.26 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.17 ~ case_when(wt &lt; 1.724 ~ 30.4, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.0375 ~ 27.3, .default = 26)), .default = 32.4), .default = case_when(cyl &lt; </span></span>
+<span><span class="co">#&gt;     7 ~ case_when(wt &lt; 3.3275 ~ case_when(cyl &lt; 5 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.3925 ~ 22.8, .default = case_when(wt &lt; 2.965 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.6225 ~ 21.5, .default = 21.4), .default = 22.8)), .default = case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;     152.5 ~ 19.7, .default = case_when(wt &lt; 3.045 ~ 21, .default = 21.4))), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 3.45 ~ 19.2, .default = 18.1)), </span></span>
+<span><span class="co">#&gt;     .default = case_when(disp &lt; 430 ~ case_when(disp &lt; 380 ~ </span></span>
+<span><span class="co">#&gt;         case_when(wt &lt; 3.955 ~ case_when(wt &lt; 3.81 ~ case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;             355.5 ~ case_when(disp &lt; 326 ~ case_when(wt &lt; 3.675 ~ </span></span>
+<span><span class="co">#&gt;             15, .default = 15.2), .default = 15.8), .default = 14.3), </span></span>
+<span><span class="co">#&gt;             .default = 13.3), .default = 16.4), .default = 19.2), </span></span>
+<span><span class="co">#&gt;         .default = 10.4))) + case_when(wt &lt; 2.26 ~ case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;     78.85 ~ case_when(wt &lt; 1.9075 ~ 30.4, .default = 32.4), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     1.724 ~ 30.4, .default = 27.3)), .default = case_when(cyl &lt; </span></span>
+<span><span class="co">#&gt;     7 ~ case_when(wt &lt; 3.315 ~ case_when(wt &lt; 3.0325 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.47 ~ 22.8, .default = case_when(disp &lt; 152.5 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     2.775 ~ 19.7, .default = 21.4), .default = 21)), .default = 24.4), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 3.45 ~ 18.5, .default = 18.1)), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 4.49 ~ case_when(disp &lt; 339 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.65 ~ case_when(disp &lt; 311 ~ case_when(wt &lt; 3.5025 ~ </span></span>
+<span><span class="co">#&gt;         15.2, .default = 15), .default = 15.5), .default = 17.3), </span></span>
+<span><span class="co">#&gt;         .default = case_when(wt &lt; 3.505 ~ 18.7, .default = 14.3)), </span></span>
+<span><span class="co">#&gt;         .default = 10.4))) + case_when(disp &lt; 163.8 ~ case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;     101.55 ~ case_when(wt &lt; 2.0675 ~ case_when(wt &lt; 1.775 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     1.564 ~ 30.4, .default = 30.4), .default = 27.3), .default = 32.4), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 2.23 ~ 26, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.0325 ~ case_when(wt &lt; 2.3925 ~ 22.8, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         2.8275 ~ case_when(wt &lt; 2.6225 ~ 21.5, .default = 21.4), </span></span>
+<span><span class="co">#&gt;         .default = 21)), .default = 24.4))), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     4.66 ~ case_when(disp &lt; 288.4 ~ case_when(wt &lt; 3.755 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.585 ~ 17.8, .default = 17.3), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.925 ~ 15.2, .default = 16.4)), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.545 ~ case_when(disp &lt; 311 ~ 15.2, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.345 ~ 15.8, .default = 15.5)), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.705 ~ case_when(disp &lt; 330.5 ~ 15, .default = 14.3), .default = 13.3))), </span></span>
+<span><span class="co">#&gt;     .default = 10.4)) + case_when(wt &lt; 2.41 ~ case_when(disp &lt; </span></span>
+<span><span class="co">#&gt;     107.7 ~ case_when(wt &lt; 1.9075 ~ 30.4, .default = 32.4), .default = 26), </span></span>
+<span><span class="co">#&gt;     .default = case_when(disp &lt; 266.9 ~ case_when(cyl &lt; 5 ~ case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.17 ~ case_when(wt &lt; 2.965 ~ 21.4, .default = 22.8), </span></span>
+<span><span class="co">#&gt;         .default = 24.4), .default = case_when(wt &lt; 3.3275 ~ </span></span>
+<span><span class="co">#&gt;         case_when(disp &lt; 152.5 ~ 19.7, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;             3.045 ~ 21, .default = 21.4)), .default = 18.5)), </span></span>
+<span><span class="co">#&gt;         .default = case_when(wt &lt; 4.66 ~ case_when(wt &lt; 3.505 ~ </span></span>
+<span><span class="co">#&gt;             case_when(wt &lt; 3.4375 ~ case_when(disp &lt; 327.5 ~ </span></span>
+<span><span class="co">#&gt;                 15.2, .default = 15.8), .default = 18.7), .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;             3.955 ~ case_when(wt &lt; 3.81 ~ case_when(disp &lt; 330.5 ~ </span></span>
+<span><span class="co">#&gt;             case_when(wt &lt; 3.675 ~ 15, .default = 15.2), .default = 14.3), </span></span>
+<span><span class="co">#&gt;             .default = 13.3), .default = 16.4)), .default = 10.4))))/5L</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -3,6 +3,22 @@
 ## tidypredict (development version)
 
 - Added support for
+  [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
+  bagged tree ensembles fit with the `"CART"` base model, including
+  [`bag_tree()`](https://parsnip.tidymodels.org/reference/bag_tree.html)
+  parsnip models fitted with the `"rpart"` engine. Regression
+  predictions average the individual trees, and classification
+  predictions return the class with the largest average class
+  probability.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now uses a strict inequality (`<`) for the continuous splits of
+  [`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) models,
+  matching how `rpart` assigns values that are exactly equal to a cut
+  point. ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`dbarts::bart()`](https://rdrr.io/pkg/dbarts/man/bart.html) Bayesian
   additive regression trees, including
   [`bart()`](https://parsnip.tidymodels.org/reference/bart.html) parsnip
@@ -63,7 +79,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -323,9 +339,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
-  now support `Gamma` family and Cox proportional hazards
-  (`family = "cox"`) models.
+- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
+  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
+  models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -390,9 +406,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
-  that use family function syntax (e.g., `family = gaussian()`) instead
-  of string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
+  use family function syntax (e.g., `family = gaussian()`) instead of
+  string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)

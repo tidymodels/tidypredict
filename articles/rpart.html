@@ -53,6 +53,7 @@
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
     <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
     <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
+    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
@@ -172,7 +173,7 @@ value handling.</p>
 a <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt; case_when(cyl &lt; 5 ~ 26.6636363636364, .default = case_when(hp &lt; </span></span>
 <span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
@@ -193,7 +194,7 @@ statement</li>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_class</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(Petal.Length &lt;= 2.45 ~ "setosa", .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt; case_when(Petal.Length &lt; 2.45 ~ "setosa", .default = case_when(Petal.Width &lt; </span></span>
 <span><span class="co">#&gt;     1.75 ~ "versicolor", .default = "virginica"))</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -209,7 +210,7 @@ objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt; case_when(cyl &lt; 5 ~ 26.6636363636364, .default = case_when(hp &lt; </span></span>
 <span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
 </div>
 <div class="section level2">
@@ -223,7 +224,7 @@ generated formula uses <code>%in%</code> for categorical splits:</p>
 <span></span>
 <span><span class="va">model_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl %in% c("6", "8") ~ case_when(hp &lt;= 192.5 ~ 18.2642857142857, </span></span>
+<span><span class="co">#&gt; case_when(cyl %in% c("6", "8") ~ case_when(hp &lt; 192.5 ~ 18.2642857142857, </span></span>
 <span><span class="co">#&gt;     .default = 13.4142857142857), .default = 26.6636363636364)</span></span></code></pre></div>
 </div>
 <div class="section level2">

@@ -50,7 +50,7 @@ statement.
 ``` r
 
 tidypredict_fit(model)
-#> case_when(cyl <= 5 ~ 26.6636363636364, .default = case_when(hp <= 
+#> case_when(cyl < 5 ~ 26.6636363636364, .default = case_when(hp < 
 #>     192.5 ~ 18.2642857142857, .default = 13.4142857142857))
 ```
 
@@ -70,7 +70,7 @@ operated. `tidypredict` provides three paths:
 
 model_class <- rpart(Species ~ ., data = iris)
 tidypredict_fit(model_class)
-#> case_when(Petal.Length <= 2.45 ~ "setosa", .default = case_when(Petal.Width <= 
+#> case_when(Petal.Length < 2.45 ~ "setosa", .default = case_when(Petal.Width < 
 #>     1.75 ~ "versicolor", .default = "virginica"))
 ```
 
@@ -88,7 +88,7 @@ parsnip_model <- decision_tree(mode = "regression") |>
   fit(mpg ~ ., data = mtcars)
 
 tidypredict_fit(parsnip_model)
-#> case_when(cyl <= 5 ~ 26.6636363636364, .default = case_when(hp <= 
+#> case_when(cyl < 5 ~ 26.6636363636364, .default = case_when(hp < 
 #>     192.5 ~ 18.2642857142857, .default = 13.4142857142857))
 ```
 
@@ -104,7 +104,7 @@ mtcars2$cyl <- factor(mtcars2$cyl)
 
 model_cat <- rpart(mpg ~ cyl + wt + hp, data = mtcars2)
 tidypredict_fit(model_cat)
-#> case_when(cyl %in% c("6", "8") ~ case_when(hp <= 192.5 ~ 18.2642857142857, 
+#> case_when(cyl %in% c("6", "8") ~ case_when(hp < 192.5 ~ 18.2642857142857, 
 #>     .default = 13.4142857142857), .default = 26.6636363636364)
 ```
 

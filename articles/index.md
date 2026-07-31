@@ -4,6 +4,8 @@
 
 - [Oblique Random Forest, using
   aorsf](https://tidypredict.tidymodels.org/articles/aorsf.md):
+- [bagger
+  models](https://tidypredict.tidymodels.org/articles/bagging.md):
 - [bart models](https://tidypredict.tidymodels.org/articles/bart.md):
 - [Decision trees, using
   C5.0](https://tidypredict.tidymodels.org/articles/C5.0.md):

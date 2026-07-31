@@ -7,8 +7,8 @@ final 'SQL' translation of the algorithm. It currently supports lm(),
 glm(), randomForest(), ranger(), rpart(), C5.0(), earth(),
 xgb.Booster.complete(), lgb.Booster(), catboost.Model(), cubist(),
 ctree(), cforest(), fda(), ksvm(), lda(), sda(), lda_diag(), pls(),
-nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(), and xrf()
-models.
+nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(), bagger(), and
+xrf() models.
 
 ## See also
 

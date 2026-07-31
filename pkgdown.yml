@@ -3,6 +3,7 @@ pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   aorsf: aorsf.html
+  bagging: bagging.html
   bart: bart.html
   C5.0: C5.0.html
   catboost: catboost.html
@@ -34,7 +35,7 @@ articles:
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-07-31T23:10Z
+last_built: 2026-07-31T23:55Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles
