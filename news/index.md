@@ -16,6 +16,19 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for
+  [`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+  naive Bayes models fit without kernel density estimates
+  (`usekernel = FALSE`), including Gaussian, categorical, Bernoulli, and
+  Poisson conditional distributions, and
+  [`naive_Bayes()`](https://parsnip.tidymodels.org/reference/naive_Bayes.html)
+  parsnip models fitted with the `"naivebayes"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions, and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`parsnip::nullmodel()`](https://parsnip.tidymodels.org/reference/nullmodel.html)
   models, including
   [`null_model()`](https://parsnip.tidymodels.org/reference/null_model.html)

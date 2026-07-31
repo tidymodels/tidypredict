@@ -137,7 +137,8 @@
 </tr>
 </tbody>
 </table>
-<p><code><a href="https://rdrr.io/pkg/klaR/man/NaiveBayes.html" class="external-link">klaR::NaiveBayes()</a></code> fits naive Bayes classifiers.
+<p><code><a href="https://rdrr.io/pkg/klaR/man/NaiveBayes.html" class="external-link">klaR::NaiveBayes()</a></code> and
+<code><a href="https://majkamichal.github.io/naivebayes/reference/naive_bayes.html" class="external-link">naivebayes::naive_bayes()</a></code> fit naive Bayes classifiers.
 Predicting with such a model multiplies the prior probability of each
 class by one conditional density per predictor, and then normalizes
 those products into posterior probabilities. Working on the log scale
@@ -145,9 +146,12 @@ turns the products into sums, which makes the posterior probabilities
 the softmax of the summed log densities.</p>
 <p>Numeric predictors contribute a normal log density, and categorical
 predictors contribute a <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> lookup of the
-conditional probability of the observed level. Only Gaussian densities
-can be expressed this way, so models fit with
-<code>usekernel = TRUE</code> are not supported.</p>
+conditional probability of the observed level.
+<code><a href="https://majkamichal.github.io/naivebayes/reference/naive_bayes.html" class="external-link">naivebayes::naive_bayes()</a></code> additionally supports Poisson
+densities for integer predictors when fit with
+<code>usepoisson = TRUE</code>. Kernel density estimates cannot be
+expressed this way, so models fit with <code>usekernel = TRUE</code> are
+not supported.</p>
 <p>Because these models predict one probability per outcome class,
 <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a <em>named list</em> of
 expressions, one for each class, rather than a single expression. Since
@@ -249,10 +253,72 @@ results</p>
 <span><span class="co">#&gt;         2.026)^2/0.150865306122449))))</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="naivebayesnaive_bayes">
+<code>naivebayes::naive_bayes()</code><a class="anchor" aria-label="anchor" href="#naivebayesnaive_bayes"></a>
+</h2>
+<p>The <code>naivebayes</code> package is supported in the same way:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nb_model</span> <span class="op">&lt;-</span> <span class="fu">naivebayes</span><span class="fu">::</span><span class="fu"><a href="https://majkamichal.github.io/naivebayes/reference/naive_bayes.html" class="external-link">naive_bayes</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">nb_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">nb_model</span><span class="op">)</span></span>
+<span><span class="va">nb_fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; exp(-1.09861228866811 + (1.04273391328984 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;     5.006)^2/0.248497959183673)) + (0.970049249016581 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;     3.428)^2/0.287379591836735)) + (1.75063290136911 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;     1.462)^2/0.0603183673469388)) + (2.25012937537181 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;     0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + (1.04273391328984 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + </span></span>
+<span><span class="co">#&gt;     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + </span></span>
+<span><span class="co">#&gt;     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + </span></span>
+<span><span class="co">#&gt;     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + </span></span>
+<span><span class="co">#&gt;     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + </span></span>
+<span><span class="co">#&gt;     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;         2.026)^2/0.150865306122449))))</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nb_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">nb_fit</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">iris</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">nb_probs</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">nb_model</span>, <span class="va">iris</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">nb_model</span><span class="op">$</span><span class="va">tables</span><span class="op">)</span><span class="op">]</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+<p>The <code>"naivebayes"</code> parsnip engine works too, as long as
+<code>usekernel = FALSE</code>:</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">nb_p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/naive_Bayes.html" class="external-link">naive_Bayes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"naivebayes"</span>, usekernel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">nb_p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
+<span><span class="co">#&gt; exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;     6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;     2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;     5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;     2.026)^2/0.150865306122449)))/(exp(-1.09861228866811 + (1.04273391328984 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + </span></span>
+<span><span class="co">#&gt;     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + </span></span>
+<span><span class="co">#&gt;     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + </span></span>
+<span><span class="co">#&gt;     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + </span></span>
+<span><span class="co">#&gt;     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + </span></span>
+<span><span class="co">#&gt;     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;         2.026)^2/0.150865306122449))))</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>

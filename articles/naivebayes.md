@@ -8,9 +8,10 @@
 | [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
 | `parsnip` | ✔ |
 
-[`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
-fits naive Bayes classifiers. Predicting with such a model multiplies
-the prior probability of each class by one conditional density per
+[`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html) and
+[`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+fit naive Bayes classifiers. Predicting with such a model multiplies the
+prior probability of each class by one conditional density per
 predictor, and then normalizes those products into posterior
 probabilities. Working on the log scale turns the products into sums,
 which makes the posterior probabilities the softmax of the summed log
@@ -19,9 +20,11 @@ densities.
 Numeric predictors contribute a normal log density, and categorical
 predictors contribute a
 [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
-lookup of the conditional probability of the observed level. Only
-Gaussian densities can be expressed this way, so models fit with
-`usekernel = TRUE` are not supported.
+lookup of the conditional probability of the observed level.
+[`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+additionally supports Poisson densities for integer predictors when fit
+with `usepoisson = TRUE`. Kernel density estimates cannot be expressed
+this way, so models fit with `usekernel = TRUE` are not supported.
 
 Because these models predict one probability per outcome class,
 [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
@@ -115,6 +118,76 @@ p_model <- naive_Bayes() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
+#> exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - 
+#>     6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - 
+#>     2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - 
+#>     5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - 
+#>     2.026)^2/0.150865306122449)))/(exp(-1.09861228866811 + (1.04273391328984 - 
+#>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - 
+#>     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - 
+#>     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - 
+#>     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + 
+#>     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + 
+#>     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
+#>     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + 
+#>     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
+#>     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - 
+#>         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - 
+#>         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - 
+#>         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - 
+#>         2.026)^2/0.150865306122449))))
+```
+
+## `naivebayes::naive_bayes()`
+
+The `naivebayes` package is supported in the same way:
+
+``` r
+
+nb_model <- naivebayes::naive_bayes(Species ~ ., data = iris)
+
+nb_fit <- tidypredict_fit(nb_model)
+nb_fit[["setosa"]]
+#> exp(-1.09861228866811 + (1.04273391328984 - ((Sepal.Length - 
+#>     5.006)^2/0.248497959183673)) + (0.970049249016581 - ((Sepal.Width - 
+#>     3.428)^2/0.287379591836735)) + (1.75063290136911 - ((Petal.Length - 
+#>     1.462)^2/0.0603183673469388)) + (2.25012937537181 - ((Petal.Width - 
+#>     0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + (1.04273391328984 - 
+#>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - 
+#>     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - 
+#>     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - 
+#>     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + 
+#>     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + 
+#>     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
+#>     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + 
+#>     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
+#>     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - 
+#>         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - 
+#>         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - 
+#>         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - 
+#>         2.026)^2/0.150865306122449))))
+```
+
+``` r
+
+nb_probs <- sapply(nb_fit, \(f) rlang::eval_tidy(f, iris))
+all.equal(
+  unname(nb_probs),
+  unname(predict(nb_model, iris[names(nb_model$tables)], type = "prob"))
+)
+#> [1] TRUE
+```
+
+The `"naivebayes"` parsnip engine works too, as long as
+`usekernel = FALSE`:
+
+``` r
+
+nb_p_model <- naive_Bayes() %>%
+  set_engine("naivebayes", usekernel = FALSE) %>%
+  fit(Species ~ ., data = iris)
+
+tidypredict_fit(nb_p_model)[["virginica"]]
 #> exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - 
 #>     6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - 
 #>     2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - 
