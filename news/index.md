@@ -3,6 +3,19 @@
 ## tidypredict (development version)
 
 - Added support for
+  [`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
+  naive Bayes models with Gaussian densities (`usekernel = FALSE`),
+  including
+  [`naive_Bayes()`](https://parsnip.tidymodels.org/reference/naive_Bayes.html)
+  parsnip models fitted with the `"klaR"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions (softmax of the
+  summed log densities), and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`parsnip::nullmodel()`](https://parsnip.tidymodels.org/reference/nullmodel.html)
   models, including
   [`null_model()`](https://parsnip.tidymodels.org/reference/null_model.html)

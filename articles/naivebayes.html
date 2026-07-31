@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>sda models • tidypredict</title>
+<title>NaiveBayes models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="sda models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="NaiveBayes models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -94,11 +94,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>sda models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>NaiveBayes models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/sda.Rmd" class="external-link"><code>vignettes/sda.Rmd</code></a></small>
-      <div class="d-none name"><code>sda.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/naivebayes.Rmd" class="external-link"><code>vignettes/naivebayes.Rmd</code></a></small>
+      <div class="d-none name"><code>naivebayes.Rmd</code></div>
     </div>
 
     
@@ -137,22 +137,28 @@
 </tr>
 </tbody>
 </table>
-<p><code><a href="https://rdrr.io/pkg/sda/man/sda.html" class="external-link">sda::sda()</a></code> fits shrinkage discriminant analysis models,
-including the diagonal variant (<code>diagonal = TRUE</code>).
-Predicting with such a model is a softmax over one linear predictor per
-outcome class, so <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a <em>named
-list</em> of expressions, one for each class, rather than a single
-expression. Since the output is a list,
-<code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>
-are not supported.</p>
-<p>Only the features that survive shrinkage appear in the fitted model,
-and the generated expressions reference just those.</p>
+<p><code><a href="https://rdrr.io/pkg/klaR/man/NaiveBayes.html" class="external-link">klaR::NaiveBayes()</a></code> fits naive Bayes classifiers.
+Predicting with such a model multiplies the prior probability of each
+class by one conditional density per predictor, and then normalizes
+those products into posterior probabilities. Working on the log scale
+turns the products into sums, which makes the posterior probabilities
+the softmax of the summed log densities.</p>
+<p>Numeric predictors contribute a normal log density, and categorical
+predictors contribute a <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> lookup of the
+conditional probability of the observed level. Only Gaussian densities
+can be expressed this way, so models fit with
+<code>usekernel = TRUE</code> are not supported.</p>
+<p>Because these models predict one probability per outcome class,
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a <em>named list</em> of
+expressions, one for each class, rather than a single expression. Since
+the output is a list, <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and
+<code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code> are not supported.</p>
 <div class="section level2">
 <h2 id="tidypredict_-functions">
 <code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">sda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sda/man/sda.html" class="external-link">sda</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>, <span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">klaR</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/klaR/man/NaiveBayes.html" class="external-link">NaiveBayes</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formulas, one per class</p>
@@ -161,16 +167,24 @@ and the generated expressions reference just those.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-13.1507094677662 + (Sepal.Length * 5.73266109594555) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;     11.3604293693887) + (Petal.Length * -16.8084846238169) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -16.6240117338793))/(exp(-13.1507094677662 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 5.73266109594555) + (Sepal.Width * 11.3604293693887) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -16.8084846238169) + (Petal.Width * -16.6240117338793)) + </span></span>
-<span><span class="co">#&gt;     exp(-2.17403913501331 + (Sepal.Length * -1.38327577793292) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -4.20634050168113) + (Petal.Length * 4.57106120700436) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 2.49705634843865)) + exp(-32.2372116751408 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.34938531801259) + (Sepal.Width * -7.15408886770751) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.2374234168125) + (Petal.Width * 14.1269553854406)))</span></span></code></pre></div>
+<span><span class="co">#&gt; exp(-1.09861228866811 + (1.04273391328984 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;     5.006)^2/0.248497959183673)) + (0.970049249016581 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;     3.428)^2/0.287379591836735)) + (1.75063290136911 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;     1.462)^2/0.0603183673469388)) + (2.25012937537181 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;     0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + (1.04273391328984 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + </span></span>
+<span><span class="co">#&gt;     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + </span></span>
+<span><span class="co">#&gt;     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + </span></span>
+<span><span class="co">#&gt;     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + </span></span>
+<span><span class="co">#&gt;     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + </span></span>
+<span><span class="co">#&gt;     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;         2.026)^2/0.150865306122449))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -188,22 +202,18 @@ and the generated expressions reference just those.</p>
 <span><span class="co">#&gt; $ Petal.Width  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.4<span style="color: #949494;">, </span>0.3<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.2<span style="color: #949494;">, </span>0.1…</span></span>
 <span><span class="co">#&gt; $ Species      <span style="color: #949494; font-style: italic;">&lt;fct&gt;</span> setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>setosa<span style="color: #949494;">, </span>…</span></span>
 <span><span class="co">#&gt; $ setosa       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ versicolor   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1.009018e-20<span style="color: #949494;">, </span>1.005223e-16<span style="color: #949494;">, </span>2.186404e-18<span style="color: #949494;">, </span>1.5199…</span></span>
-<span><span class="co">#&gt; $ virginica    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3.704434e-39<span style="color: #949494;">, </span>2.916177e-34<span style="color: #949494;">, </span>2.957542e-36<span style="color: #949494;">, </span>1.7209…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ versicolor   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2.981309e-18<span style="color: #949494;">, </span>3.169312e-17<span style="color: #949494;">, </span>2.367113e-18<span style="color: #949494;">, </span>3.0696…</span></span>
+<span><span class="co">#&gt; $ virginica    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2.152373e-25<span style="color: #949494;">, </span>6.938030e-25<span style="color: #949494;">, </span>7.240956e-26<span style="color: #949494;">, </span>8.6906…</span></span></code></pre></div>
 </li>
 <li>
 <p>Confirm that the results match the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
 results</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fit</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">iris</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="va">posterior</span> <span class="op">&lt;-</span> <span class="fu">sda</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/sda/man/predict.sda.html" class="external-link">predict.sda</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">posterior</span><span class="op">$</span><span class="va">posterior</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "Mean relative difference: 4.212717e-08"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">iris</span><span class="op">)</span><span class="op">$</span><span class="va">posterior</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </li>
 </ul>
-<p><code>sda()</code> rounds its posterior probabilities with
-<code><a href="https://rdrr.io/r/base/zapsmall.html" class="external-link">zapsmall()</a></code>, so expect agreement to about seven decimal
-places rather than exactly.</p>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -214,65 +224,49 @@ places rather than exactly.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/discrim" class="external-link">discrim</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"sda"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/naive_Bayes.html" class="external-link">naive_Bayes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"klaR"</span>, usekernel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-32.2372116751408 + (Sepal.Length * -4.34938531801259) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * -7.15408886770751) + (Petal.Length * 12.2374234168125) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * 14.1269553854406))/(exp(-13.1507094677662 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 5.73266109594555) + (Sepal.Width * 11.3604293693887) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -16.8084846238169) + (Petal.Width * -16.6240117338793)) + </span></span>
-<span><span class="co">#&gt;     exp(-2.17403913501331 + (Sepal.Length * -1.38327577793292) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -4.20634050168113) + (Petal.Length * 4.57106120700436) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 2.49705634843865)) + exp(-32.2372116751408 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.34938531801259) + (Sepal.Width * -7.15408886770751) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.2374234168125) + (Petal.Width * 14.1269553854406)))</span></span></code></pre></div>
-<p><code>sda()</code> is fit from a numeric matrix, so a model fit
-directly can only refer to the matrix columns it was given. Categorical
-predictors therefore work through the <code>parsnip</code> interface,
-which keeps the formula around and lets the dummy columns be written in
-terms of the original factors:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/transform.html" class="external-link">transform</a></span><span class="op">(</span><span class="va">mtcars</span>, cyl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">cyl</span><span class="op">)</span>, gear <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="va">gear</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">c_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/discrim_linear.html" class="external-link">discrim_linear</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"sda"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">cyl</span> <span class="op">~</span> <span class="va">mpg</span> <span class="op">+</span> <span class="va">gear</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"8"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-9.69338951858337 + (mpg * -0.300898442298614) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "4", 1, 0) * -0.288744001063268) + (ifelse(gear == "5", 1, </span></span>
-<span><span class="co">#&gt;     0) * 0.346792280462245) + (disp * 0.0491641125277205))/(exp(-5.90478040863942 + </span></span>
-<span><span class="co">#&gt;     (mpg * 0.450539182424721) + (ifelse(gear == "4", 1, 0) * </span></span>
-<span><span class="co">#&gt;     0.12033481185876) + (ifelse(gear == "5", 1, 0) * -0.326397688436069) + </span></span>
-<span><span class="co">#&gt;     (disp * -0.0361970033802602)) + exp(4.82341069251291 + (mpg * </span></span>
-<span><span class="co">#&gt;     -0.145463097730621) + (ifelse(gear == "4", 1, 0) * 0.189561232611208) + </span></span>
-<span><span class="co">#&gt;     (ifelse(gear == "5", 1, 0) * -0.0358060646840255) + (disp * </span></span>
-<span><span class="co">#&gt;     -0.0157055813201664)) + exp(-9.69338951858337 + (mpg * -0.300898442298614) + </span></span>
-<span><span class="co">#&gt;     (ifelse(gear == "4", 1, 0) * -0.288744001063268) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "5", 1, 0) * 0.346792280462245) + (disp * 0.0491641125277205)))</span></span></code></pre></div>
+<span><span class="co">#&gt; exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;     6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;     2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;     5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;     2.026)^2/0.150865306122449)))/(exp(-1.09861228866811 + (1.04273391328984 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Length - 5.006)^2/0.248497959183673)) + (0.970049249016581 - </span></span>
+<span><span class="co">#&gt;     ((Sepal.Width - 3.428)^2/0.287379591836735)) + (1.75063290136911 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Length - 1.462)^2/0.0603183673469388)) + (2.25012937537181 - </span></span>
+<span><span class="co">#&gt;     ((Petal.Width - 0.246)^2/0.0222122448979592))) + exp(-1.09861228866811 + </span></span>
+<span><span class="co">#&gt;     (0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + </span></span>
+<span><span class="co">#&gt;     (1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + </span></span>
+<span><span class="co">#&gt;     (0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + </span></span>
+<span><span class="co">#&gt;     (1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + </span></span>
+<span><span class="co">#&gt;     exp(-1.09861228866811 + (0.452746052315965 - ((Sepal.Length - </span></span>
+<span><span class="co">#&gt;         6.588)^2/0.808685714285714)) + (1.13166256707153 - ((Sepal.Width - </span></span>
+<span><span class="co">#&gt;         2.974)^2/0.208008163265306)) + (0.594398019628377 - ((Petal.Length - </span></span>
+<span><span class="co">#&gt;         5.552)^2/0.609175510204082)) + (1.29225751662055 - ((Petal.Width - </span></span>
+<span><span class="co">#&gt;         2.026)^2/0.150865306122449))))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>
 <span><span class="co">#&gt;  $ general    :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ model  : chr "sda"</span></span>
-<span><span class="co">#&gt;   ..$ version: num 2</span></span>
-<span><span class="co">#&gt;   ..$ type   : chr "multiclass_regression"</span></span>
-<span><span class="co">#&gt;   ..$ family : chr "multinomial"</span></span>
+<span><span class="co">#&gt;   ..$ model    : chr "NaiveBayes"</span></span>
+<span><span class="co">#&gt;   ..$ version  : num 2</span></span>
+<span><span class="co">#&gt;   ..$ type     : chr "naive_bayes"</span></span>
+<span><span class="co">#&gt;   ..$ threshold: num 0.001</span></span>
 <span><span class="co">#&gt;  $ classes    : chr [1:3] "setosa" "versicolor" "virginica"</span></span>
 <span><span class="co">#&gt;  $ class_terms:List of 3</span></span>
-<span><span class="co">#&gt;   ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   ..$ :List of 5</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_multiclass_regression" "list"</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..$ :List of 2</span></span>
+<span><span class="co">#&gt;   ..$ :List of 2</span></span>
+<span><span class="co">#&gt;   ..$ :List of 2</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_naive_bayes" "list"</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

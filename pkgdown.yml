@@ -17,6 +17,7 @@ articles:
   mars: mars.html
   mixOmics: mixOmics.html
   multinom: multinom.html
+  naivebayes: naivebayes.html
   non-r: non-r.html
   nullmodel: nullmodel.html
   partykit: partykit.html
@@ -31,7 +32,7 @@ articles:
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-07-29T21:45Z
+last_built: 2026-07-31T21:22Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

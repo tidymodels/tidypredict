@@ -43,14 +43,14 @@ model <- MASS::lda(Species ~ ., data = iris)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(-15.477836726795 + (Sepal.Length * 6.31475845867536) + (Sepal.Width * 
+  #> exp(-15.4778367267951 + (Sepal.Length * 6.31475845867535) + (Sepal.Width * 
   #>     12.1393171806029) + (Petal.Length * -16.9464246511956) + 
-  #>     (Petal.Width * -20.770054592318))/(exp(-15.477836726795 + 
-  #>     (Sepal.Length * 6.31475845867536) + (Sepal.Width * 12.1393171806029) + 
+  #>     (Petal.Width * -20.770054592318))/(exp(-15.4778367267951 + 
+  #>     (Sepal.Length * 6.31475845867535) + (Sepal.Width * 12.1393171806029) + 
   #>     (Petal.Length * -16.9464246511956) + (Petal.Width * -20.770054592318)) + 
-  #>     exp(-2.02197415376308 + (Sepal.Length * -1.53119918820706) + 
-  #>         (Sepal.Width * -4.37604347769129) + (Petal.Length * 4.69566530591248) + 
-  #>         (Petal.Width * 3.06258538965303)) + exp(-33.5376867395709 + 
+  #>     exp(-2.02197415376311 + (Sepal.Length * -1.53119918820706) + 
+  #>         (Sepal.Width * -4.37604347769128) + (Petal.Length * 4.69566530591248) + 
+  #>         (Petal.Width * 3.06258538965302)) + exp(-33.5376867395708 + 
   #>     (Sepal.Length * -4.7835592704683) + (Sepal.Width * -7.76327370291161) + 
   #>     (Petal.Length * 12.2507593452831) + (Petal.Width * 17.707469202665)))
   ```
@@ -103,14 +103,14 @@ p_model <- discrim_linear() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-33.5376867395709 + (Sepal.Length * -4.7835592704683) + (Sepal.Width * 
+#> exp(-33.5376867395708 + (Sepal.Length * -4.7835592704683) + (Sepal.Width * 
 #>     -7.76327370291161) + (Petal.Length * 12.2507593452831) + 
-#>     (Petal.Width * 17.707469202665))/(exp(-15.477836726795 + 
-#>     (Sepal.Length * 6.31475845867536) + (Sepal.Width * 12.1393171806029) + 
+#>     (Petal.Width * 17.707469202665))/(exp(-15.4778367267951 + 
+#>     (Sepal.Length * 6.31475845867535) + (Sepal.Width * 12.1393171806029) + 
 #>     (Petal.Length * -16.9464246511956) + (Petal.Width * -20.770054592318)) + 
-#>     exp(-2.02197415376308 + (Sepal.Length * -1.53119918820706) + 
-#>         (Sepal.Width * -4.37604347769129) + (Petal.Length * 4.69566530591248) + 
-#>         (Petal.Width * 3.06258538965303)) + exp(-33.5376867395709 + 
+#>     exp(-2.02197415376311 + (Sepal.Length * -1.53119918820706) + 
+#>         (Sepal.Width * -4.37604347769128) + (Petal.Length * 4.69566530591248) + 
+#>         (Petal.Width * 3.06258538965302)) + exp(-33.5376867395708 + 
 #>     (Sepal.Length * -4.7835592704683) + (Sepal.Width * -7.76327370291161) + 
 #>     (Petal.Length * 12.2507593452831) + (Petal.Width * 17.707469202665)))
 ```
