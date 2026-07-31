@@ -1,0 +1,121 @@
+---
+title: "bart models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bart models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("dbarts", quietly = TRUE)) {
+  library(tidypredict)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`dbarts::bart()` fits a Bayesian additive regression trees (BART) model. Each
+draw of the posterior sampler holds a full ensemble of trees, and the fitted
+value is the average, over every draw, of the summed leaf values of that draw's
+trees. `tidypredict_fit()` returns one nested `case_when()` per tree of per
+draw, so the size of the returned expression grows with both the number of trees
+and the number of posterior samples that were kept. Small values of `ntree` and
+`ndpost` keep the formula manageable.
+
+Two things are needed for the model to be parsed:
+
+- The model has to be fit with `keeptrees = TRUE`, otherwise the trees are
+  discarded and cannot be recovered.
+- The outcome has to be continuous. Binary outcomes are fit with a probit link,
+  which cannot be translated to SQL.
+
+## `tidypredict_` functions
+
+```{r}
+set.seed(100)
+model <- dbarts::bart(
+  mtcars[c("wt", "cyl", "disp")],
+  mtcars$mpg,
+  ntree = 5,
+  ndpost = 5,
+  keeptrees = TRUE,
+  verbose = FALSE
+)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+tidypredict_test(model, mtcars)
+    ```
+
+- Get the SQL translation
+    ```{r}
+tidypredict_sql(model, dbplyr::simulate_mssql())
+    ```
+
+## parsnip
+
+Models fit with `parsnip::bart()` and the `"dbarts"` engine are supported as
+well. Note that `predict()` on a parsnip `bart()` model draws from the posterior
+*predictive* distribution, which adds residual noise, so its results are only
+equal to the ones of `tidypredict_fit()` in expectation.
+
+```{r}
+library(parsnip)
+
+set.seed(100)
+model <- bart(mode = "regression", trees = 5) %>%
+  set_engine("dbarts", ndpost = 5, verbose = FALSE) %>%
+  fit(mpg ~ wt + cyl + disp, data = mtcars)
+
+tidypredict_fit(model)
+```
+
+## Factor predictors
+
+Factor and character predictors are expanded into indicator columns before the
+model is fit. `tidypredict_fit()` maps those columns back onto the original
+columns, so the returned formula can be used with the same data that the model
+was fit on.
+
+```{r}
+set.seed(100)
+model <- dbarts::bart(
+  data.frame(wt = mtcars$wt, cyl = factor(mtcars$cyl)),
+  mtcars$mpg,
+  ntree = 2,
+  ndpost = 2,
+  keeptrees = TRUE,
+  verbose = FALSE
+)
+
+tidypredict_fit(model)
+```
