@@ -32,3 +32,37 @@
       ! `tidypredict_test()` does not support `klaR::NaiveBayes()` models.
       i Use `tidypredict_fit()` directly for multiclass predictions.
 
+# naive_bayes handles binary outcomes and a single predictor
+
+    Code
+      round_print(tf[["0"]])
+    Output
+      [1] "exp(-0.5212969 + (-1.3439 - ((mpg - 17.14737)^2/29.3986)))/(exp(-0.5212969 + (-1.3439 - ((mpg - 17.14737)^2/29.3986))) + exp(-0.9007865 + (-1.819132 - ((mpg - 24.39231)^2/76.05154))))"
+
+# naive_bayes kernel density fits are rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` does not support `naivebayes::naive_bayes()` models fit with kernel density estimates.
+      i Refit with `usekernel = FALSE`.
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` does not support `naivebayes::naive_bayes()` models fit with kernel density estimates.
+      i Refit with `usekernel = FALSE`.
+
+# tidypredict_test errors for naive_bayes models
+
+    Code
+      tidypredict_test(model, iris)
+    Condition
+      Error in `tidypredict_test()`:
+      ! `tidypredict_test()` does not support `naivebayes::naive_bayes()` models.
+      i Use `tidypredict_fit()` directly for multiclass predictions.
+
