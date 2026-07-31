@@ -300,6 +300,12 @@ tidypredict_test.rpart <- function(
     )
   }
 
+  lapply(rpart_classprob_tree_info(model), generate_nested_case_when_tree)
+}
+
+# One tree_info per outcome level, where the node predictions are the class
+# probabilities instead of the predicted class
+rpart_classprob_tree_info <- function(model) {
   # Extract class probabilities from yval2
   # yval2 structure: [yval, count_class1, ..., count_classN, prob_class1, ..., prob_classN, nodeprob]
   yval2 <- model$frame$yval2
@@ -317,8 +323,9 @@ tidypredict_test.rpart <- function(
   res <- list()
   for (i in seq_len(ncol(probs))) {
     tree_info_copy <- tree_info
-    tree_info_copy$prediction <- probs[, i]
-    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
+    tree_info_copy$prediction <- unname(probs[, i])
+    res[[i]] <- tree_info_copy
   }
+  names(res) <- ylevels
   res
 }
