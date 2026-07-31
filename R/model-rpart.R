@@ -134,11 +134,14 @@ extract_one_split <- function(splits, idx, model, var_name) {
   index <- splits[idx, "index"]
 
   if (abs(ncat) == 1) {
-    # Continuous split
+    # Continuous split. `rpart` sends values strictly below the cut point to
+    # the "less than" side, which matters when a cut point coincides with an
+    # observed value
     list(
       col = var_name,
       val = index,
       is_categorical = FALSE,
+      strict = TRUE,
       needs_swap = ncat == 1
     )
   } else {

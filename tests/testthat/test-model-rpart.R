@@ -215,3 +215,19 @@ test_that(".rpart_tree_info_full is exported and works", {
     )
   )
 })
+
+test_that("splits at an observed value use a strict inequality", {
+  # `rpart` sends values strictly below the cut point to the left, which is
+  # only observable when the cut point coincides with a value in the new data
+  df <- data.frame(x = c(1, 1, 2, 2, 3, 3), y = c(0, 0, 0, 1, 1, 1))
+  model <- rpart::rpart(
+    y ~ x,
+    data = df[df$x != 2, ],
+    control = rpart::rpart.control(minsplit = 2, cp = 0)
+  )
+
+  expect_equal(
+    dplyr::mutate(df, pred = !!tidypredict_fit(model))$pred,
+    unname(predict(model, df))
+  )
+})
