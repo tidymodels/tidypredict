@@ -26,6 +26,13 @@ tidypredict_fit.model_fit <- function(model) {
     return(tidypredict_fit_mixomics(model$fit, mixomics_parsnip_vars(model)))
   }
 
+  # `mlp()` models need the extra softmax that parsnip applies to the class
+  # probabilities. `multinom_reg()` also fits an object that inherits from
+  # `"nnet"`, but its predictions are not post processed.
+  if (inherits(model$fit, "nnet") && !inherits(model$fit, "multinom")) {
+    return(tidypredict_fit_nnet_parsnip(model))
+  }
+
   tidypredict_fit(model$fit)
 }
 
