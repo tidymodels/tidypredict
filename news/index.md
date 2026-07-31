@@ -75,6 +75,18 @@
   is not supported for these multiclass models.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- Added support for
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html) single hidden
+  layer neural networks, including
+  [`mlp()`](https://parsnip.tidymodels.org/reference/mlp.html) parsnip
+  models fitted with the `"nnet"` engine, for regression and
+  classification. Regression models return a single expression, and
+  classification models return a named list of class-probability
+  expressions, for which
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - Added support for [`sda::sda()`](https://rdrr.io/pkg/sda/man/sda.html)
   shrinkage discriminant analysis models, including
   [`discrim_linear()`](https://parsnip.tidymodels.org/reference/discrim_linear.html)

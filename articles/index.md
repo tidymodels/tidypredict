@@ -32,6 +32,7 @@
   models](https://tidypredict.tidymodels.org/articles/multinom.md):
 - [NaiveBayes
   models](https://tidypredict.tidymodels.org/articles/naivebayes.md):
+- [nnet models](https://tidypredict.tidymodels.org/articles/nnet.md):
 - [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
 - [nullmodel
   models](https://tidypredict.tidymodels.org/articles/nullmodel.md):

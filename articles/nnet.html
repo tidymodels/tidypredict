@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>glmnet models • tidypredict</title>
+<title>nnet models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="glmnet models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="nnet models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -95,11 +95,11 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>glmnet models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>nnet models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/glmnet.Rmd" class="external-link"><code>vignettes/glmnet.Rmd</code></a></small>
-      <div class="d-none name"><code>glmnet.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/nnet.Rmd" class="external-link"><code>vignettes/nnet.Rmd</code></a></small>
+      <div class="d-none name"><code>nnet.Rmd</code></div>
     </div>
 
     
@@ -138,24 +138,47 @@
 </tr>
 </tbody>
 </table>
+<p><code><a href="https://rdrr.io/pkg/nnet/man/nnet.html" class="external-link">nnet::nnet()</a></code> fits feed-forward neural networks with a
+single hidden layer. Each hidden unit is the weighted sum of the
+predictors passed through the logistic squashing function, and the
+output units are the weighted sums of the hidden units, left unsquashed
+when the network was fit with <code>linout = TRUE</code>.</p>
+<p>Classification models predict one probability per outcome class, so
+<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns a <em>named list</em> of
+expressions rather than a single expression. For those models
+<code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> and <code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code>
+are not supported.</p>
 <div class="section level2">
 <h2 id="tidypredict_-functions">
 <code>tidypredict_</code> functions<a class="anchor" aria-label="anchor" href="#tidypredict_-functions"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://www.stats.ox.ac.uk/pub/MASS4/" class="external-link">nnet</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, lambda <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/nnet.html" class="external-link">nnet</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars</span>, size <span class="op">=</span> <span class="fl">3</span>, linout <span class="op">=</span> <span class="cn">TRUE</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 35.3137765116027 + (cyl * -0.871451193824228) + (hp * -0.0101173960249783) + </span></span>
-<span><span class="co">#&gt;     (wt * -2.59443677687505)</span></span></code></pre></div>
+<span><span class="co">#&gt; 9.63217435895367 + case_when(-0.255509663289361 + wt * -0.309449576415116 + </span></span>
+<span><span class="co">#&gt;     hp * 0.949425509730813 &lt; -15 ~ 0, -0.255509663289361 + wt * </span></span>
+<span><span class="co">#&gt;     -0.309449576415116 + hp * 0.949425509730813 &gt; 15 ~ 1, .default = 1/(1 + </span></span>
+<span><span class="co">#&gt;     exp(-(-0.255509663289361 + wt * -0.309449576415116 + hp * </span></span>
+<span><span class="co">#&gt;         0.949425509730813)))) * 10.1885081177867 + case_when(-0.385719808388316 + </span></span>
+<span><span class="co">#&gt;     wt * 0.522807343827803 + hp * 20.0552277393738 &lt; -15 ~ 0, </span></span>
+<span><span class="co">#&gt;     -0.385719808388316 + wt * 0.522807343827803 + hp * 20.0552277393738 &gt; </span></span>
+<span><span class="co">#&gt;         15 ~ 1, .default = 1/(1 + exp(-(-0.385719808388316 + </span></span>
+<span><span class="co">#&gt;         wt * 0.522807343827803 + hp * 20.0552277393738)))) * </span></span>
+<span><span class="co">#&gt;     0.269942523260361 + case_when(0.42285989779505 + wt * -0.212906496087752 + </span></span>
+<span><span class="co">#&gt;     hp * -0.880839556387573 &lt; -15 ~ 0, 0.42285989779505 + wt * </span></span>
+<span><span class="co">#&gt;     -0.212906496087752 + hp * -0.880839556387573 &gt; 15 ~ 1, .default = 1/(1 + </span></span>
+<span><span class="co">#&gt;     exp(-(0.42285989779505 + wt * -0.212906496087752 + hp * -0.880839556387573)))) * </span></span>
+<span><span class="co">#&gt;     10.480592173546</span></span></code></pre></div>
 </li>
 <li>
-<p>Add the prediction to the original table</p>
+<p>Add the predictions to the original table</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span></span>
@@ -175,13 +198,13 @@
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.17473<span style="color: #949494;">, </span>21.51315<span style="color: #949494;">, </span>24.86796<span style="color: #949494;">, </span>20.63104<span style="color: #949494;">, </span>17.64676<span style="color: #949494;">, </span>20.045…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 20.09063<span style="color: #949494;">, </span>20.09063<span style="color: #949494;">, </span>20.09063<span style="color: #949494;">, </span>20.09063<span style="color: #949494;">, </span>20.09063<span style="color: #949494;">, </span>20.090…</span></span></code></pre></div>
 </li>
 <li>
-<p>Confirm that <code>tidypredict</code> results match to the
-model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results.</p>
+<p>Confirm that the results match the model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>
+results</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">mtcars</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidypredict test results</span></span>
 <span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
 <span><span class="co">#&gt; </span></span>
@@ -190,45 +213,78 @@ model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 </ul>
 </div>
 <div class="section level2">
+<h2 id="classification">Classification<a class="anchor" aria-label="anchor" href="#classification"></a>
+</h2>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">cls_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/nnet/man/nnet.html" class="external-link">nnet</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span>, size <span class="op">=</span> <span class="fl">3</span>, trace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">cls_model</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">fit</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">iris</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">probs</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">cls_model</span>, <span class="va">iris</span>, type <span class="op">=</span> <span class="st">"raw"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
 <p><code>parsnip</code> fitted models are also supported by
 <code>tidypredict</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg</a></span><span class="op">(</span>penalty <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"glmnet"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/mlp.html" class="external-link">mlp</a></span><span class="op">(</span>mode <span class="op">=</span> <span class="st">"regression"</span>, hidden_units <span class="op">=</span> <span class="fl">3</span>, epochs <span class="op">=</span> <span class="fl">100</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"nnet"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 35.3140536966127 + (cyl * -0.871623418095165) + (hp * -0.0101157918502673) + </span></span>
-<span><span class="co">#&gt;     (wt * -2.59426484734253)</span></span></code></pre></div>
+<span><span class="co">#&gt; 9.63217435895367 + case_when(-0.255509663289361 + wt * -0.309449576415116 + </span></span>
+<span><span class="co">#&gt;     hp * 0.949425509730813 &lt; -15 ~ 0, -0.255509663289361 + wt * </span></span>
+<span><span class="co">#&gt;     -0.309449576415116 + hp * 0.949425509730813 &gt; 15 ~ 1, .default = 1/(1 + </span></span>
+<span><span class="co">#&gt;     exp(-(-0.255509663289361 + wt * -0.309449576415116 + hp * </span></span>
+<span><span class="co">#&gt;         0.949425509730813)))) * 10.1885081177867 + case_when(-0.385719808388316 + </span></span>
+<span><span class="co">#&gt;     wt * 0.522807343827803 + hp * 20.0552277393738 &lt; -15 ~ 0, </span></span>
+<span><span class="co">#&gt;     -0.385719808388316 + wt * 0.522807343827803 + hp * 20.0552277393738 &gt; </span></span>
+<span><span class="co">#&gt;         15 ~ 1, .default = 1/(1 + exp(-(-0.385719808388316 + </span></span>
+<span><span class="co">#&gt;         wt * 0.522807343827803 + hp * 20.0552277393738)))) * </span></span>
+<span><span class="co">#&gt;     0.269942523260361 + case_when(0.42285989779505 + wt * -0.212906496087752 + </span></span>
+<span><span class="co">#&gt;     hp * -0.880839556387573 &lt; -15 ~ 0, 0.42285989779505 + wt * </span></span>
+<span><span class="co">#&gt;     -0.212906496087752 + hp * -0.880839556387573 &gt; 15 ~ 1, .default = 1/(1 + </span></span>
+<span><span class="co">#&gt;     exp(-(0.42285989779505 + wt * -0.212906496087752 + hp * -0.880839556387573)))) * </span></span>
+<span><span class="co">#&gt;     10.480592173546</span></span></code></pre></div>
+<p>Note that <code>parsnip</code> runs the class probabilities of
+<code>predict.nnet()</code> through a second softmax, so the expressions
+returned for a classification <code><a href="https://parsnip.tidymodels.org/reference/mlp.html" class="external-link">mlp()</a></code> model match
+<code>predict(model, type = "prob")</code> rather than
+<code>predict(model$fit, type = "raw")</code>.</p>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 2</span></span>
+<span><span class="co">#&gt; List of 3</span></span>
 <span><span class="co">#&gt;  $ general:List of 6</span></span>
-<span><span class="co">#&gt;   ..$ model  : chr "glmnet"</span></span>
-<span><span class="co">#&gt;   ..$ version: num 1</span></span>
-<span><span class="co">#&gt;   ..$ type   : chr "regression"</span></span>
-<span><span class="co">#&gt;   ..$ is_glm : num 1</span></span>
-<span><span class="co">#&gt;   ..$ family : chr "gaussian"</span></span>
-<span><span class="co">#&gt;   ..$ link   : chr "identity"</span></span>
-<span><span class="co">#&gt;  $ terms  :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  NULL</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..$ model    : chr "nnet"</span></span>
+<span><span class="co">#&gt;   ..$ version  : num 2</span></span>
+<span><span class="co">#&gt;   ..$ type     : chr "nnet"</span></span>
+<span><span class="co">#&gt;   ..$ n_units  : int 7</span></span>
+<span><span class="co">#&gt;   ..$ n_outputs: num 1</span></span>
+<span><span class="co">#&gt;   ..$ softmax  : logi FALSE</span></span>
+<span><span class="co">#&gt;  $ inputs :List of 2</span></span>
+<span><span class="co">#&gt;   ..$ :List of 2</span></span>
+<span><span class="co">#&gt;   ..$ :List of 2</span></span>
+<span><span class="co">#&gt;  $ units  :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ :List of 3</span></span>
+<span><span class="co">#&gt;   ..$ :List of 3</span></span>
+<span><span class="co">#&gt;   ..$ :List of 3</span></span>
+<span><span class="co">#&gt;   ..$ :List of 3</span></span>
+<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_nnet" "list"</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
