@@ -507,3 +507,42 @@ test_that("bart is handled with parsnip", {
 
   expect_snapshot(error = TRUE, tidypredict_fit(cls))
 })
+
+test_that("bag_tree is handled with parsnip", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("parsnip")
+
+  set.seed(100)
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::bag_tree(mode = "regression"),
+      "rpart",
+      times = 3
+    ),
+    mpg ~ wt + cyl + disp,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(reg), mtcars),
+    predict(reg, mtcars)$.pred
+  )
+
+  set.seed(100)
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::bag_tree(mode = "classification"),
+      "rpart",
+      times = 3
+    ),
+    Species ~ .,
+    data = iris
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(cls), iris),
+    as.character(predict(cls, iris)$.pred_class)
+  )
+})
