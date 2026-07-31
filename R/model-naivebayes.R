@@ -7,6 +7,12 @@ tidypredict_fit.NaiveBayes <- function(model) {
 }
 
 #' @export
+tidypredict_fit.naive_bayes <- function(model) {
+  parsedmodel <- parse_model(model)
+  build_fit_formula_naive_bayes(parsedmodel)
+}
+
+#' @export
 tidypredict_fit.pm_naive_bayes <- function(model) {
   build_fit_formula_naive_bayes(model)
 }
@@ -38,6 +44,13 @@ naive_bayes_term <- function(term) {
     scale <- as.numeric(term$scale)
     offset <- as.numeric(term$offset)
     return(expr(!!offset - ((!!col - !!mean)^2 / !!scale)))
+  }
+
+  if (term$type == "poisson") {
+    # log(dpois(x, lambda)), without the constant `-log(factorial(x))`
+    log_lambda <- as.numeric(term$log_lambda)
+    lambda <- as.numeric(term$lambda)
+    return(expr(!!col * !!log_lambda - !!lambda))
   }
 
   if (term$type == "logical") {
@@ -133,6 +146,95 @@ naive_bayes_var <- function(model, var, i, threshold) {
   )
 }
 
+#' @export
+parse_model.naive_bayes <- function(model) {
+  cond_dist <- attr(model$tables, "cond_dist")
+
+  if (any(cond_dist == "KDE")) {
+    cli::cli_abort(
+      c(
+        "{.fn tidypredict_fit} does not support {.fn naivebayes::naive_bayes}
+         models fit with kernel density estimates.",
+        "i" = "Refit with {.code usekernel = FALSE}."
+      )
+    )
+  }
+
+  classes <- model$levels
+  # `predict.naive_bayes()` replaces zero densities with `threshold`
+  threshold <- 0.001
+
+  class_terms <- lapply(seq_along(classes), function(i) {
+    terms <- lapply(names(model$tables), function(var) {
+      naive_bayes_var_nb(model, var, i, cond_dist[[var]], threshold)
+    })
+    list(
+      intercept = log(as.numeric(model$prior[[i]])),
+      terms = terms
+    )
+  })
+
+  pm <- list()
+  pm$general$model <- "naive_bayes"
+  pm$general$version <- 2
+  pm$general$type <- "naive_bayes"
+  pm$general$threshold <- threshold
+  pm$classes <- classes
+  pm$class_terms <- class_terms
+
+  as_parsed_model(pm)
+}
+
+naive_bayes_var_nb <- function(model, var, i, cond_dist, threshold) {
+  tbl <- model$tables[[var]]
+
+  if (cond_dist == "Gaussian") {
+    mean <- as.numeric(tbl[1, i])
+    sd <- as.numeric(tbl[2, i])
+    if (sd <= 0) {
+      sd <- threshold
+    }
+    return(list(
+      var = var,
+      type = "numeric",
+      mean = mean,
+      scale = 2 * sd^2,
+      offset = -log(sd)
+    ))
+  }
+
+  if (cond_dist == "Poisson") {
+    lambda <- as.numeric(tbl[1, i])
+    return(list(
+      var = var,
+      type = "poisson",
+      lambda = lambda,
+      log_lambda = log(lambda)
+    ))
+  }
+
+  probs <- as.numeric(tbl[, i])
+  if (model$laplace == 0) {
+    probs[probs <= 0] <- threshold
+  }
+
+  if (is.logical(model$data$x[[var]])) {
+    return(list(
+      var = var,
+      type = "logical",
+      log_false = log(probs[[1]]),
+      log_true = log(probs[[2]])
+    ))
+  }
+
+  list(
+    var = var,
+    type = "factor",
+    levels = rownames(tbl),
+    log_probs = log(probs)
+  )
+}
+
 # Test ---------------------------------------------
 
 #' @export
@@ -147,6 +249,24 @@ tidypredict_test.NaiveBayes <- function(
   cli::cli_abort(
     c(
       "{.fn tidypredict_test} does not support {.fn klaR::NaiveBayes} models.",
+      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
+    )
+  )
+}
+
+#' @export
+tidypredict_test.naive_bayes <- function(
+  model,
+  df,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  cli::cli_abort(
+    c(
+      "{.fn tidypredict_test} does not support
+       {.fn naivebayes::naive_bayes} models.",
       "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
     )
   )
