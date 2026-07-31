@@ -13,8 +13,8 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
     earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
     cubist(), ctree(), cforest(), fda(), ksvm(), lda(), sda(), lda_diag(),
-    pls(), nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(), and
-    xrf() models.
+    pls(), nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(),
+    bagger(), and xrf() models.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,
     https://github.com/tidymodels/tidypredict
@@ -34,6 +34,7 @@ Imports:
 Suggests:
     agua,
     aorsf,
+    baguette,
     bonsai,
     C50,
     covr,

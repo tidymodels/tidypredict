@@ -1,0 +1,95 @@
+---
+title: "bagger models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{bagger models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("baguette", quietly = TRUE)) {
+  library(tidypredict)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`baguette::bagger()` fits an ensemble of models on bootstrap samples of the
+training data. Only the `"CART"` base model, which fits `rpart::rpart()` trees,
+is supported. `tidypredict_fit()` returns one nested `case_when()` per tree, so
+the size of the returned expression grows with `times`.
+
+For regression models the fitted value is the mean of the individual tree
+predictions. For classification models the class probabilities of each tree are
+averaged, and the returned expression is the class with the largest average
+probability.
+
+## `tidypredict_` functions
+
+```{r}
+set.seed(100)
+model <- baguette::bagger(mpg ~ wt + cyl + disp, data = mtcars, times = 5)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+tidypredict_test(model, mtcars)
+    ```
+
+- Get the SQL translation
+    ```{r}
+tidypredict_sql(model, dbplyr::simulate_mssql())
+    ```
+
+## Classification
+
+```{r}
+set.seed(100)
+model <- baguette::bagger(Species ~ ., data = iris, times = 3)
+
+tidypredict_test(model, iris)
+```
+
+## parsnip
+
+Models fit with `parsnip::bag_tree()` and the `"rpart"` engine are supported as
+well.
+
+```{r}
+library(parsnip)
+
+set.seed(100)
+model <- bag_tree(mode = "regression") %>%
+  set_engine("rpart", times = 5) %>%
+  fit(mpg ~ wt + cyl + disp, data = mtcars)
+
+tidypredict_fit(model)
+```

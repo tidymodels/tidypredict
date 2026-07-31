@@ -1,5 +1,9 @@
 # tidypredict (development version)
 
+- Added support for `baguette::bagger()` bagged tree ensembles fit with the `"CART"` base model, including `bag_tree()` parsnip models fitted with the `"rpart"` engine. Regression predictions average the individual trees, and classification predictions return the class with the largest average class probability. (#232)
+
+- `tidypredict_fit()` now uses a strict inequality (`<`) for the continuous splits of `rpart::rpart()` models, matching how `rpart` assigns values that are exactly equal to a cut point. (#232)
+
 - Added support for `dbarts::bart()` Bayesian additive regression trees, including `bart()` parsnip models fitted with the `"dbarts"` engine. The model has to be fit with `keeptrees = TRUE`, and only continuous outcomes are supported since binary outcomes are fit with a probit link. (#232)
 
 - Added support for `klaR::NaiveBayes()` naive Bayes models with Gaussian densities (`usekernel = FALSE`), including `naive_Bayes()` parsnip models fitted with the `"klaR"` engine. `tidypredict_fit()` returns a named list of class-probability expressions (softmax of the summed log densities), and `tidypredict_test()` is not supported for these multiclass models. (#232)
