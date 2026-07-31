@@ -38,6 +38,8 @@ navbar:
       href: articles/naivebayes.html
     - text: Partial Least Squares - mixOmics
       href: articles/mixOmics.html
+    - text: Neural Network - nnet()
+      href: articles/nnet.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()
