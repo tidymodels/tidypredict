@@ -8,7 +8,10 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-if (requireNamespace("klaR", quietly = TRUE)) {
+if (
+  requireNamespace("klaR", quietly = TRUE) &&
+    requireNamespace("naivebayes", quietly = TRUE)
+) {
   library(tidypredict)
   library(dplyr)
   eval_code <- TRUE
@@ -30,7 +33,8 @@ knitr::opts_chunk$set(
 |`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
 |`parsnip`                                                      |  ✔  |
 
-`klaR::NaiveBayes()` fits naive Bayes classifiers. Predicting with such a model
+`klaR::NaiveBayes()` and `naivebayes::naive_bayes()` fit naive Bayes
+classifiers. Predicting with such a model
 multiplies the prior probability of each class by one conditional density per
 predictor, and then normalizes those products into posterior probabilities.
 Working on the log scale turns the products into sums, which makes the posterior
@@ -38,8 +42,10 @@ probabilities the softmax of the summed log densities.
 
 Numeric predictors contribute a normal log density, and categorical predictors
 contribute a `case_when()` lookup of the conditional probability of the observed
-level. Only Gaussian densities can be expressed this way, so models fit with
-`usekernel = TRUE` are not supported.
+level. `naivebayes::naive_bayes()` additionally supports Poisson densities for
+integer predictors when fit with `usepoisson = TRUE`. Kernel density estimates
+cannot be expressed this way, so models fit with `usekernel = TRUE` are not
+supported.
 
 Because these models predict one probability per outcome class,
 `tidypredict_fit()` returns a *named list* of expressions, one for each class,
@@ -88,6 +94,33 @@ p_model <- naive_Bayes() %>%
 
 ```{r}
 tidypredict_fit(p_model)[["virginica"]]
+```
+
+## `naivebayes::naive_bayes()`
+
+The `naivebayes` package is supported in the same way:
+```{r}
+nb_model <- naivebayes::naive_bayes(Species ~ ., data = iris)
+
+nb_fit <- tidypredict_fit(nb_model)
+nb_fit[["setosa"]]
+```
+
+```{r}
+nb_probs <- sapply(nb_fit, \(f) rlang::eval_tidy(f, iris))
+all.equal(
+  unname(nb_probs),
+  unname(predict(nb_model, iris[names(nb_model$tables)], type = "prob"))
+)
+```
+
+The `"naivebayes"` parsnip engine works too, as long as `usekernel = FALSE`:
+```{r}
+nb_p_model <- naive_Bayes() %>%
+  set_engine("naivebayes", usekernel = FALSE) %>%
+  fit(Species ~ ., data = iris)
+
+tidypredict_fit(nb_p_model)[["virginica"]]
 ```
 
 ## Parse model spec
