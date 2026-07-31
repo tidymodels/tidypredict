@@ -54,6 +54,8 @@ navbar:
       href: articles/C5.0.html
     - text: BART - bart()
       href: articles/bart.html
+    - text: Bagged Trees - bagger()
+      href: articles/bagging.html
     - text: MARS - earth()
       href: articles/mars.html
     - text: Cubist - cubist()

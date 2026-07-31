@@ -38,6 +38,9 @@ tidypredict_fit.pm_tree <- function(model) {
       }
       return(generate_nested_case_when_tree(model$tree_info))
     }
+    if (model_type == "bagger") {
+      return(bagger_build_formula(model))
+    }
     if (model_type == "blackboost") {
       return(mboost_build_formula(
         model$tree_info_list,

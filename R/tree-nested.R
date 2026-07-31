@@ -104,6 +104,10 @@ build_nested_split_condition <- function(split) {
     # Categorical split: x %in% c("a", "b")
     vals <- unlist(split$vals)
     expr(!!col %in% !!vals)
+  } else if (isTRUE(split$strict)) {
+    # Continuous split where the left branch is strictly less than the
+    # threshold, as `rpart` does
+    expr(!!col < !!split$val)
   } else {
     # Continuous split: x <= threshold (left branch)
     expr(!!col <= !!split$val)
