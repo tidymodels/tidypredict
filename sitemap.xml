@@ -5,6 +5,7 @@
 <url><loc>https://tidypredict.tidymodels.org/LICENSE.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/C5.0.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/aorsf.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/bart.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/catboost.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/cubist.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/fda.html</loc></url>
@@ -46,6 +47,8 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_linear_pred.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_nested_case_when_tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-c50_tree_info_full.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_bart_scaling.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_bart_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_catboost_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_earth_multiclass.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_glmnet_multiclass.html</loc></url>

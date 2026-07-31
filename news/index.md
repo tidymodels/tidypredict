@@ -3,6 +3,15 @@
 ## tidypredict (development version)
 
 - Added support for
+  [`dbarts::bart()`](https://rdrr.io/pkg/dbarts/man/bart.html) Bayesian
+  additive regression trees, including
+  [`bart()`](https://parsnip.tidymodels.org/reference/bart.html) parsnip
+  models fitted with the `"dbarts"` engine. The model has to be fit with
+  `keeptrees = TRUE`, and only continuous outcomes are supported since
+  binary outcomes are fit with a probit link.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
   naive Bayes models with Gaussian densities (`usekernel = FALSE`),
   including
