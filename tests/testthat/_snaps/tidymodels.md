@@ -108,3 +108,13 @@
       
        All results are within the difference threshold
 
+# bart is handled with parsnip
+
+    Code
+      tidypredict_fit(cls)
+    Condition
+      Error in `check_bart_supported()`:
+      ! Classification `dbarts::bart()` models are not supported.
+      i Only regression models can be converted to tidy formulas.
+      i Classification uses the probit link, which cannot be translated to SQL.
+

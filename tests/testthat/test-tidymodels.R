@@ -456,3 +456,54 @@ test_that("mlp is handled with parsnip", {
     unname(as.matrix(predict(cls, iris, type = "prob")))
   )
 })
+
+test_that("bart is handled with parsnip", {
+  skip_if_not_installed("dbarts")
+  skip_if_not_installed("parsnip")
+
+  set.seed(100)
+  df <- data.frame(x1 = rnorm(60), x2 = rnorm(60))
+  df$y <- 2 * df$x1 - df$x2 + rnorm(60)
+
+  reg <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::bart(mode = "regression", trees = 3),
+      "dbarts",
+      ndpost = 4,
+      nskip = 10,
+      nchain = 1,
+      nthread = 1,
+      verbose = FALSE
+    ),
+    y ~ .,
+    data = df
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+
+  # `predict()` draws from the posterior predictive distribution, which adds
+  # residual noise, so the comparison is against the expected value
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(reg), df),
+    colMeans(predict(reg$fit, df, type = "ev"))
+  )
+
+  cls_df <- df
+  cls_df$y <- factor(ifelse(df$y > 0, "yes", "no"))
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::bart(mode = "classification", trees = 3),
+      "dbarts",
+      ndpost = 4,
+      nskip = 10,
+      nchain = 1,
+      nthread = 1,
+      verbose = FALSE
+    ),
+    y ~ .,
+    data = cls_df
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_fit(cls))
+})
