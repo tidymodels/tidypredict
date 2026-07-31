@@ -1,0 +1,114 @@
+---
+title: "nnet models"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{nnet models}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (requireNamespace("nnet", quietly = TRUE)) {
+  library(tidypredict)
+  library(nnet)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+`nnet::nnet()` fits feed-forward neural networks with a single hidden layer. Each
+hidden unit is the weighted sum of the predictors passed through the logistic
+squashing function, and the output units are the weighted sums of the hidden
+units, left unsquashed when the network was fit with `linout = TRUE`.
+
+Classification models predict one probability per outcome class, so
+`tidypredict_fit()` returns a *named list* of expressions rather than a single
+expression. For those models `tidypredict_to_column()` and `tidypredict_test()`
+are not supported.
+
+## `tidypredict_` functions
+
+```{r}
+library(nnet)
+
+set.seed(100)
+model <- nnet(mpg ~ wt + hp, data = mtcars, size = 3, linout = TRUE, trace = FALSE)
+```
+
+- Create the R formula
+    ```{r}
+tidypredict_fit(model)
+    ```
+
+- Add the predictions to the original table
+    ```{r}
+library(dplyr)
+
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+    ```
+
+- Confirm that the results match the model's `predict()` results
+    ```{r}
+tidypredict_test(model, mtcars)
+    ```
+
+## Classification
+
+```{r}
+set.seed(100)
+cls_model <- nnet(Species ~ ., data = iris, size = 3, trace = FALSE)
+
+fit <- tidypredict_fit(cls_model)
+names(fit)
+```
+
+```{r}
+probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
+all.equal(unname(probs), unname(predict(cls_model, iris, type = "raw")))
+```
+
+## parsnip
+
+`parsnip` fitted models are also supported by `tidypredict`:
+```{r}
+library(parsnip)
+
+set.seed(100)
+p_model <- mlp(mode = "regression", hidden_units = 3, epochs = 100) %>%
+  set_engine("nnet") %>%
+  fit(mpg ~ wt + hp, data = mtcars)
+```
+
+```{r}
+tidypredict_fit(p_model)
+```
+
+Note that `parsnip` runs the class probabilities of `predict.nnet()` through a
+second softmax, so the expressions returned for a classification `mlp()` model
+match `predict(model, type = "prob")` rather than
+`predict(model$fit, type = "raw")`.
+
+## Parse model spec
+
+Here is an example of the model spec:
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```

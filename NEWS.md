@@ -12,6 +12,8 @@
 
 - Added support for `nnet::multinom()` multinomial log-linear models, including `multinom_reg()` parsnip models fitted with the `"nnet"` engine. `tidypredict_fit()` returns a named list of class-probability expressions (softmax), and `tidypredict_test()` is not supported for these multiclass models. (#232)
 
+- Added support for `nnet::nnet()` single hidden layer neural networks, including `mlp()` parsnip models fitted with the `"nnet"` engine, for regression and classification. Regression models return a single expression, and classification models return a named list of class-probability expressions, for which `tidypredict_test()` is not supported. (#232)
+
 - Added support for `sda::sda()` shrinkage discriminant analysis models, including `discrim_linear()` parsnip models fitted with the `"sda"` engine. `tidypredict_fit()` returns a named list of class-probability expressions (softmax), and `tidypredict_test()` is not supported for these multiclass models. (#232)
 
 - Added support for the regularized linear discriminant analysis models in `sparsediscrim` (`lda_diag()`, `lda_shrink_mean()`, `lda_shrink_cov()`, and `lda_emp_bayes_eigen()`), including `discrim_linear()` parsnip models fitted with the `"sparsediscrim"` engine. `tidypredict_fit()` returns a named list of class-probability expressions (softmax of the per-class discriminant scores), and `tidypredict_test()` is not supported for these multiclass models. (#232)

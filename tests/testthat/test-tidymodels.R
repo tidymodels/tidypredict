@@ -420,3 +420,39 @@ test_that("works with rule_fit() and the xrf engine", {
     predict(cls, cls_df, type = "prob")$.pred_yes
   )
 })
+
+test_that("mlp is handled with parsnip", {
+  skip_if_not_installed("nnet")
+  skip_if_not_installed("parsnip")
+
+  set.seed(100)
+  reg <- parsnip::fit(
+    parsnip::mlp(mode = "regression", hidden_units = 3, epochs = 100),
+    mpg ~ wt + hp,
+    data = mtcars
+  )
+
+  expect_type(tidypredict_fit(reg), "language")
+  expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(reg), mtcars),
+    predict(reg, mtcars)$.pred
+  )
+
+  set.seed(100)
+  cls <- parsnip::fit(
+    parsnip::mlp(mode = "classification", hidden_units = 3, epochs = 100),
+    Species ~ .,
+    data = iris
+  )
+
+  tf <- tidypredict_fit(cls)
+  expect_named(tf, levels(iris$Species))
+
+  # parsnip runs the probabilities of `predict.nnet()` through a second softmax
+  probs <- sapply(tf, \(f) rlang::eval_tidy(f, iris))
+  expect_equal(
+    unname(probs),
+    unname(as.matrix(predict(cls, iris, type = "prob")))
+  )
+})
