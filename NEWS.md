@@ -1,6 +1,8 @@
 # tidypredict (development version)
 
-- Added support for `baguette::bagger()` bagged tree ensembles fit with the `"CART"` base model, including `bag_tree()` parsnip models fitted with the `"rpart"` engine. Regression predictions average the individual trees, and classification predictions return the class with the largest average class probability. (#232)
+- Added support for `baguette::bagger()` bagged tree ensembles fit with the `"CART"` or `"C5.0"` base model, including `bag_tree()` parsnip models fitted with the `"rpart"` or `"C5.0"` engine. Regression predictions average the individual trees, and classification predictions return the class with the largest average class probability. (#232)
+
+- `tidypredict_fit()` now supports `C50::C5.0()` models that split a discrete predictor into one branch per level. (#232)
 
 - `tidypredict_fit()` now uses a strict inequality (`<`) for the continuous splits of `rpart::rpart()` models, matching how `rpart` assigns values that are exactly equal to a cut point. (#232)
 
