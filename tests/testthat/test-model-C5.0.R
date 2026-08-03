@@ -60,6 +60,18 @@ test_that("multiway categorical splits match predict()", {
   expect_equal(fit_pred, as.character(predict(model, df)))
 })
 
+test_that("one-branch-per-level splits match predict() (#232)", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$am <- factor(df$am, labels = c("auto", "manual"))
+  df$cyl <- factor(df$cyl)
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("cyl", "vs")], df$am)
+
+  fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(model), df))
+  expect_equal(fit_pred, as.character(predict(model, df)))
+})
+
 test_that("stump trees (no splits) work correctly", {
   skip_if_not_installed("C50")
   df <- mtcars

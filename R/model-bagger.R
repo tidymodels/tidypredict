@@ -1,14 +1,15 @@
 # A {baguette} `bagger()` object is an ensemble of models fit on bootstrap
 # samples of the training data, stored as parsnip model fits in `model_df`.
-# Only the CART base model (`rpart`) is supported here. Regression predictions
-# are the mean of the individual tree predictions, and classification
-# predictions are the class with the largest mean class probability.
+# Only the CART (`rpart`) and C5.0 base models are supported here. Regression
+# predictions are the mean of the individual tree predictions, and
+# classification predictions are the class with the largest mean class
+# probability.
 
 # Parse model --------------------------------------
 
 #' @export
 parse_model.bagger <- function(model) {
-  trees <- bagger_rpart_fits(model)
+  trees <- bagger_base_fits(model)
 
   pm <- list()
   pm$general$model <- "bagger"
@@ -20,27 +21,44 @@ parse_model.bagger <- function(model) {
     pm$tree_info_list <- map(trees, rpart_tree_info_full)
   } else {
     pm$general$classes <- classes
-    pm$tree_info_list <- map(trees, rpart_classprob_tree_info)
+    pm$tree_info_list <- map(trees, bagger_classprob_tree_info)
   }
 
   as_parsed_model(pm)
 }
 
-# Pull the `rpart` fits out of the ensemble, erroring for base models that are
-# not supported
-bagger_rpart_fits <- function(model, call = rlang::caller_env()) {
+# Pull the base model fits out of the ensemble, erroring for base models that
+# are not supported
+bagger_base_fits <- function(model, call = rlang::caller_env()) {
   base_model <- model$base_model[[1]]
-  if (!identical(base_model, "CART")) {
+  if (!base_model %in% c("CART", "C5.0")) {
     cli::cli_abort(
       c(
-        "Only {.val CART} bagged models are supported, not {.val {base_model}}.",
-        i = "Fit the model with {.code base_model = \"CART\"}."
+        "Only {.val CART} and {.val C5.0} bagged models are supported, not {.val {base_model}}.",
+        i = "Fit the model with {.code base_model = \"CART\"} or {.code base_model = \"C5.0\"}."
       ),
       call = call
     )
   }
 
-  map(model$model_df$model, function(x) x$fit)
+  fits <- map(model$model_df$model, function(x) x$fit)
+
+  if (identical(base_model, "C5.0")) {
+    for (fit in fits) {
+      c50_check_supported(fit, call = call)
+    }
+  }
+
+  fits
+}
+
+# The class probability trees of a single base model fit
+bagger_classprob_tree_info <- function(fit, call = rlang::caller_env()) {
+  if (inherits(fit, "C5.0")) {
+    c50_classprob_tree_info(fit, call = call)
+  } else {
+    rpart_classprob_tree_info(fit)
+  }
 }
 
 # `NULL` for regression models, the outcome levels for classification models
@@ -185,7 +203,7 @@ tidypredict_test.bagger <- function(
     )
   }
 
-  map(bagger_rpart_fits(model), tidypredict_fit)
+  map(bagger_base_fits(model), tidypredict_fit)
 }
 
 #' Extract class probability trees for bagger models
@@ -208,7 +226,7 @@ tidypredict_test.bagger <- function(
     )
   }
 
-  tree_info_list <- map(bagger_rpart_fits(model), rpart_classprob_tree_info)
+  tree_info_list <- map(bagger_base_fits(model), bagger_classprob_tree_info)
 
   res <- map(
     seq_along(classes),

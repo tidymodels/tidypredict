@@ -31,6 +31,26 @@ parse_c50_attrs <- function(line) {
   attrs
 }
 
+# The levels of each discrete predictor, taken from the `model$names` text where
+# every attribute is declared on a line of the form `name: level, level, ...`
+# (continuous attributes are declared as `name: continuous.`). C5.0 escapes the
+# characters that are special in that file with a backslash.
+c50_attr_levels <- function(model) {
+  lines <- strsplit(model$names %||% "", "\n")[[1]]
+  lines <- lines[!grepl("^\\s*\\|", lines)]
+  lines <- lines[grepl(":", lines, fixed = TRUE)]
+
+  res <- list()
+  for (line in lines) {
+    line <- sub("\\.$", "", trimws(line))
+    pos <- regexpr(":", line, fixed = TRUE)
+    name <- gsub("\\\\", "", trimws(substr(line, 1, pos - 1)))
+    vals <- strsplit(substr(line, pos + 1, nchar(line)), ",")[[1]]
+    res[[name]] <- gsub("\\\\", "", trimws(vals))
+  }
+  res
+}
+
 # Parse `model$tree` into a list of nested trees (one per boosting trial). A
 # non-boosted model has a single tree; a boosted model (`trials > 1`) stores its
 # trials concatenated, with the count in the `entries=` header line. Leaf nodes
@@ -47,8 +67,9 @@ parse_c50_trees <- function(model) {
     1L
   }
 
-  lines <- lines[!grepl("^(id=|entries=)", lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
   levels <- model$levels
+  attr_levels <- c50_attr_levels(model)
 
   pos <- 1L
   read_node <- function() {
@@ -70,7 +91,8 @@ parse_c50_trees <- function(model) {
       return(list(
         kind = "leaf",
         prediction = attrs$class,
-        confidence = confidence
+        confidence = confidence,
+        freq = freq
       ))
     }
 
@@ -89,6 +111,22 @@ parse_c50_trees <- function(model) {
         val = as.numeric(attrs$cut),
         left = kids[[2]],
         right = kids[[3]]
+      )
+    } else if (type == "1") {
+      # Discrete split with one fork per level of the attribute. The first fork
+      # is the missing-value branch (ignored, NAs are not handled) and the rest
+      # follow the order the levels are declared in.
+      groups <- attr_levels[[attrs$att]]
+      if (length(groups) != forks - 1) {
+        cli::cli_abort(
+          "Unsupported C5.0 discrete split on {.field {attrs$att}} with {forks} forks and {length(groups)} level{?s}."
+        )
+      }
+      list(
+        kind = "cat",
+        col = attrs$att,
+        groups = as.list(groups),
+        kids = kids[-1]
       )
     } else if (type == "3") {
       # Categorical split. Each fork holds a group of factor levels (`elts`).
@@ -166,6 +204,7 @@ c50_tree_info <- function(node) {
         terminal = TRUE,
         prediction = node$prediction,
         confidence = node$confidence %||% NA_real_,
+        freq = node$freq,
         split = list(NULL)
       ))
       return(id)
@@ -210,25 +249,28 @@ c50_tree_info <- function(node) {
     terminal = map_lgl(rows, ~ .x$terminal),
     prediction = map_chr(rows, ~ .x$prediction),
     confidence = map_dbl(rows, ~ .x$confidence),
+    leaf_freq = map(rows, ~ .x$freq),
     node_splits = map(rows, ~ .x$split),
     majority_left = rep(NA, n),
     use_surrogates = FALSE
   )
 }
 
-c50_check_supported <- function(model) {
+c50_check_supported <- function(model, call = rlang::caller_env()) {
   if (isTRUE(model$control$fuzzyThreshold)) {
     # Fuzzy thresholds route cases near a split point partly down both branches,
     # which cannot be expressed as a hard `<= cut` comparison.
     cli::cli_abort(
-      "{.pkg tidypredict} does not support C5.0 models with fuzzy thresholds ({.code fuzzyThreshold = TRUE})."
+      "{.pkg tidypredict} does not support C5.0 models with fuzzy thresholds ({.code fuzzyThreshold = TRUE}).",
+      call = call
     )
   }
   if (!is.null(model$costMatrix)) {
     # A cost matrix changes how the final class is chosen from the votes, which
     # the generated argmax expression does not account for.
     cli::cli_abort(
-      "{.pkg tidypredict} does not support C5.0 models fitted with a cost matrix ({.code costs})."
+      "{.pkg tidypredict} does not support C5.0 models fitted with a cost matrix ({.code costs}).",
+      call = call
     )
   }
   invisible(model)
@@ -242,6 +284,51 @@ c50_tree_info_full <- function(model) {
     )
   }
   c50_tree_info(parse_c50_tree(model))
+}
+
+# The class proportions of the training sample, taken from the frequencies
+# C5.0 records on the root node of the first tree.
+c50_priors <- function(model) {
+  lines <- strsplit(model$tree, "\n")[[1]]
+  lines <- lines[nzchar(lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
+  freq <- as.numeric(strsplit(parse_c50_attrs(lines[[1]])$freq, ",")[[1]])
+  freq / sum(freq)
+}
+
+# One tree_info per outcome level, where the node predictions are the class
+# probabilities instead of the predicted class. C5.0 reports the probability of
+# a class at a leaf as `(freq + prior) / (n_leaf + 1)`, where `freq` is the
+# number of training cases of that class reaching the leaf and `prior` is the
+# class proportion of the whole training sample.
+c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
+  if (isTRUE(model$rbm)) {
+    cli::cli_abort(
+      "Class probabilities are not supported for rule-based C5.0 models ({.code rules = TRUE}).",
+      call = call
+    )
+  }
+  c50_check_supported(model, call = call)
+
+  classes <- model$levels
+  priors <- c50_priors(model)
+  tree_info <- c50_tree_info_full(model)
+
+  probs <- map(tree_info$leaf_freq, function(freq) {
+    if (is.null(freq)) {
+      rep(0, length(classes))
+    } else {
+      (freq + priors) / (sum(freq) + 1)
+    }
+  })
+
+  res <- map(seq_along(classes), function(i) {
+    tree_info_copy <- tree_info
+    tree_info_copy$prediction <- map_dbl(probs, ~ .x[[i]])
+    tree_info_copy
+  })
+  names(res) <- classes
+  res
 }
 
 # Build a nested case_when returning, at each leaf, the leaf confidence when the
@@ -331,7 +418,7 @@ parse_c50_rules <- function(model) {
     )
   }
 
-  lines <- lines[!grepl("^(id=|entries=)", lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
 
   header <- parse_c50_attrs(lines[[1]])
   default <- header$default

@@ -8,6 +8,16 @@ bagger_cls <- function(times = 3) {
   baguette::bagger(Species ~ ., data = iris, times = times)
 }
 
+bagger_c50 <- function(times = 3) {
+  set.seed(100)
+  baguette::bagger(
+    Species ~ .,
+    data = iris,
+    base_model = "C5.0",
+    times = times
+  )
+}
+
 test_that("returns the right output", {
   skip_if_not_installed("baguette")
 
@@ -271,6 +281,172 @@ test_that("binary classification works", {
     as.character(predict(model, df)$.pred_class)
   )
   expect_length(.extract_bagger_classprob(model), 2)
+})
+
+test_that("C5.0 base models return the right output", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  model <- bagger_c50()
+  tf <- tidypredict_fit(model)
+  pm <- parse_model(model)
+
+  expect_type(tf, "language")
+  expect_s3_class(pm, "list")
+  expect_equal(length(pm), 2)
+  expect_equal(pm$general$model, "bagger")
+  expect_equal(pm$general$version, 3)
+  expect_equal(pm$general$classes, levels(iris$Species))
+  expect_length(pm$tree_info_list, 3)
+
+  expect_snapshot(tidypredict_test(model, iris))
+})
+
+test_that("tidypredict_fit matches predict() - C5.0 base model", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  model <- bagger_c50()
+
+  expect_equal(
+    dplyr::mutate(iris, pred = !!tidypredict_fit(model))$pred,
+    as.character(predict(model, iris)$.pred_class)
+  )
+
+  model <- bagger_c50(times = 7)
+
+  expect_length(parse_model(model)$tree_info_list, 7)
+  expect_equal(
+    dplyr::mutate(iris, pred = !!tidypredict_fit(model))$pred,
+    as.character(predict(model, iris)$.pred_class)
+  )
+})
+
+test_that("C5.0 base models work with categorical predictors", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  df <- mtcars
+  df$am <- factor(df$am, labels = c("auto", "manual"))
+  df$cyl <- factor(df$cyl)
+  df$vs <- factor(df$vs)
+  set.seed(100)
+  model <- baguette::bagger(
+    am ~ cyl + vs + gear + carb,
+    data = df,
+    base_model = "C5.0",
+    times = 3
+  )
+
+  expect_equal(
+    dplyr::mutate(df, pred = !!tidypredict_fit(model))$pred,
+    as.character(predict(model, df)$.pred_class)
+  )
+  expect_length(.extract_bagger_classprob(model), 2)
+})
+
+test_that("C5.0 control arguments are respected", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  set.seed(100)
+  model <- baguette::bagger(
+    Species ~ .,
+    data = iris,
+    base_model = "C5.0",
+    times = 3,
+    minCases = 5,
+    noGlobalPruning = TRUE
+  )
+
+  expect_type(tidypredict_fit(model), "language")
+  expect_equal(
+    dplyr::mutate(iris, pred = !!tidypredict_fit(model))$pred,
+    as.character(predict(model, iris)$.pred_class)
+  )
+})
+
+test_that("C5.0 model can be saved and re-loaded", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  model <- bagger_c50()
+  mp <- tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  pm <- as_parsed_model(yaml::read_yaml(mp))
+
+  expect_equal(
+    dplyr::mutate(iris, pred = !!tidypredict_fit(pm))$pred,
+    as.character(predict(model, iris)$.pred_class)
+  )
+})
+
+test_that("C5.0 SQL translation works", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+  skip_if_not_installed("dbplyr")
+
+  expect_s3_class(
+    tidypredict_sql(bagger_c50(), dbplyr::simulate_dbi()),
+    "sql"
+  )
+})
+
+test_that(".extract_bagger_classprob works with C5.0 base models", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  model <- bagger_c50()
+  res <- .extract_bagger_classprob(model)
+
+  expect_type(res, "list")
+  expect_named(res, levels(iris$Species))
+  expect_true(all(vapply(res, length, integer(1)) == 3))
+  expect_true(
+    all(vapply(unlist(res, recursive = FALSE), is.language, logical(1)))
+  )
+
+  eval_env <- rlang::new_environment(
+    data = as.list(iris),
+    parent = asNamespace("dplyr")
+  )
+  probs <- vapply(
+    res,
+    function(class_trees) {
+      rowMeans(vapply(
+        class_trees,
+        rlang::eval_tidy,
+        numeric(nrow(iris)),
+        env = eval_env
+      ))
+    },
+    numeric(nrow(iris))
+  )
+
+  expect_equal(rowSums(probs), rep(1, nrow(iris)))
+  expect_equal(
+    unname(probs),
+    unname(as.matrix(predict(model, iris, type = "prob")))
+  )
+})
+
+test_that("C5.0 base models with a cost matrix error", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  df <- mtcars
+  df$am <- factor(df$am, labels = c("auto", "manual"))
+  set.seed(100)
+  model <- baguette::bagger(
+    am ~ wt + disp,
+    data = df,
+    base_model = "C5.0",
+    times = 2,
+    cost = 2
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+  expect_snapshot(error = TRUE, parse_model(model))
 })
 
 test_that("small ensembles work", {

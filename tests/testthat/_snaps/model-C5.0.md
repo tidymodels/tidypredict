@@ -10,7 +10,7 @@
     Code
       tidypredict_fit(fuzzy)
     Condition
-      Error in `c50_check_supported()`:
+      Error in `tidypredict_fit()`:
       ! tidypredict does not support C5.0 models with fuzzy thresholds (`fuzzyThreshold = TRUE`).
 
 ---
@@ -18,7 +18,7 @@
     Code
       tidypredict_fit(costs)
     Condition
-      Error in `c50_check_supported()`:
+      Error in `tidypredict_fit()`:
       ! tidypredict does not support C5.0 models fitted with a cost matrix (`costs`).
 
 # rule-based models return the right output

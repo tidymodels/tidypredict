@@ -546,3 +546,27 @@ test_that("bag_tree is handled with parsnip", {
     as.character(predict(cls, iris)$.pred_class)
   )
 })
+
+test_that("bag_tree is handled with parsnip and the C5.0 engine", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("C50")
+
+  set.seed(100)
+  cls <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::bag_tree(mode = "classification"),
+      "C5.0",
+      times = 3
+    ),
+    Species ~ .,
+    data = iris
+  )
+
+  expect_type(tidypredict_fit(cls), "language")
+  expect_s3_class(tidypredict_sql(cls, dbplyr::simulate_dbi()), "sql")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(cls), iris),
+    as.character(predict(cls, iris)$.pred_class)
+  )
+})

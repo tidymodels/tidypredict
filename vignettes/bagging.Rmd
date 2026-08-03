@@ -31,9 +31,10 @@ knitr::opts_chunk$set(
 |`parsnip`                                                      |  ✔  |
 
 `baguette::bagger()` fits an ensemble of models on bootstrap samples of the
-training data. Only the `"CART"` base model, which fits `rpart::rpart()` trees,
-is supported. `tidypredict_fit()` returns one nested `case_when()` per tree, so
-the size of the returned expression grows with `times`.
+training data. The `"CART"` base model, which fits `rpart::rpart()` trees, and
+the `"C5.0"` base model, which fits `C50::C5.0()` trees, are supported.
+`tidypredict_fit()` returns one nested `case_when()` per tree, so the size of
+the returned expression grows with `times`.
 
 For regression models the fitted value is the mean of the individual tree
 predictions. For classification models the class probabilities of each tree are
@@ -78,10 +79,25 @@ model <- baguette::bagger(Species ~ ., data = iris, times = 3)
 tidypredict_test(model, iris)
 ```
 
+C5.0 trees are only fit for classification, and are used by passing
+`base_model = "C5.0"`.
+
+```{r}
+set.seed(100)
+model <- baguette::bagger(
+  Species ~ .,
+  data = iris,
+  base_model = "C5.0",
+  times = 3
+)
+
+tidypredict_test(model, iris)
+```
+
 ## parsnip
 
-Models fit with `parsnip::bag_tree()` and the `"rpart"` engine are supported as
-well.
+Models fit with `parsnip::bag_tree()` and the `"rpart"` or `"C5.0"` engine are
+supported as well.
 
 ```{r}
 library(parsnip)
