@@ -31,8 +31,8 @@
       tidypredict_fit(model)
     Condition
       Error in `parse_model()`:
-      ! Only "CART" bagged models are supported, not "MARS".
-      i Fit the model with `base_model = "CART"`.
+      ! Only "CART" and "C5.0" bagged models are supported, not "MARS".
+      i Fit the model with `base_model = "CART"` or `base_model = "C5.0"`.
 
 ---
 
@@ -40,8 +40,8 @@
       parse_model(model)
     Condition
       Error in `parse_model()`:
-      ! Only "CART" bagged models are supported, not "MARS".
-      i Fit the model with `base_model = "CART"`.
+      ! Only "CART" and "C5.0" bagged models are supported, not "MARS".
+      i Fit the model with `base_model = "CART"` or `base_model = "C5.0"`.
 
 # .extract_bagger_trees errors on bad input
 
@@ -76,4 +76,30 @@
       Error in `.extract_bagger_classprob()`:
       ! Model is not a classification model.
       i Use `.extract_bagger_trees()` for regression models.
+
+# C5.0 base models return the right output
+
+    Code
+      tidypredict_test(model, iris)
+    Output
+      tidypredict test results
+      Difference threshold: 0
+      
+       All results are within the difference threshold
+
+# C5.0 base models with a cost matrix error
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! tidypredict does not support C5.0 models fitted with a cost matrix (`costs`).
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! tidypredict does not support C5.0 models fitted with a cost matrix (`costs`).
 
