@@ -31,6 +31,26 @@ parse_c50_attrs <- function(line) {
   attrs
 }
 
+# The levels of each discrete predictor, taken from the `model$names` text where
+# every attribute is declared on a line of the form `name: level, level, ...`
+# (continuous attributes are declared as `name: continuous.`). C5.0 escapes the
+# characters that are special in that file with a backslash.
+c50_attr_levels <- function(model) {
+  lines <- strsplit(model$names %||% "", "\n")[[1]]
+  lines <- lines[!grepl("^\\s*\\|", lines)]
+  lines <- lines[grepl(":", lines, fixed = TRUE)]
+
+  res <- list()
+  for (line in lines) {
+    line <- sub("\\.$", "", trimws(line))
+    pos <- regexpr(":", line, fixed = TRUE)
+    name <- gsub("\\\\", "", trimws(substr(line, 1, pos - 1)))
+    vals <- strsplit(substr(line, pos + 1, nchar(line)), ",")[[1]]
+    res[[name]] <- gsub("\\\\", "", trimws(vals))
+  }
+  res
+}
+
 # Parse `model$tree` into a list of nested trees (one per boosting trial). A
 # non-boosted model has a single tree; a boosted model (`trials > 1`) stores its
 # trials concatenated, with the count in the `entries=` header line. Leaf nodes
@@ -47,8 +67,9 @@ parse_c50_trees <- function(model) {
     1L
   }
 
-  lines <- lines[!grepl("^(id=|entries=)", lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
   levels <- model$levels
+  attr_levels <- c50_attr_levels(model)
 
   pos <- 1L
   read_node <- function() {
@@ -89,6 +110,22 @@ parse_c50_trees <- function(model) {
         val = as.numeric(attrs$cut),
         left = kids[[2]],
         right = kids[[3]]
+      )
+    } else if (type == "1") {
+      # Discrete split with one fork per level of the attribute. The first fork
+      # is the missing-value branch (ignored, NAs are not handled) and the rest
+      # follow the order the levels are declared in.
+      groups <- attr_levels[[attrs$att]]
+      if (length(groups) != forks - 1) {
+        cli::cli_abort(
+          "Unsupported C5.0 discrete split on {.field {attrs$att}} with {forks} forks and {length(groups)} level{?s}."
+        )
+      }
+      list(
+        kind = "cat",
+        col = attrs$att,
+        groups = as.list(groups),
+        kids = kids[-1]
       )
     } else if (type == "3") {
       # Categorical split. Each fork holds a group of factor levels (`elts`).
@@ -331,7 +368,7 @@ parse_c50_rules <- function(model) {
     )
   }
 
-  lines <- lines[!grepl("^(id=|entries=)", lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
 
   header <- parse_c50_attrs(lines[[1]])
   default <- header$default
