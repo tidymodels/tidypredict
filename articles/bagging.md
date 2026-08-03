@@ -10,9 +10,11 @@
 
 [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
 fits an ensemble of models on bootstrap samples of the training data.
-Only the `"CART"` base model, which fits
-[`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) trees, is
-supported.
+The `"CART"` base model, which fits
+[`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) trees, and
+the `"C5.0"` base model, which fits
+[`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+trees, are supported.
 [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
 returns one nested
 [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
@@ -115,11 +117,31 @@ tidypredict_test(model, iris)
 #>  All results are within the difference threshold
 ```
 
+C5.0 trees are only fit for classification, and are used by passing
+`base_model = "C5.0"`.
+
+``` r
+
+set.seed(100)
+model <- baguette::bagger(
+  Species ~ .,
+  data = iris,
+  base_model = "C5.0",
+  times = 3
+)
+
+tidypredict_test(model, iris)
+#> tidypredict test results
+#> Difference threshold: 0
+#> 
+#>  All results are within the difference threshold
+```
+
 ## parsnip
 
 Models fit with
 [`parsnip::bag_tree()`](https://parsnip.tidymodels.org/reference/bag_tree.html)
-and the `"rpart"` engine are supported as well.
+and the `"rpart"` or `"C5.0"` engine are supported as well.
 
 ``` r
 

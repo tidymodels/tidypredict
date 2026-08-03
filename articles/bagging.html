@@ -141,9 +141,10 @@
 </tbody>
 </table>
 <p><code><a href="https://baguette.tidymodels.org/reference/bagger.html" class="external-link">baguette::bagger()</a></code> fits an ensemble of models on
-bootstrap samples of the training data. Only the <code>"CART"</code>
-base model, which fits <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> trees, is supported.
-<code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns one nested
+bootstrap samples of the training data. The <code>"CART"</code> base
+model, which fits <code><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart::rpart()</a></code> trees, and the
+<code>"C5.0"</code> base model, which fits <code><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C50::C5.0()</a></code>
+trees, are supported. <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> returns one nested
 <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when()</a></code> per tree, so the size of the returned
 expression grows with <code>times</code>.</p>
 <p>For regression models the fitted value is the mean of the individual
@@ -234,13 +235,30 @@ results</p>
 <span><span class="co">#&gt; Difference threshold: 0</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
+<p>C5.0 trees are only fit for classification, and are used by passing
+<code>base_model = "C5.0"</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">baguette</span><span class="fu">::</span><span class="fu"><a href="https://baguette.tidymodels.org/reference/bagger.html" class="external-link">bagger</a></span><span class="op">(</span></span>
+<span>  <span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>,</span>
+<span>  data <span class="op">=</span> <span class="va">iris</span>,</span>
+<span>  base_model <span class="op">=</span> <span class="st">"C5.0"</span>,</span>
+<span>  times <span class="op">=</span> <span class="fl">3</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">iris</span><span class="op">)</span></span>
+<span><span class="co">#&gt; tidypredict test results</span></span>
+<span><span class="co">#&gt; Difference threshold: 0</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
 <p>Models fit with <code><a href="https://parsnip.tidymodels.org/reference/bag_tree.html" class="external-link">parsnip::bag_tree()</a></code> and the
-<code>"rpart"</code> engine are supported as well.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code>"rpart"</code> or <code>"C5.0"</code> engine are supported as
+well.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">100</span><span class="op">)</span></span>
