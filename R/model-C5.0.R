@@ -91,7 +91,8 @@ parse_c50_trees <- function(model) {
       return(list(
         kind = "leaf",
         prediction = attrs$class,
-        confidence = confidence
+        confidence = confidence,
+        freq = freq
       ))
     }
 
@@ -203,6 +204,7 @@ c50_tree_info <- function(node) {
         terminal = TRUE,
         prediction = node$prediction,
         confidence = node$confidence %||% NA_real_,
+        freq = node$freq,
         split = list(NULL)
       ))
       return(id)
@@ -247,25 +249,28 @@ c50_tree_info <- function(node) {
     terminal = map_lgl(rows, ~ .x$terminal),
     prediction = map_chr(rows, ~ .x$prediction),
     confidence = map_dbl(rows, ~ .x$confidence),
+    leaf_freq = map(rows, ~ .x$freq),
     node_splits = map(rows, ~ .x$split),
     majority_left = rep(NA, n),
     use_surrogates = FALSE
   )
 }
 
-c50_check_supported <- function(model) {
+c50_check_supported <- function(model, call = rlang::caller_env()) {
   if (isTRUE(model$control$fuzzyThreshold)) {
     # Fuzzy thresholds route cases near a split point partly down both branches,
     # which cannot be expressed as a hard `<= cut` comparison.
     cli::cli_abort(
-      "{.pkg tidypredict} does not support C5.0 models with fuzzy thresholds ({.code fuzzyThreshold = TRUE})."
+      "{.pkg tidypredict} does not support C5.0 models with fuzzy thresholds ({.code fuzzyThreshold = TRUE}).",
+      call = call
     )
   }
   if (!is.null(model$costMatrix)) {
     # A cost matrix changes how the final class is chosen from the votes, which
     # the generated argmax expression does not account for.
     cli::cli_abort(
-      "{.pkg tidypredict} does not support C5.0 models fitted with a cost matrix ({.code costs})."
+      "{.pkg tidypredict} does not support C5.0 models fitted with a cost matrix ({.code costs}).",
+      call = call
     )
   }
   invisible(model)
@@ -279,6 +284,51 @@ c50_tree_info_full <- function(model) {
     )
   }
   c50_tree_info(parse_c50_tree(model))
+}
+
+# The class proportions of the training sample, taken from the frequencies
+# C5.0 records on the root node of the first tree.
+c50_priors <- function(model) {
+  lines <- strsplit(model$tree, "\n")[[1]]
+  lines <- lines[nzchar(lines)]
+  lines <- lines[!grepl("^(id=|entries=|costs=)", lines)]
+  freq <- as.numeric(strsplit(parse_c50_attrs(lines[[1]])$freq, ",")[[1]])
+  freq / sum(freq)
+}
+
+# One tree_info per outcome level, where the node predictions are the class
+# probabilities instead of the predicted class. C5.0 reports the probability of
+# a class at a leaf as `(freq + prior) / (n_leaf + 1)`, where `freq` is the
+# number of training cases of that class reaching the leaf and `prior` is the
+# class proportion of the whole training sample.
+c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
+  if (isTRUE(model$rbm)) {
+    cli::cli_abort(
+      "Class probabilities are not supported for rule-based C5.0 models ({.code rules = TRUE}).",
+      call = call
+    )
+  }
+  c50_check_supported(model, call = call)
+
+  classes <- model$levels
+  priors <- c50_priors(model)
+  tree_info <- c50_tree_info_full(model)
+
+  probs <- map(tree_info$leaf_freq, function(freq) {
+    if (is.null(freq)) {
+      rep(0, length(classes))
+    } else {
+      (freq + priors) / (sum(freq) + 1)
+    }
+  })
+
+  res <- map(seq_along(classes), function(i) {
+    tree_info_copy <- tree_info
+    tree_info_copy$prediction <- map_dbl(probs, ~ .x[[i]])
+    tree_info_copy
+  })
+  names(res) <- classes
+  res
 }
 
 # Build a nested case_when returning, at each leaf, the leaf confidence when the
