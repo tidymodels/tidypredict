@@ -285,6 +285,32 @@ get_ra_trees <- function(model) {
   )
 }
 
+# Test ---------------------------------------------
+
+# `predict.ranger()` returns a `ranger.prediction` list rather than a vector,
+# so the default method cannot read the predictions out of it.
+#' @export
+tidypredict_test.ranger <- function(
+  model,
+  df,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  df <- maybe_head(df, max_rows)
+
+  base <- predict(model, df)$predictions
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+
+  test_results_numeric(base, te[, "fit_te"], threshold, model$call)
+}
+
 # For {orbital} -----------------------------------------------
 
 #' Extract classification probability trees for ranger models
