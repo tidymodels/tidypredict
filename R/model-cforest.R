@@ -6,13 +6,7 @@
 cforest_check_regression <- function(model) {
   response_col <- model$fitted[["(response)"]]
   if (!is.numeric(response_col)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for cforest.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("cforest")
   }
   invisible(model)
 }
@@ -50,6 +44,5 @@ tidypredict_fit.cforest <- function(model, ...) {
     }
   )
 
-  res <- reduce_addition(tree_exprs)
-  expr_division(res, n_trees)
+  expr_mean(tree_exprs, n_trees)
 }

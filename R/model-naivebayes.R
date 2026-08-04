@@ -23,11 +23,7 @@ tidypredict_fit.pm_naive_bayes <- function(model) {
 # same for every class, so it cancels out and is left out of the scores.
 build_fit_formula_naive_bayes <- function(parsedmodel) {
   scores <- map(parsedmodel$class_terms, naive_bayes_score)
-  exp_scores <- map(scores, ~ expr(exp(!!.x)))
-  denom <- reduce_addition(exp_scores)
-  res <- map(scores, ~ expr(exp(!!.x) / (!!denom)))
-  names(res) <- parsedmodel$classes
-  res
+  expr_softmax(scores, parsedmodel$classes)
 }
 
 naive_bayes_score <- function(class_term) {
@@ -246,12 +242,7 @@ tidypredict_test.NaiveBayes <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support {.fn klaR::NaiveBayes} models.",
-      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
-    )
-  )
+  abort_test_unsupported("{.fn klaR::NaiveBayes} models")
 }
 
 #' @export
@@ -263,11 +254,5 @@ tidypredict_test.naive_bayes <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support
-       {.fn naivebayes::naive_bayes} models.",
-      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
-    )
-  )
+  abort_test_unsupported("{.fn naivebayes::naive_bayes} models")
 }

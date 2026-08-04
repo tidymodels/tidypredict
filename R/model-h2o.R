@@ -110,12 +110,7 @@ tidypredict_fit.H2OMultinomialModel <- function(model, ...) {
     f
   })
 
-  exp_raws <- map(raw_scores, \(x) expr(exp(!!x)))
-  denom <- reduce_addition(exp_raws)
-
-  result <- map(exp_raws, \(x) expr(!!x / (!!denom)))
-  names(result) <- domain
-  result
+  expr_softmax(raw_scores, domain)
 }
 
 # Test model -------------------------------------------------------

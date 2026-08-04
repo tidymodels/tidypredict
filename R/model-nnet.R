@@ -41,11 +41,7 @@ build_fit_formula_nnet <- function(parsedmodel) {
 }
 
 nnet_softmax <- function(outputs, classes) {
-  exp_outputs <- map(outputs, ~ expr(exp(!!.x)))
-  denom <- reduce_addition(exp_outputs)
-  res <- map(outputs, ~ expr(exp(!!.x) / (!!denom)))
-  names(res) <- classes
-  res
+  expr_softmax(outputs, classes)
 }
 
 # `predict.model_fit()` runs the probabilities that `predict.nnet()` already
@@ -177,12 +173,9 @@ tidypredict_test.nnet <- function(
   xg_df = NULL
 ) {
   if (length(model$lev) > 0) {
-    cli::cli_abort(
-      c(
-        "{.fn tidypredict_test} does not support classification
-         {.fn nnet::nnet} models.",
-        "i" = "Use {.fn tidypredict_fit} directly for class predictions."
-      )
+    abort_test_unsupported(
+      "classification {.fn nnet::nnet} models",
+      "class predictions"
     )
   }
 

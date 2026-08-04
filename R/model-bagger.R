@@ -90,29 +90,13 @@ bagger_build_formula <- function(parsedmodel) {
 
 # Average the per-tree expressions of a single quantity
 bagger_mean_tree <- function(tree_info_list) {
-  tree_exprs <- map(tree_info_list, generate_nested_case_when_tree)
-  expr_division(reduce_addition(tree_exprs), length(tree_exprs))
+  expr_mean(map(tree_info_list, generate_nested_case_when_tree))
 }
 
 # Return the class with the largest probability, with ties going to the class
 # that comes first, matching `which.max()`
 bagger_class_case_when <- function(probs, classes) {
-  n <- length(classes)
-  if (n == 1) {
-    return(classes[[1]])
-  }
-
-  args <- list()
-  for (i in seq_len(n - 1L)) {
-    comparisons <- map(
-      seq.int(i + 1L, n),
-      function(j) expr(!!probs[[i]] >= !!probs[[j]])
-    )
-    condition <- combine_path_conditions(comparisons)
-    args[[i]] <- expr(!!condition ~ !!classes[[i]])
-  }
-  args$.default <- classes[[n]]
-  rlang::call2("case_when", !!!args)
+  build_argmax_case_when(probs, classes)
 }
 
 # Test model -----------------------------------------------
