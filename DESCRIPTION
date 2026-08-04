@@ -12,7 +12,8 @@ Description: It parses a fitted 'R' model object, and returns a formula in
     for the final 'SQL' translation of the algorithm. It currently
     supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
     earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
-    cubist(), ctree(), cforest(), fda(), ksvm(), lda(), sda(), lda_diag(),
+    cubist(), ctree(), cforest(), fda(), ksvm(), lda(), qda(), sda(),
+    lda_diag(),
     pls(), nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(),
     bagger(), and xrf() models.
 License: MIT + file LICENSE
