@@ -307,9 +307,22 @@ build_fit_formula_xgb_nested <- function(model) {
 
 # Build nested formula from parsed xgboost model (version 3)
 build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
-  # Build nested trees from flat paths
+  # Build nested trees from flat paths. `get_xgb_path()` walks from each leaf up
+  # to the root, so the stored paths are leaf-first while
+  # `build_nested_from_flat_paths()` needs them root-first. Reversing here
+  # rather than in the parser keeps already-serialized models readable; the
+  # legacy flat builder ANDs the conditions together and does not care about
+  # order.
   trees_nested <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(tree, build_xgb_nested_condition)
+    tree <- map(tree, function(leaf) {
+      leaf$path <- rev(leaf$path)
+      leaf
+    })
+    build_nested_from_flat_paths(
+      tree,
+      build_xgb_nested_condition,
+      xgb_is_left_op
+    )
   })
 
   # Apply DART weight_drop if present
@@ -386,29 +399,26 @@ apply_xgb_objective <- function(f, objective, base_score) {
   )
 }
 
-# nocov start
-# Build condition for xgboost nested generation from path element
-# Note: This function is currently not called due to how build_nested_from_flat_paths
-# partitions leaves - xgboost's op naming doesn't match the expected convention.
-# Kept for potential future use when the partitioning logic is updated.
+# `get_xgb_path_fun()` labels a leaf reached through the Yes child "more-equal"
+# and one reached through the No child "less", which is the opposite of what the
+# names suggest. Yes is xgboost's left branch, so "more-equal" is left.
+xgb_is_left_op <- function(op) {
+  op == "more-equal"
+}
+
+# Build condition for xgboost nested generation from path element. Only ever
+# called with left-branch elements, so the condition is always `< threshold`.
 build_xgb_nested_condition <- function(path_elem) {
   col <- rlang::sym(path_elem$col)
   val <- as.numeric(path_elem$val)
   missing <- path_elem$missing %||% FALSE
 
-  # xgboost uses "less" for left (< threshold) and "more-equal" for right
-  if (path_elem$op %in% c("less", "more-equal")) {
-    if (missing) {
-      expr(!!col < !!val | is.na(!!col))
-    } else {
-      expr(!!col < !!val)
-    }
+  if (missing) {
+    expr(!!col < !!val | is.na(!!col))
   } else {
-    # This shouldn't happen in normal xgboost trees
-    expr(!!col >= !!val)
+    expr(!!col < !!val)
   }
 }
-# nocov end
 
 # Extract nested trees from xgboost model
 extract_xgb_trees_nested <- function(model) {

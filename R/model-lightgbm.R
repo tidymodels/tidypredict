@@ -547,7 +547,11 @@ build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
 
   # Build nested trees from flat paths
   trees <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(tree, build_lgb_nested_condition)
+    build_nested_from_flat_paths(
+      tree,
+      build_lgb_nested_condition,
+      lgb_is_left_op
+    )
   })
 
   # RF boosting averages trees instead of summing
@@ -572,12 +576,20 @@ build_fit_formula_lgb_multiclass_from_parsed <- function(
   }
 
   trees <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(tree, build_lgb_nested_condition)
+    build_nested_from_flat_paths(
+      tree,
+      build_lgb_nested_condition,
+      lgb_is_left_op
+    )
   })
   apply_lgb_multiclass_transformation(trees, num_class, objective)
 }
 
 # Build condition for lightgbm nested generation from path element
+lgb_is_left_op <- function(op) {
+  op %in% c("less-equal", "in")
+}
+
 build_lgb_nested_condition <- function(path_elem) {
   col <- rlang::sym(path_elem$col)
   missing <- path_elem$missing %||% FALSE

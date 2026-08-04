@@ -139,23 +139,33 @@ build_nested_split_condition <- function(split) {
 # @param build_condition_fn Function to build a condition expression from a
 #   path element. Should only build the LEFT branch condition (the right
 #   branch is handled by `.default`).
+# @param is_left_op Predicate taking an `op` string and returning TRUE when it
+#   denotes the left branch.
 #
 # ## Operator naming convention
 #
-# Different models use different operator names, but they follow a pattern:
-# - **Left branch operators** (condition is TRUE): "less", "less-equal", "in",
-#   "more-equal", "equal"
-# - **Right branch operators** (condition is FALSE): "more", "not-in",
-#   "not-equal"
+# Each model names its branch operators differently, and the names do not
+# always mean what they say: xgboost labels the left branch "more-equal" even
+# though the condition it generates is `value < threshold`. There is therefore
+# no safe shared default, and every caller must state its own convention:
 #
-# Model-specific conventions:
-# - **xgboost**: "less" and "more-equal" for left, inverse for right
-# - **lightgbm**: "less-equal" and "in" for left, "more" and "not-in" for right
-# - **catboost**: "less-equal" and "equal" for left, "more" and "not-equal" for right
+# - **xgboost**: "more-equal" is left, "less" is right
+# - **lightgbm**: "less-equal" and "in" are left, "more" and "not-in" are right
+# - **catboost**: "less-equal" and "equal" are left, "more" and "not-equal" are
+#   right
+#
+# An earlier version inferred this from one shared allowlist that happened to
+# contain both of xgboost's operators. Every xgboost leaf then looked like a
+# left branch, the right partition was always empty, and each tree silently
+# collapsed to its first leaf's prediction.
 #
 # The `build_condition_fn` is only called with left-branch path elements,
 # so it only needs to handle left-branch operators.
-build_nested_from_flat_paths <- function(leaves, build_condition_fn) {
+build_nested_from_flat_paths <- function(
+  leaves,
+  build_condition_fn,
+  is_left_op
+) {
   if (length(leaves) == 0) {
     cli::cli_abort("Empty tree.", .internal = TRUE)
   }
@@ -165,12 +175,18 @@ build_nested_from_flat_paths <- function(leaves, build_condition_fn) {
     return(leaves[[1]]$prediction)
   }
 
-  build_nested_from_paths_recursive(leaves, build_condition_fn, path_depth = 1)
+  build_nested_from_paths_recursive(
+    leaves,
+    build_condition_fn,
+    is_left_op,
+    path_depth = 1
+  )
 }
 
 build_nested_from_paths_recursive <- function(
   leaves,
   build_condition_fn,
+  is_left_op,
   path_depth
 ) {
   if (length(leaves) == 1) {
@@ -182,40 +198,48 @@ build_nested_from_paths_recursive <- function(
     return(first_leaf$prediction)
   }
 
-  # Get condition at this depth
-  split_info <- first_leaf$path[[path_depth]]
-
   # Partition leaves by left vs right condition based on operator name.
   # See "Operator naming convention" in build_nested_from_flat_paths docs.
   is_left_condition <- function(leaf) {
     if (path_depth > length(leaf$path)) {
       return(TRUE)
     }
-    op <- leaf$path[[path_depth]]$op
-    op %in% c("less", "less-equal", "in", "more-equal", "equal")
+    is_left_op(leaf$path[[path_depth]]$op)
   }
 
   left_leaves <- Filter(is_left_condition, leaves)
   right_leaves <- Filter(Negate(is_left_condition), leaves)
 
+  # A split that sends every leaf the same way carries no information, so
+  # descend past it. This is expected for unbalanced trees, where a leaf with a
+  # shorter path counts as left at depths it does not reach.
   if (length(left_leaves) == 0 || length(right_leaves) == 0) {
     return(build_nested_from_paths_recursive(
       leaves,
       build_condition_fn,
+      is_left_op,
       path_depth + 1
     ))
   }
 
-  condition <- build_condition_fn(split_info)
+  # Describe the split using a left leaf that actually reaches this depth. The
+  # left and right elements carry the same column and threshold, but flags such
+  # as xgboost's `missing` are stated relative to the branch taken, so reading
+  # them off a right leaf would send missing values the wrong way.
+  deep_enough <- Filter(\(leaf) path_depth <= length(leaf$path), left_leaves)
+  split_leaf <- if (length(deep_enough) > 0) deep_enough[[1]] else first_leaf
+  condition <- build_condition_fn(split_leaf$path[[path_depth]])
 
   left_subtree <- build_nested_from_paths_recursive(
     left_leaves,
     build_condition_fn,
+    is_left_op,
     path_depth + 1
   )
   right_subtree <- build_nested_from_paths_recursive(
     right_leaves,
     build_condition_fn,
+    is_left_op,
     path_depth + 1
   )
 
