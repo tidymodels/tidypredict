@@ -72,12 +72,9 @@ tidypredict_test.nullmodel <- function(
   xg_df = NULL
 ) {
   if (!is.null(model$levels)) {
-    cli::cli_abort(
-      c(
-        "{.fn tidypredict_test} does not support classification
-         {.fn parsnip::nullmodel} models.",
-        "i" = "Use {.fn tidypredict_fit} directly for class probabilities."
-      )
+    abort_test_unsupported(
+      "classification {.fn parsnip::nullmodel} models",
+      "class probabilities"
     )
   }
 
