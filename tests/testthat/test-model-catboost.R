@@ -1021,6 +1021,46 @@ test_that("tidypredict_test works for regression", {
   expect_false(result$alert)
 })
 
+test_that("parsed model produces same predictions as the fitted model", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  pm <- as_parsed_model(parse_model(model))
+
+  direct <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  parsed <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+
+  expect_equal(parsed, direct)
+})
+
+test_that("parsed model predictions match native predict", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  pool <- catboost_catboost.load_pool(X)
+  pm <- as_parsed_model(parse_model(model))
+
+  parsed <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+
+  expect_equal(
+    parsed,
+    catboost_catboost.predict(model, pool),
+    tolerance = 1e-6
+  )
+})
+
+test_that("tidypredict_test flags differences in both directions", {
+  skip_if_not_installed("catboost")
+
+  model <- make_catboost_model()
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+
+  result <- tidypredict_test(model, xg_df = X, threshold = 1e-7)
+
+  expect_threshold_consistent(result, 1e-7)
+})
+
 test_that("tidypredict_test works for binary classification", {
   skip_if_not_installed("catboost")
 
