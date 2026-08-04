@@ -115,20 +115,48 @@ parse_model_lm <- function(model, call = rlang::caller_env()) {
   if (class(model)[[1]] == "glm") {
     pm$general$is_glm <- 1
   }
-  terms <- map(
-    seq_len(length(labels)),
-    ~ {
-      list(
-        label = labels[.x],
-        coef = coefs[.x],
-        is_intercept = ifelse(labels[.x] == "(Intercept)", 1, 0),
-        fields = parse_label_lm(labels[.x], vars),
-        qr = parse_qr_lm(labels[.x], qr)
-      )
-    }
-  )
-  pm$terms <- terms
+  pm$terms <- build_terms(coefs, labels, vars, qr = qr)
   as_parsed_model(pm)
+}
+
+# Build the `terms` entries of a parsed model from a set of coefficients.
+#
+# `vars` is the set of variables the model was fit on, used to recognise
+# interactions and factor levels in a coefficient label. Pass `NULL` for models
+# fit from a numeric matrix, where each coefficient names a column directly.
+# `qr` adds the inverse QR decomposition needed for prediction intervals, and
+# `drop_zero` discards zero coefficients, as the penalised models do.
+build_terms <- function(
+  values,
+  labels,
+  vars = NULL,
+  qr = NULL,
+  drop_zero = FALSE
+) {
+  terms <- map2(as.numeric(values), labels, function(value, label) {
+    if (drop_zero && value == 0) {
+      return(NULL)
+    }
+    term <- list(
+      label = label,
+      coef = value,
+      is_intercept = as.integer(label == "(Intercept)"),
+      fields = if (is.null(vars)) {
+        list(list(type = "ordinary", col = label))
+      } else {
+        parse_label_lm(label, vars)
+      }
+    )
+    if (!is.null(qr)) {
+      term$qr <- parse_qr_lm(label, qr)
+    }
+    term
+  })
+
+  if (drop_zero) {
+    return(purrr::discard(terms, is.null))
+  }
+  terms
 }
 
 parse_label_lm <- function(label, vars) {

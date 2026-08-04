@@ -6,13 +6,7 @@ parse_model.ranger <- function(model) {
   first_tree <- ranger::treeInfo(model, 1)
   first_pred <- first_tree$prediction[first_tree$terminal][1]
   if (is.character(first_pred) || is.factor(first_pred)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for ranger.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("ranger")
   }
 
   pm <- list()
@@ -71,13 +65,7 @@ tidypredict_fit_ranger_nested <- function(model) {
   first_tree <- ranger::treeInfo(model, 1)
   first_pred <- first_tree$prediction[first_tree$terminal][1]
   if (is.character(first_pred) || is.factor(first_pred)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for ranger.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("ranger")
   }
 
   n_trees <- model$num.trees
@@ -85,8 +73,7 @@ tidypredict_fit_ranger_nested <- function(model) {
     build_nested_ranger_tree(model, tree_no)
   })
 
-  res <- reduce_addition(tree_exprs)
-  expr_division(res, n_trees)
+  expr_mean(tree_exprs, n_trees)
 }
 
 # Build nested case_when for a single ranger tree
@@ -136,19 +123,10 @@ tidypredict_fit_ranger <- function(parsedmodel) {
   # Check if this is a classification model (string predictions)
   first_pred <- parsedmodel$trees[[1]][[1]]$prediction
   if (is.character(first_pred)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for ranger.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("ranger")
   }
 
-  res <- generate_case_when_trees(parsedmodel)
-  res <- reduce_addition(res)
-  n_trees <- length(parsedmodel$trees)
-  expr_division(res, n_trees)
+  expr_mean(generate_case_when_trees(parsedmodel))
 }
 
 # Legacy tree extraction functions (no longer used) ---------------------------

@@ -354,18 +354,7 @@ c50_boosted_case_when <- function(tree_info_list, classes) {
     reduce_addition(lapply(tree_info_list, c50_class_vote, class = class))
   })
 
-  n <- length(classes)
-  args <- list()
-  for (i in seq_len(n - 1L)) {
-    comparisons <- lapply(
-      seq.int(i + 1L, n),
-      function(j) expr(!!votes[[i]] >= !!votes[[j]])
-    )
-    condition <- combine_path_conditions(comparisons)
-    args[[i]] <- expr(!!condition ~ !!classes[[i]])
-  }
-  args$.default <- classes[[n]]
-  rlang::call2("case_when", !!!args)
+  build_argmax_case_when(votes, classes)
 }
 
 # Rules -----------------------------------------
@@ -493,22 +482,7 @@ c50_rules_case_when <- function(rules_obj) {
 
   votes <- lapply(ordered, function(cl) c50_class_vote_rules(rules_obj, cl))
 
-  n <- length(ordered)
-  if (n == 1) {
-    return(ordered[[1]])
-  }
-
-  args <- list()
-  for (i in seq_len(n - 1L)) {
-    comparisons <- lapply(
-      seq.int(i + 1L, n),
-      function(j) expr(!!votes[[i]] >= !!votes[[j]])
-    )
-    condition <- combine_path_conditions(comparisons)
-    args[[i]] <- expr(!!condition ~ !!ordered[[i]])
-  }
-  args$.default <- ordered[[n]]
-  rlang::call2("case_when", !!!args)
+  build_argmax_case_when(votes, ordered)
 }
 
 # Predict ---------------------------------------

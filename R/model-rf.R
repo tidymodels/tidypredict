@@ -4,13 +4,7 @@
 parse_model.randomForest <- function(model) {
   # Check if this is a classification model
   if (!is.null(model$classes)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for randomForest.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("randomForest")
   }
 
   pm <- list()
@@ -84,13 +78,7 @@ tidypredict_fit.randomForest <- function(model, ...) {
 tidypredict_fit_rf_nested <- function(model) {
   # Check if this is a classification model
   if (!is.null(model$classes)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for randomForest.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("randomForest")
   }
 
   n_trees <- model$ntree
@@ -100,8 +88,7 @@ tidypredict_fit_rf_nested <- function(model) {
     build_nested_rf_tree(model, tree_no, term_labels)
   })
 
-  res <- reduce_addition(tree_exprs)
-  expr_division(res, n_trees)
+  expr_mean(tree_exprs, n_trees)
 }
 
 # Build nested case_when for a single randomForest tree
@@ -154,19 +141,10 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
   # Check if this is a classification model (string predictions)
   first_pred <- parsedmodel$trees[[1]][[1]]$prediction
   if (is.character(first_pred)) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for randomForest.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("randomForest")
   }
 
-  res <- generate_case_when_trees(parsedmodel)
-  res <- reduce_addition(res)
-  n_trees <- length(parsedmodel$trees)
-  expr_division(res, n_trees)
+  expr_mean(generate_case_when_trees(parsedmodel))
 }
 
 # For {orbital} -----------------------------------------------

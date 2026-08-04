@@ -59,7 +59,7 @@ parse_model_mixomics <- function(model, vars = character(0)) {
     # into class probabilities with a softmax.
     class_terms <- lapply(
       outcomes,
-      function(outcome) mixomics_terms(coefs[, outcome], labels, vars)
+      function(outcome) build_terms(coefs[, outcome], labels, vars)
     )
 
     pm <- list()
@@ -83,7 +83,7 @@ parse_model_mixomics <- function(model, vars = character(0)) {
       pm$general$type <- "regression"
       pm$general$is_glm <- 0
       pm$general$ncomp <- model$ncomp
-      pm$terms <- mixomics_terms(coefs[, outcome], labels, vars)
+      pm$terms <- build_terms(coefs[, outcome], labels, vars)
       as_parsed_model(pm)
     }
   )
@@ -130,28 +130,6 @@ mixomics_coefs <- function(model, call = rlang::caller_env()) {
   coefs
 }
 
-mixomics_terms <- function(values, labels, vars) {
-  map2(as.numeric(values), labels, function(value, label) {
-    list(
-      label = label,
-      coef = value,
-      is_intercept = as.integer(label == "(Intercept)"),
-      fields = parse_label_lm(label, vars)
-    )
-  })
-}
-
-# {mixOmics} is fit from a numeric matrix, so a bare model has no way of
-# knowing that a column such as `gear4` is a dummy variable. A parsnip fit does
-# keep the formula around, which lets the dummy columns be expressed in terms
-# of the original factors.
-mixomics_parsnip_vars <- function(model) {
-  terms <- model$preproc$terms
-  if (is.null(terms)) {
-    return(character(0))
-  }
-  names(attr(terms, "dataClasses"))
-}
 
 # Test ---------------------------------------------
 
@@ -239,14 +217,12 @@ mixomics_test <- function(
 abort_mixomics_test <- function(type, call = rlang::caller_env()) {
   detail <- switch(
     type,
-    multiclass = "Use {.fn tidypredict_fit} directly for multiclass predictions.",
-    multivariate = "Use {.fn tidypredict_fit} directly for multivariate outcomes."
+    multiclass = "multiclass predictions",
+    multivariate = "multivariate outcomes"
   )
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support this {.pkg mixOmics} model.",
-      "i" = detail
-    ),
+  abort_test_unsupported(
+    "this {.pkg mixOmics} model",
+    detail,
     call = call
   )
 }

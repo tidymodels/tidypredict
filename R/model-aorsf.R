@@ -8,13 +8,7 @@
 
 aorsf_check_supported <- function(model) {
   if (!inherits(model, "ObliqueForestRegression")) {
-    cli::cli_abort(
-      c(
-        "Classification models are not supported for aorsf.",
-        i = "Only regression models can be converted to tidy formulas.",
-        i = "Classification requires a voting mechanism that cannot be expressed as a single formula."
-      )
-    )
+    abort_classification_unsupported("aorsf")
   }
 
   names_x <- model$get_names_x()
@@ -119,6 +113,5 @@ tidypredict_fit.ObliqueForest <- function(model, ...) {
     }
   )
 
-  res <- reduce_addition(tree_exprs)
-  expr_division(res, n_trees)
+  expr_mean(tree_exprs, n_trees)
 }

@@ -697,12 +697,7 @@ apply_catboost_multiclass_transformation <- function(
   raw_scores <- lapply(raw_scores, apply_catboost_scale_bias, parsedmodel)
 
   if (objective == "MultiClass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
+    result <- expr_softmax(raw_scores)
   } else {
     # MultiClassOneVsAll: sigmoid for each class independently
     result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))

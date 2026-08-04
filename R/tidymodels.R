@@ -1,5 +1,17 @@
 # parsnip ----------------------------------------------------------------
 
+# Models fit from a numeric model matrix have no way of knowing that a column
+# such as `gear4` is a dummy variable. A parsnip fit does keep the formula
+# around, which lets the dummy columns be expressed in terms of the original
+# factors.
+parsnip_vars <- function(model) {
+  terms <- model$preproc$terms
+  if (is.null(terms)) {
+    return(character(0))
+  }
+  names(attr(terms, "dataClasses"))
+}
+
 #' @export
 tidypredict_fit._xgb.Booster <- function(model) {
   tidypredict_fit(model$fit)
@@ -23,7 +35,7 @@ tidypredict_fit.model_fit <- function(model) {
   # {mixOmics} models only see the model matrix, so the formula is needed to map
   # dummy columns back onto the original factors
   if (inherits(model$fit, mixomics_classes)) {
-    return(tidypredict_fit_mixomics(model$fit, mixomics_parsnip_vars(model)))
+    return(tidypredict_fit_mixomics(model$fit, parsnip_vars(model)))
   }
 
   # `mlp()` models need the extra softmax that parsnip applies to the class
@@ -41,18 +53,18 @@ parse_model.model_fit <- function(model) {
   model <- glmnet_set_lambda(model)
 
   if (inherits(model$fit, "sda")) {
-    return(parse_model_sda(model$fit, sda_parsnip_vars(model)))
+    return(parse_model_sda(model$fit, parsnip_vars(model)))
   }
 
   if (inherits(model$fit, sparsediscrim_classes)) {
     return(parse_model_sparsediscrim(
       model$fit,
-      sparsediscrim_parsnip_vars(model)
+      parsnip_vars(model)
     ))
   }
 
   if (inherits(model$fit, mixomics_classes)) {
-    return(parse_model_mixomics(model$fit, mixomics_parsnip_vars(model)))
+    return(parse_model_mixomics(model$fit, parsnip_vars(model)))
   }
 
   parse_model(model$fit)

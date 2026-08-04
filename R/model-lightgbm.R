@@ -388,12 +388,7 @@ apply_lgb_multiclass_transformation <- function(trees, num_class, objective) {
 
   # Apply transformation based on objective
   if (objective == "multiclass") {
-    # Softmax: exp(raw_i) / sum(exp(raw_j))
-    exp_raws <- map(raw_scores, ~ expr(exp(!!.x)))
-    denom <- reduce_addition(exp_raws)
-    result <- map(seq_len(num_class), function(i) {
-      expr(exp(!!raw_scores[[i]]) / (!!denom))
-    })
+    result <- expr_softmax(raw_scores)
   } else if (objective == "multiclassova") {
     # One-vs-all: sigmoid for each class independently
     result <- map(raw_scores, lgb_sigmoid)

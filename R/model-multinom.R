@@ -30,19 +30,15 @@ parse_model.multinom <- function(model) {
     list(multinom_reference_terms()),
     lapply(
       classes[-1],
-      \(cl) multinom_terms(coefs[cl, ], colnames(coefs), vars)
+      \(cl) build_terms(coefs[cl, ], colnames(coefs), vars)
     )
   )
 
-  pm <- list()
-  pm$general$model <- "multinom"
-  pm$general$version <- 2
-  pm$general$type <- "multiclass_regression"
-  pm$general$family <- "multinomial"
-  pm$classes <- classes
-  pm$class_terms <- class_terms
-
-  as_parsed_model(pm)
+  new_multiclass_parsed_model(
+    "multinom",
+    classes,
+    class_terms
+  )
 }
 
 multinom_reference_terms <- function() {
@@ -54,16 +50,6 @@ multinom_reference_terms <- function() {
   ))
 }
 
-multinom_terms <- function(values, labels, vars) {
-  map2(as.numeric(values), labels, function(value, label) {
-    list(
-      label = label,
-      coef = value,
-      is_intercept = as.integer(label == "(Intercept)"),
-      fields = parse_label_lm(label, vars)
-    )
-  })
-}
 
 #' @export
 acceptable_formula.multinom <- function(model) acceptable_lm(model)
@@ -79,10 +65,5 @@ tidypredict_test.multinom <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support {.fn nnet::multinom} models.",
-      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
-    )
-  )
+  abort_test_unsupported("{.fn nnet::multinom} models")
 }
