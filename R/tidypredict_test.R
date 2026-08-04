@@ -509,7 +509,7 @@ xgb_booster <- function(
   )
   raw_results <- cbind(base, te)
   raw_results$fit_diff <- raw_results$base - raw_results$fit_te
-  raw_results$fit_threshold <- raw_results$fit_diff > threshold
+  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
 
   rowid <- seq_len(nrow(raw_results))
   raw_results <- cbind(data.frame(rowid), raw_results)
@@ -524,7 +524,7 @@ xgb_booster <- function(
   )
 
   if (alert) {
-    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
+    difference <- data.frame(fit_diff = max(abs(raw_results$fit_diff)))
     message <- paste0(
       message,
       "\nFitted records above the threshold: ",

@@ -36,7 +36,7 @@
       tidypredict test results
       Difference threshold: 0
       
-      Fitted records above the threshold: 18
+      Fitted records above the threshold: 32
       
       Max difference: <number>
 
