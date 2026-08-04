@@ -31,9 +31,10 @@ included in the test. It defaults to FALSE.}
 \item{max_rows}{The number of rows in the object passed in the df argument. Highly
 recommended for large data sets.}
 
-\item{xg_df}{A xgb.DMatrix object, required only for XGBoost models. It defaults to
-NULL
-recommended for large data sets.}
+\item{xg_df}{The prediction matrix used to obtain the model's own
+predictions. Required for XGBoost, LightGBM and CatBoost models, which
+cannot predict from a data frame. Pass an \code{xgb.DMatrix} for XGBoost and a
+numeric matrix for LightGBM and CatBoost. It defaults to NULL.}
 }
 \description{
 Compares the results of predict() and tidypredict_to_column()

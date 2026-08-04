@@ -1343,6 +1343,52 @@ test_that("loaded model produces same predictions", {
   expect_equal(loaded_preds, original_preds, tolerance = 1e-5)
 })
 
+test_that("parsed model produces same predictions as the fitted model", {
+  skip_if_not_installed("xgboost")
+
+  model <- make_xgb_model()
+  pm <- as_parsed_model(parse_model(model))
+
+  direct <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  parsed <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+
+  expect_equal(parsed, direct)
+})
+
+test_that("parsed model predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model()
+  pm <- as_parsed_model(parse_model(model))
+
+  parsed <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
+
+  expect_equal(parsed, predict(model, xgb_data), tolerance = 1e-6)
+})
+
+test_that("tidypredict_fit predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model()
+
+  direct <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+
+  expect_equal(direct, predict(model, xgb_data), tolerance = 1e-6)
+})
+
+test_that("tidypredict_test flags differences in both directions", {
+  skip_if_not_installed("xgboost")
+
+  xgb_data <- make_xgb_data()
+  model <- make_xgb_model()
+
+  result <- tidypredict_test(model, mtcars, xg_df = xgb_data, threshold = 1e-7)
+
+  expect_threshold_consistent(result, 1e-7)
+})
+
 # Parsnip integration tests --------------------------------------------------
 
 test_that("tidypredict works with parsnip xgboost regression", {

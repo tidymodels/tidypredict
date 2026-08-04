@@ -1,3 +1,53 @@
+# Split thresholds ---------------------------------
+
+# xgboost stores split thresholds and feature values as 32-bit floats, and
+# routes a row left when `f32(value) < f32(threshold)`. Comparing in R's
+# doubles instead sends any row whose value rounds to the threshold the wrong
+# way: `mtcars$wt` of 3.19 is below the reported threshold of 3.19000006 as a
+# double, but equal to it as a float, so xgboost sends it right and a naive
+# translation sends it left.
+#
+# Shifting each threshold to the midpoint between it and the next lower float
+# makes `value < boundary` in doubles exactly equivalent to xgboost's float
+# comparison, because every value that rounds to the threshold or above now
+# falls on the right of the boundary.
+as_f32 <- function(x) {
+  readBin(writeBin(x, raw(), size = 4), "double", size = 4, n = length(x))
+}
+
+f32_bits <- function(x) {
+  readBin(writeBin(x, raw(), size = 4), "integer", size = 4, n = length(x))
+}
+
+f32_split_boundary <- function(x) {
+  out <- as.numeric(x)
+  keep <- !is.na(out)
+  if (!any(keep)) {
+    return(out)
+  }
+
+  f32 <- as_f32(out[keep])
+  bits <- f32_bits(f32)
+
+  # Bit pattern of the largest float strictly below `f32`. Floats are stored
+  # sign and magnitude, so stepping down means decrementing the pattern for
+  # positive values and incrementing it for negative ones.
+  lower <- bits - 1L
+  lower[f32 < 0] <- bits[f32 < 0] + 1L
+  # 0x80000001, the smallest negative subnormal, is what sits below zero.
+  lower[f32 == 0] <- -2147483647L
+
+  out[keep] <- (as_f32(readBin(
+    writeBin(lower, raw(), size = 4),
+    "double",
+    size = 4,
+    n = length(lower)
+  )) +
+    f32) /
+    2
+  out
+}
+
 # Model parser -------------------------------------
 
 get_xgb_path <- function(row_id, tree) {
@@ -92,6 +142,7 @@ get_xgb_trees_character <- function(x, feature_names) {
     trees <- xgboost::xgb.model.dt.tree(model = x)
   }
   trees <- as.data.frame(trees)
+  trees$Split <- f32_split_boundary(trees$Split)
   trees$original_order <- 1:nrow(trees)
 
   if (is.character(x)) {
@@ -256,9 +307,22 @@ build_fit_formula_xgb_nested <- function(model) {
 
 # Build nested formula from parsed xgboost model (version 3)
 build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
-  # Build nested trees from flat paths
+  # Build nested trees from flat paths. `get_xgb_path()` walks from each leaf up
+  # to the root, so the stored paths are leaf-first while
+  # `build_nested_from_flat_paths()` needs them root-first. Reversing here
+  # rather than in the parser keeps already-serialized models readable; the
+  # legacy flat builder ANDs the conditions together and does not care about
+  # order.
   trees_nested <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(tree, build_xgb_nested_condition)
+    tree <- map(tree, function(leaf) {
+      leaf$path <- rev(leaf$path)
+      leaf
+    })
+    build_nested_from_flat_paths(
+      tree,
+      build_xgb_nested_condition,
+      xgb_is_left_op
+    )
   })
 
   # Apply DART weight_drop if present
@@ -335,29 +399,26 @@ apply_xgb_objective <- function(f, objective, base_score) {
   )
 }
 
-# nocov start
-# Build condition for xgboost nested generation from path element
-# Note: This function is currently not called due to how build_nested_from_flat_paths
-# partitions leaves - xgboost's op naming doesn't match the expected convention.
-# Kept for potential future use when the partitioning logic is updated.
+# `get_xgb_path_fun()` labels a leaf reached through the Yes child "more-equal"
+# and one reached through the No child "less", which is the opposite of what the
+# names suggest. Yes is xgboost's left branch, so "more-equal" is left.
+xgb_is_left_op <- function(op) {
+  op == "more-equal"
+}
+
+# Build condition for xgboost nested generation from path element. Only ever
+# called with left-branch elements, so the condition is always `< threshold`.
 build_xgb_nested_condition <- function(path_elem) {
   col <- rlang::sym(path_elem$col)
   val <- as.numeric(path_elem$val)
   missing <- path_elem$missing %||% FALSE
 
-  # xgboost uses "less" for left (< threshold) and "more-equal" for right
-  if (path_elem$op %in% c("less", "more-equal")) {
-    if (missing) {
-      expr(!!col < !!val | is.na(!!col))
-    } else {
-      expr(!!col < !!val)
-    }
+  if (missing) {
+    expr(!!col < !!val | is.na(!!col))
   } else {
-    # This shouldn't happen in normal xgboost trees
-    expr(!!col >= !!val)
+    expr(!!col < !!val)
   }
 }
-# nocov end
 
 # Extract nested trees from xgboost model
 extract_xgb_trees_nested <- function(model) {
@@ -382,6 +443,7 @@ get_xgb_trees_df <- function(model) {
     trees <- xgboost::xgb.model.dt.tree(model = model)
   }
   trees <- as.data.frame(trees)
+  trees$Split <- f32_split_boundary(trees$Split)
 
   # Map feature indices to names if needed
   if (is.null(attr(model, "param"))) {

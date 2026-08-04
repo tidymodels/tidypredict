@@ -8,9 +8,7 @@
       
       Fitted records above the threshold: 32
       
-      Fit max  difference:
-      Lower max difference:
-      Upper max difference:-<number>
+      Fit max  difference:<number>
 
 # alert with intervals (mocked)
 
@@ -26,7 +24,7 @@
       
       Fit max  difference:<number>
       Lower max difference:<number>
-      Upper max difference:-<number>
+      Upper max difference:<number>
 
 # xgboost alert branch
 
@@ -36,7 +34,7 @@
       tidypredict test results
       Difference threshold: 0
       
-      Fitted records above the threshold: 18
+      Fitted records above the threshold: 32
       
       Max difference: <number>
 
