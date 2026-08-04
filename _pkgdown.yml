@@ -30,6 +30,8 @@ navbar:
       href: articles/fda.html
     - text: Linear Discriminant Analysis - lda()
       href: articles/lda.html
+    - text: Quadratic Discriminant Analysis - qda()
+      href: articles/qda.html
     - text: Shrinkage Discriminant Analysis - sda()
       href: articles/sda.html
     - text: Regularized Discriminant Analysis - sparsediscrim
