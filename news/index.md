@@ -329,6 +329,37 @@
   results were within the threshold, even when `alert` was `TRUE`.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now compares ranger models against
+  [`predict()`](https://rdrr.io/r/stats/predict.html). Previously the
+  comparison silently measured tidypredict’s predictions against
+  themselves and so always reported a difference of zero.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now reports an absolute maximum difference for glmnet models, which
+  could previously be negative.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now names the model’s own predictions `fit` in `raw_results` for
+  XGBoost, LightGBM, CatBoost and h2o models, matching every other model
+  type. The column was previously called `base`.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now reports `fit_diff` as a signed difference for LightGBM, CatBoost
+  and h2o models, so the direction of the error is visible. The
+  threshold is applied to its absolute value, as before.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  results for classification models are now reported consistently:
+  `fit_diff` is a 0/1 indicator, the threshold is reported as 0 since
+  labels are compared exactly, and the message counts records that do
+  not match rather than quoting a maximum difference.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 ## tidypredict 1.1.0
 
 CRAN release: 2026-02-27
