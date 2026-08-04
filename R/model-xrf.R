@@ -190,45 +190,10 @@ tidypredict_test.xrf <- function(
     add_interval = FALSE,
     vars = c("fit_te", "upr_te", "lwr_te")
   )
-  te <- data.frame(fit_te = te[, "fit_te"])
-
-  raw_results <- cbind(base, te)
-  raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
-  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
-
-  rowid <- seq_len(nrow(raw_results))
-  raw_results <- cbind(data.frame(rowid), raw_results)
-
-  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
-  alert <- any(threshold_df > 0)
-
-  message <- paste0(
-    "tidypredict test results\n",
-    "Difference threshold: ",
+  test_results_numeric(
+    base$fit,
+    te[, "fit_te"],
     threshold,
-    "\n"
+    model$base_formula
   )
-
-  if (alert) {
-    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
-    message <- paste0(
-      message,
-      "\nFitted records above the threshold: ",
-      threshold_df$fit_threshold,
-      "\n\nMax difference: ",
-      difference$fit_diff
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
-  }
-
-  results <- list()
-  results$model_call <- model$base_formula
-  results$raw_results <- raw_results
-  results$message <- message
-  results$alert <- alert
-  structure(results, class = c("tidypredict_test", "list"))
 }
