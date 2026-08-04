@@ -169,6 +169,18 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for
+  [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html) quadratic
+  discriminant analysis models, including
+  [`discrim_quad()`](https://parsnip.tidymodels.org/reference/discrim_quad.html)
+  parsnip models fitted with the `"MASS"` engine.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  returns a named list of class-probability expressions (softmax of the
+  per-class quadratic discriminant scores), and
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  is not supported for these multiclass models.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- Added support for
   [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) linear
   support vector machine models (`vanilladot` kernel), including
   [`svm_linear()`](https://parsnip.tidymodels.org/reference/svm_linear.html)

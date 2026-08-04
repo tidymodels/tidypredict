@@ -24,6 +24,7 @@ articles:
   non-r: non-r.html
   nullmodel: nullmodel.html
   partykit: partykit.html
+  qda: qda.html
   ranger: ranger.html
   regression: regression.html
   rf: rf.html
@@ -35,7 +36,7 @@ articles:
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-08-03T18:45Z
+last_built: 2026-08-04T16:11Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

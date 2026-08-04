@@ -41,6 +41,7 @@
   models](https://tidypredict.tidymodels.org/articles/nullmodel.md):
 - [Random Forest -
   partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
+- [qda models](https://tidypredict.tidymodels.org/articles/qda.md):
 - [Random Forest, using
   Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
 - [Create a regression spec - version
