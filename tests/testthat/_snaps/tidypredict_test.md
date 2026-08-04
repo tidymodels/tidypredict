@@ -8,7 +8,7 @@
       
       Fitted records above the threshold: 32
       
-      Fit max  difference:<number>
+      Max difference: <number>
 
 # alert with intervals (mocked)
 
@@ -22,9 +22,9 @@
       Lower interval records above the threshold: 32
       Upper interval records above the threshold: 32
       
-      Fit max  difference:<number>
-      Lower max difference:<number>
-      Upper max difference:<number>
+      Max difference: <number>
+      Lower max difference: <number>
+      Upper max difference: <number>
 
 # xgboost alert branch
 
@@ -48,7 +48,7 @@
       
       Fitted records above the threshold: 2368
       
-      Max difference: -<number>
+      Max difference: <number>
 
 # lightgbm alert branch (mocked)
 
