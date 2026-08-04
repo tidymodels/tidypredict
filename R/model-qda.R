@@ -41,22 +41,18 @@ parse_model.qda <- function(model) {
 
     pairs <- expand_quadratic(a, labels)
 
-    lda_terms(
+    build_terms(
       c(intercept, linear, pairs$coefs),
       c("(Intercept)", labels, pairs$labels),
       vars
     )
   })
 
-  pm <- list()
-  pm$general$model <- "qda"
-  pm$general$version <- 2
-  pm$general$type <- "multiclass_regression"
-  pm$general$family <- "multinomial"
-  pm$classes <- classes
-  pm$class_terms <- class_terms
-
-  as_parsed_model(pm)
+  new_multiclass_parsed_model(
+    "qda",
+    classes,
+    class_terms
+  )
 }
 
 # Coefficients of `-0.5 * x' A x`, one per unique pair of predictors. The
@@ -88,10 +84,5 @@ tidypredict_test.qda <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support {.fn MASS::qda} models.",
-      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
-    )
-  )
+  abort_test_unsupported("{.fn MASS::qda} models")
 }

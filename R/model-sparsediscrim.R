@@ -68,22 +68,18 @@ parse_model_sparsediscrim <- function(model, vars = character(0)) {
     coefs <- as.vector(precision %*% xbar)
     intercept <- log(class_est$prior) - 0.5 * sum(xbar * coefs)
 
-    sparsediscrim_terms(
+    build_terms(
       c(intercept, coefs),
       c("(Intercept)", labels),
       vars
     )
   })
 
-  pm <- list()
-  pm$general$model <- sparsediscrim_method(model)
-  pm$general$version <- 2
-  pm$general$type <- "multiclass_regression"
-  pm$general$family <- "multinomial"
-  pm$classes <- model$groups
-  pm$class_terms <- unname(class_terms)
-
-  as_parsed_model(pm)
+  new_multiclass_parsed_model(
+    sparsediscrim_method(model),
+    model$groups,
+    unname(class_terms)
+  )
 }
 
 sparsediscrim_method <- function(model) {
@@ -105,16 +101,6 @@ sparsediscrim_precision <- function(model) {
   diag(1 / variances, nrow = length(variances))
 }
 
-sparsediscrim_terms <- function(values, labels, vars) {
-  map2(as.numeric(values), labels, function(value, label) {
-    list(
-      label = label,
-      coef = value,
-      is_intercept = as.integer(label == "(Intercept)"),
-      fields = parse_label_lm(label, vars)
-    )
-  })
-}
 
 #' @export
 acceptable_formula.lda_diag <- function(model) acceptable_sparsediscrim(model)
@@ -143,17 +129,6 @@ acceptable_sparsediscrim <- function(model) {
   acceptable_lm(list(terms = model$.terms))
 }
 
-# `sparsediscrim` models only ever see a numeric model matrix, so a bare model
-# has no way of knowing that a column such as `gear4` is a dummy variable. A
-# parsnip fit does keep the formula around, which lets the dummy columns be
-# expressed in terms of the original factors.
-sparsediscrim_parsnip_vars <- function(model) {
-  terms <- model$preproc$terms
-  if (is.null(terms)) {
-    return(character(0))
-  }
-  names(attr(terms, "dataClasses"))
-}
 
 # Test ---------------------------------------------
 
@@ -206,11 +181,5 @@ tidypredict_test.lda_emp_bayes_eigen <- function(
 }
 
 abort_sparsediscrim_test <- function(call = rlang::caller_env()) {
-  cli::cli_abort(
-    c(
-      "{.fn tidypredict_test} does not support {.pkg sparsediscrim} models.",
-      "i" = "Use {.fn tidypredict_fit} directly for multiclass predictions."
-    ),
-    call = call
-  )
+  abort_test_unsupported("{.pkg sparsediscrim} models", call = call)
 }
