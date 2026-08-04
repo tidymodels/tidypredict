@@ -97,7 +97,7 @@ nnet_squash <- function(f) {
   expr(case_when(
     (!!f) < -15 ~ 0,
     (!!f) > 15 ~ 1,
-    .default = 1 / (1 + exp(-(!!f)))
+    .default = !!expr_logistic(f)
   ))
 }
 

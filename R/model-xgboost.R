@@ -366,8 +366,8 @@ apply_xgb_objective <- function(f, objective, base_score) {
   }
 
   if (objective %in% c("binary:logistic", "reg:logistic")) {
-    return(expr(
-      1 - 1 / (1 + exp(!!f + log(!!base_score / (1 - !!base_score))))
+    return(expr_logistic(
+      expr(!!f + log(!!base_score / (1 - !!base_score)))
     ))
   }
 

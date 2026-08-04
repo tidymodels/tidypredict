@@ -700,7 +700,7 @@ apply_catboost_multiclass_transformation <- function(
     result <- expr_softmax(raw_scores)
   } else {
     # MultiClassOneVsAll: sigmoid for each class independently
-    result <- map(raw_scores, ~ expr(1 / (1 + exp(-(!!.x)))))
+    result <- map(raw_scores, expr_logistic)
   }
 
   names(result) <- paste0("class_", seq_len(num_class) - 1)
@@ -829,7 +829,7 @@ build_fit_formula_catboost_nested <- function(parsedmodel) {
   f <- apply_catboost_scale_bias(f, parsedmodel)
 
   if (objective %in% catboost_sigmoid_objectives) {
-    f <- expr(1 / (1 + exp(-(!!f))))
+    f <- expr_logistic(f)
   }
 
   f
