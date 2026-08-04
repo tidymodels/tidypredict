@@ -84,15 +84,15 @@ model <- earth(survived ~ .,
 )
 
 tidypredict_fit(model)
-#> 1 - 1/(1 + exp(2.91352600741336 + (ifelse(age > 32, age - 32, 
-#>     0) * -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * 
-#>     ifelse(sex == "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == 
-#>     "3rd", 1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", 
-#>     1, 0) * ifelse(sibsp < 4, 4 - sibsp, 0) * 0.618652747659846) + 
+#> 1/(1 + exp(-(2.91352600741336 + (ifelse(age > 32, age - 32, 0) * 
+#>     -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * ifelse(sex == 
+#>     "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == "3rd", 
+#>     1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", 1, 
+#>     0) * ifelse(sibsp < 4, 4 - sibsp, 0) * 0.618652747659846) + 
 #>     (ifelse(pclass == "3rd", 1, 0) * ifelse(sex == "male", 1, 
 #>         0) * 1.22269536265148) + (ifelse(sex == "male", 1, 0) * 
 #>     -3.18562450248531) + (ifelse(sex == "male", 1, 0) * ifelse(age < 
-#>     16, 16 - age, 0) * 0.241814028713263)))
+#>     16, 16 - age, 0) * 0.241814028713263))))
 ```
 
 The spec sets the `is_glm` entry to 1, as well as the `family` and

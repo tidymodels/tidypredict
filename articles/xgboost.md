@@ -39,7 +39,7 @@ model <- xgboost::xgb.train(
   ``` r
 
   tidypredict_fit(model)
-  #> 1 - 1/(1 + exp(case_when(wt < 3.18999993801117 ~ case_when(qsec < 
+  #> 1/(1 + exp(-(case_when(wt < 3.18999993801117 ~ case_when(qsec < 
   #>     19.4399995803833 ~ 0.428571463, .default = 0), .default = -0.436363667) + 
   #>     case_when(wt < 3.14999997615814 ~ 0.311573088, .default = case_when(hp < 
   #>         229.999992370605 ~ -0.392053694, .default = -0.0240745768)) + 
@@ -94,7 +94,7 @@ model <- xgboost::xgb.train(
   #>     case_when(wt < 3.18999993801117 ~ 0.0388614088, .default = -0.0400568396) + 
   #>     -0.000357544719 + -0.000285989838 + -0.000228823963 + -0.00018303754 + 
   #>     -0.000146419203 + -0.000117138377 + -9.37248842e-05 + -7.49547908e-05 + 
-  #>     log(0.5/(1 - 0.5))))
+  #>     log(0.5/(1 - 0.5)))))
   ```
 
 - Add the prediction to the original table

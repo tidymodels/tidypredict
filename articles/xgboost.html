@@ -171,7 +171,7 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 1 - 1/(1 + exp(case_when(wt &lt; 3.18999993801117 ~ case_when(qsec &lt; </span></span>
+<span><span class="co">#&gt; 1/(1 + exp(-(case_when(wt &lt; 3.18999993801117 ~ case_when(qsec &lt; </span></span>
 <span><span class="co">#&gt;     19.4399995803833 ~ 0.428571463, .default = 0), .default = -0.436363667) + </span></span>
 <span><span class="co">#&gt;     case_when(wt &lt; 3.14999997615814 ~ 0.311573088, .default = case_when(hp &lt; </span></span>
 <span><span class="co">#&gt;         229.999992370605 ~ -0.392053694, .default = -0.0240745768)) + </span></span>
@@ -226,7 +226,7 @@
 <span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0388614088, .default = -0.0400568396) + </span></span>
 <span><span class="co">#&gt;     -0.000357544719 + -0.000285989838 + -0.000228823963 + -0.00018303754 + </span></span>
 <span><span class="co">#&gt;     -0.000146419203 + -0.000117138377 + -9.37248842e-05 + -7.49547908e-05 + </span></span>
-<span><span class="co">#&gt;     log(0.5/(1 - 0.5))))</span></span></code></pre></div>
+<span><span class="co">#&gt;     log(0.5/(1 - 0.5)))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>

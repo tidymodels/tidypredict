@@ -211,15 +211,15 @@ well:</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 1 - 1/(1 + exp(2.91352600741336 + (ifelse(age &gt; 32, age - 32, </span></span>
-<span><span class="co">#&gt;     0) * -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * </span></span>
-<span><span class="co">#&gt;     ifelse(sex == "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == </span></span>
-<span><span class="co">#&gt;     "3rd", 1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", </span></span>
-<span><span class="co">#&gt;     1, 0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.618652747659846) + </span></span>
+<span><span class="co">#&gt; 1/(1 + exp(-(2.91352600741336 + (ifelse(age &gt; 32, age - 32, 0) * </span></span>
+<span><span class="co">#&gt;     -0.0375714917713104) + (ifelse(pclass == "2nd", 1, 0) * ifelse(sex == </span></span>
+<span><span class="co">#&gt;     "male", 1, 0) * -1.76809447811121) + (ifelse(pclass == "3rd", </span></span>
+<span><span class="co">#&gt;     1, 0) * -5.03005595780694) + (ifelse(pclass == "3rd", 1, </span></span>
+<span><span class="co">#&gt;     0) * ifelse(sibsp &lt; 4, 4 - sibsp, 0) * 0.618652747659846) + </span></span>
 <span><span class="co">#&gt;     (ifelse(pclass == "3rd", 1, 0) * ifelse(sex == "male", 1, </span></span>
 <span><span class="co">#&gt;         0) * 1.22269536265148) + (ifelse(sex == "male", 1, 0) * </span></span>
 <span><span class="co">#&gt;     -3.18562450248531) + (ifelse(sex == "male", 1, 0) * ifelse(age &lt; </span></span>
-<span><span class="co">#&gt;     16, 16 - age, 0) * 0.241814028713263)))</span></span></code></pre></div>
+<span><span class="co">#&gt;     16, 16 - age, 0) * 0.241814028713263))))</span></span></code></pre></div>
 <p>The spec sets the <code>is_glm</code> entry to 1, as well as the
 <code>family</code> and <code>link</code> entries.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
