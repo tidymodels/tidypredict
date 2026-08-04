@@ -1252,6 +1252,19 @@ test_that("tidypredict_test works for multiclass", {
   expect_false(result$alert)
 })
 
+test_that("tidypredict_test reports multiclass results above the threshold", {
+  skip_if_not_installed("catboost")
+
+  model <- make_multiclass_model()
+  X <- data.matrix(iris[, 1:4])
+
+  result <- tidypredict_test(model, xg_df = X, threshold = 0)
+
+  expect_true(result$alert)
+  expect_match(result$message, "Fitted records above the threshold")
+  expect_no_match(result$message, "within the difference threshold")
+})
+
 test_that("multiclass model requires num_class >= 2", {
   skip_if_not_installed("catboost")
 

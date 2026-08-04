@@ -15,9 +15,10 @@
 #' included in the test. It defaults to FALSE.
 #' @param max_rows The number of rows in the object passed in the df argument. Highly
 #' recommended for large data sets.
-#' @param xg_df A xgb.DMatrix object, required only for XGBoost models. It defaults to
-#' NULL
-#' recommended for large data sets.
+#' @param xg_df The prediction matrix used to obtain the model's own
+#' predictions. Required for XGBoost, LightGBM and CatBoost models, which
+#' cannot predict from a data frame. Pass an `xgb.DMatrix` for XGBoost and a
+#' numeric matrix for LightGBM and CatBoost. It defaults to NULL.
 #'
 #' @examples
 #'
@@ -327,10 +328,10 @@ tidypredict_test_default <- function(
   )
 
   if (alert) {
-    difference <- data.frame(fit_diff = max(raw_results$fit_diff))
+    difference <- data.frame(fit_diff = max(abs(raw_results$fit_diff)))
     if (include_intervals) {
-      difference$lwr_diff <- max(raw_results$lwr_diff)
-      difference$upr_diff <- max(raw_results$upr_diff)
+      difference$lwr_diff <- max(abs(raw_results$lwr_diff))
+      difference$upr_diff <- max(abs(raw_results$upr_diff))
     }
     message <- paste0(
       message,
@@ -345,11 +346,11 @@ tidypredict_test_default <- function(
       },
       threshold_df$upr_threshold,
       "\n\nFit max  difference:",
-      difference$upr_diff,
-      "\nLower max difference:",
+      difference$fit_diff,
+      if (include_intervals) "\nLower max difference:",
       difference$lwr_diff,
-      "\nUpper max difference:",
-      difference$fit_diff
+      if (include_intervals) "\nUpper max difference:",
+      difference$upr_diff
     )
   } else {
     message <- paste0(
@@ -832,11 +833,6 @@ catboost_model_multiclass <- function(
     "\n"
   )
 
-  message <- paste0(
-    message,
-    "\n All results are within the difference threshold"
-  )
-
   # Build raw_results for consistency
   raw_results <- data.frame(rowid = seq_len(nrow(df)))
   for (i in seq_len(num_class)) {
@@ -847,7 +843,23 @@ catboost_model_multiclass <- function(
   raw_results$max_diff <- apply(diffs, 1, max)
   raw_results$fit_threshold <- raw_results$max_diff > threshold
 
+  if (alert) {
+    message <- paste0(
+      message,
+      "\nFitted records above the threshold: ",
+      sum(raw_results$fit_threshold),
+      "\n\nMax difference: ",
+      max(diffs)
+    )
+  } else {
+    message <- paste0(
+      message,
+      "\n All results are within the difference threshold"
+    )
+  }
+
   results <- list()
+  results$model_call <- model$call
   results$raw_results <- raw_results
   results$message <- message
   results$alert <- alert

@@ -58,6 +58,16 @@
 
 - Added support for `quantreg::rq()` quantile regression models, including `linear_reg()` parsnip models fitted with the `"quantreg"` engine. Models fitted with multiple quantiles return one fit expression per quantile, named by the quantile level. (#232)
 
+- `tidypredict_fit()` now returns correct predictions for xgboost models whose feature values fall exactly on a split threshold. xgboost compares split thresholds as 32-bit floats, so a value such as a `wt` of 3.19 was sent down the wrong branch when the comparison was made in R's doubles. (#232)
+
+- `tidypredict_fit()` now returns correct predictions for xgboost models that have been saved and reloaded with `parse_model()` and `as_parsed_model()`. Previously every tree collapsed to a single leaf value. (#232)
+
+- `tidypredict_test()` now flags rows where the fitted value is above the model's own prediction for xgboost models. Previously only differences in one direction were reported, so real disagreements could go unnoticed. (#232)
+
+- `tidypredict_test()` now reports the maximum fit, lower, and upper differences under the correct labels, and reports absolute rather than signed differences. Previously the fit and upper values were swapped, and the fit value was omitted entirely when `include_intervals = FALSE`. (#232)
+
+- `tidypredict_test()` now reports a failure message for multiclass CatBoost models when results exceed the threshold. Previously it always claimed that all results were within the threshold, even when `alert` was `TRUE`. (#232)
+
 # tidypredict 1.1.0
 
 ## New Model Supports
