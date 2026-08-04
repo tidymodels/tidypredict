@@ -126,61 +126,17 @@ tidypredict_test.bagger <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  if (is.numeric(max_rows)) {
-    df <- head(df, max_rows)
-  }
-
-  is_class <- !is.null(bagger_classes(model))
-  if (is_class) {
-    threshold <- 0
-    base <- as.character(predict(model, df, type = "class")$.pred_class)
-  } else {
-    base <- predict(model, df)$.pred
-  }
+  df <- maybe_head(df, max_rows)
 
   te <- rlang::eval_tidy(tidypredict_fit(model), df)
 
-  raw_results <- data.frame(
-    rowid = seq_along(base),
-    fit = base,
-    fit_te = if (is_class) as.character(te) else te
-  )
-  raw_results$fit_diff <- if (is_class) {
-    as.numeric(raw_results$fit != raw_results$fit_te)
-  } else {
-    raw_results$fit - raw_results$fit_te
-  }
-  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
-
-  alert <- any(raw_results$fit_threshold)
-
-  message <- paste0(
-    "tidypredict test results\n",
-    "Difference threshold: ",
-    threshold,
-    "\n"
-  )
-
-  if (alert) {
-    message <- paste0(
-      message,
-      "\nFitted records above the threshold: ",
-      sum(raw_results$fit_threshold),
-      "\n\nMax difference: ",
-      max(abs(raw_results$fit_diff))
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
+  if (!is.null(bagger_classes(model))) {
+    base <- predict(model, df, type = "class")$.pred_class
+    return(test_results_class(base, te))
   }
 
-  results <- list()
-  results$raw_results <- raw_results
-  results$message <- message
-  results$alert <- alert
-  structure(results, class = c("tidypredict_test", "list"))
+  base <- predict(model, df)$.pred
+  test_results_numeric(base, te, threshold)
 }
 
 # For {orbital} -----------------------------------------------

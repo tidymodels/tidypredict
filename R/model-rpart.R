@@ -214,19 +214,11 @@ tidypredict_test.rpart <- function(
   max_rows = NULL,
   xg_df = NULL
 ) {
-  if (is.numeric(max_rows)) {
-    df <- head(df, max_rows)
-  }
+  df <- maybe_head(df, max_rows)
 
   # rpart uses type = "vector" for regression, type = "class" for classification
-  pred_type <- if (model$method == "class") "class" else "vector"
-  base <- predict(model, df, type = pred_type)
-
-  # For classification, threshold should be 0 (exact match)
-  if (model$method == "class") {
-    threshold <- 0
-    base <- as.character(base)
-  }
+  is_class <- model$method == "class"
+  base <- predict(model, df, type = if (is_class) "class" else "vector")
 
   te <- tidypredict_to_column(
     df,
@@ -235,49 +227,11 @@ tidypredict_test.rpart <- function(
     vars = c("fit_te", "upr_te", "lwr_te")
   )
 
-  raw_results <- data.frame(fit = base, fit_te = te$fit_te)
-  raw_results$fit_diff <- if (model$method == "class") {
-    as.numeric(raw_results$fit != raw_results$fit_te)
-  } else {
-    raw_results$fit - raw_results$fit_te
-  }
-  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
-
-  rowid <- seq_len(nrow(raw_results))
-  raw_results <- cbind(data.frame(rowid), raw_results)
-
-  threshold_df <- data.frame(fit_threshold = sum(raw_results$fit_threshold))
-  alert <- any(threshold_df > 0)
-
-  message <- paste0(
-    "tidypredict test results\n",
-    "Difference threshold: ",
-    threshold,
-    "\n"
-  )
-
-  if (alert) {
-    difference <- max(abs(raw_results$fit_diff))
-    message <- paste0(
-      message,
-      "\nFitted records above the threshold: ",
-      threshold_df$fit_threshold,
-      "\n\nMax difference: ",
-      difference
-    )
-  } else {
-    message <- paste0(
-      message,
-      "\n All results are within the difference threshold"
-    )
+  if (is_class) {
+    return(test_results_class(base, te$fit_te, model$call))
   }
 
-  results <- list()
-  results$model_call <- model$call
-  results$raw_results <- raw_results
-  results$message <- message
-  results$alert <- alert
-  structure(results, class = c("tidypredict_test", "list"))
+  test_results_numeric(base, te$fit_te, threshold, model$call)
 }
 
 # For {orbital}

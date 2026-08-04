@@ -68,6 +68,16 @@
 
 - `tidypredict_test()` now reports a failure message for multiclass CatBoost models when results exceed the threshold. Previously it always claimed that all results were within the threshold, even when `alert` was `TRUE`. (#232)
 
+- `tidypredict_test()` now compares ranger models against `predict()`. Previously the comparison silently measured tidypredict's predictions against themselves and so always reported a difference of zero. (#232)
+
+- `tidypredict_test()` now reports an absolute maximum difference for glmnet models, which could previously be negative. (#232)
+
+- `tidypredict_test()` now names the model's own predictions `fit` in `raw_results` for XGBoost, LightGBM, CatBoost and h2o models, matching every other model type. The column was previously called `base`. (#232)
+
+- `tidypredict_test()` now reports `fit_diff` as a signed difference for LightGBM, CatBoost and h2o models, so the direction of the error is visible. The threshold is applied to its absolute value, as before. (#232)
+
+- `tidypredict_test()` results for classification models are now reported consistently: `fit_diff` is a 0/1 indicator, the threshold is reported as 0 since labels are compared exactly, and the message counts records that do not match rather than quoting a maximum difference. (#232)
+
 # tidypredict 1.1.0
 
 ## New Model Supports
