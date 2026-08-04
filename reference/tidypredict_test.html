@@ -125,9 +125,10 @@ recommended for large data sets.</p></dd>
 
 
 <dt id="arg-xg-df">xg_df<a class="anchor" aria-label="anchor" href="#arg-xg-df"></a></dt>
-<dd><p>A xgb.DMatrix object, required only for XGBoost models. It defaults to
-NULL
-recommended for large data sets.</p></dd>
+<dd><p>The prediction matrix used to obtain the model's own
+predictions. Required for XGBoost, LightGBM and CatBoost models, which
+cannot predict from a data frame. Pass an <code>xgb.DMatrix</code> for XGBoost and a
+numeric matrix for LightGBM and CatBoost. It defaults to NULL.</p></dd>
 
 </dl></div>
 

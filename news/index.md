@@ -293,6 +293,42 @@
   the quantile level.
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for xgboost models whose feature
+  values fall exactly on a split threshold. xgboost compares split
+  thresholds as 32-bit floats, so a value such as a `wt` of 3.19 was
+  sent down the wrong branch when the comparison was made in R’s
+  doubles.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for xgboost models that have been
+  saved and reloaded with
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  and
+  [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md).
+  Previously every tree collapsed to a single leaf value.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now flags rows where the fitted value is above the model’s own
+  prediction for xgboost models. Previously only differences in one
+  direction were reported, so real disagreements could go unnoticed.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now reports the maximum fit, lower, and upper differences under the
+  correct labels, and reports absolute rather than signed differences.
+  Previously the fit and upper values were swapped, and the fit value
+  was omitted entirely when `include_intervals = FALSE`.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now reports a failure message for multiclass CatBoost models when
+  results exceed the threshold. Previously it always claimed that all
+  results were within the threshold, even when `alert` was `TRUE`.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 ## tidypredict 1.1.0
 
 CRAN release: 2026-02-27

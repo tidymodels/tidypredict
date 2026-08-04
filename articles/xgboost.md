@@ -39,58 +39,59 @@ model <- xgboost::xgb.train(
   ``` r
 
   tidypredict_fit(model)
-  #> 1 - 1/(1 + exp(case_when(wt < 3.19000006 ~ case_when(qsec < 19.4400005 ~ 
-  #>     0.428571463, .default = 0), .default = -0.436363667) + case_when(wt < 
-  #>     3.1500001 ~ 0.311573088, .default = case_when(hp < 230 ~ 
-  #>     -0.392053694, .default = -0.0240745768)) + case_when(gear < 
-  #>     4 ~ -0.355945677, .default = case_when(wt < 3.1500001 ~ 0.325712085, 
-  #>     .default = -0.0384863913)) + case_when(gear < 4 ~ -0.309683114, 
-  #>     .default = case_when(wt < 3.1500001 ~ 0.283893973, .default = -0.032039877)) + 
-  #>     case_when(gear < 4 ~ -0.275577009, .default = case_when(wt < 
-  #>         3.1500001 ~ 0.252453178, .default = -0.0266750772)) + 
-  #>     case_when(gear < 4 ~ -0.248323873, .default = case_when(qsec < 
-  #>         17.0499992 ~ 0.261978835, .default = -0.00959526002)) + 
-  #>     case_when(gear < 4 ~ -0.225384533, .default = case_when(wt < 
-  #>         3.1500001 ~ 0.218285918, .default = -0.0373593047)) + 
-  #>     case_when(gear < 4 ~ -0.205454513, .default = case_when(qsec < 
-  #>         18.8999996 ~ 0.196076646, .default = -0.0544253439)) + 
-  #>     case_when(wt < 3.1500001 ~ 0.149246693, .default = case_when(qsec < 
-  #>         17.4200001 ~ 0.0354709327, .default = -0.226075932)) + 
-  #>     case_when(gear < 4 ~ -0.184417158, .default = case_when(wt < 
-  #>         3.1500001 ~ 0.176768288, .default = -0.0237750355)) + 
-  #>     case_when(gear < 4 ~ -0.168993726, .default = case_when(qsec < 
-  #>         18.6100006 ~ 0.155569643, .default = -0.0325752236)) + 
-  #>     case_when(wt < 3.1500001 ~ 0.119126029, .default = -0.105012275) + 
-  #>     case_when(qsec < 17.2999992 ~ 0.117254697, .default = -0.0994235724) + 
-  #>     case_when(wt < 3.19000006 ~ 0.097100094, .default = -0.10567718) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0824323222, .default = -0.091120176) + 
-  #>     case_when(qsec < 17.6000004 ~ 0.0854752287, .default = -0.0764453933) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0749477893, .default = -0.0799863264) + 
-  #>     case_when(qsec < 17.8199997 ~ 0.0728750378, .default = -0.0646049976) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0682478622, .default = -0.0711427554) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0579533465, .default = -0.0613371208) + 
-  #>     case_when(qsec < 18.2999992 ~ 0.0595484748, .default = -0.0546668135) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0535288528, .default = -0.0558333211) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0454574414, .default = -0.048143398) + 
-  #>     case_when(qsec < 18.6000004 ~ 0.0422042683, .default = -0.0454404354) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0420555808, .default = -0.0449385941) + 
-  #>     case_when(qsec < 18.6000004 ~ 0.0393446013, .default = -0.0425945036) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0391179025, .default = -0.0420661867) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0304145869, .default = -0.031833414) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0362136625, .default = -0.038949281) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0295153651, .default = -0.0307046026) + 
-  #>     case_when(drat < 3.8499999 ~ -0.0306891855, .default = 0.0288283136) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0271221269, .default = -0.0281750448) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0228891298, .default = -0.0238814205) + 
-  #>     case_when(drat < 3.8499999 ~ -0.0296511576, .default = 0.0280048084) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0214707125, .default = -0.0224219449) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0181306079, .default = -0.0190209728) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0379650332, .default = -0.0395050682) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0194106717, .default = -0.0202215631) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0164139606, .default = -0.0171694476) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.013879573, .default = -0.0145772668) + 
-  #>     case_when(qsec < 18.5200005 ~ 0.0117362784, .default = -0.0123759825) + 
-  #>     case_when(wt < 3.19000006 ~ 0.0388614088, .default = -0.0400568396) + 
+  #> 1 - 1/(1 + exp(case_when(wt < 3.18999993801117 ~ case_when(qsec < 
+  #>     19.4399995803833 ~ 0.428571463, .default = 0), .default = -0.436363667) + 
+  #>     case_when(wt < 3.14999997615814 ~ 0.311573088, .default = case_when(hp < 
+  #>         229.999992370605 ~ -0.392053694, .default = -0.0240745768)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.355945677, .default = case_when(wt < 
+  #>         3.14999997615814 ~ 0.325712085, .default = -0.0384863913)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.309683114, .default = case_when(wt < 
+  #>         3.14999997615814 ~ 0.283893973, .default = -0.032039877)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.275577009, .default = case_when(wt < 
+  #>         3.14999997615814 ~ 0.252453178, .default = -0.0266750772)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.248323873, .default = case_when(qsec < 
+  #>         17.0499982833862 ~ 0.261978835, .default = -0.00959526002)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.225384533, .default = case_when(wt < 
+  #>         3.14999997615814 ~ 0.218285918, .default = -0.0373593047)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.205454513, .default = case_when(qsec < 
+  #>         18.899998664856 ~ 0.196076646, .default = -0.0544253439)) + 
+  #>     case_when(wt < 3.14999997615814 ~ 0.149246693, .default = case_when(qsec < 
+  #>         17.4199991226196 ~ 0.0354709327, .default = -0.226075932)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.184417158, .default = case_when(wt < 
+  #>         3.14999997615814 ~ 0.176768288, .default = -0.0237750355)) + 
+  #>     case_when(gear < 3.99999988079071 ~ -0.168993726, .default = case_when(qsec < 
+  #>         18.6099996566772 ~ 0.155569643, .default = -0.0325752236)) + 
+  #>     case_when(wt < 3.14999997615814 ~ 0.119126029, .default = -0.105012275) + 
+  #>     case_when(qsec < 17.2999982833862 ~ 0.117254697, .default = -0.0994235724) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.097100094, .default = -0.10567718) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0824323222, .default = -0.091120176) + 
+  #>     case_when(qsec < 17.5999994277954 ~ 0.0854752287, .default = -0.0764453933) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0749477893, .default = -0.0799863264) + 
+  #>     case_when(qsec < 17.8199987411499 ~ 0.0728750378, .default = -0.0646049976) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0682478622, .default = -0.0711427554) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0579533465, .default = -0.0613371208) + 
+  #>     case_when(qsec < 18.2999982833862 ~ 0.0595484748, .default = -0.0546668135) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0535288528, .default = -0.0558333211) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0454574414, .default = -0.048143398) + 
+  #>     case_when(qsec < 18.5999994277954 ~ 0.0422042683, .default = -0.0454404354) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0420555808, .default = -0.0449385941) + 
+  #>     case_when(qsec < 18.5999994277954 ~ 0.0393446013, .default = -0.0425945036) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0391179025, .default = -0.0420661867) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0304145869, .default = -0.031833414) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0362136625, .default = -0.038949281) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0295153651, .default = -0.0307046026) + 
+  #>     case_when(drat < 3.84999978542328 ~ -0.0306891855, .default = 0.0288283136) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0271221269, .default = -0.0281750448) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0228891298, .default = -0.0238814205) + 
+  #>     case_when(drat < 3.84999978542328 ~ -0.0296511576, .default = 0.0280048084) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0214707125, .default = -0.0224219449) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0181306079, .default = -0.0190209728) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0379650332, .default = -0.0395050682) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0194106717, .default = -0.0202215631) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0164139606, .default = -0.0171694476) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.013879573, .default = -0.0145772668) + 
+  #>     case_when(qsec < 18.5199995040894 ~ 0.0117362784, .default = -0.0123759825) + 
+  #>     case_when(wt < 3.18999993801117 ~ 0.0388614088, .default = -0.0400568396) + 
   #>     -0.000357544719 + -0.000285989838 + -0.000228823963 + -0.00018303754 + 
   #>     -0.000146419203 + -0.000117138377 + -9.37248842e-05 + -7.49547908e-05 + 
   #>     log(0.5/(1 - 0.5))))
@@ -118,7 +119,7 @@ model <- xgboost::xgb.train(
   #> $ am   <dbl> 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1,…
   #> $ gear <dbl> 4, 4, 4, 3, 3, 3, 3, 4, 4, 4, 4, 3, 3, 3, 3, 3, 3, 4, 4,…
   #> $ carb <dbl> 4, 4, 1, 1, 2, 1, 4, 2, 2, 4, 4, 3, 3, 3, 4, 4, 4, 1, 2,…
-  #> $ fit  <dbl> 0.98574329, 0.98574329, 0.93896617, 0.01079918, 0.046325…
+  #> $ fit  <dbl> 0.98574329, 0.98574329, 0.92725081, 0.01079918, 0.046325…
   ```
 
 - Confirm that `tidypredict` results match to the model’s
@@ -131,9 +132,9 @@ model <- xgboost::xgb.train(
   #> tidypredict test results
   #> Difference threshold: 1e-12
   #> 
-  #> Fitted records above the threshold: 5
+  #> Fitted records above the threshold: 32
   #> 
-  #> Max difference: 7.11972936162653e-08
+  #> Max difference: 8.00697489422575e-08
   ```
 
 Please be aware that XGBoost converts data into 32-bit floats
@@ -163,7 +164,7 @@ tidypredict_test(p_model, mtcars, xg_df = xgb_bin_data)
 #> tidypredict test results
 #> Difference threshold: 1e-12
 #> 
-#> Fitted records above the threshold: 12
+#> Fitted records above the threshold: 32
 #> 
 #> Max difference: 1.04374733855828e-07
 ```
