@@ -147,6 +147,22 @@ test_that("binomial family with logit link works", {
   expect_equal(tidy, native)
 })
 
+test_that("logit link keeps probabilities below the double precision floor", {
+  suppressWarnings(
+    model <- glm(am ~ wt + hp, data = mtcars, family = binomial())
+  )
+  fit <- tidypredict_fit(model)
+  # A linear predictor this far below zero gives a probability that the
+  # `1 - 1 / (1 + exp(f))` spelling of the inverse link rounds down to 0.
+  newdata <- data.frame(wt = 20, hp = 500)
+
+  expect_equal(
+    rlang::eval_tidy(fit, newdata),
+    unname(predict(model, newdata, type = "response"))
+  )
+  expect_gt(rlang::eval_tidy(fit, newdata), 0)
+})
+
 test_that("poisson family with log link works", {
   model <- glm(gear ~ wt + hp, data = mtcars, family = poisson())
   fit <- tidypredict_fit(model)

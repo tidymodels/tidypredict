@@ -132,7 +132,7 @@ tidypredict_fit_h2o_rulefit_binomial <- function(model) {
     model@model$intercept
   )
   # Probability of the second (positive) domain level: logistic link.
-  expr(1 / (1 + exp(-(!!f))))
+  expr_logistic(f)
 }
 
 # Multinomial RuleFit models cannot be reconstructed from the public H2O API:

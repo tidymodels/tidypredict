@@ -91,7 +91,7 @@ tidypredict_fit.H2OBinomialModel <- function(model, ...) {
   f <- reduce_addition(h2o_tree_exprs(model))
   init_f <- model@model$init_f %||% 0
   # Probability of the second (positive) domain level: logistic link.
-  expr(1 / (1 + exp(-(!!init_f + !!f))))
+  expr_logistic(expr(!!init_f + !!f))
 }
 
 #' @export

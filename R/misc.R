@@ -49,6 +49,15 @@ expr_mean <- function(x, n = length(x)) {
   expr_division(reduce_addition(x), n)
 }
 
+# The inverse logit, mapping a linear predictor onto a probability.
+#
+# Written as `1 / (1 + exp(-f))` rather than the algebraically equal
+# `1 - 1 / (1 + exp(f))`, because the latter rounds to exactly 0 once `exp(f)`
+# reaches 1 in double precision, losing every small probability.
+expr_logistic <- function(f) {
+  expr(1 / (1 + exp(-(!!f))))
+}
+
 # Turn per-class scores into class probabilities.
 expr_softmax <- function(scores, names = NULL) {
   denom <- reduce_addition(map(scores, ~ expr(exp(!!.x))))

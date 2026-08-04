@@ -368,7 +368,7 @@ parse_lgb_categorical_threshold <- function(threshold) {
 
 # Helper for sigmoid transformation
 lgb_sigmoid <- function(f) {
-  expr(1 / (1 + exp(-(!!f))))
+  expr_logistic(f)
 }
 
 # Apply multiclass transformation to tree expressions

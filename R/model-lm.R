@@ -50,7 +50,7 @@ apply_inverse_link <- function(f, link) {
   switch(
     link,
     "identity" = f,
-    "logit" = expr(1 - 1 / (1 + exp(!!f))),
+    "logit" = expr_logistic(f),
     "log" = expr(exp(!!f)),
     "inverse" = expr(1 / (!!f)),
     "1/mu^2" = expr(1 / sqrt(!!f)),
