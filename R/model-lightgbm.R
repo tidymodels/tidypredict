@@ -466,59 +466,30 @@ tidypredict_fit.lgb.Booster <- function(model, ...) {
 
 # Nested formula builder for lightgbm (from model directly)
 build_fit_formula_lgb_nested <- function(parsedmodel, model) {
-  n_trees <- length(parsedmodel$trees)
-
-  if (n_trees == 0) {
-    cli::cli_abort("Model has no trees.")
-  }
-
-  objective <- parsedmodel$general$params$objective %||% "regression"
-
-  if (!objective %in% lgb_supported_objectives) {
-    cli::cli_abort(
-      c(
-        "Unsupported objective: {.val {objective}}.",
-        "i" = "Supported objectives: {.val {lgb_supported_objectives}}."
-      )
-    )
-  }
-
-  if (objective %in% lgb_multiclass_objectives) {
-    return(build_fit_formula_lgb_multiclass_nested(
-      parsedmodel,
-      model,
-      objective
-    ))
-  }
-
-  # Extract nested trees (pass feature_names to avoid redundant JSON parsing)
-  trees <- extract_lgb_trees_nested(model, parsedmodel$general$feature_names)
-
-  # RF boosting averages trees instead of summing
-  boosting <- parsedmodel$general$params$boosting
-  if (!is.null(boosting) && boosting == "rf") {
-    f <- reduce_addition(trees)
-    f <- expr_division(f, n_trees)
-  } else {
-    f <- reduce_addition(trees)
-  }
-
-  apply_lgb_objective(f, objective, parsedmodel$general$params)
-}
-
-build_fit_formula_lgb_multiclass_nested <- function(
-  parsedmodel,
-  model,
-  objective
-) {
-  num_class <- parsedmodel$general$num_class
-
-  trees <- extract_lgb_trees_nested(model, parsedmodel$general$feature_names)
-  apply_lgb_multiclass_transformation(trees, num_class, objective)
+  assemble_lgb_formula(parsedmodel, function() {
+    # Pass feature_names to avoid redundant JSON parsing
+    extract_lgb_trees_nested(model, parsedmodel$general$feature_names)
+  })
 }
 
 # Nested formula builder for lightgbm (from parsed model, version 3)
 build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
+  assemble_lgb_formula(parsedmodel, function() {
+    map(parsedmodel$trees, function(tree) {
+      build_nested_from_flat_paths(
+        tree,
+        build_lgb_nested_condition,
+        lgb_is_left_op
+      )
+    })
+  })
+}
+
+# Only the source of the trees differs between a fitted model and a parsed one,
+# so `build_trees` supplies them and everything else is shared. It is a function
+# rather than a value so that the objective is validated before the trees are
+# built.
+assemble_lgb_formula <- function(parsedmodel, build_trees) {
   n_trees <- length(parsedmodel$trees)
 
   if (n_trees == 0) {
@@ -536,48 +507,25 @@ build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
     )
   }
 
+  trees <- build_trees()
+
   if (objective %in% lgb_multiclass_objectives) {
-    return(build_fit_formula_lgb_multiclass_from_parsed(parsedmodel, objective))
+    num_class <- parsedmodel$general$num_class
+    if (is.null(num_class) || num_class < 2) {
+      cli::cli_abort("Multiclass model must have num_class >= 2.")
+    }
+    return(apply_lgb_multiclass_transformation(trees, num_class, objective))
   }
 
-  # Build nested trees from flat paths
-  trees <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(
-      tree,
-      build_lgb_nested_condition,
-      lgb_is_left_op
-    )
-  })
+  f <- reduce_addition(trees)
 
   # RF boosting averages trees instead of summing
   boosting <- parsedmodel$general$params$boosting
   if (!is.null(boosting) && boosting == "rf") {
-    f <- reduce_addition(trees)
     f <- expr_division(f, n_trees)
-  } else {
-    f <- reduce_addition(trees)
   }
 
   apply_lgb_objective(f, objective, parsedmodel$general$params)
-}
-
-build_fit_formula_lgb_multiclass_from_parsed <- function(
-  parsedmodel,
-  objective
-) {
-  num_class <- parsedmodel$general$num_class
-  if (is.null(num_class) || num_class < 2) {
-    cli::cli_abort("Multiclass model must have num_class >= 2.")
-  }
-
-  trees <- map(parsedmodel$trees, function(tree) {
-    build_nested_from_flat_paths(
-      tree,
-      build_lgb_nested_condition,
-      lgb_is_left_op
-    )
-  })
-  apply_lgb_multiclass_transformation(trees, num_class, objective)
 }
 
 # Build condition for lightgbm nested generation from path element

@@ -285,22 +285,34 @@ tidypredict_fit.xgb.Booster <- function(model, ...) {
 
 # Build nested xgboost formula (from model directly)
 build_fit_formula_xgb_nested <- function(model) {
-  trees_nested <- extract_xgb_trees_nested(model)
-
-  # Apply DART weight_drop if present
   json_params <- get_xgb_json_params(model)
-  trees_nested <- apply_dart_weights(trees_nested, json_params$weight_drop)
+  params <- attr(model, "param") %||% model$params
+
+  assemble_xgb_formula(
+    extract_xgb_trees_nested(model),
+    weight_drop = json_params$weight_drop,
+    base_score = json_params$base_score,
+    objective = params$objective
+  )
+}
+
+# Everything after the trees have been built is the same whether they came from
+# the fitted model or from a parsed one.
+assemble_xgb_formula <- function(
+  trees_nested,
+  weight_drop,
+  base_score,
+  objective
+) {
+  # Apply DART weight_drop if present
+  trees_nested <- apply_dart_weights(trees_nested, weight_drop)
 
   # Additive model
   f <- reduce_addition(trees_nested)
 
-  base_score <- json_params$base_score
   if (is.null(base_score)) {
     base_score <- 0.5 # nocov
   }
-
-  params <- attr(model, "param") %||% model$params
-  objective <- params$objective
 
   apply_xgb_objective(f, objective, base_score)
 }
@@ -325,21 +337,12 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
     )
   })
 
-  # Apply DART weight_drop if present
-  weight_drop <- parsedmodel$general$weight_drop
-  trees_nested <- apply_dart_weights(trees_nested, weight_drop)
-
-  # Additive model
-  f <- reduce_addition(trees_nested)
-
-  base_score <- parsedmodel$general$params$base_score
-  if (is.null(base_score)) {
-    base_score <- 0.5 # nocov
-  }
-
-  objective <- parsedmodel$general$params$objective
-
-  apply_xgb_objective(f, objective, base_score)
+  assemble_xgb_formula(
+    trees_nested,
+    weight_drop = parsedmodel$general$weight_drop,
+    base_score = parsedmodel$general$params$base_score,
+    objective = parsedmodel$general$params$objective
+  )
 }
 
 # Apply xgboost objective transformation to formula
