@@ -1,3 +1,7 @@
+# Covers both `R/model-h2o.R` and `R/model-h2o-rulefit.R`, which is why this
+# file is not named after either of them. Every test needs a live h2o cluster,
+# so they all go through `skip_if_no_h2o()` in `helper-h2o.R`.
+
 test_that("works with H2O GBM regression models", {
   skip_if_no_h2o()
 
