@@ -31,7 +31,9 @@ parse_model.cubist <- function(model) {
                 ~ list(
                   type = "conditional",
                   col = .x$variable,
-                  val = .x$value,
+                  # Cubist compares as a 32-bit float, so a value that rounds
+                  # to the threshold belongs to the `<=` side.
+                  val = f32_split_boundary(.x$value, "upper"),
                   op = ifelse(.x$dir == ">", "more", "less-equal")
                 )
               )

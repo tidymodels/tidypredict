@@ -1,4 +1,6 @@
 test_that("returns the right output", {
+  skip_if_not_installed("Cubist")
+
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,
@@ -21,24 +23,30 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
+  skip_if_not_installed("Cubist")
+
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,
     committees = 3
   )
-  pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
-  yaml::write_yaml(pm, mp)
-  l <- yaml::read_yaml(mp)
-  pm <- as_parsed_model(l)
+  mp <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), mp)
+  pm <- as_parsed_model(yaml::read_yaml(mp))
 
-  expect_identical(
-    tidypredict_fit(model),
-    tidypredict_fit(pm)
+  # Against Cubist's own predictions rather than the fitted formula's text:
+  # YAML stores fewer digits than a double carries, so the reloaded split
+  # thresholds are close but not identical.
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    unname(predict(model, mtcars)),
+    tolerance = 1e-6
   )
 })
 
 test_that("formulas produces correct predictions", {
+  skip_if_not_installed("Cubist")
+
   model <- Cubist::cubist(
     x = mtcars[, -1],
     y = mtcars$mpg,
@@ -64,6 +72,8 @@ test_that("formulas produces correct predictions", {
 })
 
 test_that("intercept is done correctly (#58)", {
+  skip_if_not_installed("Cubist")
+
   biomass_tr <- modeldata::biomass %>%
     dplyr::filter(dataset == "Training") %>%
     dplyr::select(-dataset, -sample)
@@ -79,6 +89,8 @@ test_that("intercept is done correctly (#58)", {
 })
 
 test_that("doesn't divide by TRUE (#143)", {
+  skip_if_not_installed("Cubist")
+
   rules <- list(quote(37.2 + hp * -0.0318 + wt * -3.88))
   paths <- list(TRUE)
 
@@ -93,5 +105,57 @@ test_that("doesn't divide by TRUE (#143)", {
   expect_identical(
     expr_text(make_committee(rules, paths)),
     "(37.2 + hp * -0.0318 + wt * -3.88)/(disp > 95.099998)"
+  )
+})
+
+test_that("predictions match predict()", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    unname(predict(model, mtcars)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("tidypredict_to_column() works", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  res <- tidypredict_to_column(mtcars, model)
+  expect_equal(res$fit, unname(predict(model, mtcars)), tolerance = 1e-6)
+})
+
+test_that("SQL translation works", {
+  skip_if_not_installed("Cubist")
+  skip_if_not_installed("dbplyr")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
+})
+
+test_that("prediction intervals are not supported", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  expect_snapshot(error = TRUE, tidypredict_interval(model))
+})
+
+test_that("rows exactly on a split threshold match predict() (#232)", {
+  skip_if_not_installed("Cubist")
+  # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus
+  # Europa. It stores the threshold as the 32-bit float 95.099998 and compares
+  # as a float, so that row takes the `<=` branch; comparing in doubles sent it
+  # the other way.
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  on_boundary <- mtcars[mtcars$disp == 95.1, , drop = FALSE]
+  expect_equal(nrow(on_boundary), 1)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), on_boundary),
+    unname(predict(model, on_boundary)),
+    tolerance = 1e-6
   )
 })
