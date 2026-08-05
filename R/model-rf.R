@@ -92,7 +92,15 @@ tidypredict_fit_rf_nested <- function(model) {
 }
 
 # Build nested case_when for a single randomForest tree
-build_nested_rf_tree <- function(model, tree_no, term_labels) {
+#
+# `leaf_value` turns the tree's own prediction into the value the leaf should
+# contribute, which is the only way a regression tree and a voting tree differ.
+build_nested_rf_tree <- function(
+  model,
+  tree_no,
+  term_labels,
+  leaf_value = identity
+) {
   tree <- randomForest::getTree(model, tree_no)
 
   # Pre-extract columns as vectors for fast indexing (avoids slow row access)
@@ -107,7 +115,7 @@ build_nested_rf_tree <- function(model, tree_no, term_labels) {
   build_node <- function(node_id) {
     # Check if terminal (leaf) node - status == -1
     if (status[node_id] == -1) {
-      return(prediction[node_id])
+      return(leaf_value(prediction[node_id]))
     }
 
     # Internal node - get split info
@@ -194,46 +202,17 @@ build_nested_rf_vote_tree <- function(
   term_labels,
   class_level
 ) {
-  tree <- randomForest::getTree(model, tree_no)
   classes <- model$classes
 
-  # Pre-extract columns as vectors for fast indexing (avoids slow row access)
-  # Use unname() once here instead of on every recursive call
-  status <- unname(tree[, "status"])
-  prediction <- unname(tree[, "prediction"])
-  left_daughter <- unname(tree[, "left daughter"])
-  right_daughter <- unname(tree[, "right daughter"])
-  split_var <- unname(tree[, "split var"])
-  split_point <- unname(tree[, "split point"])
-
-  build_node <- function(node_id) {
-    # Check if terminal (leaf) node - status == -1
-    if (status[node_id] == -1) {
-      # Return 1 if prediction matches class_level, 0 otherwise
-      pred_class <- classes[prediction[node_id]]
-      return(if (pred_class == class_level) 1L else 0L)
+  build_nested_rf_tree(
+    model,
+    tree_no,
+    term_labels,
+    # Vote 1 if the leaf predicts this class, 0 otherwise
+    leaf_value = function(prediction) {
+      if (classes[prediction] == class_level) 1L else 0L
     }
-
-    # Internal node - get split info
-    left_id <- left_daughter[node_id]
-    right_id <- right_daughter[node_id]
-    var_idx <- split_var[node_id]
-    split_val <- split_point[node_id]
-
-    # Recurse
-    left_subtree <- build_node(left_id)
-    right_subtree <- build_node(right_id)
-
-    col_name <- term_labels[var_idx]
-    col_sym <- rlang::sym(col_name)
-
-    # Numeric split: left = <= splitval, right = > splitval
-    condition <- expr(!!col_sym <= !!split_val)
-
-    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
-  }
-
-  build_node(1L)
+  )
 }
 
 #' Extract regression trees for randomForest models

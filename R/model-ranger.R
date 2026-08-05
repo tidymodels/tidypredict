@@ -77,17 +77,20 @@ tidypredict_fit_ranger_nested <- function(model) {
 }
 
 # Build nested case_when for a single ranger tree
-build_nested_ranger_tree <- function(model, tree_no) {
+#
+# `leaf_col` is the `treeInfo()` column holding the value a leaf contributes.
+# Regression trees use `prediction`; probability forests have one `pred.<class>`
+# column per class.
+build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
   tree <- ranger::treeInfo(model, tree_no)
 
   # Pre-extract columns as vectors for fast indexing (avoids slow df[i,] access)
-  nodeID <- tree$nodeID
   leftChild <- tree$leftChild
   rightChild <- tree$rightChild
   splitvarName <- as.character(tree$splitvarName)
   splitval <- tree$splitval
   terminal <- tree$terminal
-  prediction <- tree$prediction
+  prediction <- tree[[leaf_col]]
 
   build_node <- function(node_id) {
     # node_id is 0-indexed, convert to 1-indexed for vector access
@@ -332,41 +335,7 @@ tidypredict_test.ranger <- function(
 
 # Build nested case_when for ranger probability tree
 build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
-  tree <- ranger::treeInfo(model, tree_no)
-
-  # Pre-extract columns as vectors for fast indexing (avoids slow df[i,] access)
-  nodeID <- tree$nodeID
-  leftChild <- tree$leftChild
-  rightChild <- tree$rightChild
-  splitvarName <- as.character(tree$splitvarName)
-  splitval <- tree$splitval
-  terminal <- tree$terminal
-  prob_col <- paste0("pred.", class_level)
-  prob_vals <- tree[[prob_col]]
-
-  build_node <- function(node_id) {
-    # node_id is 0-indexed, convert to 1-indexed for vector access
-    idx <- node_id + 1L
-
-    if (terminal[idx]) {
-      return(prob_vals[idx])
-    }
-
-    left_id <- leftChild[idx]
-    right_id <- rightChild[idx]
-    split_var <- splitvarName[idx]
-    split_val <- splitval[idx]
-
-    left_subtree <- build_node(left_id)
-    right_subtree <- build_node(right_id)
-
-    col_sym <- rlang::sym(split_var)
-    condition <- expr(!!col_sym <= !!split_val)
-
-    expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
-  }
-
-  build_node(0L)
+  build_nested_ranger_tree(model, tree_no, paste0("pred.", class_level))
 }
 
 #' Extract regression trees for ranger models
