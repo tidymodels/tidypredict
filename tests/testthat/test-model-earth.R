@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 12)
   tf <- tidypredict_fit(model)
@@ -17,6 +18,7 @@ test_that("returns the right output", {
 })
 
 test_that("Model can be saved and re-loaded", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 7)
 
@@ -33,6 +35,7 @@ test_that("Model can be saved and re-loaded", {
 })
 
 test_that("formulas produces correct predictions", {
+  skip_if_not_installed("earth")
   # Regression - numeric predictors
   expect_snapshot(
     tidypredict_test(
@@ -243,6 +246,7 @@ test_that("formulas produces correct predictions", {
 })
 
 test_that("probit link works (#194)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     survived ~ age + sibsp,
     data = earth::etitanic,
@@ -258,6 +262,7 @@ test_that("probit link works (#194)", {
 })
 
 test_that("cloglog link works (#194)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     survived ~ age + sibsp,
     data = earth::etitanic,
@@ -272,6 +277,7 @@ test_that("cloglog link works (#194)", {
 })
 
 test_that("Gamma family works (#195)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     mpg ~ cyl + disp + hp,
     data = mtcars,
@@ -286,6 +292,7 @@ test_that("Gamma family works (#195)", {
 })
 
 test_that("inverse.gaussian family works (#195)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     mpg ~ cyl + disp + hp,
     data = mtcars,
@@ -302,12 +309,14 @@ test_that("inverse.gaussian family works (#195)", {
 # Tests for .extract_earth_multiclass()
 
 test_that(".extract_earth_multiclass errors on non-earth model", {
+  skip_if_not_installed("earth")
   model <- lm(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
 })
 
 test_that(".extract_earth_multiclass errors on binary model", {
+  skip_if_not_installed("earth")
   suppressWarnings(
     model <- earth::earth(
       vs ~ disp + hp,
@@ -320,12 +329,14 @@ test_that(".extract_earth_multiclass errors on binary model", {
 })
 
 test_that(".extract_earth_multiclass errors on regression model", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
 })
 
 test_that(".extract_earth_multiclass returns correct structure", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"
@@ -349,6 +360,7 @@ test_that(".extract_earth_multiclass returns correct structure", {
 })
 
 test_that(".extract_earth_multiclass produces correct predictions", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"
@@ -380,6 +392,7 @@ test_that(".extract_earth_multiclass produces correct predictions", {
 })
 
 test_that(".extract_earth_multiclass works with degree > 1", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"

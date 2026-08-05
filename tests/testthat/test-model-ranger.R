@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -29,6 +30,7 @@ test_that("returns the right output", {
 })
 
 test_that("tidypredict_fit produces correct predictions", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -50,6 +52,7 @@ test_that("tidypredict_fit produces correct predictions", {
 })
 
 test_that("formulas produces correct predictions", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -71,6 +74,7 @@ test_that("formulas produces correct predictions", {
 })
 
 test_that("split operator uses <= for left child (#189)", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -92,6 +96,7 @@ test_that("split operator uses <= for left child (#189)", {
 })
 
 test_that("predictions are averaged not summed (#190)", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -113,6 +118,7 @@ test_that("predictions are averaged not summed (#190)", {
 })
 
 test_that("produced case_when uses .default", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -133,6 +139,7 @@ test_that("produced case_when uses .default", {
 })
 
 test_that("classification models error with clear message (#191)", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -152,6 +159,7 @@ test_that("classification models error with clear message (#191)", {
 # Tests for .extract_ranger_classprob()
 
 test_that(".extract_ranger_classprob returns correct structure", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -176,12 +184,14 @@ test_that(".extract_ranger_classprob returns correct structure", {
 })
 
 test_that(".extract_ranger_classprob errors on non-ranger model", {
+  skip_if_not_installed("ranger")
   model <- lm(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_ranger_classprob(model))
 })
 
 test_that(".extract_ranger_classprob errors without probability = TRUE", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -200,6 +210,7 @@ test_that(".extract_ranger_classprob errors without probability = TRUE", {
 })
 
 test_that(".extract_ranger_classprob works with binary classification", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -223,6 +234,7 @@ test_that(".extract_ranger_classprob works with binary classification", {
 })
 
 test_that(".extract_ranger_classprob produces correct probabilities", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -259,6 +271,7 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
 })
 
 test_that(".extract_ranger_classprob works with single tree", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -284,6 +297,7 @@ test_that(".extract_ranger_classprob works with single tree", {
 # Tests for .extract_ranger_trees() (regression)
 
 test_that(".extract_ranger_trees returns correct structure", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -305,12 +319,14 @@ test_that(".extract_ranger_trees returns correct structure", {
 })
 
 test_that(".extract_ranger_trees errors on non-ranger model", {
+  skip_if_not_installed("ranger")
   model <- lm(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_ranger_trees(model))
 })
 
 test_that(".extract_ranger_trees errors on classification model", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -328,6 +344,7 @@ test_that(".extract_ranger_trees errors on classification model", {
 })
 
 test_that(".extract_ranger_trees produces correct predictions when averaged", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -355,6 +372,7 @@ test_that(".extract_ranger_trees produces correct predictions when averaged", {
 # Backwards compatibility tests for v2 parsed models
 
 test_that("v2 parsed ranger model can be loaded and used", {
+  skip_if_not_installed("ranger")
   pm <- readRDS(test_path("backwards-compat", "ranger-v2-parsed.rds"))
 
   expect_equal(pm$general$version, 2)
@@ -369,6 +387,7 @@ test_that("v2 parsed ranger model can be loaded and used", {
 })
 
 test_that("v2 parsed ranger model produces expected predictions", {
+  skip_if_not_installed("ranger")
   pm <- readRDS(test_path("backwards-compat", "ranger-v2-parsed.rds"))
 
   fit <- tidypredict_fit(pm)
@@ -381,6 +400,7 @@ test_that("v2 parsed ranger model produces expected predictions", {
 })
 
 test_that("v2 parsed classification model errors", {
+  skip_if_not_installed("ranger")
   pm <- readRDS(test_path("backwards-compat", "ranger-v2-classification.rds"))
 
   expect_equal(pm$general$version, 2)
@@ -391,6 +411,7 @@ test_that("v2 parsed classification model errors", {
 })
 
 test_that("legacy get_ra_trees extracts correct structure", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -423,6 +444,7 @@ test_that("legacy get_ra_trees extracts correct structure", {
 })
 
 test_that("legacy get_ra_tree extracts single tree", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -445,6 +467,7 @@ test_that("legacy get_ra_tree extracts single tree", {
 })
 
 test_that("legacy get_child_info builds parent map", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -467,6 +490,7 @@ test_that("legacy get_child_info builds parent map", {
 })
 
 test_that("legacy get_ra_path handles stump trees", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -491,6 +515,7 @@ test_that("legacy get_ra_path handles stump trees", {
 })
 
 test_that("legacy get_ra_path with default_op = TRUE", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -526,6 +551,7 @@ test_that("legacy get_ra_path with default_op = TRUE", {
 })
 
 test_that("parse_model.ranger errors on classification", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -543,6 +569,7 @@ test_that("parse_model.ranger errors on classification", {
 })
 
 test_that("legacy get_ra_tree converts factor predictions to character", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")
@@ -566,6 +593,7 @@ test_that("legacy get_ra_tree converts factor predictions to character", {
 })
 
 test_that("legacy get_ra_tree handles probability predictions", {
+  skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")
   skip_on_os("linux")

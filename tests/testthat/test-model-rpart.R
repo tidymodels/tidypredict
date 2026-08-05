@@ -1,4 +1,5 @@
 test_that("rpart_tree_info returns correct structure", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
   tree_info <- rpart_tree_info(model)
 
@@ -19,6 +20,7 @@ test_that("rpart_tree_info returns correct structure", {
 })
 
 test_that("rpart_tree_info handles categorical predictors", {
+  skip_if_not_installed("rpart")
   mtcars2 <- mtcars
   mtcars2$cyl <- factor(mtcars2$cyl)
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars2)
@@ -29,6 +31,7 @@ test_that("rpart_tree_info handles categorical predictors", {
 })
 
 test_that("returns the right output", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
@@ -42,6 +45,7 @@ test_that("returns the right output", {
 })
 
 test_that("tidypredict_fit produces correct predictions", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
 
   fit_expr <- tidypredict_fit(model)
@@ -52,6 +56,7 @@ test_that("tidypredict_fit produces correct predictions", {
 })
 
 test_that("formulas produce correct predictions - regression", {
+  skip_if_not_installed("rpart")
   expect_snapshot(
     tidypredict_test(
       rpart::rpart(mpg ~ am + cyl + wt, data = mtcars),
@@ -61,6 +66,7 @@ test_that("formulas produce correct predictions - regression", {
 })
 
 test_that("tidypredict_test.rpart max_rows parameter works", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ am + cyl + wt, data = mtcars)
   result <- tidypredict_test(model, mtcars, max_rows = 10)
 
@@ -68,6 +74,7 @@ test_that("tidypredict_test.rpart max_rows parameter works", {
 })
 
 test_that("tidypredict_test.rpart alert message works", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ am + cyl + wt, data = mtcars)
 
   # Use negative threshold to trigger alert
@@ -79,6 +86,7 @@ test_that("tidypredict_test.rpart alert message works", {
 })
 
 test_that("formulas produce correct predictions - classification", {
+  skip_if_not_installed("rpart")
   expect_snapshot(
     tidypredict_test(
       rpart::rpart(Species ~ ., data = iris),
@@ -88,6 +96,7 @@ test_that("formulas produce correct predictions - classification", {
 })
 
 test_that("categorical predictors work correctly", {
+  skip_if_not_installed("rpart")
   mtcars2 <- mtcars
   mtcars2$cyl <- factor(mtcars2$cyl)
 
@@ -100,6 +109,7 @@ test_that("categorical predictors work correctly", {
 })
 
 test_that("stump trees work correctly", {
+  skip_if_not_installed("rpart")
   ctrl <- rpart::rpart.control(minsplit = 100, cp = 1)
   model <- rpart::rpart(mpg ~ cyl + disp, data = mtcars, control = ctrl)
 
@@ -110,6 +120,7 @@ test_that("stump trees work correctly", {
 })
 
 test_that("produced case_when uses .default", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ am + cyl, data = mtcars)
 
   fit <- tidypredict_fit(model)
@@ -121,6 +132,7 @@ test_that("produced case_when uses .default", {
 # .extract_rpart_classprob tests ------------------------------------------
 
 test_that(".extract_rpart_classprob returns list of expressions", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_rpart_classprob(model)
@@ -131,6 +143,7 @@ test_that(".extract_rpart_classprob returns list of expressions", {
 })
 
 test_that(".extract_rpart_classprob results match predict probabilities", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_rpart_classprob(model)
@@ -147,10 +160,12 @@ test_that(".extract_rpart_classprob results match predict probabilities", {
 })
 
 test_that(".extract_rpart_classprob errors on non-rpart model", {
+  skip_if_not_installed("rpart")
   expect_snapshot(.extract_rpart_classprob(list()), error = TRUE)
 })
 
 test_that(".extract_rpart_classprob errors on regression model", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
   expect_snapshot(.extract_rpart_classprob(model), error = TRUE)
 })
@@ -158,6 +173,7 @@ test_that(".extract_rpart_classprob errors on regression model", {
 # Nested case_when tests --------------------------------------------------
 
 test_that("tidypredict_fit matches original model predictions", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
 
   fit_expr <- tidypredict_fit(model)
@@ -168,6 +184,7 @@ test_that("tidypredict_fit matches original model predictions", {
 })
 
 test_that("tidypredict_fit works for classification", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ ., data = iris)
 
   fit_expr <- tidypredict_fit(model)
@@ -178,6 +195,7 @@ test_that("tidypredict_fit works for classification", {
 })
 
 test_that(".extract_rpart_classprob matches original model probabilities", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_rpart_classprob(model)
@@ -195,6 +213,7 @@ test_that(".extract_rpart_classprob matches original model probabilities", {
 })
 
 test_that(".rpart_tree_info_full is exported and works", {
+  skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
 
   tree_info <- .rpart_tree_info_full(model)
@@ -217,6 +236,7 @@ test_that(".rpart_tree_info_full is exported and works", {
 })
 
 test_that("splits at an observed value use a strict inequality", {
+  skip_if_not_installed("rpart")
   # `rpart` sends values strictly below the cut point to the left, which is
   # only observable when the cut point coincides with a value in the new data
   df <- data.frame(x = c(1, 1, 2, 2, 3, 3), y = c(0, 0, 0, 1, 1, 1))
