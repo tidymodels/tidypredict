@@ -930,56 +930,22 @@ build_nested_oblivious_level <- function(
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
-# Build nested case_when for non-oblivious tree
-build_nested_catboost_nonoblivious_tree <- function(tree, cat_mapping) {
-  # For non-oblivious trees, we need to reconstruct the tree structure
-  # from the flat list of (prediction, path) pairs
-
-  # Single leaf (stump) - reachable with depth=0
-  if (length(tree) == 1 && length(tree[[1]]$path) == 0) {
-    return(tree[[1]]$prediction)
-  }
-
-  # Build recursively from paths
-  build_nested_nonoblivious_node(tree, cat_mapping, path_depth = 1)
+# Non-oblivious trees are stored as a flat list of (prediction, path) pairs, the
+# same shape the xgboost and lightgbm parsed models use, so the shared builder
+# reconstructs them. It also carries guards this file did not have, for empty
+# partitions and for paths that end before the current depth.
+catboost_is_left_op <- function(op) {
+  op %in% c("less-equal", "equal")
 }
 
-build_nested_nonoblivious_node <- function(leaves, cat_mapping, path_depth) {
-  if (length(leaves) == 1) {
-    # Single leaf - return prediction
-    return(leaves[[1]]$prediction)
-  }
-
-  # Get condition from first leaf
-  # Note: all grouped leaves have path length >= path_depth (tree structure guarantees this)
-  first_leaf <- leaves[[1]]
-  split_info <- first_leaf$path[[path_depth]]
-
-  # Partition leaves based on their condition at this depth
-  # "less-equal" or "equal" go left, "more" or "not-equal" go right
-  is_left_condition <- function(leaf) {
-    op <- leaf$path[[path_depth]]$op
-    op %in% c("less-equal", "equal")
-  }
-
-  left_leaves <- Filter(is_left_condition, leaves)
-  right_leaves <- Filter(Negate(is_left_condition), leaves)
-
-  # Build condition (use left condition)
-  condition <- build_nested_catboost_condition(split_info, cat_mapping)
-
-  left_subtree <- build_nested_nonoblivious_node(
-    left_leaves,
-    cat_mapping,
-    path_depth + 1
+build_nested_catboost_nonoblivious_tree <- function(tree, cat_mapping) {
+  build_nested_from_flat_paths(
+    tree,
+    function(path_elem) {
+      build_nested_catboost_condition(path_elem, cat_mapping)
+    },
+    catboost_is_left_op
   )
-  right_subtree <- build_nested_nonoblivious_node(
-    right_leaves,
-    cat_mapping,
-    path_depth + 1
-  )
-
-  expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
 # Build condition expression for a split
