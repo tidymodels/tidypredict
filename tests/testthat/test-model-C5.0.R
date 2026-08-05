@@ -192,10 +192,8 @@ test_that("model can be saved and re-loaded", {
   yaml::write_yaml(pm, tmp)
   pm2 <- as_parsed_model(yaml::read_yaml(tmp))
 
-  expect_equal(
-    rlang::expr_text(tidypredict_fit(pm)),
-    rlang::expr_text(tidypredict_fit(pm2))
-  )
+  reloaded <- as.character(rlang::eval_tidy(tidypredict_fit(pm2), df))
+  expect_equal(reloaded, as.character(predict(model, df)))
 })
 
 test_that("rule-based models return the right output", {
@@ -275,10 +273,8 @@ test_that("rule-based models can be saved and re-loaded", {
   yaml::write_yaml(pm, tmp)
   pm2 <- as_parsed_model(yaml::read_yaml(tmp))
 
-  expect_equal(
-    rlang::expr_text(tidypredict_fit(pm)),
-    rlang::expr_text(tidypredict_fit(pm2))
-  )
+  reloaded <- as.character(rlang::eval_tidy(tidypredict_fit(pm2), iris))
+  expect_equal(reloaded, as.character(predict(model, iris)))
 })
 
 test_that("boosted rule-based models are not supported", {

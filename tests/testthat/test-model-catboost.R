@@ -1169,10 +1169,19 @@ test_that("loaded model produces same predictions", {
   loaded <- yaml::read_yaml(tmp_file)
   class(loaded) <- class(pm)
 
-  original_preds <- rlang::eval_tidy(tidypredict_fit(pm), mtcars)
   loaded_preds <- rlang::eval_tidy(tidypredict_fit(loaded), mtcars)
 
-  expect_equal(loaded_preds, original_preds, tolerance = 1e-6)
+  # Against catboost's own predictions, not against the un-serialized parsed
+  # model, so that a round-trip which loses information cannot agree with an
+  # equally broken original.
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  )
+  expect_equal(
+    loaded_preds,
+    catboost_catboost.predict(model, pool),
+    tolerance = 1e-6
+  )
 })
 
 # Multiclass tests ---------------------------------------------------------
