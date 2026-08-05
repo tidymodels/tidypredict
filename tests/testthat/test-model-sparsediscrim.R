@@ -154,7 +154,7 @@ test_that("model can be saved and re-loaded", {
   model <- sparsediscrim::lda_diag(as.matrix(iris[1:4]), iris$Species)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 

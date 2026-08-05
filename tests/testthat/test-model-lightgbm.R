@@ -1778,7 +1778,7 @@ test_that("parsed model can be saved and loaded via YAML", {
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm_loaded <- as_parsed_model(l)
@@ -1818,7 +1818,7 @@ test_that("parsed multiclass model can be saved and loaded via YAML", {
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm_loaded <- as_parsed_model(l)

@@ -20,7 +20,7 @@ test_that("Model can be saved and re-loaded", {
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
@@ -195,7 +195,7 @@ test_that("multinomial model can be saved and re-loaded", {
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 
