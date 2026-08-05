@@ -25,6 +25,31 @@
   matching how `rpart` assigns values that are exactly equal to a cut
   point. ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now supports
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  models, including boosted and rule-based ones.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now honours its `interval` argument. It was hardcoded to 0.95, so
+  [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md),
+  `tidypredict_to_column(add_interval = TRUE)`, and
+  [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
+  all returned a 95% interval regardless of what was asked for.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now reports an unsupported model class with a message naming the
+  class, rather than R’s default “no applicable method” error.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
+  now explains that a model returning more than one formula is
+  unsupported, instead of incorrectly claiming that tree based models
+  are unsupported.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now reports an unsupported model class with a message naming the
   class, rather than R’s default “no applicable method” error.
