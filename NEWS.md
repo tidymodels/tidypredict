@@ -6,6 +6,14 @@
 
 - `tidypredict_fit()` now uses a strict inequality (`<`) for the continuous splits of `rpart::rpart()` models, matching how `rpart` assigns values that are exactly equal to a cut point. (#232)
 
+- `tidypredict_test()` now supports `C50::C5.0()` models, including boosted and rule-based ones. (#232)
+
+- `tidypredict_interval()` now honours its `interval` argument. It was hardcoded to 0.95, so `tidypredict_interval()`, `tidypredict_to_column(add_interval = TRUE)`, and `tidypredict_sql_interval()` all returned a 95% interval regardless of what was asked for. (#232)
+
+- `tidypredict_interval()` now reports an unsupported model class with a message naming the class, rather than R's default "no applicable method" error. (#232)
+
+- `tidypredict_to_column()` now explains that a model returning more than one formula is unsupported, instead of incorrectly claiming that tree based models are unsupported. (#232)
+
 - `tidypredict_fit()` now reports an unsupported model class with a message naming the class, rather than R's default "no applicable method" error. (#232)
 
 - `tidypredict_fit()` now keeps small probabilities for models with a logit link, such as `glm()` with `family = binomial` and `LiblineaR::LiblineaR()`. The inverse link was written in a form that rounded to exactly 0 once the linear predictor fell below about -37. (#232)

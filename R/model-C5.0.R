@@ -500,6 +500,33 @@ tidypredict_fit.C5.0 <- function(model, ...) {
   c50_boosted_case_when(tree_info_list, model$levels)
 }
 
+# Test ---------------------------------------------
+
+# `C5.0()` keeps no copy of the training data, so `df` has no useful default.
+#' @export
+tidypredict_test.C5.0 <- function(
+  model,
+  df,
+  threshold = 0.000000000001,
+  include_intervals = FALSE,
+  max_rows = NULL,
+  xg_df = NULL
+) {
+  df <- maybe_head(df, max_rows)
+
+  # C5.0 only fits classification models
+  base <- predict(model, df, type = "class")
+
+  te <- tidypredict_to_column(
+    df,
+    model,
+    add_interval = FALSE,
+    vars = c("fit_te", "upr_te", "lwr_te")
+  )
+
+  test_results_class(base, te$fit_te, model$call)
+}
+
 # Parse model --------------------------------------
 
 #' @export

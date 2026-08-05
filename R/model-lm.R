@@ -229,7 +229,7 @@ te_interval_lm <- function(parsedmodel, interval = 0.95) {
     ~ get_qr_lm(.x, parsedmodel)
   )
   qrs <- reduce_addition(qrs_map)
-  tfrac <- qt(1 - (1 - 0.95) / 2, parsedmodel$general$residual)
+  tfrac <- qt(1 - (1 - interval) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
 }
 

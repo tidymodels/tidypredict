@@ -44,6 +44,8 @@ air format .
 - All new code should have an accompanying test.
 - If there are existing tests, place new tests next to similar existing tests.
 - Strive to keep your tests minimal with few comments.
+- When adding or changing support for a model, follow the "Testing a new model" battery in `CONTRIBUTING.md`.
+- Never assert that one tidypredict result equals another tidypredict result. Correctness tests compare against the modelling package's own `predict()`.
 
 ### Documentation
 

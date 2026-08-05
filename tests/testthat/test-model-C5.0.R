@@ -316,3 +316,49 @@ test_that(".c50_tree_info_full is exported and works", {
     c("nodeID", "leftChild", "rightChild", "terminal") %in% names(info)
   ))
 })
+
+test_that("tidypredict_test() agrees with predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs)
+
+  result <- tidypredict_test(model, df)
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test() works for boosted models", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, trials = 3)
+
+  result <- tidypredict_test(model, iris)
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test() works for rule-based models", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE)
+
+  result <- tidypredict_test(model, iris)
+  expect_false(result$alert)
+})
+
+test_that("tidypredict_test() honours max_rows", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species)
+
+  result <- tidypredict_test(model, iris, max_rows = 10)
+  expect_equal(nrow(result$raw_results), 10)
+})
+
+test_that("tidypredict_test() compares against predict(), not against itself", {
+  skip_if_not_installed("C50")
+  model <- C50::C5.0(iris[, 1:4], iris$Species)
+
+  result <- tidypredict_test(model, iris)
+
+  # Guards against the failure mode where both sides of the comparison come
+  # from tidypredict, which makes `alert` unable to ever be TRUE.
+  expect_equal(result$raw_results$fit, as.character(predict(model, iris)))
+  expect_true(any(result$raw_results$fit != "setosa"))
+})
