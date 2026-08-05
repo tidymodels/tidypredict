@@ -281,3 +281,9 @@ rpart_classprob_tree_info <- function(model) {
   names(res) <- ylevels
   res
 }
+
+# Parsed model builder ----------------------------
+
+build_tree_formula.pm_tree_rpart <- function(model) {
+  build_tree_formula_single(model)
+}

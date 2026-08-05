@@ -225,3 +225,7 @@ tidypredict_fit.party <- function(model, ...) {
     )
   })
 }
+
+build_tree_formula.pm_tree_party <- function(model) {
+  build_tree_formula_single(model)
+}

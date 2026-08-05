@@ -51,38 +51,9 @@ tidypredict_fit.default <- function(model) {
 tidypredict_fit.pm_tree <- function(model) {
   version <- model$general$version %||% 1
 
-  # Version 3: nested case_when format
+  # Version 3: nested case_when format, one builder per model
   if (version >= 3) {
-    model_type <- model$general$model
-    if (model_type == "cubist") {
-      return(tidypredict_fit_cubist(model))
-    }
-    if (model_type %in% c("rpart", "party", "C5.0")) {
-      if (model_type == "C5.0" && !is.null(model$rules_info)) {
-        return(c50_rules_case_when(model$rules_info))
-      }
-      if (model_type == "C5.0" && !is.null(model$tree_info_list)) {
-        return(c50_boosted_case_when(model$tree_info_list, model$classes))
-      }
-      return(generate_nested_case_when_tree(model$tree_info))
-    }
-    if (model_type == "bagger") {
-      return(bagger_build_formula(model))
-    }
-    if (model_type == "blackboost") {
-      return(mboost_build_formula(
-        model$tree_info_list,
-        model$general$nu,
-        model$general$offset
-      ))
-    }
-    if (model_type %in% c("ranger", "randomForest", "cforest", "aorsf")) {
-      # For forests, average all trees
-      return(expr_mean(map(
-        model$tree_info_list,
-        generate_nested_case_when_tree
-      )))
-    }
+    return(build_tree_formula(as_pm_tree_model(model)))
   }
 
   # Version 1/2: flat case_when format (backwards compatibility with saved models)
@@ -95,6 +66,38 @@ tidypredict_fit.pm_tree <- function(model) {
   if (model$general$model == "ranger") {
     return(tidypredict_fit_ranger(model))
   }
+}
+
+# Tree parsed models all share the `pm_tree` class, so the model they came from
+# only shows up as a string. Turn that string into a class so each model's
+# builder can be a method living beside the rest of its code.
+#
+# The class is added here rather than in `as_parsed_model()` so that parsed
+# models serialized before this existed still dispatch correctly.
+as_pm_tree_model <- function(model) {
+  class(model) <- c(paste0("pm_tree_", model$general$model), class(model))
+  model
+}
+
+build_tree_formula <- function(model) {
+  UseMethod("build_tree_formula")
+}
+
+build_tree_formula.default <- function(model) {
+  cli::cli_abort(
+    "No builder for tree model {.val {model$general$model}}.",
+    .internal = TRUE
+  )
+}
+
+# Forests average their trees.
+build_tree_formula_forest <- function(model) {
+  expr_mean(map(model$tree_info_list, generate_nested_case_when_tree))
+}
+
+# A single tree is just its own nested `case_when()`.
+build_tree_formula_single <- function(model) {
+  generate_nested_case_when_tree(model$tree_info)
 }
 
 #' @export

@@ -534,3 +534,15 @@ parse_model.C5.0 <- function(model) {
 .c50_tree_info_full <- function(model) {
   c50_tree_info_full(model)
 }
+
+# C5.0 has three shapes: a rule set, a boosted sequence of trees, and a single
+# tree.
+build_tree_formula.pm_tree_C5.0 <- function(model) {
+  if (!is.null(model$rules_info)) {
+    return(c50_rules_case_when(model$rules_info))
+  }
+  if (!is.null(model$tree_info_list)) {
+    return(c50_boosted_case_when(model$tree_info_list, model$classes))
+  }
+  build_tree_formula_single(model)
+}

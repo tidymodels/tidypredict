@@ -245,3 +245,7 @@ build_nested_rf_vote_tree <- function(
     build_nested_rf_tree(model, tree_no, term_labels)
   })
 }
+
+build_tree_formula.pm_tree_randomForest <- function(model) {
+  build_tree_formula_forest(model)
+}

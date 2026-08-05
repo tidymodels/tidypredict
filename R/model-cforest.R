@@ -46,3 +46,7 @@ tidypredict_fit.cforest <- function(model, ...) {
 
   expr_mean(tree_exprs, n_trees)
 }
+
+build_tree_formula.pm_tree_cforest <- function(model) {
+  build_tree_formula_forest(model)
+}

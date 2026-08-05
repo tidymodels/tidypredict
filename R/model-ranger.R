@@ -368,3 +368,7 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
     build_nested_ranger_tree(model, tree_no)
   })
 }
+
+build_tree_formula.pm_tree_ranger <- function(model) {
+  build_tree_formula_forest(model)
+}
