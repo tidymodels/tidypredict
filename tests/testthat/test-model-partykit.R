@@ -1,4 +1,6 @@
 test_that("returns the right output", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
   tf <- tidypredict_fit(model)
   pm <- parse_model(model)
@@ -16,6 +18,8 @@ test_that("returns the right output", {
 })
 
 test_that("tidypredict_fit produces correct predictions", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
 
   fit_expr <- tidypredict_fit(model)
@@ -26,6 +30,8 @@ test_that("tidypredict_fit produces correct predictions", {
 })
 
 test_that("formulas produces correct predictions", {
+  skip_if_not_installed("partykit")
+
   mtcars <- mtcars
   mtcars$am1 <- mtcars$am
   mtcars$am <- ifelse(mtcars$am == 1, "auto", "man")
@@ -72,6 +78,8 @@ test_that("formulas produces correct predictions", {
 # .extract_partykit_classprob tests ------------------------------------------
 
 test_that(".extract_partykit_classprob returns list of expressions", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_partykit_classprob(model)
@@ -82,6 +90,8 @@ test_that(".extract_partykit_classprob returns list of expressions", {
 })
 
 test_that(".extract_partykit_classprob results match predict probabilities", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_partykit_classprob(model)
@@ -98,10 +108,14 @@ test_that(".extract_partykit_classprob results match predict probabilities", {
 })
 
 test_that(".extract_partykit_classprob errors on non-party model", {
+  skip_if_not_installed("partykit")
+
   expect_snapshot(.extract_partykit_classprob(list()), error = TRUE)
 })
 
 test_that("stump trees (no splits) work correctly (#196)", {
+  skip_if_not_installed("partykit")
+
   ctrl <- partykit::ctree_control(mincriterion = 0.9999999)
   model <- partykit::ctree(mpg ~ cyl + disp + hp, data = mtcars, control = ctrl)
 
@@ -115,6 +129,8 @@ test_that("stump trees (no splits) work correctly (#196)", {
 })
 
 test_that("produced case_when uses .default", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(mpg ~ am + cyl, data = mtcars)
 
   fit <- tidypredict_fit(model)
@@ -126,6 +142,8 @@ test_that("produced case_when uses .default", {
 # Nested case_when tests --------------------------------------------------
 
 test_that("tidypredict_fit matches original model predictions", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(mpg ~ cyl + wt, data = mtcars)
 
   fit_expr <- tidypredict_fit(model)
@@ -136,6 +154,8 @@ test_that("tidypredict_fit matches original model predictions", {
 })
 
 test_that("tidypredict_fit works for classification", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(Species ~ ., data = iris)
 
   fit_expr <- tidypredict_fit(model)
@@ -146,6 +166,8 @@ test_that("tidypredict_fit works for classification", {
 })
 
 test_that(".extract_partykit_classprob matches original model probabilities", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
   exprs <- .extract_partykit_classprob(model)
@@ -163,6 +185,8 @@ test_that(".extract_partykit_classprob matches original model probabilities", {
 })
 
 test_that(".partykit_tree_info_full is exported and works", {
+  skip_if_not_installed("partykit")
+
   model <- partykit::ctree(mpg ~ cyl + wt, data = mtcars)
 
   tree_info <- .partykit_tree_info_full(model)
@@ -182,4 +206,45 @@ test_that(".partykit_tree_info_full is exported and works", {
       "use_surrogates"
     )
   )
+})
+
+test_that("tidypredict_to_column() works", {
+  skip_if_not_installed("partykit")
+  model <- partykit::ctree(mpg ~ wt + cyl, data = mtcars)
+
+  res <- tidypredict_to_column(mtcars, model)
+  expect_equal(res$fit, unname(predict(model, mtcars)))
+})
+
+test_that("SQL translation works", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("dbplyr")
+  model <- partykit::ctree(mpg ~ wt + cyl, data = mtcars)
+
+  sql <- tidypredict_sql(model, dbplyr::simulate_dbi())
+  expect_s3_class(sql, "sql")
+  expect_match(as.character(sql), "CASE")
+})
+
+test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("yaml")
+  model <- partykit::ctree(mpg ~ wt + cyl, data = mtcars)
+
+  tmp <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), tmp)
+  pm <- as_parsed_model(yaml::read_yaml(tmp))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    unname(predict(model, mtcars)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("tidypredict_test() agrees with predict()", {
+  skip_if_not_installed("partykit")
+  model <- partykit::ctree(mpg ~ wt + cyl, data = mtcars)
+
+  expect_false(tidypredict_test(model, mtcars)$alert)
 })
