@@ -25,6 +25,26 @@
   matching how `rpart` assigns values that are exactly equal to a cut
   point. ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  models that have been saved and reloaded with
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  and
+  [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md).
+  Every split variable after the first leaf in a tree was named
+  incorrectly, so the reloaded model split on the wrong columns.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+  models whose predictor values fall exactly on a split threshold.
+  Cubist compares split thresholds as 32-bit floats, so a `disp` of 95.1
+  was sent down the wrong branch when the comparison was made in R’s
+  doubles.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
 - [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
   now supports
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)

@@ -159,61 +159,64 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ((ifelse(nox &gt; 0.66799998, -1.11 + crim * -0.02 + nox * 21.4 + </span></span>
-<span><span class="co">#&gt;     rm * 0.1 + age * -0.003 + dis * 2.93 + ptratio * -0.13 + </span></span>
-<span><span class="co">#&gt;     b * 0.008 + lstat * -0.33, 0) + ifelse(lstat &gt; 9.5900002 &amp; </span></span>
-<span><span class="co">#&gt;     nox &lt;= 0.66799998, 23.57 + crim * 0.05 + nox * -5.2 + rm * </span></span>
-<span><span class="co">#&gt;     3.1 + age * -0.048 + dis * -0.81 + rad * 0.02 + tax * -0.0041 + </span></span>
-<span><span class="co">#&gt;     ptratio * -0.71 + b * 0.01 + lstat * -0.15, 0) + ifelse(lstat &lt;= </span></span>
-<span><span class="co">#&gt;     9.5900002 &amp; rm &lt;= 6.2259998, 1.18 + crim * 3.83 + rm * 4.3 + </span></span>
-<span><span class="co">#&gt;     age * -0.06 + dis * -0.09 + tax * -0.003 + ptratio * -0.08 + </span></span>
-<span><span class="co">#&gt;     lstat * -0.11, 0) + ifelse(lstat &lt;= 9.5900002 &amp; rm &gt; 6.2259998, </span></span>
-<span><span class="co">#&gt;     -4.71 + crim * 2.22 + zn * 0.008 + nox * -1.7 + rm * 9.2 + </span></span>
-<span><span class="co">#&gt;         age * -0.04 + dis * -0.71 + rad * 0.03 + tax * -0.0182 + </span></span>
-<span><span class="co">#&gt;         ptratio * -0.72 + lstat * -0.83, 0))/((nox &gt; 0.66799998) + </span></span>
-<span><span class="co">#&gt;     (lstat &gt; 9.5900002 &amp; nox &lt;= 0.66799998) + (lstat &lt;= 9.5900002 &amp; </span></span>
-<span><span class="co">#&gt;     rm &lt;= 6.2259998) + (lstat &lt;= 9.5900002 &amp; rm &gt; 6.2259998)) + </span></span>
-<span><span class="co">#&gt;     (ifelse(dis &lt;= 1.7553999 &amp; lstat &gt; 5.1199999, 122.32 + crim * </span></span>
-<span><span class="co">#&gt;         -0.29 + nox * -21.6 + rm * -3 + dis * -30.88 + rad * </span></span>
-<span><span class="co">#&gt;         0.02 + tax * -0.001 + b * -0.023 + lstat * -0.73, 0) + </span></span>
-<span><span class="co">#&gt;         ifelse(rm &lt;= 6.5450001 &amp; lstat &gt; 5.1199999, 27.8 + crim * </span></span>
-<span><span class="co">#&gt;             -0.16 + zn * 0.007 + nox * -3.9 + rm * 2 + age * </span></span>
-<span><span class="co">#&gt;             -0.035 + dis * -0.7 + rad * 0.28 + tax * -0.0135 + </span></span>
-<span><span class="co">#&gt;             ptratio * -0.6 + b * 0.013 + lstat * -0.25, 0) + </span></span>
-<span><span class="co">#&gt;         ifelse(rm &gt; 6.5450001 &amp; lstat &gt; 5.1199999, 22.21 + crim * </span></span>
-<span><span class="co">#&gt;             -0.04 + zn * 0.01 + indus * -0.02 + nox * -4 + rm * </span></span>
-<span><span class="co">#&gt;             4.7 + dis * -0.34 + rad * 0.11 + tax * -0.0248 + </span></span>
-<span><span class="co">#&gt;             ptratio * -0.9 + b * 0.002 + lstat * -0.1, 0) + ifelse(lstat &lt;= </span></span>
-<span><span class="co">#&gt;         5.1199999 &amp; rm &lt;= 8.0340004, -71.95 + rm * 17 + age * </span></span>
-<span><span class="co">#&gt;         -0.06 + tax * -0.0112 + ptratio * -0.48 + lstat * -0.03, </span></span>
-<span><span class="co">#&gt;         0) + ifelse(rm &gt; 8.0340004 &amp; dis &gt; 3.1991999, -32.79 + </span></span>
-<span><span class="co">#&gt;         crim * -0.01 + zn * 0.005 + nox * -1.8 + rm * 12.9 + </span></span>
-<span><span class="co">#&gt;         age * -0.117 + dis * -0.15 + rad * 0.04 + tax * -0.0246 + </span></span>
-<span><span class="co">#&gt;         ptratio * -1.05 + lstat * -0.04, 0) + ifelse(lstat &lt;= </span></span>
-<span><span class="co">#&gt;         5.1199999 &amp; dis &lt;= 3.1991999, 53.41 + rm * 1.6 + dis * </span></span>
-<span><span class="co">#&gt;         -7.16 + tax * 0.0088 + lstat * -0.68, 0))/((dis &lt;= 1.7553999 &amp; </span></span>
-<span><span class="co">#&gt;         lstat &gt; 5.1199999) + (rm &lt;= 6.5450001 &amp; lstat &gt; 5.1199999) + </span></span>
-<span><span class="co">#&gt;         (rm &gt; 6.5450001 &amp; lstat &gt; 5.1199999) + (lstat &lt;= 5.1199999 &amp; </span></span>
-<span><span class="co">#&gt;         rm &lt;= 8.0340004) + (rm &gt; 8.0340004 &amp; dis &gt; 3.1991999) + </span></span>
-<span><span class="co">#&gt;         (lstat &lt;= 5.1199999 &amp; dis &lt;= 3.1991999)) + (ifelse(nox &gt; </span></span>
-<span><span class="co">#&gt;     0.66799998, -36.31 + crim * 0.08 + nox * 48.4 + dis * 7.52 + </span></span>
-<span><span class="co">#&gt;     b * 0.01 + lstat * -0.24, 0) + ifelse(lstat &gt; 9.5299997 &amp; </span></span>
-<span><span class="co">#&gt;     nox &lt;= 0.66799998, 28.04 + nox * -4.8 + rm * 2.9 + age * </span></span>
-<span><span class="co">#&gt;     -0.051 + dis * -0.86 + rad * 0.01 + tax * -0.0019 + ptratio * </span></span>
-<span><span class="co">#&gt;     -0.72 + lstat * -0.12, 0) + ifelse(lstat &lt;= 9.5299997, -26.05 + </span></span>
+<span><span class="co">#&gt; ((ifelse(nox &gt; 0.668000012636185, -1.11 + crim * -0.02 + nox * </span></span>
+<span><span class="co">#&gt;     21.4 + rm * 0.1 + age * -0.003 + dis * 2.93 + ptratio * -0.13 + </span></span>
+<span><span class="co">#&gt;     b * 0.008 + lstat * -0.33, 0) + ifelse(lstat &gt; 9.59000062942505 &amp; </span></span>
+<span><span class="co">#&gt;     nox &lt;= 0.668000012636185, 23.57 + crim * 0.05 + nox * -5.2 + </span></span>
+<span><span class="co">#&gt;     rm * 3.1 + age * -0.048 + dis * -0.81 + rad * 0.02 + tax * </span></span>
+<span><span class="co">#&gt;     -0.0041 + ptratio * -0.71 + b * 0.01 + lstat * -0.15, 0) + </span></span>
+<span><span class="co">#&gt;     ifelse(lstat &lt;= 9.59000062942505 &amp; rm &lt;= 6.2260000705719, </span></span>
+<span><span class="co">#&gt;         1.18 + crim * 3.83 + rm * 4.3 + age * -0.06 + dis * -0.09 + </span></span>
+<span><span class="co">#&gt;             tax * -0.003 + ptratio * -0.08 + lstat * -0.11, 0) + </span></span>
+<span><span class="co">#&gt;     ifelse(lstat &lt;= 9.59000062942505 &amp; rm &gt; 6.2260000705719, </span></span>
+<span><span class="co">#&gt;         -4.71 + crim * 2.22 + zn * 0.008 + nox * -1.7 + rm * </span></span>
+<span><span class="co">#&gt;             9.2 + age * -0.04 + dis * -0.71 + rad * 0.03 + tax * </span></span>
+<span><span class="co">#&gt;             -0.0182 + ptratio * -0.72 + lstat * -0.83, 0))/((nox &gt; </span></span>
+<span><span class="co">#&gt;     0.668000012636185) + (lstat &gt; 9.59000062942505 &amp; nox &lt;= 0.668000012636185) + </span></span>
+<span><span class="co">#&gt;     (lstat &lt;= 9.59000062942505 &amp; rm &lt;= 6.2260000705719) + (lstat &lt;= </span></span>
+<span><span class="co">#&gt;     9.59000062942505 &amp; rm &gt; 6.2260000705719)) + (ifelse(dis &lt;= </span></span>
+<span><span class="co">#&gt;     1.75540000200272 &amp; lstat &gt; 5.12000012397766, 122.32 + crim * </span></span>
+<span><span class="co">#&gt;     -0.29 + nox * -21.6 + rm * -3 + dis * -30.88 + rad * 0.02 + </span></span>
+<span><span class="co">#&gt;     tax * -0.001 + b * -0.023 + lstat * -0.73, 0) + ifelse(rm &lt;= </span></span>
+<span><span class="co">#&gt;     6.54500031471252 &amp; lstat &gt; 5.12000012397766, 27.8 + crim * </span></span>
+<span><span class="co">#&gt;     -0.16 + zn * 0.007 + nox * -3.9 + rm * 2 + age * -0.035 + </span></span>
+<span><span class="co">#&gt;     dis * -0.7 + rad * 0.28 + tax * -0.0135 + ptratio * -0.6 + </span></span>
+<span><span class="co">#&gt;     b * 0.013 + lstat * -0.25, 0) + ifelse(rm &gt; 6.54500031471252 &amp; </span></span>
+<span><span class="co">#&gt;     lstat &gt; 5.12000012397766, 22.21 + crim * -0.04 + zn * 0.01 + </span></span>
+<span><span class="co">#&gt;     indus * -0.02 + nox * -4 + rm * 4.7 + dis * -0.34 + rad * </span></span>
+<span><span class="co">#&gt;     0.11 + tax * -0.0248 + ptratio * -0.9 + b * 0.002 + lstat * </span></span>
+<span><span class="co">#&gt;     -0.1, 0) + ifelse(lstat &lt;= 5.12000012397766 &amp; rm &lt;= 8.03400087356567, </span></span>
+<span><span class="co">#&gt;     -71.95 + rm * 17 + age * -0.06 + tax * -0.0112 + ptratio * </span></span>
+<span><span class="co">#&gt;         -0.48 + lstat * -0.03, 0) + ifelse(rm &gt; 8.03400087356567 &amp; </span></span>
+<span><span class="co">#&gt;     dis &gt; 3.19920003414154, -32.79 + crim * -0.01 + zn * 0.005 + </span></span>
+<span><span class="co">#&gt;     nox * -1.8 + rm * 12.9 + age * -0.117 + dis * -0.15 + rad * </span></span>
+<span><span class="co">#&gt;     0.04 + tax * -0.0246 + ptratio * -1.05 + lstat * -0.04, 0) + </span></span>
+<span><span class="co">#&gt;     ifelse(lstat &lt;= 5.12000012397766 &amp; dis &lt;= 3.19920003414154, </span></span>
+<span><span class="co">#&gt;         53.41 + rm * 1.6 + dis * -7.16 + tax * 0.0088 + lstat * </span></span>
+<span><span class="co">#&gt;             -0.68, 0))/((dis &lt;= 1.75540000200272 &amp; lstat &gt; 5.12000012397766) + </span></span>
+<span><span class="co">#&gt;     (rm &lt;= 6.54500031471252 &amp; lstat &gt; 5.12000012397766) + (rm &gt; </span></span>
+<span><span class="co">#&gt;     6.54500031471252 &amp; lstat &gt; 5.12000012397766) + (lstat &lt;= </span></span>
+<span><span class="co">#&gt;     5.12000012397766 &amp; rm &lt;= 8.03400087356567) + (rm &gt; 8.03400087356567 &amp; </span></span>
+<span><span class="co">#&gt;     dis &gt; 3.19920003414154) + (lstat &lt;= 5.12000012397766 &amp; dis &lt;= </span></span>
+<span><span class="co">#&gt;     3.19920003414154)) + (ifelse(nox &gt; 0.668000012636185, -36.31 + </span></span>
+<span><span class="co">#&gt;     crim * 0.08 + nox * 48.4 + dis * 7.52 + b * 0.01 + lstat * </span></span>
+<span><span class="co">#&gt;     -0.24, 0) + ifelse(lstat &gt; 9.53000020980835 &amp; nox &lt;= 0.668000012636185, </span></span>
+<span><span class="co">#&gt;     28.04 + nox * -4.8 + rm * 2.9 + age * -0.051 + dis * -0.86 + </span></span>
+<span><span class="co">#&gt;         rad * 0.01 + tax * -0.0019 + ptratio * -0.72 + lstat * </span></span>
+<span><span class="co">#&gt;         -0.12, 0) + ifelse(lstat &lt;= 9.53000020980835, -26.05 + </span></span>
 <span><span class="co">#&gt;     crim * 0.89 + nox * -2.3 + rm * 9.6 + dis * -0.17 + rad * </span></span>
 <span><span class="co">#&gt;     0.02 + tax * -0.0055 + ptratio * -0.12 + b * 0.001 + lstat * </span></span>
-<span><span class="co">#&gt;     -0.74, 0) + ifelse(lstat &lt;= 9.5299997 &amp; dis &lt;= 2.6403, 136.67 + </span></span>
-<span><span class="co">#&gt;     crim * 7.2 + nox * -96.6 + rm * 1.1 + tax * -0.0033 + ptratio * </span></span>
-<span><span class="co">#&gt;     -3.31 + lstat * -0.1, 0))/((nox &gt; 0.66799998) + (lstat &gt; </span></span>
-<span><span class="co">#&gt;     9.5299997 &amp; nox &lt;= 0.66799998) + (lstat &lt;= 9.5299997) + (lstat &lt;= </span></span>
-<span><span class="co">#&gt;     9.5299997 &amp; dis &lt;= 2.6403)))/3</span></span></code></pre></div>
+<span><span class="co">#&gt;     -0.74, 0) + ifelse(lstat &lt;= 9.53000020980835 &amp; dis &lt;= 2.64030015468597, </span></span>
+<span><span class="co">#&gt;     136.67 + crim * 7.2 + nox * -96.6 + rm * 1.1 + tax * -0.0033 + </span></span>
+<span><span class="co">#&gt;         ptratio * -3.31 + lstat * -0.1, 0))/((nox &gt; 0.668000012636185) + </span></span>
+<span><span class="co">#&gt;     (lstat &gt; 9.53000020980835 &amp; nox &lt;= 0.668000012636185) + (lstat &lt;= </span></span>
+<span><span class="co">#&gt;     9.53000020980835) + (lstat &lt;= 9.53000020980835 &amp; dis &lt;= 2.64030015468597)))/3</span></span></code></pre></div>
 </li>
 <li>
 <p>SQL output example</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; ((((((CASE WHEN ("nox" &gt; 0.66799998) THEN ((((((((-1.11 + "crim" * -0.02) + "nox" * 21.4) + "rm" * 0.1) + "age" * -0.003) + "dis" * 2.93) + "ptratio" * -0.13) + "b" * 0.008) + "lstat" * -0.33) WHEN NOT ("nox" &gt; 0.66799998) THEN 0.0 END + CASE WHEN ("lstat" &gt; 9.5900002 AND "nox" &lt;= 0.66799998) THEN ((((((((((23.57 + "crim" * 0.05) + "nox" * -5.2) + "rm" * 3.1) + "age" * -0.048) + "dis" * -0.81) + "rad" * 0.02) + "tax" * -0.0041) + "ptratio" * -0.71) + "b" * 0.01) + "lstat" * -0.15) WHEN NOT ("lstat" &gt; 9.5900002 AND "nox" &lt;= 0.66799998) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.5900002 AND "rm" &lt;= 6.2259998) THEN (((((((1.18 + "crim" * 3.83) + "rm" * 4.3) + "age" * -0.06) + "dis" * -0.09) + "tax" * -0.003) + "ptratio" * -0.08) + "lstat" * -0.11) WHEN NOT ("lstat" &lt;= 9.5900002 AND "rm" &lt;= 6.2259998) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.5900002 AND "rm" &gt; 6.2259998) THEN ((((((((((-4.71 + "crim" * 2.22) + "zn" * 0.008) + "nox" * -1.7) + "rm" * 9.2) + "age" * -0.04) + "dis" * -0.71) + "rad" * 0.03) + "tax" * -0.0182) + "ptratio" * -0.72) + "lstat" * -0.83) WHEN NOT ("lstat" &lt;= 9.5900002 AND "rm" &gt; 6.2259998) THEN 0.0 END) / ((("nox" &gt; 0.66799998 + "lstat" &gt; 9.5900002 AND "nox" &lt;= 0.66799998) + "lstat" &lt;= 9.5900002 AND "rm" &lt;= 6.2259998) + "lstat" &lt;= 9.5900002 AND "rm" &gt; 6.2259998)) + (((((CASE WHEN ("dis" &lt;= 1.7553999 AND "lstat" &gt; 5.1199999) THEN ((((((((122.32 + "crim" * -0.29) + "nox" * -21.6) + "rm" * -3.0) + "dis" * -30.88) + "rad" * 0.02) + "tax" * -0.001) + "b" * -0.023) + "lstat" * -0.73) WHEN NOT ("dis" &lt;= 1.7553999 AND "lstat" &gt; 5.1199999) THEN 0.0 END + CASE WHEN ("rm" &lt;= 6.5450001 AND "lstat" &gt; 5.1199999) THEN (((((((((((27.8 + "crim" * -0.16) + "zn" * 0.007) + "nox" * -3.9) + "rm" * 2.0) + "age" * -0.035) + "dis" * -0.7) + "rad" * 0.28) + "tax" * -0.0135) + "ptratio" * -0.6) + "b" * 0.013) + "lstat" * -0.25) WHEN NOT ("rm" &lt;= 6.5450001 AND "lstat" &gt; 5.1199999) THEN 0.0 END) + CASE WHEN ("rm" &gt; 6.5450001 AND "lstat" &gt; 5.1199999) THEN (((((((((((22.21 + "crim" * -0.04) + "zn" * 0.01) + "indus" * -0.02) + "nox" * -4.0) + "rm" * 4.7) + "dis" * -0.34) + "rad" * 0.11) + "tax" * -0.0248) + "ptratio" * -0.9) + "b" * 0.002) + "lstat" * -0.1) WHEN NOT ("rm" &gt; 6.5450001 AND "lstat" &gt; 5.1199999) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 5.1199999 AND "rm" &lt;= 8.0340004) THEN (((((-71.95 + "rm" * 17.0) + "age" * -0.06) + "tax" * -0.0112) + "ptratio" * -0.48) + "lstat" * -0.03) WHEN NOT ("lstat" &lt;= 5.1199999 AND "rm" &lt;= 8.0340004) THEN 0.0 END) + CASE WHEN ("rm" &gt; 8.0340004 AND "dis" &gt; 3.1991999) THEN ((((((((((-32.79 + "crim" * -0.01) + "zn" * 0.005) + "nox" * -1.8) + "rm" * 12.9) + "age" * -0.117) + "dis" * -0.15) + "rad" * 0.04) + "tax" * -0.0246) + "ptratio" * -1.05) + "lstat" * -0.04) WHEN NOT ("rm" &gt; 8.0340004 AND "dis" &gt; 3.1991999) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 5.1199999 AND "dis" &lt;= 3.1991999) THEN ((((53.41 + "rm" * 1.6) + "dis" * -7.16) + "tax" * 0.0088) + "lstat" * -0.68) WHEN NOT ("lstat" &lt;= 5.1199999 AND "dis" &lt;= 3.1991999) THEN 0.0 END) / ((((("dis" &lt;= 1.7553999 AND "lstat" &gt; 5.1199999 + "rm" &lt;= 6.5450001 AND "lstat" &gt; 5.1199999) + "rm" &gt; 6.5450001 AND "lstat" &gt; 5.1199999) + "lstat" &lt;= 5.1199999 AND "rm" &lt;= 8.0340004) + "rm" &gt; 8.0340004 AND "dis" &gt; 3.1991999) + "lstat" &lt;= 5.1199999 AND "dis" &lt;= 3.1991999)) + (((CASE WHEN ("nox" &gt; 0.66799998) THEN (((((-36.31 + "crim" * 0.08) + "nox" * 48.4) + "dis" * 7.52) + "b" * 0.01) + "lstat" * -0.24) WHEN NOT ("nox" &gt; 0.66799998) THEN 0.0 END + CASE WHEN ("lstat" &gt; 9.5299997 AND "nox" &lt;= 0.66799998) THEN ((((((((28.04 + "nox" * -4.8) + "rm" * 2.9) + "age" * -0.051) + "dis" * -0.86) + "rad" * 0.01) + "tax" * -0.0019) + "ptratio" * -0.72) + "lstat" * -0.12) WHEN NOT ("lstat" &gt; 9.5299997 AND "nox" &lt;= 0.66799998) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.5299997) THEN (((((((((-26.05 + "crim" * 0.89) + "nox" * -2.3) + "rm" * 9.6) + "dis" * -0.17) + "rad" * 0.02) + "tax" * -0.0055) + "ptratio" * -0.12) + "b" * 0.001) + "lstat" * -0.74) WHEN NOT ("lstat" &lt;= 9.5299997) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.5299997 AND "dis" &lt;= 2.6403) THEN ((((((136.67 + "crim" * 7.2) + "nox" * -96.6) + "rm" * 1.1) + "tax" * -0.0033) + "ptratio" * -3.31) + "lstat" * -0.1) WHEN NOT ("lstat" &lt;= 9.5299997 AND "dis" &lt;= 2.6403) THEN 0.0 END) / ((("nox" &gt; 0.66799998 + "lstat" &gt; 9.5299997 AND "nox" &lt;= 0.66799998) + "lstat" &lt;= 9.5299997) + "lstat" &lt;= 9.5299997 AND "dis" &lt;= 2.6403)) / 3.0</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((((CASE WHEN ("nox" &gt; 0.668000012636185) THEN ((((((((-1.11 + "crim" * -0.02) + "nox" * 21.4) + "rm" * 0.1) + "age" * -0.003) + "dis" * 2.93) + "ptratio" * -0.13) + "b" * 0.008) + "lstat" * -0.33) WHEN NOT ("nox" &gt; 0.668000012636185) THEN 0.0 END + CASE WHEN ("lstat" &gt; 9.59000062942505 AND "nox" &lt;= 0.668000012636185) THEN ((((((((((23.57 + "crim" * 0.05) + "nox" * -5.2) + "rm" * 3.1) + "age" * -0.048) + "dis" * -0.81) + "rad" * 0.02) + "tax" * -0.0041) + "ptratio" * -0.71) + "b" * 0.01) + "lstat" * -0.15) WHEN NOT ("lstat" &gt; 9.59000062942505 AND "nox" &lt;= 0.668000012636185) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.59000062942505 AND "rm" &lt;= 6.2260000705719) THEN (((((((1.18 + "crim" * 3.83) + "rm" * 4.3) + "age" * -0.06) + "dis" * -0.09) + "tax" * -0.003) + "ptratio" * -0.08) + "lstat" * -0.11) WHEN NOT ("lstat" &lt;= 9.59000062942505 AND "rm" &lt;= 6.2260000705719) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.59000062942505 AND "rm" &gt; 6.2260000705719) THEN ((((((((((-4.71 + "crim" * 2.22) + "zn" * 0.008) + "nox" * -1.7) + "rm" * 9.2) + "age" * -0.04) + "dis" * -0.71) + "rad" * 0.03) + "tax" * -0.0182) + "ptratio" * -0.72) + "lstat" * -0.83) WHEN NOT ("lstat" &lt;= 9.59000062942505 AND "rm" &gt; 6.2260000705719) THEN 0.0 END) / ((("nox" &gt; 0.668000012636185 + "lstat" &gt; 9.59000062942505 AND "nox" &lt;= 0.668000012636185) + "lstat" &lt;= 9.59000062942505 AND "rm" &lt;= 6.2260000705719) + "lstat" &lt;= 9.59000062942505 AND "rm" &gt; 6.2260000705719)) + (((((CASE WHEN ("dis" &lt;= 1.75540000200272 AND "lstat" &gt; 5.12000012397766) THEN ((((((((122.32 + "crim" * -0.29) + "nox" * -21.6) + "rm" * -3.0) + "dis" * -30.88) + "rad" * 0.02) + "tax" * -0.001) + "b" * -0.023) + "lstat" * -0.73) WHEN NOT ("dis" &lt;= 1.75540000200272 AND "lstat" &gt; 5.12000012397766) THEN 0.0 END + CASE WHEN ("rm" &lt;= 6.54500031471252 AND "lstat" &gt; 5.12000012397766) THEN (((((((((((27.8 + "crim" * -0.16) + "zn" * 0.007) + "nox" * -3.9) + "rm" * 2.0) + "age" * -0.035) + "dis" * -0.7) + "rad" * 0.28) + "tax" * -0.0135) + "ptratio" * -0.6) + "b" * 0.013) + "lstat" * -0.25) WHEN NOT ("rm" &lt;= 6.54500031471252 AND "lstat" &gt; 5.12000012397766) THEN 0.0 END) + CASE WHEN ("rm" &gt; 6.54500031471252 AND "lstat" &gt; 5.12000012397766) THEN (((((((((((22.21 + "crim" * -0.04) + "zn" * 0.01) + "indus" * -0.02) + "nox" * -4.0) + "rm" * 4.7) + "dis" * -0.34) + "rad" * 0.11) + "tax" * -0.0248) + "ptratio" * -0.9) + "b" * 0.002) + "lstat" * -0.1) WHEN NOT ("rm" &gt; 6.54500031471252 AND "lstat" &gt; 5.12000012397766) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 5.12000012397766 AND "rm" &lt;= 8.03400087356567) THEN (((((-71.95 + "rm" * 17.0) + "age" * -0.06) + "tax" * -0.0112) + "ptratio" * -0.48) + "lstat" * -0.03) WHEN NOT ("lstat" &lt;= 5.12000012397766 AND "rm" &lt;= 8.03400087356567) THEN 0.0 END) + CASE WHEN ("rm" &gt; 8.03400087356567 AND "dis" &gt; 3.19920003414154) THEN ((((((((((-32.79 + "crim" * -0.01) + "zn" * 0.005) + "nox" * -1.8) + "rm" * 12.9) + "age" * -0.117) + "dis" * -0.15) + "rad" * 0.04) + "tax" * -0.0246) + "ptratio" * -1.05) + "lstat" * -0.04) WHEN NOT ("rm" &gt; 8.03400087356567 AND "dis" &gt; 3.19920003414154) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 5.12000012397766 AND "dis" &lt;= 3.19920003414154) THEN ((((53.41 + "rm" * 1.6) + "dis" * -7.16) + "tax" * 0.0088) + "lstat" * -0.68) WHEN NOT ("lstat" &lt;= 5.12000012397766 AND "dis" &lt;= 3.19920003414154) THEN 0.0 END) / ((((("dis" &lt;= 1.75540000200272 AND "lstat" &gt; 5.12000012397766 + "rm" &lt;= 6.54500031471252 AND "lstat" &gt; 5.12000012397766) + "rm" &gt; 6.54500031471252 AND "lstat" &gt; 5.12000012397766) + "lstat" &lt;= 5.12000012397766 AND "rm" &lt;= 8.03400087356567) + "rm" &gt; 8.03400087356567 AND "dis" &gt; 3.19920003414154) + "lstat" &lt;= 5.12000012397766 AND "dis" &lt;= 3.19920003414154)) + (((CASE WHEN ("nox" &gt; 0.668000012636185) THEN (((((-36.31 + "crim" * 0.08) + "nox" * 48.4) + "dis" * 7.52) + "b" * 0.01) + "lstat" * -0.24) WHEN NOT ("nox" &gt; 0.668000012636185) THEN 0.0 END + CASE WHEN ("lstat" &gt; 9.53000020980835 AND "nox" &lt;= 0.668000012636185) THEN ((((((((28.04 + "nox" * -4.8) + "rm" * 2.9) + "age" * -0.051) + "dis" * -0.86) + "rad" * 0.01) + "tax" * -0.0019) + "ptratio" * -0.72) + "lstat" * -0.12) WHEN NOT ("lstat" &gt; 9.53000020980835 AND "nox" &lt;= 0.668000012636185) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.53000020980835) THEN (((((((((-26.05 + "crim" * 0.89) + "nox" * -2.3) + "rm" * 9.6) + "dis" * -0.17) + "rad" * 0.02) + "tax" * -0.0055) + "ptratio" * -0.12) + "b" * 0.001) + "lstat" * -0.74) WHEN NOT ("lstat" &lt;= 9.53000020980835) THEN 0.0 END) + CASE WHEN ("lstat" &lt;= 9.53000020980835 AND "dis" &lt;= 2.64030015468597) THEN ((((((136.67 + "crim" * 7.2) + "nox" * -96.6) + "rm" * 1.1) + "tax" * -0.0033) + "ptratio" * -3.31) + "lstat" * -0.1) WHEN NOT ("lstat" &lt;= 9.53000020980835 AND "dis" &lt;= 2.64030015468597) THEN 0.0 END) / ((("nox" &gt; 0.668000012636185 + "lstat" &gt; 9.53000020980835 AND "nox" &lt;= 0.668000012636185) + "lstat" &lt;= 9.53000020980835) + "lstat" &lt;= 9.53000020980835 AND "dis" &lt;= 2.64030015468597)) / 3.0</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
