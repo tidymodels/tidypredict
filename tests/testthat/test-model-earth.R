@@ -17,7 +17,7 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 7)
@@ -34,7 +34,7 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   skip_if_not_installed("earth")
   # Regression - numeric predictors
   expect_false(

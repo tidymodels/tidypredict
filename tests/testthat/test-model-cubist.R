@@ -22,7 +22,7 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("Cubist")
 
   model <- Cubist::cubist(
@@ -44,7 +44,7 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   skip_if_not_installed("Cubist")
 
   model <- Cubist::cubist(

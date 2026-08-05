@@ -172,7 +172,7 @@ test_that("stumps are supported", {
   expect_equal(rep(fit, length(preds)), preds)
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("dbarts")
   skip_if_not_installed("yaml")
 

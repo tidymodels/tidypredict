@@ -19,7 +19,7 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
 
   model$coefficients <- round(model$coefficients, 7)
@@ -36,7 +36,7 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   mtcars$cyl <- paste0("cyl", mtcars$cyl)
   # family = gaussian
   expect_false(

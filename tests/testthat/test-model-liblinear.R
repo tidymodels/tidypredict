@@ -60,7 +60,7 @@ test_that("tidypredict_test agrees with predict()", {
   expect_false(tidypredict_test(model, df)$alert)
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("LiblineaR")
 
   df <- mtcars

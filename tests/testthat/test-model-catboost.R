@@ -1140,7 +1140,7 @@ test_that(".extract_catboost_trees errors on non-catboost model", {
 
 # YAML serialization tests ------------------------------------------------
 
-test_that("parsed model can be saved and loaded via YAML", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("catboost")
   skip_if_not_installed("yaml")
 

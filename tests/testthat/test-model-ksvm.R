@@ -79,7 +79,7 @@ test_that("works without predictor scaling", {
   expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("kernlab")
 
   set.seed(1)

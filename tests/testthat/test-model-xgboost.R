@@ -1312,7 +1312,7 @@ test_that("v1 parsed model with missing=TRUE on less op", {
 
 # YAML serialization tests ---------------------------------------------------
 
-test_that("parsed model can be saved and loaded via YAML", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("xgboost")
   skip_if_not_installed("yaml")
 

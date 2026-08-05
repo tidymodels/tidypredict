@@ -51,7 +51,7 @@ test_that("tidypredict_fit produces correct predictions", {
   expect_equal(fit_pred, original_pred)
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   skip_if_not_installed("ranger")
   skip_on_cran()
   skip_on_os("windows")

@@ -127,7 +127,7 @@ test_that("tidypredict_test.bagger max_rows and alert work", {
   expect_match(result$message, "Fitted records above the threshold")
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("baguette")
 
   model <- bagger_reg()
