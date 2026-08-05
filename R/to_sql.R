@@ -12,12 +12,7 @@
 #' @keywords internal
 #' @export
 tidypredict_sql <- function(model, con) {
-  f <- tidypredict_fit(model)
-  if (inherits(f, "call")) {
-    dbplyr::translate_sql(!!f, con = con)
-  } else {
-    map(f, ~ dbplyr::translate_sql(!!.x, con = con))
-  }
+  translate_fit(tidypredict_fit(model), con)
 }
 
 #' Returns a SQL query with formula to calculate predicted interval
@@ -36,10 +31,14 @@ tidypredict_sql <- function(model, con) {
 #' @keywords internal
 #' @export
 tidypredict_sql_interval <- function(model, con, interval = 0.95) {
-  f <- tidypredict_interval(model, interval)
+  translate_fit(tidypredict_interval(model, interval), con)
+}
+
+# Multiclass and multivariate models return a list of expressions rather than a
+# single one, so each element is translated separately.
+translate_fit <- function(f, con) {
   if (inherits(f, "call")) {
-    dbplyr::translate_sql(!!f, con = con)
-  } else {
-    map(f, ~ dbplyr::translate_sql(!!.x, con = con))
+    return(dbplyr::translate_sql(!!f, con = con))
   }
+  map(f, ~ dbplyr::translate_sql(!!.x, con = con))
 }

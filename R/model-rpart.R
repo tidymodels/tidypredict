@@ -274,12 +274,10 @@ rpart_classprob_tree_info <- function(model) {
   # Get tree structure
   tree_info <- rpart_tree_info_full(model)
 
-  res <- list()
-  for (i in seq_len(ncol(probs))) {
-    tree_info_copy <- tree_info
-    tree_info_copy$prediction <- unname(probs[, i])
-    res[[i]] <- tree_info_copy
-  }
+  res <- map(
+    seq_len(ncol(probs)),
+    ~ tree_info_with_predictions(tree_info, unname(probs[, .x]))
+  )
   names(res) <- ylevels
   res
 }

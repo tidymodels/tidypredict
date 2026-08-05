@@ -219,11 +219,9 @@ tidypredict_fit.party <- function(model, ...) {
 
   tree_info_full <- partykit_tree_info_full(model)
 
-  res <- list()
-  for (i in seq_len(ncol(preds))) {
-    tree_info_copy <- tree_info_full
-    tree_info_copy$prediction <- preds[, i]
-    res[[i]] <- generate_nested_case_when_tree(tree_info_copy)
-  }
-  res
+  map(seq_len(ncol(preds)), function(i) {
+    generate_nested_case_when_tree(
+      tree_info_with_predictions(tree_info_full, preds[, i])
+    )
+  })
 }

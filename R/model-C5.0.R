@@ -323,9 +323,7 @@ c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
   })
 
   res <- map(seq_along(classes), function(i) {
-    tree_info_copy <- tree_info
-    tree_info_copy$prediction <- map_dbl(probs, ~ .x[[i]])
-    tree_info_copy
+    tree_info_with_predictions(tree_info, map_dbl(probs, ~ .x[[i]]))
   })
   names(res) <- classes
   res
@@ -335,13 +333,14 @@ c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
 # leaf predicts `class` and 0 otherwise. Summed across trials this gives the
 # total confidence-weighted vote C5.0 assigns to `class`.
 c50_class_vote <- function(tree_info, class) {
-  value_info <- tree_info
-  value_info$prediction <- ifelse(
-    tree_info$terminal & tree_info$prediction == class,
-    tree_info$confidence,
-    0
-  )
-  generate_nested_case_when_tree(value_info)
+  generate_nested_case_when_tree(tree_info_with_predictions(
+    tree_info,
+    ifelse(
+      tree_info$terminal & tree_info$prediction == class,
+      tree_info$confidence,
+      0
+    )
+  ))
 }
 
 # Combine boosted trials by confidence-weighted voting. C5.0 predicts the class
