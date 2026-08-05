@@ -22,9 +22,14 @@ tidypredict_to_column <- function(
 ) {
   fit_model <- tidypredict_fit(model)
 
+  # Multiclass and multivariate models return one formula per outcome, and there
+  # is no single column to put them in.
   if (inherits(fit_model, "list")) {
     cli::cli_abort(
-      "{.fn tidypredict_to_column} does not support tree based models."
+      c(
+        "{.fn tidypredict_to_column} does not support models that return more than one formula.",
+        i = "Use {.fn tidypredict_fit} directly for these models."
+      )
     )
   }
 
