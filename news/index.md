@@ -26,6 +26,11 @@
   point. ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reports an unsupported model class with a message naming the
+  class, rather than R’s default “no applicable method” error.
+  ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now keeps small probabilities for models with a logit link, such as
   [`glm()`](https://rdrr.io/r/stats/glm.html) with `family = binomial`
   and
