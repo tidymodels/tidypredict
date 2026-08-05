@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 12)
   tf <- tidypredict_fit(model)
@@ -16,12 +17,13 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 7)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
@@ -32,80 +34,81 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
+  skip_if_not_installed("earth")
   # Regression - numeric predictors
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors, degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic, degree = 2),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors, degree = 3
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic, degree = 3),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors and categorical predictors
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "backwards"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "backward"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "non"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "none"),
       earth::etitanic
-    )
+    )$alert
   )
   # Regression - pmethod = "exhaustive"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "exhaustive"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "forward"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "forward"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "seqrep"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "seqrep"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ age + sibsp,
@@ -113,11 +116,11 @@ test_that("formulas produces correct predictions", {
         glm = list(family = binomial)
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - w/ degree
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ age + sibsp,
@@ -126,11 +129,11 @@ test_that("formulas produces correct predictions", {
         degree = 2
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "backwards"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -139,11 +142,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "backward"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "non"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -152,10 +155,10 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       earth::etitanic
-    )
+    )$alert
   )
   # binomial - pmethod = "exhaustive"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -164,11 +167,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "exhaustive"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "forward"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -177,11 +180,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "forward"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "seqrep"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -190,33 +193,33 @@ test_that("formulas produces correct predictions", {
         pmethod = "seqrep"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # formula interface
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         Sepal.Length ~ .,
         data = iris
       ),
       iris
-    )
+    )$alert
   )
 
   # XY interface
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         x = iris[, -1],
         y = iris$Sepal.Length
       ),
       iris
-    )
+    )$alert
   )
 
   # formula interface - degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         Sepal.Length ~ .,
@@ -225,11 +228,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       iris
-    )
+    )$alert
   )
 
   # XY interface - degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         x = iris[, -1],
@@ -238,11 +241,12 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       iris
-    )
+    )$alert
   )
 })
 
 test_that("probit link works (#194)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     survived ~ age + sibsp,
     data = earth::etitanic,
@@ -258,6 +262,7 @@ test_that("probit link works (#194)", {
 })
 
 test_that("cloglog link works (#194)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     survived ~ age + sibsp,
     data = earth::etitanic,
@@ -272,6 +277,7 @@ test_that("cloglog link works (#194)", {
 })
 
 test_that("Gamma family works (#195)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     mpg ~ cyl + disp + hp,
     data = mtcars,
@@ -286,6 +292,7 @@ test_that("Gamma family works (#195)", {
 })
 
 test_that("inverse.gaussian family works (#195)", {
+  skip_if_not_installed("earth")
   model <- earth::earth(
     mpg ~ cyl + disp + hp,
     data = mtcars,
@@ -302,12 +309,14 @@ test_that("inverse.gaussian family works (#195)", {
 # Tests for .extract_earth_multiclass()
 
 test_that(".extract_earth_multiclass errors on non-earth model", {
+  skip_if_not_installed("earth")
   model <- lm(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
 })
 
 test_that(".extract_earth_multiclass errors on binary model", {
+  skip_if_not_installed("earth")
   suppressWarnings(
     model <- earth::earth(
       vs ~ disp + hp,
@@ -320,12 +329,14 @@ test_that(".extract_earth_multiclass errors on binary model", {
 })
 
 test_that(".extract_earth_multiclass errors on regression model", {
+  skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
 
   expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
 })
 
 test_that(".extract_earth_multiclass returns correct structure", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"
@@ -349,6 +360,7 @@ test_that(".extract_earth_multiclass returns correct structure", {
 })
 
 test_that(".extract_earth_multiclass produces correct predictions", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"
@@ -380,6 +392,7 @@ test_that(".extract_earth_multiclass produces correct predictions", {
 })
 
 test_that(".extract_earth_multiclass works with degree > 1", {
+  skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
     "earth multiclass not available"

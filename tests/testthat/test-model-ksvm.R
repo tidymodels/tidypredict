@@ -79,7 +79,7 @@ test_that("works without predictor scaling", {
   expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("kernlab")
 
   set.seed(1)
@@ -91,7 +91,7 @@ test_that("Model can be saved and re-loaded", {
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp, precision = 22)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 

@@ -19,13 +19,13 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   model <- lm(am ~ wt + cyl, data = mtcars)
 
   model$coefficients <- round(model$coefficients, 7)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
@@ -36,47 +36,47 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   mtcars$cyl <- paste0("cyl", mtcars$cyl)
 
   # normal
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + am + cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # offset
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt, offset = am, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interaction
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + disp * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interaction
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + disp:cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ (wt + disp) * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 })
 
@@ -92,11 +92,11 @@ test_that("tidypredict works when variable names are subset of other variables",
     data = mtcars
   )
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       mtcars
-    )
+    )$alert
   )
 })
 

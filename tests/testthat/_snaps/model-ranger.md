@@ -5,17 +5,6 @@
     Output
       [1] "(case_when(hp <= 118 ~ case_when(cyl <= 5 ~ 26.7, .default = 21.1333333333333), \n    .default = case_when(hp <= 205 ~ 17.48, .default = 14.5416666666667)) + \n    case_when(hp <= 80.5 ~ 32.2333333333333, .default = case_when(hp <= \n        118 ~ 21.9545454545455, .default = 16.5722222222222)) + \n    case_when(disp <= 101.55 ~ 31.9, .default = case_when(cyl <= \n        7 ~ 20.8384615384615, .default = 14.8785714285714)))/3"
 
-# formulas produces correct predictions
-
-    Code
-      tidypredict_test(ranger::ranger(mpg ~ ., data = mtcars, num.trees = 3,
-      max.depth = 2, seed = 100, num.threads = 2), mtcars)
-    Output
-      tidypredict test results
-      Difference threshold: 1e-12
-      
-       All results are within the difference threshold
-
 # classification models error with clear message (#191)
 
     Code

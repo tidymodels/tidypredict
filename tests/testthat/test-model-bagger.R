@@ -108,8 +108,8 @@ test_that("produced case_when uses .default", {
 test_that("formulas produce correct predictions", {
   skip_if_not_installed("baguette")
 
-  expect_snapshot(tidypredict_test(bagger_reg(), mtcars))
-  expect_snapshot(tidypredict_test(bagger_cls(), iris))
+  expect_false(tidypredict_test(bagger_reg(), mtcars)$alert)
+  expect_false(tidypredict_test(bagger_cls(), iris)$alert)
 })
 
 test_that("tidypredict_test.bagger max_rows and alert work", {
@@ -127,11 +127,11 @@ test_that("tidypredict_test.bagger max_rows and alert work", {
   expect_match(result$message, "Fitted records above the threshold")
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   skip_if_not_installed("baguette")
 
   model <- bagger_reg()
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 
@@ -146,7 +146,7 @@ test_that("Classification model can be saved and re-loaded", {
   skip_if_not_installed("baguette")
 
   model <- bagger_cls()
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 
@@ -299,7 +299,7 @@ test_that("C5.0 base models return the right output", {
   expect_equal(pm$general$classes, levels(iris$Species))
   expect_length(pm$tree_info_list, 3)
 
-  expect_snapshot(tidypredict_test(model, iris))
+  expect_false(tidypredict_test(model, iris)$alert)
 })
 
 test_that("tidypredict_fit matches predict() - C5.0 base model", {
@@ -371,7 +371,7 @@ test_that("C5.0 model can be saved and re-loaded", {
   skip_if_not_installed("C50")
 
   model <- bagger_c50()
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(parse_model(model), mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 

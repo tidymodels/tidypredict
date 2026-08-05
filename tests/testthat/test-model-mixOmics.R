@@ -41,7 +41,7 @@ test_that("predictions match native predict", {
     rlang::eval_tidy(tidypredict_fit(model), mtcars),
     mixomics_native(model, x)
   )
-  expect_snapshot(tidypredict_test(model, mtcars))
+  expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
 test_that("all values of ncomp are handled", {
@@ -171,7 +171,7 @@ test_that("model can be saved and re-loaded", {
   model <- mixOmics::pls(mixomics_x(), mtcars$mpg, ncomp = 2)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 

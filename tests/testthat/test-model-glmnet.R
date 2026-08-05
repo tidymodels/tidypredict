@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
   tf <- tidypredict_fit(model)
@@ -16,11 +17,12 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
@@ -31,33 +33,35 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
+  skip_if_not_installed("glmnet")
   # gaussian
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -1], mtcars$mpg, family = "gaussian", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 
   # binomial
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "binomial", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 
   # poisson
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "poisson", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 })
 
 test_that("family function syntax works (#197)", {
+  skip_if_not_installed("glmnet")
   x <- as.matrix(mtcars[, -1])
 
   # gaussian()
@@ -74,6 +78,7 @@ test_that("family function syntax works (#197)", {
 })
 
 test_that("family string syntax works (#197)", {
+  skip_if_not_installed("glmnet")
   x <- as.matrix(mtcars[, -1])
 
   # "gaussian"
@@ -90,6 +95,7 @@ test_that("family string syntax works (#197)", {
 })
 
 test_that("errors if more than 1 penalty is selected", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg)
 
   expect_snapshot(
@@ -106,6 +112,7 @@ test_that("errors if more than 1 penalty is selected", {
 })
 
 test_that("glmnet are handeld neatly with parsnip", {
+  skip_if_not_installed("glmnet")
   spec <- parsnip::linear_reg(engine = "glmnet", penalty = 1)
 
   model <- parsnip::fit(spec, mpg ~ ., mtcars)
@@ -126,6 +133,7 @@ test_that("glmnet are handeld neatly with parsnip", {
 })
 
 test_that("Gamma family works (#200)", {
+  skip_if_not_installed("glmnet")
   x <- as.matrix(mtcars[, -1])
   model <- glmnet::glmnet(x, mtcars$mpg, family = Gamma(), lambda = 0.5)
 
@@ -137,6 +145,7 @@ test_that("Gamma family works (#200)", {
 })
 
 test_that("Cox family works (#201)", {
+  skip_if_not_installed("glmnet")
   skip_if_not_installed("survival")
   x <- as.matrix(mtcars[, -c(1, 8)])
   y <- survival::Surv(mtcars$mpg, mtcars$vs)
@@ -156,6 +165,7 @@ test_that("Cox family works (#201)", {
 })
 
 test_that("multinomial family is supported (#198)", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -187,6 +197,7 @@ test_that("multinomial family is supported (#198)", {
 })
 
 test_that("multinomial model can be saved and re-loaded", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -195,7 +206,7 @@ test_that("multinomial model can be saved and re-loaded", {
   )
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   pm <- as_parsed_model(yaml::read_yaml(mp))
 
@@ -206,6 +217,7 @@ test_that("multinomial model can be saved and re-loaded", {
 })
 
 test_that("multinomial errors with multiple penalties", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -216,6 +228,7 @@ test_that("multinomial errors with multiple penalties", {
 })
 
 test_that("tidypredict_test errors for multinomial models", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -227,6 +240,7 @@ test_that("tidypredict_test errors for multinomial models", {
 })
 
 test_that("multinomial is handled with parsnip", {
+  skip_if_not_installed("glmnet")
   spec <- parsnip::multinom_reg(engine = "glmnet", penalty = 0.05)
   model <- parsnip::fit(spec, Species ~ ., iris)
 
@@ -242,6 +256,7 @@ test_that("multinomial is handled with parsnip", {
 })
 
 test_that("multinomial SQL translation works", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -256,6 +271,7 @@ test_that("multinomial SQL translation works", {
 })
 
 test_that("mgaussian family errors with helpful message (#199)", {
+  skip_if_not_installed("glmnet")
   x <- as.matrix(mtcars[, -c(1, 4)])
   y <- cbind(mtcars$mpg, mtcars$hp)
   model <- glmnet::glmnet(x, y, family = "mgaussian", lambda = 0.5)
@@ -266,6 +282,7 @@ test_that("mgaussian family errors with helpful message (#199)", {
 # Tests for .extract_glmnet_multiclass()
 
 test_that(".extract_glmnet_multiclass returns correct structure", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -282,12 +299,14 @@ test_that(".extract_glmnet_multiclass returns correct structure", {
 })
 
 test_that(".extract_glmnet_multiclass errors on non-multnet model", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
   expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
 })
 
 test_that(".extract_glmnet_multiclass errors with multiple penalties", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -298,6 +317,7 @@ test_that(".extract_glmnet_multiclass errors with multiple penalties", {
 })
 
 test_that(".extract_glmnet_multiclass works with explicit penalty", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -311,6 +331,7 @@ test_that(".extract_glmnet_multiclass works with explicit penalty", {
 })
 
 test_that(".extract_glmnet_multiclass handles sparse coefficients", {
+  skip_if_not_installed("glmnet")
   # High penalty should zero out many coefficients
 
   model <- glmnet::glmnet(
@@ -327,6 +348,7 @@ test_that(".extract_glmnet_multiclass handles sparse coefficients", {
 })
 
 test_that(".extract_glmnet_multiclass produces correct predictions", {
+  skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
@@ -356,18 +378,21 @@ test_that(".extract_glmnet_multiclass produces correct predictions", {
 # Tests for .build_linear_pred()
 
 test_that(".build_linear_pred handles intercept only", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred("(Intercept)", 5.5)
 
   expect_equal(result, "5.5")
 })
 
 test_that(".build_linear_pred handles single predictor", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(c("(Intercept)", "x"), c(1.5, 2.0))
 
   expect_equal(result, "1.5 + (`x` * 2)")
 })
 
 test_that(".build_linear_pred handles multiple predictors", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "x", "y"),
     c(1.0, 2.0, 3.0)
@@ -377,6 +402,7 @@ test_that(".build_linear_pred handles multiple predictors", {
 })
 
 test_that(".build_linear_pred skips zero coefficients", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "x", "y", "z"),
     c(1.0, 0.0, 2.0, 0.0)
@@ -386,6 +412,7 @@ test_that(".build_linear_pred skips zero coefficients", {
 })
 
 test_that(".build_linear_pred returns '0' when all coefficients are zero", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "x", "y"),
     c(0, 0, 0)
@@ -395,6 +422,7 @@ test_that(".build_linear_pred returns '0' when all coefficients are zero", {
 })
 
 test_that(".build_linear_pred handles negative coefficients", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "x"),
     c(-1.5, -2.0)
@@ -404,6 +432,7 @@ test_that(".build_linear_pred handles negative coefficients", {
 })
 
 test_that(".build_linear_pred handles special characters in variable names", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "var with space", "var.with.dots"),
     c(1.0, 2.0, 3.0)
@@ -413,12 +442,14 @@ test_that(".build_linear_pred handles special characters in variable names", {
 })
 
 test_that(".build_linear_pred handles no intercept", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(c("x", "y"), c(2.0, 3.0))
 
   expect_equal(result, "(`x` * 2) + (`y` * 3)")
 })
 
 test_that(".build_linear_pred handles zero intercept", {
+  skip_if_not_installed("glmnet")
   result <- .build_linear_pred(
     c("(Intercept)", "x"),
     c(0, 2.0)

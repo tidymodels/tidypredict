@@ -8,11 +8,11 @@ test_that("works with parsnip model specification", {
     data = etitanic_fac
   )
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       df = etitanic_fac
-    )
+    )$alert
   )
 
   # Regression
@@ -22,11 +22,11 @@ test_that("works with parsnip model specification", {
     data = etitanic
   )
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       df = etitanic_fac
-    )
+    )$alert
   )
 })
 
@@ -46,7 +46,7 @@ test_that("works with decision_tree() and the C5.0 engine", {
 
   expect_type(tidypredict_fit(model), "language")
   expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
-  expect_snapshot(tidypredict_test(model, df = df))
+  expect_false(tidypredict_test(model, df = df)$alert)
 })
 
 test_that("works with C5_rules() and the C5.0 engine", {
@@ -65,7 +65,7 @@ test_that("works with C5_rules() and the C5.0 engine", {
 
   expect_type(tidypredict_fit(model), "language")
   expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
-  expect_snapshot(tidypredict_test(model, df = iris))
+  expect_false(tidypredict_test(model, df = iris)$alert)
 })
 
 test_that("works with boost_tree() and the C5.0 engine", {
@@ -82,7 +82,7 @@ test_that("works with boost_tree() and the C5.0 engine", {
 
   expect_type(tidypredict_fit(model), "language")
   expect_s3_class(tidypredict_sql(model, dbplyr::simulate_dbi()), "sql")
-  expect_snapshot(tidypredict_test(model, df = iris))
+  expect_false(tidypredict_test(model, df = iris)$alert)
 })
 
 test_that("works with boost_tree() and the h2o_gbm engine", {
@@ -146,9 +146,7 @@ test_that("works with linear_reg() and the glm engine", {
 
   expect_type(tidypredict_fit(model), "language")
 
-  expect_snapshot(
-    tidypredict_test(model, df = mtcars)
-  )
+  expect_false(tidypredict_test(model, df = mtcars)$alert)
 })
 
 test_that("works with logistic_reg() and the LiblineaR engine", {
@@ -267,7 +265,7 @@ test_that("works with decision_tree() and the rpart engine", {
 
   expect_type(tidypredict_fit(reg), "language")
   expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
-  expect_snapshot(tidypredict_test(reg, df = mtcars))
+  expect_false(tidypredict_test(reg, df = mtcars)$alert)
 
   # Classification
   df <- mtcars
@@ -301,7 +299,7 @@ test_that("works with rand_forest() and the partykit engine", {
 
   expect_type(tidypredict_fit(reg), "language")
   expect_s3_class(tidypredict_sql(reg, dbplyr::simulate_dbi()), "sql")
-  expect_snapshot(tidypredict_test(reg, df = mtcars))
+  expect_false(tidypredict_test(reg, df = mtcars)$alert)
 
   # Classification is not supported
   cls <- parsnip::fit(
@@ -366,9 +364,7 @@ test_that("works with linear_reg() and the quantreg engine", {
 
   expect_type(tidypredict_fit(model), "language")
 
-  expect_snapshot(
-    tidypredict_test(model, df = mtcars)
-  )
+  expect_false(tidypredict_test(model, df = mtcars)$alert)
 })
 
 test_that("works with rule_fit() and the xrf engine", {

@@ -19,7 +19,7 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   set.seed(1234)
 
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
@@ -31,15 +31,15 @@ test_that("Model can be saved and re-loaded", {
   expect_equal(fit_pred, as.vector(original_pred))
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   set.seed(1234)
 
   # regression
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3),
       mtcars,
-    )
+    )$alert
   )
 })
 

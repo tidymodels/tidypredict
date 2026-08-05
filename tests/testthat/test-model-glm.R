@@ -19,13 +19,13 @@ test_that("returns the right output", {
   )
 })
 
-test_that("Model can be saved and re-loaded", {
+test_that("model can be saved and re-loaded", {
   model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
 
   model$coefficients <- round(model$coefficients, 7)
 
   pm <- parse_model(model)
-  mp <- tempfile(fileext = ".yml")
+  mp <- withr::local_tempfile(fileext = ".yml")
   yaml::write_yaml(pm, mp)
   l <- yaml::read_yaml(mp)
   pm <- as_parsed_model(l)
@@ -36,49 +36,52 @@ test_that("Model can be saved and re-loaded", {
   )
 })
 
-test_that("formulas produces correct predictions", {
+test_that("formulas produce correct predictions", {
   mtcars$cyl <- paste0("cyl", mtcars$cyl)
   # family = gaussian
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glm(am ~ wt + cyl + disp, data = mtcars, family = "gaussian"),
       mtcars
-    )
+    )$alert
   )
   # family = binomial
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glm(am ~ wt + cyl + disp, data = mtcars, family = "binomial"),
       mtcars
-    )
+    )$alert
   )
   # family = gaussian, with interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glm(am ~ wt * cyl + disp, data = mtcars, family = "gaussian"),
       mtcars
-    )
+    )$alert
   )
-  # family = binomial, with interactions
-  expect_snapshot(
-    tidypredict_test(
-      glm(am ~ wt * cyl + disp, data = mtcars, family = "binomial"),
-      mtcars
-    )
+  # family = binomial, with interactions. This fit separates the data, so glm
+  # warns about fitted probabilities of 0 or 1; the agreement still holds.
+  expect_false(
+    suppressWarnings(
+      tidypredict_test(
+        glm(am ~ wt * cyl + disp, data = mtcars, family = "binomial"),
+        mtcars
+      )
+    )$alert
   )
   # family = gaussian, with interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glm(am ~ wt:cyl + disp, data = mtcars, family = "gaussian"),
       mtcars
-    )
+    )$alert
   )
   # family = binomial, with interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glm(am ~ wt:cyl + disp, data = mtcars, family = "binomial"),
       mtcars
-    )
+    )$alert
   )
 })
 
@@ -95,11 +98,11 @@ test_that("tidypredict works when variable names are subset of other variables",
     family = "binomial"
   ))
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       mtcars
-    )
+    )$alert
   )
 })
 

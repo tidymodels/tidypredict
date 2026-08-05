@@ -5,16 +5,6 @@
     Output
       [1] "(37.2 + hp * -0.0318 + wt * -3.88 + (ifelse(disp > 95.1000022888184, \n    14.89 + hp * -0.0406 + drat * 2.4, 0) + ifelse(disp <= 95.1000022888184, \n    33.06, 0))/((disp > 95.1000022888184) + (disp <= 95.1000022888184)) + \n    (37.26 + wt * -5.28))/3"
 
-# formulas produces correct predictions
-
-    Code
-      tidypredict_test(model, non_split_data, threshold = 1e-05)
-    Output
-      tidypredict test results
-      Difference threshold: 1e-05
-      
-       All results are within the difference threshold
-
 # prediction intervals are not supported
 
     Code
