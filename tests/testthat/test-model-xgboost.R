@@ -1,7 +1,11 @@
 # Helper to create test model
-# Uses mtcars[, -9] (all columns except 'am') to avoid boundary issues
-# This matches the original test setup and avoids floating point precision
-# issues at exact split boundaries
+#
+# Uses mtcars[, -9], every column except `am`, because `am` is the label.
+#
+# This does not avoid split boundaries: xgboost picks 3.19 as a `wt` threshold
+# here, which is exactly an observed value, and comparing it in doubles rather
+# than 32-bit floats used to route two rows down the wrong branch. See the
+# f32 tests below.
 make_xgb_model <- function(
   max_depth = 2L,
   nrounds = 4L,

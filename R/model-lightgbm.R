@@ -425,11 +425,7 @@ build_lgb_linear_prediction <- function(linear) {
     feat <- as.name(fn)
     expr(is.na(!!feat))
   })
-  any_na <- if (length(na_checks) == 1) {
-    na_checks[[1]]
-  } else {
-    reduce_or(na_checks)
-  }
+  any_na <- reduce_or(na_checks)
 
   # If any feature is NA, use fallback; otherwise use linear formula
   expr(ifelse(!!any_na, !!fallback, !!linear_formula))

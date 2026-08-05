@@ -1783,14 +1783,15 @@ test_that("parsed model can be saved and loaded via YAML", {
   l <- yaml::read_yaml(mp)
   pm_loaded <- as_parsed_model(l)
 
-  fit_original <- tidypredict_fit(pm)
   fit_loaded <- tidypredict_fit(pm_loaded)
 
   test_df <- as.data.frame(X)
-  preds_original <- dplyr::mutate(test_df, pred = !!fit_original)$pred
   preds_loaded <- dplyr::mutate(test_df, pred = !!fit_loaded)$pred
 
-  expect_equal(preds_original, preds_loaded, tolerance = 1e-6)
+  # Against lightgbm's own predictions, not against the un-serialized parsed
+  # model, so that a round-trip which loses information cannot agree with an
+  # equally broken original.
+  expect_equal(preds_loaded, unname(predict(model, X)), tolerance = 1e-6)
 })
 
 test_that("parsed multiclass model can be saved and loaded via YAML", {
