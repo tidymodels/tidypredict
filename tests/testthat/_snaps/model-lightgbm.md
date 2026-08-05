@@ -3,7 +3,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_from_parsed()`:
+      Error in `assemble_lgb_formula()`:
       ! Unsupported objective: "unsupported_objective".
       i Supported objectives: "regression", "regression_l2", "regression_l1", "huber", "fair", "quantile", "mape", "poisson", "gamma", "tweedie", "binary", "cross_entropy", "multiclass", and "multiclassova".
 
@@ -12,7 +12,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_from_parsed()`:
+      Error in `assemble_lgb_formula()`:
       ! Model has no trees.
 
 # multiclass with num_class < 2 throws error
@@ -20,7 +20,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_multiclass_from_parsed()`:
+      Error in `assemble_lgb_formula()`:
       ! Multiclass model must have num_class >= 2.
 
 # multiclass with NULL num_class throws error
@@ -28,7 +28,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_lgb_multiclass_from_parsed()`:
+      Error in `assemble_lgb_formula()`:
       ! Multiclass model must have num_class >= 2.
 
 # build_lgb_nested_condition errors on unknown type

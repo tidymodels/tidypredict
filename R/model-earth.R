@@ -1,10 +1,4 @@
 #' @export
-tidypredict_fit.earth <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula(parsedmodel)
-}
-
-#' @export
 parse_model.earth <- function(model) {
   is_glm <- !is.null(model$glm.list)
 

@@ -150,3 +150,7 @@ make_committee <- function(rules, paths) {
   }
   res
 }
+
+build_tree_formula.pm_tree_cubist <- function(model) {
+  tidypredict_fit_cubist(model)
+}

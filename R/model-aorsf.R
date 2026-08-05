@@ -115,3 +115,7 @@ tidypredict_fit.ObliqueForest <- function(model, ...) {
 
   expr_mean(tree_exprs, n_trees)
 }
+
+build_tree_formula.pm_tree_aorsf <- function(model) {
+  build_tree_formula_forest(model)
+}

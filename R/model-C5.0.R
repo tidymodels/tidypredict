@@ -323,9 +323,7 @@ c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
   })
 
   res <- map(seq_along(classes), function(i) {
-    tree_info_copy <- tree_info
-    tree_info_copy$prediction <- map_dbl(probs, ~ .x[[i]])
-    tree_info_copy
+    tree_info_with_predictions(tree_info, map_dbl(probs, ~ .x[[i]]))
   })
   names(res) <- classes
   res
@@ -335,13 +333,14 @@ c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
 # leaf predicts `class` and 0 otherwise. Summed across trials this gives the
 # total confidence-weighted vote C5.0 assigns to `class`.
 c50_class_vote <- function(tree_info, class) {
-  value_info <- tree_info
-  value_info$prediction <- ifelse(
-    tree_info$terminal & tree_info$prediction == class,
-    tree_info$confidence,
-    0
-  )
-  generate_nested_case_when_tree(value_info)
+  generate_nested_case_when_tree(tree_info_with_predictions(
+    tree_info,
+    ifelse(
+      tree_info$terminal & tree_info$prediction == class,
+      tree_info$confidence,
+      0
+    )
+  ))
 }
 
 # Combine boosted trials by confidence-weighted voting. C5.0 predicts the class
@@ -534,4 +533,16 @@ parse_model.C5.0 <- function(model) {
 #' @export
 .c50_tree_info_full <- function(model) {
   c50_tree_info_full(model)
+}
+
+# C5.0 has three shapes: a rule set, a boosted sequence of trees, and a single
+# tree.
+build_tree_formula.pm_tree_C5.0 <- function(model) {
+  if (!is.null(model$rules_info)) {
+    return(c50_rules_case_when(model$rules_info))
+  }
+  if (!is.null(model$tree_info_list)) {
+    return(c50_boosted_case_when(model$tree_info_list, model$classes))
+  }
+  build_tree_formula_single(model)
 }

@@ -6,6 +6,8 @@
 
 - `tidypredict_fit()` now uses a strict inequality (`<`) for the continuous splits of `rpart::rpart()` models, matching how `rpart` assigns values that are exactly equal to a cut point. (#232)
 
+- `tidypredict_fit()` now reports an unsupported model class with a message naming the class, rather than R's default "no applicable method" error. (#232)
+
 - `tidypredict_fit()` now keeps small probabilities for models with a logit link, such as `glm()` with `family = binomial` and `LiblineaR::LiblineaR()`. The inverse link was written in a form that rounded to exactly 0 once the linear predictor fell below about -37. (#232)
 
 - Added support for `dbarts::bart()` Bayesian additive regression trees, including `bart()` parsnip models fitted with the `"dbarts"` engine. The model has to be fit with `keeptrees = TRUE`, and only continuous outcomes are supported since binary outcomes are fit with a probit link. (#232)

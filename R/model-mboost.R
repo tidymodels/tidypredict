@@ -84,3 +84,11 @@ tidypredict_fit.blackboost <- function(model, ...) {
   comps <- mboost_components(model)
   mboost_build_formula(comps$tree_info_list, comps$nu, comps$offset)
 }
+
+build_tree_formula.pm_tree_blackboost <- function(model) {
+  mboost_build_formula(
+    model$tree_info_list,
+    model$general$nu,
+    model$general$offset
+  )
+}

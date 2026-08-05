@@ -48,6 +48,13 @@ generate_nested_case_when_tree <- function(tree_info) {
   build_nested_node(0L, tree_info)
 }
 
+# Restate one tree's structure with different leaf values, as classification
+# models do when they need one tree per class out of a single fitted tree.
+tree_info_with_predictions <- function(tree_info, prediction) {
+  tree_info$prediction <- prediction
+  tree_info
+}
+
 #' Build a nested case_when expression for a single node
 #'
 #' @param node_id The node ID to build (0-indexed)

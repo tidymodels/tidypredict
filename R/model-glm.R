@@ -1,11 +1,5 @@
 # Predict ---------------------------------------
 
-#' @export
-tidypredict_fit.glm <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula(parsedmodel)
-}
-
 # Parse model --------------------------------------
 
 #' @export
