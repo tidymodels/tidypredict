@@ -1,11 +1,5 @@
 # Predict ---------------------------------------
 
-#' @export
-tidypredict_fit.LiblineaR <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula(parsedmodel)
-}
-
 # Parse model --------------------------------------
 
 #' @export

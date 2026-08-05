@@ -11,26 +11,6 @@ sparsediscrim_classes <- c(
 
 # Predict ---------------------------------------
 
-#' @export
-tidypredict_fit.lda_diag <- function(model) {
-  build_fit_formula_multinom(parse_model(model))
-}
-
-#' @export
-tidypredict_fit.lda_shrink_mean <- function(model) {
-  build_fit_formula_multinom(parse_model(model))
-}
-
-#' @export
-tidypredict_fit.lda_shrink_cov <- function(model) {
-  build_fit_formula_multinom(parse_model(model))
-}
-
-#' @export
-tidypredict_fit.lda_emp_bayes_eigen <- function(model) {
-  build_fit_formula_multinom(parse_model(model))
-}
-
 # Parse model --------------------------------------
 
 #' @export

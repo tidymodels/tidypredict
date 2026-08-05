@@ -1,11 +1,5 @@
 # Predict ---------------------------------------
 
-#' @export
-tidypredict_fit.lm <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula(parsedmodel)
-}
-
 build_fit_formula <- function(parsedmodel) {
   f <- build_linear_predictor(parsedmodel$terms)
 

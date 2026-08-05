@@ -39,3 +39,15 @@ test_that("tidypredict_fit.pm_tree works for v2 randomForest (backwards compat)"
   fit <- tidypredict_fit(pm)
   expect_type(fit, "language")
 })
+
+test_that("tidypredict_fit() errors for a model class it has no parser for", {
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_fit(structure(list(), class = "made_up_model"))
+  )
+})
+
+test_that("tidypredict_fit() errors for a parsed model type with no builder", {
+  pm <- as_parsed_model(list(general = list(type = "made_up")))
+  expect_snapshot(error = TRUE, tidypredict_fit(pm))
+})

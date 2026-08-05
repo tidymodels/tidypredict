@@ -1,9 +1,10 @@
 # Predict ---------------------------------------
 
+# `multinom` objects also inherit from `nnet`, so this cannot fall through to
+# `tidypredict_fit.default()`: it would reach the nnet method instead.
 #' @export
 tidypredict_fit.multinom <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula_multinom(parsedmodel)
+  tidypredict_fit(parse_model(model))
 }
 
 # Parse model --------------------------------------

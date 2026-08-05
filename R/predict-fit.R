@@ -19,6 +19,34 @@ tidypredict_fit.pm_regression <- function(model) {
   build_fit_formula(model)
 }
 
+# Most models have nothing to do beyond parsing, because the parsed model's own
+# `pm_*` class already selects the right builder. Dispatching on the parsed
+# class rather than the fitted one keeps that in one place.
+#' @export
+tidypredict_fit.default <- function(model) {
+  if (inherits(model, "parsed_model")) {
+    # Parsing again would recurse forever, so a parsed model arriving here means
+    # its type has no builder registered.
+    cli::cli_abort(
+      "Parsed models of type {.val {model$general$type}} are not supported.",
+      .internal = TRUE
+    )
+  }
+
+  has_parser <- any(map_lgl(
+    class(model),
+    ~ !is.null(utils::getS3method("parse_model", .x, optional = TRUE))
+  ))
+
+  if (!has_parser) {
+    cli::cli_abort(
+      "Models of class {.cls {class(model)[[1]]}} are not supported."
+    )
+  }
+
+  tidypredict_fit(parse_model(model))
+}
+
 #' @export
 tidypredict_fit.pm_tree <- function(model) {
   version <- model$general$version %||% 1

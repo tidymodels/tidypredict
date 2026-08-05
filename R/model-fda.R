@@ -1,11 +1,5 @@
 # Predict ---------------------------------------
 
-#' @export
-tidypredict_fit.fda <- function(model) {
-  parsedmodel <- parse_model(model)
-  build_fit_formula_multinom(parsedmodel)
-}
-
 # Parse model --------------------------------------
 
 #' @export
