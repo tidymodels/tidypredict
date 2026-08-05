@@ -269,3 +269,33 @@ test_that(".extract_rf_trees produces correct predictions when averaged", {
 
   expect_equal(avg_pred, native)
 })
+
+test_that("parsed models use the right split variable at every node (#232)", {
+  skip_if_not_installed("randomForest")
+  set.seed(123)
+  model <- randomForest::randomForest(mpg ~ wt + cyl, data = mtcars, ntree = 5)
+
+  # Leaves report a split variable of 0, and indexing the term labels with a 0
+  # used to shorten the vector, misaligning every split name after the first
+  # leaf. The direct builder was unaffected, so only the parsed path was wrong.
+  pm <- as_parsed_model(parse_model(model))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    unname(predict(model, mtcars))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  )
+})
+
+test_that("parsed model leaf values carry no names", {
+  skip_if_not_installed("randomForest")
+  set.seed(123)
+  model <- randomForest::randomForest(mpg ~ wt + cyl, data = mtcars, ntree = 2)
+
+  info <- rf_tree_info_full(model, 1, names(model$forest$ncat))
+  expect_null(names(info$prediction))
+  expect_null(names(info$splitvarName))
+})
