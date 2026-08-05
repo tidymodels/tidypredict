@@ -26,21 +26,24 @@ rf_tree_info_full <- function(model, tree_no, term_labels) {
 
   # randomForest uses 1-indexed nodes, convert to 0-indexed
   # Also convert child IDs to 0-indexed (or NA for leaves)
-  left_child <- tree[, "left daughter"]
-  right_child <- tree[, "right daughter"]
+  # `getTree()` names its rows, and those names would otherwise ride along into
+  # the generated leaf values.
+  left_child <- unname(tree[, "left daughter"])
+  right_child <- unname(tree[, "right daughter"])
   left_child <- ifelse(left_child == 0, NA_integer_, left_child - 1L)
   right_child <- ifelse(right_child == 0, NA_integer_, right_child - 1L)
 
-  terminal <- tree[, "status"] == -1
-  prediction <- ifelse(terminal, tree[, "prediction"], NA_real_)
+  terminal <- unname(tree[, "status"]) == -1
+  prediction <- ifelse(terminal, unname(tree[, "prediction"]), NA_real_)
 
-  # Build split var names
-  split_var_idx <- tree[, "split var"]
-  splitvarName <- ifelse(
-    split_var_idx == 0,
-    NA_character_,
-    term_labels[split_var_idx]
-  )
+  # Build split var names. Leaves report a split variable of 0, and indexing
+  # `term_labels` with a 0 drops the element rather than yielding an NA, so the
+  # subset has to be assigned by position: `ifelse()` over a shortened vector
+  # silently misaligns every name after the first leaf.
+  split_var_idx <- unname(tree[, "split var"])
+  splitvarName <- rep(NA_character_, n_nodes)
+  has_split <- split_var_idx != 0
+  splitvarName[has_split] <- term_labels[split_var_idx[has_split]]
 
   # Build node_splits list
   node_splits <- vector("list", n_nodes)

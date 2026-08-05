@@ -6,6 +6,10 @@
 
 - `tidypredict_fit()` now uses a strict inequality (`<`) for the continuous splits of `rpart::rpart()` models, matching how `rpart` assigns values that are exactly equal to a cut point. (#232)
 
+- `tidypredict_fit()` now returns correct predictions for `randomForest::randomForest()` models that have been saved and reloaded with `parse_model()` and `as_parsed_model()`. Every split variable after the first leaf in a tree was named incorrectly, so the reloaded model split on the wrong columns. (#232)
+
+- `tidypredict_fit()` now returns correct predictions for `Cubist::cubist()` models whose predictor values fall exactly on a split threshold. Cubist compares split thresholds as 32-bit floats, so a `disp` of 95.1 was sent down the wrong branch when the comparison was made in R's doubles. (#232)
+
 - `tidypredict_test()` now supports `C50::C5.0()` models, including boosted and rule-based ones. (#232)
 
 - `tidypredict_interval()` now honours its `interval` argument. It was hardcoded to 0.95, so `tidypredict_interval()`, `tidypredict_to_column(add_interval = TRUE)`, and `tidypredict_sql_interval()` all returned a 95% interval regardless of what was asked for. (#232)
