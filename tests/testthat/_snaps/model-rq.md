@@ -5,19 +5,6 @@
     Output
       [1] "38.8714285714286 + (wt * -2.67857142857143) + (cyl * -1.74285714285714)"
 
-# formulas produces correct predictions
-
-    Code
-      tidypredict_test(quantreg::rq(mpg ~ wt + cyl + disp, data = mtcars), mtcars)
-    Condition
-      Warning in `rq.fit.br()`:
-      Solution may be nonunique
-    Output
-      tidypredict test results
-      Difference threshold: 1e-12
-      
-       All results are within the difference threshold
-
 # returns one expression per quantile for multiple quantiles
 
     Code

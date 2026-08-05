@@ -22,11 +22,14 @@ test_that("formulas produces correct predictions", {
   skip_if_not_installed("quantreg")
 
   mtcars$cyl <- paste0("cyl", mtcars$cyl)
-  expect_snapshot(
-    tidypredict_test(
-      quantreg::rq(mpg ~ wt + cyl + disp, data = mtcars),
-      mtcars
-    )
+  # quantreg warns that the solution may be nonunique for this fit
+  expect_false(
+    suppressWarnings(
+      tidypredict_test(
+        quantreg::rq(mpg ~ wt + cyl + disp, data = mtcars),
+        mtcars
+      )
+    )$alert
   )
 })
 

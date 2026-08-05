@@ -40,43 +40,43 @@ test_that("formulas produces correct predictions", {
   mtcars$cyl <- paste0("cyl", mtcars$cyl)
 
   # normal
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + am + cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # offset
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt, offset = am, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interaction
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + disp * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interaction
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ wt + disp:cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       lm(mpg ~ (wt + disp) * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 })
 
@@ -92,11 +92,11 @@ test_that("tidypredict works when variable names are subset of other variables",
     data = mtcars
   )
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       mtcars
-    )
+    )$alert
   )
 })
 

@@ -37,78 +37,78 @@ test_that("Model can be saved and re-loaded", {
 test_that("formulas produces correct predictions", {
   skip_if_not_installed("earth")
   # Regression - numeric predictors
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors, degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic, degree = 2),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors, degree = 3
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ sibsp + parch, data = earth::etitanic, degree = 3),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - numeric predictors and categorical predictors
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "backwards"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "backward"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "non"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "none"),
       earth::etitanic
-    )
+    )$alert
   )
   # Regression - pmethod = "exhaustive"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "exhaustive"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "forward"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "forward"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # Regression - pmethod = "seqrep"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(age ~ ., data = earth::etitanic, pmethod = "seqrep"),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ age + sibsp,
@@ -116,11 +116,11 @@ test_that("formulas produces correct predictions", {
         glm = list(family = binomial)
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - w/ degree
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ age + sibsp,
@@ -129,11 +129,11 @@ test_that("formulas produces correct predictions", {
         degree = 2
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "backwards"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -142,11 +142,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "backward"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "non"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -155,10 +155,10 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       earth::etitanic
-    )
+    )$alert
   )
   # binomial - pmethod = "exhaustive"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -167,11 +167,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "exhaustive"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "forward"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -180,11 +180,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "forward"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # binomial - pmethod = "seqrep"
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         survived ~ .,
@@ -193,33 +193,33 @@ test_that("formulas produces correct predictions", {
         pmethod = "seqrep"
       ),
       earth::etitanic
-    )
+    )$alert
   )
 
   # formula interface
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         Sepal.Length ~ .,
         data = iris
       ),
       iris
-    )
+    )$alert
   )
 
   # XY interface
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         x = iris[, -1],
         y = iris$Sepal.Length
       ),
       iris
-    )
+    )$alert
   )
 
   # formula interface - degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         Sepal.Length ~ .,
@@ -228,11 +228,11 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       iris
-    )
+    )$alert
   )
 
   # XY interface - degree = 2
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       earth::earth(
         x = iris[, -1],
@@ -241,7 +241,7 @@ test_that("formulas produces correct predictions", {
         pmethod = "none"
       ),
       iris
-    )
+    )$alert
   )
 })
 

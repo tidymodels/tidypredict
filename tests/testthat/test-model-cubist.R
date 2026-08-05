@@ -62,12 +62,12 @@ test_that("formulas produces correct predictions", {
   non_split_data <- mtcars %>%
     dplyr::filter(!!!splits)
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       model,
       non_split_data,
       threshold = 0.00001
-    )
+    )$alert
   )
 })
 

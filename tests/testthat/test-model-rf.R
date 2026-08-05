@@ -35,11 +35,11 @@ test_that("formulas produces correct predictions", {
   set.seed(1234)
 
   # regression
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3),
       mtcars,
-    )
+    )$alert
   )
 })
 

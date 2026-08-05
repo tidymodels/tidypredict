@@ -15,7 +15,7 @@ test_that("returns the right output", {
 test_that("regression predictions match native predict", {
   model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
 
-  expect_snapshot(tidypredict_test(model, mtcars))
+  expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
 test_that("classification returns one probability per class", {

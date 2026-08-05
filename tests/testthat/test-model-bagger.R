@@ -108,8 +108,8 @@ test_that("produced case_when uses .default", {
 test_that("formulas produce correct predictions", {
   skip_if_not_installed("baguette")
 
-  expect_snapshot(tidypredict_test(bagger_reg(), mtcars))
-  expect_snapshot(tidypredict_test(bagger_cls(), iris))
+  expect_false(tidypredict_test(bagger_reg(), mtcars)$alert)
+  expect_false(tidypredict_test(bagger_cls(), iris)$alert)
 })
 
 test_that("tidypredict_test.bagger max_rows and alert work", {
@@ -299,7 +299,7 @@ test_that("C5.0 base models return the right output", {
   expect_equal(pm$general$classes, levels(iris$Species))
   expect_length(pm$tree_info_list, 3)
 
-  expect_snapshot(tidypredict_test(model, iris))
+  expect_false(tidypredict_test(model, iris)$alert)
 })
 
 test_that("tidypredict_fit matches predict() - C5.0 base model", {

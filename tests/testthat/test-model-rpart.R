@@ -57,11 +57,11 @@ test_that("tidypredict_fit produces correct predictions", {
 
 test_that("formulas produce correct predictions - regression", {
   skip_if_not_installed("rpart")
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       rpart::rpart(mpg ~ am + cyl + wt, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 })
 
@@ -87,11 +87,11 @@ test_that("tidypredict_test.rpart alert message works", {
 
 test_that("formulas produce correct predictions - classification", {
   skip_if_not_installed("rpart")
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       rpart::rpart(Species ~ ., data = iris),
       iris
-    )
+    )$alert
   )
 })
 
@@ -100,11 +100,11 @@ test_that("categorical predictors work correctly", {
   mtcars2 <- mtcars
   mtcars2$cyl <- factor(mtcars2$cyl)
 
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       rpart::rpart(mpg ~ cyl + wt, data = mtcars2),
       mtcars2
-    )
+    )$alert
   )
 })
 

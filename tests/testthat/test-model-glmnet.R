@@ -36,27 +36,27 @@ test_that("Model can be saved and re-loaded", {
 test_that("formulas produces correct predictions", {
   skip_if_not_installed("glmnet")
   # gaussian
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -1], mtcars$mpg, family = "gaussian", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 
   # binomial
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "binomial", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 
   # poisson
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "poisson", lambda = 1),
       mtcars[, -1]
-    )
+    )$alert
   )
 })
 

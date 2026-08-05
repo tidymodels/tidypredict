@@ -58,7 +58,7 @@ test_that("formulas produces correct predictions", {
   skip_on_os("linux")
 
   # regression
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       ranger::ranger(
         mpg ~ .,
@@ -69,7 +69,7 @@ test_that("formulas produces correct predictions", {
         num.threads = 2
       ),
       mtcars
-    )
+    )$alert
   )
 })
 

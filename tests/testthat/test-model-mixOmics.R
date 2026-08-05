@@ -41,7 +41,7 @@ test_that("predictions match native predict", {
     rlang::eval_tidy(tidypredict_fit(model), mtcars),
     mixomics_native(model, x)
   )
-  expect_snapshot(tidypredict_test(model, mtcars))
+  expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
 test_that("all values of ncomp are handled", {

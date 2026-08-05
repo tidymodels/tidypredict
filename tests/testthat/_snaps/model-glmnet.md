@@ -5,39 +5,6 @@
     Output
       [1] "35.31378 + (cyl * -0.8714512) + (hp * -0.0101174) + (wt * -2.594437)"
 
-# formulas produces correct predictions
-
-    Code
-      tidypredict_test(glmnet::glmnet(mtcars[, -1], mtcars$mpg, family = "gaussian",
-      lambda = 1), mtcars[, -1])
-    Output
-      tidypredict test results
-      Difference threshold: 1e-12
-      
-       All results are within the difference threshold
-
----
-
-    Code
-      tidypredict_test(glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "binomial",
-      lambda = 1), mtcars[, -1])
-    Output
-      tidypredict test results
-      Difference threshold: 1e-12
-      
-       All results are within the difference threshold
-
----
-
-    Code
-      tidypredict_test(glmnet::glmnet(mtcars[, -8], mtcars$vs, family = "poisson",
-      lambda = 1), mtcars[, -1])
-    Output
-      tidypredict test results
-      Difference threshold: 1e-12
-      
-       All results are within the difference threshold
-
 # errors if more than 1 penalty is selected
 
     Code

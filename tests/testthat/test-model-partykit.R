@@ -43,35 +43,35 @@ test_that("formulas produces correct predictions", {
   mtcars$cyl <- as.factor(mtcars$cyl)
 
   # normal
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       partykit::ctree(mpg ~ am + cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # offset
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       partykit::ctree(mpg ~ wt, offset = am1, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interaction
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       partykit::ctree(mpg ~ wt + disp * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 
   # interactions
-  expect_snapshot(
+  expect_false(
     tidypredict_test(
       partykit::ctree(mpg ~ (wt + disp) * cyl, data = mtcars),
       mtcars
-    )
+    )$alert
   )
 })
 
