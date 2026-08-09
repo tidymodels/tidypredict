@@ -2,6 +2,20 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now picks the right factor predictor when three or more variable names
+  are nested prefixes of one another, such as `x`, `xy` and `xyz`. The
+  longest match was selected by indexing with
+  [`rank()`](https://rdrr.io/r/base/rank.html), which silently chose the
+  wrong variable and produced wrong predictions for
+  [`lm()`](https://rdrr.io/r/stats/lm.html),
+  [`glm()`](https://rdrr.io/r/stats/glm.html),
+  [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html),
+  [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html),
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html) and
+  [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html).
+  ([\#290](https://github.com/tidymodels/tidypredict/issues/290))
+
 - Added support for
   [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
   bagged tree ensembles fit with the `"CART"` or `"C5.0"` base model,
@@ -145,7 +159,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -484,9 +498,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
-  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
-  models.
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -551,9 +565,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
-  use family function syntax (e.g., `family = gaussian()`) instead of
-  string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  that use family function syntax (e.g., `family = gaussian()`) instead
+  of string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)

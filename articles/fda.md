@@ -53,15 +53,15 @@ model <- mda::fda(Species ~ ., data = iris)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(-15.7712902867569 + (Sepal.Length * 6.44363108028105) + (Sepal.Width * 
+  #> exp(-15.7712902867569 + (Sepal.Length * 6.44363108028106) + (Sepal.Width * 
   #>     12.3870583475541) + (Petal.Length * -17.2922700522406) + 
   #>     (Petal.Width * -21.1939332574676))/(exp(-15.7712902867569 + 
-  #>     (Sepal.Length * 6.44363108028105) + (Sepal.Width * 12.3870583475541) + 
+  #>     (Sepal.Length * 6.44363108028106) + (Sepal.Width * 12.3870583475541) + 
   #>     (Petal.Length * -17.2922700522406) + (Petal.Width * -21.1939332574676)) + 
-  #>     exp(-2.04081827345901 + (Sepal.Length * -1.5624481512317) + 
+  #>     exp(-2.040818273459 + (Sepal.Length * -1.5624481512317) + 
   #>         (Sepal.Width * -4.4653504874401) + (Petal.Length * 4.7914952101148) + 
   #>         (Petal.Width * 3.12508713229903)) + exp(-34.1997086671406 + 
-  #>     (Sepal.Length * -4.88118292904935) + (Sepal.Width * -7.92170786011395) + 
+  #>     (Sepal.Length * -4.88118292904936) + (Sepal.Width * -7.92170786011395) + 
   #>     (Petal.Length * 12.5007748421258) + (Petal.Width * 18.0688461251685)))
   ```
 
@@ -113,16 +113,16 @@ p_model <- discrim_linear(penalty = 1) %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-33.2183837927999 + (Sepal.Length * -4.41029984072516) + 
-#>     (Sepal.Width * -6.75173810807851) + (Petal.Length * 12.0386389001351) + 
-#>     (Petal.Width * 14.7915580954521))/(exp(-11.9575128198864 + 
-#>     (Sepal.Length * 5.80316342827787) + (Sepal.Width * 10.8028995796442) + 
-#>     (Petal.Length * -16.5217691675752) + (Petal.Width * -17.3381617005552)) + 
-#>     exp(-2.27975663240439 + (Sepal.Length * -1.39286358755271) + 
-#>         (Sepal.Width * -4.05116147156568) + (Petal.Length * 4.48313026744015) + 
-#>         (Petal.Width * 2.54660360510309)) + exp(-33.2183837927999 + 
-#>     (Sepal.Length * -4.41029984072516) + (Sepal.Width * -6.75173810807851) + 
-#>     (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954521)))
+#> exp(-33.2183837928001 + (Sepal.Length * -4.41029984072515) + 
+#>     (Sepal.Width * -6.75173810807853) + (Petal.Length * 12.0386389001351) + 
+#>     (Petal.Width * 14.7915580954522))/(exp(-11.9575128198863 + 
+#>     (Sepal.Length * 5.80316342827786) + (Sepal.Width * 10.8028995796442) + 
+#>     (Petal.Length * -16.5217691675753) + (Petal.Width * -17.3381617005553)) + 
+#>     exp(-2.27975663240445 + (Sepal.Length * -1.3928635875527) + 
+#>         (Sepal.Width * -4.05116147156568) + (Petal.Length * 4.48313026744016) + 
+#>         (Petal.Width * 2.5466036051031)) + exp(-33.2183837928001 + 
+#>     (Sepal.Length * -4.41029984072515) + (Sepal.Width * -6.75173810807853) + 
+#>     (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954522)))
 ```
 
 ## Parse model spec
