@@ -100,6 +100,19 @@ test_that("tidypredict works when variable names are subset of other variables",
   )
 })
 
+test_that("longest variable name wins with three nested prefixes (#290)", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(30),
+    x = rnorm(30),
+    xyz = factor(rep(c("A", "B", "C"), each = 10)),
+    xy = rnorm(30)
+  )
+
+  expect_false(tidypredict_test(lm(y ~ x + xyz + xy, data = df), df)$alert)
+  expect_false(tidypredict_test(glm(y ~ x + xyz + xy, data = df), df)$alert)
+})
+
 test_that("tidy() works", {
   expect_s3_class(
     tidy(parse_model(lm(mpg ~ ., mtcars))),
