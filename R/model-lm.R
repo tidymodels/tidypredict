@@ -168,7 +168,7 @@ parse_label_lm <- function(label, vars) {
         !(items[i] %in% vars)
     ) {
       cat_match_vars <- vars[cat_match]
-      sole_cat_match <- cat_match_vars[rank(-nchar(cat_match_vars))][[1]]
+      sole_cat_match <- cat_match_vars[[which.max(nchar(cat_match_vars))]]
       item <- list(
         type = "conditional",
         col = sole_cat_match,
