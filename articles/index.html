@@ -17,7 +17,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-model-list"><li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-model-list"><li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
     <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
@@ -73,79 +75,97 @@
     </div>
 
     <div class="section ">
-      <h3>All vignettes</h3>
+      <h3>Get started</h3>
       <div class="section-desc"></div>
 
-      <dl><dt><a href="aorsf.html">Oblique Random Forest, using aorsf</a></dt>
+      <dl><dt><a href="models.html">Supported models</a></dt>
         <dd>
-        </dd><dt><a href="bagging.html">bagger models</a></dt>
+        </dd><dt><a href="save.html">Save and re-load models</a></dt>
         <dd>
-        </dd><dt><a href="bart.html">bart models</a></dt>
+        </dd><dt><a href="sql.html">Database write-back</a></dt>
         <dd>
-        </dd><dt><a href="C5.0.html">Decision trees, using C5.0</a></dt>
-        <dd>
-        </dd><dt><a href="catboost.html">catboost models</a></dt>
-        <dd>
-        </dd><dt><a href="cubist.html">Cubist models</a></dt>
-        <dd>
-        </dd><dt><a href="fda.html">fda models</a></dt>
-        <dd>
-        </dd><dt><a href="float-precision.html">Float precision at split boundaries</a></dt>
+      </dd></dl></div>
+    <div class="section ">
+      <h3>Supported models</h3>
+      <div class="section-desc"><p>One article per model family. See <code><a href="../articles/models.html">vignette("models")</a></code> for the full list.</p></div>
+
+      <dl><dt><a href="lm.html">Linear Regression</a></dt>
         <dd>
         </dd><dt><a href="glm.html">Generalized Linear Regression</a></dt>
         <dd>
         </dd><dt><a href="glmnet.html">glmnet models</a></dt>
         <dd>
-        </dd><dt><a href="h2o.html">Gradient boosting, using H2O</a></dt>
+        </dd><dt><a href="multinom.html">multinom models</a></dt>
+        <dd>
+        </dd><dt><a href="fda.html">fda models</a></dt>
         <dd>
         </dd><dt><a href="lda.html">lda models</a></dt>
         <dd>
-        </dd><dt><a href="lightgbm.html">LightGBM models</a></dt>
-        <dd>
-        </dd><dt><a href="lm.html">Linear Regression</a></dt>
-        <dd>
-        </dd><dt><a href="mars.html">MARS models via the `earth` package</a></dt>
-        <dd>
-        </dd><dt><a href="mixOmics.html">mixOmics PLS models</a></dt>
-        <dd>
-        </dd><dt><a href="multinom.html">multinom models</a></dt>
-        <dd>
-        </dd><dt><a href="naivebayes.html">NaiveBayes models</a></dt>
-        <dd>
-        </dd><dt><a href="nnet.html">nnet models</a></dt>
-        <dd>
-        </dd><dt><a href="non-r.html">Non-R Models</a></dt>
-        <dd>
-        </dd><dt><a href="nullmodel.html">nullmodel models</a></dt>
-        <dd>
-        </dd><dt><a href="partykit.html">Random Forest - partykit</a></dt>
-        <dd>
         </dd><dt><a href="qda.html">qda models</a></dt>
-        <dd>
-        </dd><dt><a href="ranger.html">Random Forest, using Ranger</a></dt>
-        <dd>
-        </dd><dt><a href="regression.html">Create a regression spec - version 2</a></dt>
-        <dd>
-        </dd><dt><a href="rf.html">Random Forest</a></dt>
-        <dd>
-        </dd><dt><a href="rpart.html">Decision trees, using rpart</a></dt>
-        <dd>
-        </dd><dt><a href="save.html">Save and re-load models</a></dt>
         <dd>
         </dd><dt><a href="sda.html">sda models</a></dt>
         <dd>
         </dd><dt><a href="sparsediscrim.html">sparsediscrim models</a></dt>
         <dd>
-        </dd><dt><a href="sql.html">Database write-back</a></dt>
+        </dd><dt><a href="naivebayes.html">NaiveBayes models</a></dt>
         <dd>
-        </dd><dt><a href="tree-internals.html">How tidypredict generates tree formulas</a></dt>
+        </dd><dt><a href="mixOmics.html">mixOmics PLS models</a></dt>
         <dd>
-        </dd><dt><a href="tree.html">Create a tree spec - version 2</a></dt>
+        </dd><dt><a href="nnet.html">nnet models</a></dt>
+        <dd>
+        </dd><dt><a href="ranger.html">Random Forest, using Ranger</a></dt>
+        <dd>
+        </dd><dt><a href="rf.html">Random Forest</a></dt>
+        <dd>
+        </dd><dt><a href="partykit.html">Random Forest - partykit</a></dt>
+        <dd>
+        </dd><dt><a href="aorsf.html">Oblique Random Forest, using aorsf</a></dt>
+        <dd>
+        </dd><dt><a href="rpart.html">Decision trees, using rpart</a></dt>
+        <dd>
+        </dd><dt><a href="C5.0.html">Decision trees, using C5.0</a></dt>
+        <dd>
+        </dd><dt><a href="bart.html">bart models</a></dt>
+        <dd>
+        </dd><dt><a href="bagging.html">bagger models</a></dt>
+        <dd>
+        </dd><dt><a href="mars.html">MARS models via the `earth` package</a></dt>
+        <dd>
+        </dd><dt><a href="cubist.html">Cubist models</a></dt>
         <dd>
         </dd><dt><a href="xgboost.html">XGBoost models</a></dt>
         <dd>
+        </dd><dt><a href="lightgbm.html">LightGBM models</a></dt>
+        <dd>
+        </dd><dt><a href="catboost.html">catboost models</a></dt>
+        <dd>
+        </dd><dt><a href="h2o.html">Gradient boosting, using H2O</a></dt>
+        <dd>
+        </dd><dt><a href="nullmodel.html">nullmodel models</a></dt>
+        <dd>
       </dd></dl></div>
-  </main></div>
+    <div class="section ">
+      <h3>How it works</h3>
+      <div class="section-desc"><p>The internals, and how to talk to tidypredict from outside R.</p></div>
+
+      <dl><dt><a href="tree-internals.html">How tidypredict generates tree formulas</a></dt>
+        <dd>
+        </dd><dt><a href="float-precision.html">Float precision at split boundaries</a></dt>
+        <dd>
+        </dd><dt><a href="non-r.html">Non-R Models</a></dt>
+        <dd>
+      </dd></dl></div>
+    <div class="section ">
+      <h3>Parsed model specs</h3>
+      <div class="section-desc"><p>The on-disk format that <code><a href="../reference/parse_model.html">parse_model()</a></code> writes and <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> reads.</p></div>
+
+      <dl><dt><a href="regression.html">Create a regression spec - version 2</a></dt>
+        <dd>
+        </dd><dt><a href="tree.html">Create a tree spec - version 2</a></dt>
+        <dd>
+      </dd></dl></div>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
+    </nav></aside></div>
 
 
    </div>

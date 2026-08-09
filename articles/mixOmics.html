@@ -35,7 +35,9 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
     <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
@@ -221,9 +223,9 @@ expression per class:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(0.391460011724113 + (Sepal.Length * -0.118750531861652) + </span></span>
+<span><span class="co">#&gt; exp(0.391460011724112 + (Sepal.Length * -0.118750531861652) + </span></span>
 <span><span class="co">#&gt;     (Sepal.Width * 0.378311039737146) + (Petal.Length * -0.084556881358667) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -0.16933234787912))/(exp(0.391460011724113 + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * -0.16933234787912))/(exp(0.391460011724112 + </span></span>
 <span><span class="co">#&gt;     (Sepal.Length * -0.118750531861652) + (Sepal.Width * 0.378311039737146) + </span></span>
 <span><span class="co">#&gt;     (Petal.Length * -0.084556881358667) + (Petal.Width * -0.16933234787912)) + </span></span>
 <span><span class="co">#&gt;     exp(1.96606184899222 + (Sepal.Length * -0.0303959537594359) + </span></span>

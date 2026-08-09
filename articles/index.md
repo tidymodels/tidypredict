@@ -1,64 +1,87 @@
 # Articles
 
-### All vignettes
+### Get started
 
-- [Oblique Random Forest, using
-  aorsf](https://tidypredict.tidymodels.org/articles/aorsf.md):
-- [bagger
-  models](https://tidypredict.tidymodels.org/articles/bagging.md):
-- [bart models](https://tidypredict.tidymodels.org/articles/bart.md):
-- [Decision trees, using
-  C5.0](https://tidypredict.tidymodels.org/articles/C5.0.md):
-- [catboost
-  models](https://tidypredict.tidymodels.org/articles/catboost.md):
-- [Cubist
-  models](https://tidypredict.tidymodels.org/articles/cubist.md):
-- [fda models](https://tidypredict.tidymodels.org/articles/fda.md):
-- [Float precision at split
-  boundaries](https://tidypredict.tidymodels.org/articles/float-precision.md):
+- [Supported
+  models](https://tidypredict.tidymodels.org/articles/models.md):
+- [Save and re-load
+  models](https://tidypredict.tidymodels.org/articles/save.md):
+- [Database
+  write-back](https://tidypredict.tidymodels.org/articles/sql.md):
+
+### Supported models
+
+One article per model family. See
+[`vignette("models")`](https://tidypredict.tidymodels.org/articles/models.md)
+for the full list.
+
+- [Linear
+  Regression](https://tidypredict.tidymodels.org/articles/lm.md):
 - [Generalized Linear
   Regression](https://tidypredict.tidymodels.org/articles/glm.md):
 - [glmnet
   models](https://tidypredict.tidymodels.org/articles/glmnet.md):
-- [Gradient boosting, using
-  H2O](https://tidypredict.tidymodels.org/articles/h2o.md):
-- [lda models](https://tidypredict.tidymodels.org/articles/lda.md):
-- [LightGBM
-  models](https://tidypredict.tidymodels.org/articles/lightgbm.md):
-- [Linear
-  Regression](https://tidypredict.tidymodels.org/articles/lm.md):
-- [MARS models via the \`earth\`
-  package](https://tidypredict.tidymodels.org/articles/mars.md):
-- [mixOmics PLS
-  models](https://tidypredict.tidymodels.org/articles/mixOmics.md):
 - [multinom
   models](https://tidypredict.tidymodels.org/articles/multinom.md):
-- [NaiveBayes
-  models](https://tidypredict.tidymodels.org/articles/naivebayes.md):
-- [nnet models](https://tidypredict.tidymodels.org/articles/nnet.md):
-- [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
-- [nullmodel
-  models](https://tidypredict.tidymodels.org/articles/nullmodel.md):
-- [Random Forest -
-  partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
+- [fda models](https://tidypredict.tidymodels.org/articles/fda.md):
+- [lda models](https://tidypredict.tidymodels.org/articles/lda.md):
 - [qda models](https://tidypredict.tidymodels.org/articles/qda.md):
-- [Random Forest, using
-  Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
-- [Create a regression spec - version
-  2](https://tidypredict.tidymodels.org/articles/regression.md):
-- [Random Forest](https://tidypredict.tidymodels.org/articles/rf.md):
-- [Decision trees, using
-  rpart](https://tidypredict.tidymodels.org/articles/rpart.md):
-- [Save and re-load
-  models](https://tidypredict.tidymodels.org/articles/save.md):
 - [sda models](https://tidypredict.tidymodels.org/articles/sda.md):
 - [sparsediscrim
   models](https://tidypredict.tidymodels.org/articles/sparsediscrim.md):
-- [Database
-  write-back](https://tidypredict.tidymodels.org/articles/sql.md):
-- [How tidypredict generates tree
-  formulas](https://tidypredict.tidymodels.org/articles/tree-internals.md):
-- [Create a tree spec - version
-  2](https://tidypredict.tidymodels.org/articles/tree.md):
+- [NaiveBayes
+  models](https://tidypredict.tidymodels.org/articles/naivebayes.md):
+- [mixOmics PLS
+  models](https://tidypredict.tidymodels.org/articles/mixOmics.md):
+- [nnet models](https://tidypredict.tidymodels.org/articles/nnet.md):
+- [Random Forest, using
+  Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
+- [Random Forest](https://tidypredict.tidymodels.org/articles/rf.md):
+- [Random Forest -
+  partykit](https://tidypredict.tidymodels.org/articles/partykit.md):
+- [Oblique Random Forest, using
+  aorsf](https://tidypredict.tidymodels.org/articles/aorsf.md):
+- [Decision trees, using
+  rpart](https://tidypredict.tidymodels.org/articles/rpart.md):
+- [Decision trees, using
+  C5.0](https://tidypredict.tidymodels.org/articles/C5.0.md):
+- [bart models](https://tidypredict.tidymodels.org/articles/bart.md):
+- [bagger
+  models](https://tidypredict.tidymodels.org/articles/bagging.md):
+- [MARS models via the \`earth\`
+  package](https://tidypredict.tidymodels.org/articles/mars.md):
+- [Cubist
+  models](https://tidypredict.tidymodels.org/articles/cubist.md):
 - [XGBoost
   models](https://tidypredict.tidymodels.org/articles/xgboost.md):
+- [LightGBM
+  models](https://tidypredict.tidymodels.org/articles/lightgbm.md):
+- [catboost
+  models](https://tidypredict.tidymodels.org/articles/catboost.md):
+- [Gradient boosting, using
+  H2O](https://tidypredict.tidymodels.org/articles/h2o.md):
+- [nullmodel
+  models](https://tidypredict.tidymodels.org/articles/nullmodel.md):
+
+### How it works
+
+The internals, and how to talk to tidypredict from outside R.
+
+- [How tidypredict generates tree
+  formulas](https://tidypredict.tidymodels.org/articles/tree-internals.md):
+- [Float precision at split
+  boundaries](https://tidypredict.tidymodels.org/articles/float-precision.md):
+- [Non-R Models](https://tidypredict.tidymodels.org/articles/non-r.md):
+
+### Parsed model specs
+
+The on-disk format that
+[`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+writes and
+[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+reads.
+
+- [Create a regression spec - version
+  2](https://tidypredict.tidymodels.org/articles/regression.md):
+- [Create a tree spec - version
+  2](https://tidypredict.tidymodels.org/articles/tree.md):
