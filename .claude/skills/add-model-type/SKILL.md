@@ -99,7 +99,10 @@ Rscript -e "testthat::snapshot_review('model-<name>')"
 
 - **DESCRIPTION**: add the modeling package to `Suggests`. If it is a headline model type, add it to the `Description:` supported-models list.
 - **NEWS.md**: one bullet, alphabetical by function name, mention the function and issue/PR number, no line wrapping.
-- **Vignettes**: a small addition (like `rq`) can join the nearest existing vignette (`vignettes/lm.Rmd`). A brand-new headline model type gets its own `vignettes/<name>.Rmd` plus a `_pkgdown.yml` navbar entry under "Model list".
+- **Vignettes**: a small addition (like `rq`) can join the nearest existing vignette (`vignettes/lm.Rmd`). A brand-new headline model type gets its own `vignettes/<name>.Rmd`, plus a `_pkgdown.yml` navbar entry under "Model list" **and** an entry in the `articles:` section (the index is explicit, so an unlisted vignette makes `pkgdown` error).
+- **`vignettes/models.Rmd`** is the supported-model list of record. Add a row to the right table (Model, Fit with, parsnip spec and engine, link to the model's article). Leave the parsnip cell blank if no test covers that route.
+- **Counts**: `vignettes/models.Rmd` and `README.md` both state an exact class/package count. Recompute it from `NAMESPACE` (`parse_model()` methods minus `model_fit`, plus the three `tidypredict_fit()`-only H2O classes) and update both, then `Rscript -e "devtools::build_readme()"`.
+- The README keeps only a one-line-per-category summary. Add the package to the matching bullet; do not reintroduce a full list there.
 - If you add a new exported doc topic, add it to `_pkgdown.yml` and run `Rscript -e "pkgdown::check_pkgdown()"`.
 
 ## Orbital helpers
