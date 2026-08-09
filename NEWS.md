@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- `tidypredict_fit()` now picks the right factor predictor when three or more variable names are nested prefixes of one another, such as `x`, `xy` and `xyz`. The longest match was selected by indexing with `rank()`, which silently chose the wrong variable and produced wrong predictions for `lm()`, `glm()`, `quantreg::rq()`, `nnet::multinom()`, `nnet::nnet()` and `earth::earth()`. (#290)
+
 - Added support for `baguette::bagger()` bagged tree ensembles fit with the `"CART"` or `"C5.0"` base model, including `bag_tree()` parsnip models fitted with the `"rpart"` or `"C5.0"` engine. Regression predictions average the individual trees, and classification predictions return the class with the largest average class probability. (#232)
 
 - `tidypredict_fit()` now supports `C50::C5.0()` models that split a discrete predictor into one branch per level. (#232)
