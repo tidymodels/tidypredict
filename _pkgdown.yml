@@ -14,10 +14,66 @@ template:
 figures:
   fig.width: 8
   fig.height: 5.75
+
+articles:
+- title: Get started
+  navbar: ~
+  contents:
+  - models
+  - save
+  - sql
+
+- title: Supported models
+  desc: One article per model family. See `vignette("models")` for the full list.
+  contents:
+  - lm
+  - glm
+  - glmnet
+  - multinom
+  - fda
+  - lda
+  - qda
+  - sda
+  - sparsediscrim
+  - naivebayes
+  - mixOmics
+  - nnet
+  - ranger
+  - rf
+  - partykit
+  - aorsf
+  - rpart
+  - C5.0
+  - bart
+  - bagging
+  - mars
+  - cubist
+  - xgboost
+  - lightgbm
+  - catboost
+  - h2o
+  - nullmodel
+
+- title: How it works
+  desc: The internals, and how to talk to tidypredict from outside R.
+  contents:
+  - tree-internals
+  - float-precision
+  - non-r
+
+- title: Parsed model specs
+  desc: The on-disk format that `parse_model()` writes and `tidypredict_fit()` reads.
+  contents:
+  - regression
+  - tree
+
 navbar:
   left:
   - text: Model list
     menu:
+    - text: All supported models
+      href: articles/models.html
+    - text: '-------'
     - text: Linear Regression - lm()
       href: articles/lm.html
     - text: Generalized Regression - glm()

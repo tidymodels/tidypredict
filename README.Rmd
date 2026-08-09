@@ -88,34 +88,16 @@ Instead of translating directly to a SQL statement, `tidypredict` creates an R f
 
 ## Supported models
 
-The following models are supported by `tidypredict`:
+`tidypredict` parses 43 fitted model classes from 30 modeling packages. [Supported models](https://tidypredict.tidymodels.org/articles/models.html) has the full list, with the `parsnip` spec and engine for each and a link to a worked example. In brief:
 
-- Linear Regression - `lm()`
-- Generalized Linear model - `glm()`
-- Elastic net models - `glmnet::glmnet()`
-- Random Forest models - `randomForest::randomForest()`
-- Random Forest models, via `ranger` - `ranger::ranger()`
-- MARS models - `earth::earth()`
-- Decision tree models - `rpart::rpart()`
-- XGBoost models - `xgboost::xgb.Booster`
-- LightGBM models - `lightgbm::lgb.Booster`
-- CatBoost models - `catboost::catboost.Model`
-- Cubist models - `Cubist::cubist()`
-- Tree models, via `partykit` - `partykit::ctree()` 
+- Regression: `lm()`, `glm()`, `glmnet::glmnet()`, `LiblineaR::LiblineaR()`, `quantreg::rq()`, `nnet::multinom()`, `kernlab::ksvm()`, `nnet::nnet()`, `earth::earth()`, `mixOmics` PLS, `parsnip::nullmodel()`
+- Classification and discriminant analysis: `naivebayes::naive_bayes()`, `klaR::NaiveBayes()`, `MASS::lda()`, `MASS::qda()`, `mda::fda()`, `sda::sda()`, `sparsediscrim`
+- Trees and forests: `rpart::rpart()`, `C50::C5.0()`, `partykit::ctree()` and `cforest()`, `randomForest::randomForest()`, `ranger::ranger()`, `aorsf::orsf()`, `baguette::bagger()`, `dbarts::bart()`
+- Boosting and rules: `xgboost`, `lightgbm`, `catboost`, `mboost::blackboost()`, `Cubist::cubist()`, `xrf::xrf()`, H2O GBM and RuleFit
 
-### `parsnip` 
+`tidypredict` dispatches on the class of the fitted model, so models fitted through `parsnip` work for any engine whose underlying model appears above: pass the `parsnip` fit object to `tidypredict_fit()` just as you would the engine's own fit.
 
-`tidypredict` supports models fitted via the `parsnip` interface. The ones confirmed currently work in `tidypredict` are:
-
-- `lm()` - `parsnip`: `linear_reg()` with *"lm"* as the engine.
-- `glmnet::glmnet()` - `parsnip`: `linear_reg()` or `logistic_reg()` with *"glmnet"* as the engine.
-- `randomForest::randomForest()` - `parsnip`: `rand_forest()` with *"randomForest"* as the engine.
-- `ranger::ranger()` - `parsnip`: `rand_forest()` with *"ranger"* as the engine.
-- `earth::earth()` - `parsnip`: `mars()` with *"earth"* as the engine.
-- `rpart::rpart()` - `parsnip`: `decision_tree()` with *"rpart"* as the engine.
-- `xgboost::xgb.Booster` - `parsnip`: `boost_tree()` with *"xgboost"* as the engine.
-- `lightgbm::lgb.Booster` - `parsnip`: `boost_tree()` with *"lightgbm"* as the engine (via `bonsai`).
-- `catboost::catboost.Model` - `parsnip`: `boost_tree()` with *"catboost"* as the engine (via `bonsai`).
+`tidypredict_interval()` and `tidypredict_sql_interval()` are narrower, and only support `lm()` and `glm()` models.
 
 ### `broom`
 

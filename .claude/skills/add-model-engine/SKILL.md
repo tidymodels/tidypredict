@@ -13,7 +13,7 @@ When you `parsnip::fit()` a spec, the result is a `model_fit` whose `$fit` is th
 
 So there are two cases:
 
-1. **The engine's fitted object is a class tidypredict already parses.** Then there is likely **no R code to write at all** — the engine works through delegation, and your job is just to verify it, add a test, and document it (touching only `NEWS.md`, `tests/testthat/test-tidymodels.R`, the snapshot, and a vignette). The `glm` engine for `linear_reg()` was added this way.
+1. **The engine's fitted object is a class tidypredict already parses.** Then there is likely **no R code to write at all** — the engine works through delegation, and your job is just to verify it, add a test, and document it (touching only `NEWS.md`, `tests/testthat/test-tidymodels.R`, the snapshot, a vignette, and the parsnip column of `vignettes/models.Rmd`). The `glm` engine for `linear_reg()` was added this way.
 
 2. **The engine produces a class tidypredict does not yet handle.** Then you must add class support first with the **add-model-type** skill, then come back here to wire up and test the engine. This is what happened with the `quantreg` engine, which introduced the `rq`/`rqs` classes.
 
@@ -58,7 +58,7 @@ If your engine needs the spec's arguments (like a penalty or a tuning value) bak
 
    If the underlying class supports SQL, also confirm it survives the parsnip wrapper: `tidypredict_sql(model, dbplyr::simulate_dbi())` returns class `"sql"`. Tree/boosting engines (e.g. the bonsai lightgbm/catboost tests) go further and round-trip through a real SQLite DB. Note that a `model_fit` carries the recipe's `xlevels`, so categorical handling can differ from a bare fit and is worth a dedicated test.
 
-5. Document it: add a note to the relevant vignette (e.g. `vignettes/glm.Rmd`, `vignettes/lm.Rmd`) showing the engine working, mirroring how sibling engines are described.
+5. Document it: add a note to the relevant vignette (e.g. `vignettes/glm.Rmd`, `vignettes/lm.Rmd`) showing the engine working, mirroring how sibling engines are described. Also record the engine in the parsnip column of the matching row in `vignettes/models.Rmd`, which is the supported-model list of record. If it is a new spec/engine pair for a model class already listed, that cell is the only change needed; the README's category summary and its class count only move when a new *class* is added.
 6. Add a `NEWS.md` bullet (alphabetical by function name, mention the engine and the issue/PR number, no line wrapping). Example: `` * `linear_reg()` models can now use the `"glm"` engine (#239). ``
 7. If the modeling package is newly required by tests, add it to `Suggests` in `DESCRIPTION`.
 
@@ -70,7 +70,7 @@ Rscript -e "devtools::test(filter = '^tidymodels')"
 Rscript -e "testthat::snapshot_review('tidymodels')"   # if snapshot changed
 ```
 
-Then sanity-check the touched file set against a comparable past change: `git log --oneline --grep="engine"` to find one, then `git show --stat <sha>`. A pure new-engine change touches only tests, a snapshot, `NEWS.md`, and a vignette; if it also added a class, expect `R/` and `NAMESPACE` changes too.
+Then sanity-check the touched file set against a comparable past change: `git log --oneline --grep="engine"` to find one, then `git show --stat <sha>`. A pure new-engine change touches only tests, a snapshot, `NEWS.md`, a vignette, and `vignettes/models.Rmd`; if it also added a class, expect `R/` and `NAMESPACE` changes too.
 
 ## Tracking issue (if present)
 
