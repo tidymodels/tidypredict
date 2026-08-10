@@ -92,6 +92,56 @@ test_that("test_results_multiclass reports failures", {
   expect_match(res$message, "Fitted records above the threshold: 1")
 })
 
+test_that("a missing value on both sides agrees, on one side does not (#309)", {
+  res <- test_results_numeric(c(1, NA, NA), c(1, NA, 3), threshold = 1e-12)
+
+  expect_true(res$alert)
+  expect_equal(res$raw_results$fit_threshold, c(FALSE, FALSE, TRUE))
+  expect_match(res$message, "Records missing from only one side: 1")
+})
+
+test_that("an all-missing comparison reports rather than errors (#309)", {
+  res <- expect_no_warning(
+    test_results_numeric(c(NA_real_, NA), c(NA_real_, NA), threshold = 1e-12)
+  )
+
+  expect_false(res$alert)
+  expect_match(res$message, "within the difference threshold")
+})
+
+test_that("missing labels are compared the same way (#309)", {
+  res <- test_results_class(c("a", NA, NA), c("a", NA, "c"))
+
+  expect_true(res$alert)
+  expect_equal(res$raw_results$fit_threshold, c(FALSE, FALSE, TRUE))
+})
+
+test_that("a missing probability is a mismatch (#309)", {
+  fit <- matrix(c(0.5, NA, 0.5, NA), ncol = 2)
+  fit_te <- matrix(c(0.5, 0.9, 0.5, 0.1), ncol = 2)
+
+  res <- test_results_multiclass(fit, fit_te, 0.1, classes = c("a", "b"))
+
+  expect_true(res$alert)
+  expect_equal(res$raw_results$fit_threshold, c(FALSE, TRUE))
+})
+
+test_that("comparing no rows is an error, not a vacuous pass (#309)", {
+  expect_snapshot(error = TRUE, {
+    test_results_numeric(numeric(0), numeric(0), threshold = 1e-12)
+    test_results_class(character(0), character(0))
+    test_results_multiclass(
+      matrix(numeric(0), ncol = 2),
+      matrix(numeric(0), ncol = 2),
+      0.1,
+      classes = c("a", "b")
+    )
+  })
+
+  model <- lm(mpg ~ wt, data = mtcars)
+  expect_error(tidypredict_test(model, df = mtcars[0, ]), "nothing to compare")
+})
+
 test_that("maybe_head only trims when asked", {
   expect_equal(nrow(maybe_head(mtcars, NULL)), 32)
   expect_equal(nrow(maybe_head(mtcars, 5)), 5)
