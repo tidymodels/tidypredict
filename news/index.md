@@ -19,6 +19,19 @@
   marked as internal in the documentation index.
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now handles missing predictions instead of erroring with “missing
+  value where TRUE/FALSE needed”. A row where both the model and
+  tidypredict return `NA` counts as a match, and a row where only one of
+  them does is reported as a mismatch, so the function can be used to
+  check how a model behaves on missing data.
+  ([\#309](https://github.com/tidymodels/tidypredict/issues/309))
+
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now errors when given data with no rows, rather than reporting that
+  all results are within the difference threshold.
+  ([\#309](https://github.com/tidymodels/tidypredict/issues/309))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns correct predictions for
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
