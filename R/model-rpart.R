@@ -94,7 +94,9 @@ rpart_tree_info_full <- function(model) {
         right_id <- 2L * orig_node_ids[i] + 1L
         left_n <- frame$n[orig_node_ids == left_id]
         right_n <- frame$n[orig_node_ids == right_id]
-        majority_left[i] <- left_n >= right_n
+        # A tie leaves no majority to go with, and `rpart` then stops at the
+        # node rather than picking a side.
+        majority_left[i] <- if (left_n == right_n) NA else left_n > right_n
 
         node_splits[[i]] <- list(
           primary = primary,
@@ -124,7 +126,11 @@ rpart_tree_info_full <- function(model) {
     prediction = prediction,
     node_splits = node_splits,
     majority_left = majority_left_adjusted,
-    use_surrogates = use_surrogates
+    use_surrogates = use_surrogates,
+    # Only `usesurrogate = 2` carries a row that is missing the primary split
+    # and every surrogate on to a child, in the majority direction. Below that
+    # the row stops here and takes this node's own fitted value.
+    stops_at_node = usesurr < 2
   )
 }
 
