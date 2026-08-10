@@ -14,13 +14,16 @@ the correct SQL translation syntax.}
 
 \item{interval}{The prediction interval, defaults to 0.95}
 }
+\value{
+A SQL query, as returned by \code{\link[dbplyr:translate_sql]{dbplyr::translate_sql()}}, giving the
+half width of the prediction interval.
+}
 \description{
 Returns a SQL query with formula to calculate predicted interval
 }
 \examples{
-library(dbplyr)
-
+\dontshow{if (rlang::is_installed("dbplyr")) withAutoprint(\{ # examplesIf}
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql_interval(model, simulate_dbi())
+tidypredict_sql_interval(model, dbplyr::simulate_dbi())
+\dontshow{\}) # examplesIf}
 }
-\keyword{internal}

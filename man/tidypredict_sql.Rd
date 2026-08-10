@@ -12,13 +12,16 @@ tidypredict_sql(model, con)
 \item{con}{Database connection object. It is used to select
 the correct SQL translation syntax.}
 }
+\value{
+A SQL query, as returned by \code{\link[dbplyr:translate_sql]{dbplyr::translate_sql()}}. Models that
+produce one formula per class or per outcome return a list of queries.
+}
 \description{
 Returns a SQL query with formula to calculate fitted values
 }
 \examples{
-library(dbplyr)
-
+\dontshow{if (rlang::is_installed("dbplyr")) withAutoprint(\{ # examplesIf}
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql(model, simulate_dbi())
+tidypredict_sql(model, dbplyr::simulate_dbi())
+\dontshow{\}) # examplesIf}
 }
-\keyword{internal}
