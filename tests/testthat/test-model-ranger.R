@@ -617,3 +617,32 @@ test_that("legacy get_ra_tree handles probability predictions", {
   expect_true("probs" %in% names(tree[[1]]))
   expect_true("prob" %in% names(tree[[1]]))
 })
+
+test_that("a missing predictor takes the left branch, matching predict() (#294)", {
+  skip_if_not_installed("ranger")
+
+  set.seed(1)
+  n <- 300
+  df <- data.frame(x = rnorm(n), z = rnorm(n), w = rnorm(n))
+  df$y <- 2 * df$x - df$z + rnorm(n)
+
+  new_df <- df
+  set.seed(4)
+  for (col in c("x", "z", "w")) {
+    new_df[[col]][sample(n, 50)] <- NA_real_
+  }
+  new_df[1:5, c("x", "z", "w")] <- NA_real_
+
+  model <- ranger::ranger(y ~ x + z + w, data = df, num.trees = 20, seed = 1)
+
+  # `ranger` compares as `value > splitval`, which a missing value fails, so it
+  # goes the same way as a value at or below the split point.
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), new_df),
+    predict(model, new_df)$predictions
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), new_df),
+    predict(model, new_df)$predictions
+  )
+})
