@@ -19,6 +19,18 @@
   marked as internal in the documentation index.
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns `NA` for a row with a missing predictor for
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  and
+  [`aorsf::orsf()`](https://docs.ropensci.org/aorsf/reference/orsf.html)
+  models, rather than a confident value the model itself would never
+  produce. `randomForest::predict()` returns `NA` for any incomplete row
+  and `aorsf` refuses to predict from one at all, so there is no value
+  to match. Rows are kept rather than dropped.
+  ([\#294](https://github.com/tidymodels/tidypredict/issues/294),
+  [\#325](https://github.com/tidymodels/tidypredict/issues/325))
+
 - [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
   now handles missing predictions instead of erroring with “missing
   value where TRUE/FALSE needed”. A row where both the model and
