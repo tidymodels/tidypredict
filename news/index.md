@@ -2,6 +2,23 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
+  returned `numeric(0)` for every gaussian glm, because the residual
+  variance was read from `summary()$sigma`, which only
+  [`summary.lm()`](https://rdrr.io/r/stats/summary.lm.html) has;
+  [`summary.glm()`](https://rdrr.io/r/stats/summary.glm.html) reports it
+  as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored
+  as a result.
+  ([\#293](https://github.com/tidymodels/tidypredict/issues/293))
+
+- [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)
+  and
+  [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
+  now check that dbplyr is installed before using it, and are no longer
+  marked as internal in the documentation index.
+  ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns correct predictions for
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)

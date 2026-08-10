@@ -102,14 +102,17 @@ the correct SQL translation syntax.</p></dd>
 <dd><p>The prediction interval, defaults to 0.95</p></dd>
 
 </dl></div>
+    <div class="section level2">
+    <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
+    <p>A SQL query, as returned by <code><a href="https://dbplyr.tidyverse.org/reference/translate_sql.html" class="external-link">dbplyr::translate_sql()</a></code>, giving the
+half width of the prediction interval.</p>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbplyr.tidyverse.org/" class="external-link">dbplyr</a></span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">am</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">tidypredict_sql_interval</span><span class="op">(</span><span class="va">model</span>, <span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-ansi.html" class="external-link">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.8231093058295) + ((-0.590557271637747 + "wt" * 0.183559646169165) * (-0.590557271637747 + "wt" * 0.183559646169165)) * 6.8231093058295) + (((0.769566489443368 + "wt" * -0.176199380745393) + "am" * -0.498926847360626) * ((0.769566489443368 + "wt" * -0.176199380745393) + "am" * -0.498926847360626)) * 6.8231093058295) + ((((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132) * (((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132)) * 6.8231093058295) + 6.8231093058295)</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">am</span> <span class="op">+</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">tidypredict_sql_interval</span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-ansi.html" class="external-link">simulate_dbi</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;SQL&gt; 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.8231093058295) + ((-0.590557271637747 + "wt" * 0.183559646169165) * (-0.590557271637747 + "wt" * 0.183559646169165)) * 6.8231093058295) + (((0.769566489443369 + "wt" * -0.176199380745393) + "am" * -0.498926847360626) * ((0.769566489443369 + "wt" * -0.176199380745393) + "am" * -0.498926847360626)) * 6.8231093058295) + ((((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132) * (((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132)) * 6.8231093058295) + 6.8231093058295)</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
