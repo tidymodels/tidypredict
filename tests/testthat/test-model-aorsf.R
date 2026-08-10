@@ -80,13 +80,13 @@ test_that("model can be saved and re-loaded", {
   model <- aorsf::orsf(mtcars, mpg ~ wt + cyl + disp, n_tree = 10)
 
   tmp <- withr::local_tempfile(fileext = ".yml")
-  yaml::write_yaml(parse_model(model), tmp)
-  reloaded <- as_parsed_model(yaml::read_yaml(tmp))
+  tidypredict_save(model, tmp)
+  reloaded <- tidypredict_load(tmp)
 
   nd <- new_data()
   base <- as.numeric(predict(model, new_data = nd))
   parsed <- rlang::eval_tidy(tidypredict_fit(reloaded), nd)
-  expect_equal(parsed, base, tolerance = 1e-6)
+  expect_equal(parsed, base)
 })
 
 test_that("classification errors with clear message", {
