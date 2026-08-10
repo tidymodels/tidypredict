@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- `tidypredict_save()` and `tidypredict_load()` write a parsed model to a YAML file and read it back. Use them instead of `yaml::write_yaml()`, which stores only 7 significant digits by default and so rounds split thresholds enough to send rows down a different branch when the model is re-loaded. (#307)
+
 - `tidypredict_fit()` now picks the right factor predictor when three or more variable names are nested prefixes of one another, such as `x`, `xy` and `xyz`. The longest match was selected by indexing with `rank()`, which silently chose the wrong variable and produced wrong predictions for `lm()`, `glm()`, `quantreg::rq()`, `nnet::multinom()`, `nnet::nnet()` and `earth::earth()`. (#290)
 
 - Added support for `baguette::bagger()` bagged tree ensembles fit with the `"CART"` or `"C5.0"` base model, including `bag_tree()` parsnip models fitted with the `"rpart"` or `"C5.0"` engine. Regression predictions average the individual trees, and classification predictions return the class with the largest average class probability. (#232)

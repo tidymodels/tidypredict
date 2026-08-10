@@ -13,7 +13,6 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 library(tidypredict)
-library(yaml)
 ```
 
 `tidypredict` splits the translation process in two.  It first parses the model to extract the needed components to produce the prediction.  And second, it uses the object with the parsed information to produce the R formula. Thanks to this two step process, `tidypredict` does not need to parse the model every time.  `tidypredict`'s functions also accept R objects that contained already models that have been parsed already.  Additionally, because the parsed model object is made up of a list made up of basic variables, it is possible to save it in a file.  Currently, the best file format is YAML.
@@ -44,34 +43,35 @@ tidypredict_fit(parsed)
 
 
 ```{r, include = FALSE}
-library(yaml)
 model_file <- tempfile(fileext = ".yml")
-write_yaml(parsed, model_file)
-loaded_model <- read_yaml(model_file)
-loaded_model <- as_parsed_model(loaded_model)
+tidypredict_save(parsed, model_file)
+loaded_model <- tidypredict_load(model_file)
 ```
 
 ## Saving the model
 
-Saving the model is quite easy, use the package such as `yaml` to write the model object as a YAML file.  Any format that can persist a ragged list object should work as well. 
+Use `tidypredict_save()` to write the model to a YAML file.
 
 ```{r, eval = FALSE}
-library(yaml)
-
-write_yaml(parsed, "my_model.yml")
+tidypredict_save(parsed, "my_model.yml")
 ```
+
+It accepts a fitted model as well, parsing it for you:
+
+```{r, eval = FALSE}
+tidypredict_save(model, "my_model.yml")
+```
+
+Write the file with `tidypredict_save()` rather than calling `yaml::write_yaml()` yourself. `yaml` writes numbers with 7 significant digits by default, which is not enough to store a split threshold exactly. A tree model saved that way can send rows down a different branch than the model it came from, silently and with no warning.
 
 ## Re-load the model
 
-In a new R session, we can read the YAML file into our environment. 
+In a new R session, read the file back with `tidypredict_load()`.
 
 ```{r, eval = FALSE}
 library(tidypredict)
-library(yaml)
 
-loaded_model <- read_yaml("my_model")
-
-loaded_model <- as_parsed_model(loaded_model)
+loaded_model <- tidypredict_load("my_model.yml")
 ```
 
 The preview of the file looks exactly as the preview of the original parsed model. 
