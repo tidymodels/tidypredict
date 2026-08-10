@@ -2,6 +2,21 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  models whose predictor values fall on a split cut point. C5.0 compares
+  cut points as 32-bit floats, so values between a cut and its float
+  image were sent down the wrong branch.
+  ([\#287](https://github.com/tidymodels/tidypredict/issues/287))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for `catboost` models whose predictor
+  values fall on a split border. catboost compares borders as 32-bit
+  floats, so a value a fraction above a border was sent down the wrong
+  branch.
+  ([\#298](https://github.com/tidymodels/tidypredict/issues/298))
+
 - [`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
   and
   [`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
