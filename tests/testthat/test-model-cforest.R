@@ -102,3 +102,21 @@ test_that("classification errors with clear message", {
   expect_snapshot(error = TRUE, tidypredict_fit(model))
   expect_snapshot(error = TRUE, parse_model(model))
 })
+
+test_that("a missing predictor gives NA rather than a random draw (#294)", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  model <- partykit::cforest(mpg ~ wt + disp + cyl, data = mtcars, ntree = 20)
+
+  df <- mtcars
+  df$wt[1:4] <- NA_real_
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+
+  expect_length(fit, nrow(df))
+  expect_true(all(is.na(fit[1:4])))
+  expect_equal(
+    fit[-(1:4)],
+    as.numeric(predict(model, mtcars))[-(1:4)]
+  )
+})

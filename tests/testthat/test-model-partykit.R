@@ -248,3 +248,37 @@ test_that("tidypredict_test() agrees with predict()", {
 
   expect_false(tidypredict_test(model, mtcars)$alert)
 })
+
+test_that("a missing predictor gives NA at the split that needs it (#294)", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  model <- partykit::ctree(mpg ~ wt + disp + cyl, data = mtcars)
+
+  # `partykit` resolves a missing value by sampling the split probabilities
+  # (see `partykit:::kidids_node`), so `predict()` returns a different answer
+  # on each call. There is no value to match, so tidypredict returns `NA`.
+  df <- mtcars
+  df$wt[1:4] <- NA_real_
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+
+  expect_length(fit, nrow(df))
+  expect_true(all(is.na(fit[1:4])))
+  expect_equal(fit[-(1:4)], unname(predict(model, mtcars))[-(1:4)])
+})
+
+test_that("only the splits a row reaches propagate NA (#294)", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  model <- partykit::ctree(mpg ~ wt + disp + cyl, data = mtcars)
+
+  # The fitted tree splits on `wt` and `disp` only, so blanking `cyl`
+  # changes nothing.
+  df <- mtcars
+  df$cyl <- NA_real_
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+
+  expect_false(anyNA(fit))
+  expect_equal(fit, unname(predict(model, mtcars)))
+})
