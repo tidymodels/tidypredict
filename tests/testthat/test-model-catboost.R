@@ -2050,3 +2050,39 @@ test_that("Depthwise binary classification predictions match (#187)", {
 
   expect_equal(tidy_preds, native_preds, tolerance = 1e-10)
 })
+
+test_that("values on a split border match catboost's float comparison (#298)", {
+  skip_if_not_installed("catboost")
+
+  set.seed(1)
+  n <- 400
+  df <- data.frame(a = rnorm(n), b = rnorm(n))
+  y <- df$a * 2 - df$b + rnorm(n)
+  model <- catboost::catboost.train(
+    catboost::catboost.load_pool(data = df, label = y),
+    params = list(
+      loss_function = "RMSE",
+      iterations = 30,
+      depth = 4,
+      logging_level = "Silent",
+      random_seed = 1
+    )
+  )
+
+  borders <- unlist(lapply(parse_model(model)$trees, function(tree) {
+    lapply(tree, function(leaf) {
+      lapply(leaf$path, function(node) if (identical(node$col, "a")) node$val)
+    })
+  }))
+  borders <- sort(unique(borders[is.finite(borders)]))
+  expect_gt(length(borders), 0)
+
+  probe <- data.frame(a = borders + 1e-9, b = 0)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), probe),
+    catboost::catboost.predict(
+      model,
+      catboost::catboost.load_pool(data = probe)
+    )
+  )
+})
