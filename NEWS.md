@@ -4,6 +4,10 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_test()` now handles missing predictions instead of erroring with "missing value where TRUE/FALSE needed". A row where both the model and tidypredict return `NA` counts as a match, and a row where only one of them does is reported as a mismatch, so the function can be used to check how a model behaves on missing data. (#309)
+
+- `tidypredict_test()` now errors when given data with no rows, rather than reporting that all results are within the difference threshold. (#309)
+
 - `tidypredict_fit()` now returns correct predictions for `C50::C5.0()` models whose predictor values fall on a split cut point. C5.0 compares cut points as 32-bit floats, so values between a cut and its float image were sent down the wrong branch. (#287)
 
 - `tidypredict_fit()` now returns correct predictions for `catboost` models whose predictor values fall on a split border. catboost compares borders as 32-bit floats, so a value a fraction above a border was sent down the wrong branch. (#298)
