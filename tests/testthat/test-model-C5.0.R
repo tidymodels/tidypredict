@@ -362,3 +362,40 @@ test_that("tidypredict_test() compares against predict(), not against itself", {
   expect_equal(result$raw_results$fit, as.character(predict(model, iris)))
   expect_true(any(result$raw_results$fit != "setosa"))
 })
+
+test_that("values on a cut boundary match C5.0's float comparison (#287)", {
+  set.seed(3)
+  n <- 600
+  df <- as.data.frame(matrix(rnorm(n * 4), ncol = 4))
+  names(df) <- paste0("v", 1:4)
+  df$g <- factor(
+    c("a", "b", "c")[cut(
+      as.matrix(df) %*% c(1, -2, 0.5, 1) + rnorm(n),
+      3,
+      labels = FALSE
+    )]
+  )
+
+  model <- C50::C5.0(g ~ ., data = df)
+
+  lines <- strsplit(model$tree, "\n")[[1]]
+  cuts <- as.numeric(gsub(
+    '.*cut="([^"]*)".*',
+    "\\1",
+    grep('cut="', lines, value = TRUE)
+  ))
+  cuts <- sort(unique(cuts[is.finite(cuts)]))
+  expect_gt(length(cuts), 0)
+
+  # values between a cut and its 32-bit float image: C5.0 compares these as
+  # floats and treats them as equal to the cut, R compares them as doubles.
+  for (col in paste0("v", 1:4)) {
+    probe <- df[rep(1, length(cuts)), paste0("v", 1:4), drop = FALSE]
+    probe[[col]] <- (cuts + as_f32(cuts)) / 2
+
+    expect_equal(
+      as.character(rlang::eval_tidy(tidypredict_fit(model), probe)),
+      as.character(predict(model, probe))
+    )
+  }
+})

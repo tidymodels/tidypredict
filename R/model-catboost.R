@@ -527,7 +527,7 @@ make_float_split <- function(split, float_features, op) {
   list(
     type = "conditional",
     col = feature_name,
-    val = split$border,
+    val = f32_split_boundary(split$border, "upper"),
     op = op,
     missing = get_catboost_missing(nan_treatment, op)
   )
@@ -585,7 +585,7 @@ get_catboost_tree <- function(
         type = "conditional",
         col = feature_info$feature_id %||%
           paste0("feature_", feature_info$flat_feature_index),
-        val = split$border,
+        val = f32_split_boundary(split$border, "upper"),
         nan_treatment = feature_info$nan_value_treatment %||% "AsIs",
         is_categorical = FALSE
       )

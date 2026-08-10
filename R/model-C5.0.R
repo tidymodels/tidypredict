@@ -108,7 +108,7 @@ parse_c50_trees <- function(model) {
       list(
         kind = "cont",
         col = attrs$att,
-        val = as.numeric(attrs$cut),
+        val = f32_split_boundary(as.numeric(attrs$cut), "upper"),
         left = kids[[2]],
         right = kids[[3]]
       )
@@ -378,7 +378,7 @@ c50_rule_condition <- function(attrs) {
     list(
       col = attrs$att,
       op = if (attrs$result == "<") "le" else "gt",
-      val = as.numeric(attrs$cut)
+      val = f32_split_boundary(as.numeric(attrs$cut), "upper")
     )
   } else if (type == "3") {
     vals <- gsub('^"|"$', "", strsplit(attrs$elts, '","')[[1]])
