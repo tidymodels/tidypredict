@@ -41,14 +41,26 @@ model <- baguette::bagger(mpg ~ wt + cyl + disp, data = mtcars, times = 5)
   ``` r
 
   tidypredict_fit(model)
-  #> (case_when(wt < 2.975 ~ 23.0583333333333, .default = case_when(wt < 
-  #>     3.545 ~ 16.9125, .default = 15.125)) + case_when(wt < 3.16 ~ 
-  #>     24.3642857142857, .default = 15.7444444444444) + case_when(wt < 
-  #>     2.26 ~ 30.0857142857143, .default = case_when(cyl < 7 ~ 20.4428571428571, 
-  #>     .default = 14.6454545454545)) + case_when(disp < 163.8 ~ 
-  #>     25.6733333333333, .default = 14.6764705882353) + case_when(wt < 
-  #>     2.41 ~ 29.8, .default = case_when(disp < 266.9 ~ 21.325, 
-  #>     .default = 14.6916666666667)))/5L
+  #> (case_when(case_when(!is.na(wt) ~ wt < 2.975, !is.na(disp) ~ 
+  #>     disp < 163.8, !is.na(cyl) ~ cyl < 7, .default = FALSE) ~ 
+  #>     23.0583333333333, .default = case_when(case_when(!is.na(wt) ~ 
+  #>     wt < 3.545, !is.na(disp) ~ disp < 380, !is.na(cyl) ~ cyl < 
+  #>     7, .default = FALSE) ~ 16.9125, .default = 15.125)) + case_when(case_when(!is.na(wt) ~ 
+  #>     wt < 3.16, !is.na(disp) ~ disp < 163.8, !is.na(cyl) ~ cyl < 
+  #>     7, .default = FALSE) ~ 24.3642857142857, .default = 15.7444444444444) + 
+  #>     case_when(case_when(!is.na(wt) ~ wt < 2.26, !is.na(disp) ~ 
+  #>         disp < 101.55, !is.na(cyl) ~ cyl < 5, .default = FALSE) ~ 
+  #>         30.0857142857143, .default = case_when(case_when(!is.na(cyl) ~ 
+  #>         cyl < 7, !is.na(disp) ~ disp < 250.4, !is.na(wt) ~ wt < 
+  #>         3.3125, .default = TRUE) ~ 20.4428571428571, .default = 14.6454545454545)) + 
+  #>     case_when(case_when(!is.na(disp) ~ disp < 163.8, !is.na(wt) ~ 
+  #>         wt < 3.3125, !is.na(cyl) ~ cyl < 5, .default = FALSE) ~ 
+  #>         25.6733333333333, .default = 14.6764705882353) + case_when(case_when(!is.na(wt) ~ 
+  #>     wt < 2.41, !is.na(disp) ~ disp < 120.65, !is.na(cyl) ~ cyl < 
+  #>     5, .default = FALSE) ~ 29.8, .default = case_when(case_when(!is.na(disp) ~ 
+  #>     disp < 266.9, !is.na(cyl) ~ cyl < 7, !is.na(wt) ~ wt < 3.325, 
+  #>     .default = FALSE) ~ 21.325, !is.na(disp) | !is.na(cyl) | 
+  #>     !is.na(wt) ~ 14.6916666666667, .default = 18.0083333333333)))/5L
   ```
 
 - Add the predictions to the original table
@@ -92,14 +104,70 @@ model <- baguette::bagger(mpg ~ wt + cyl + disp, data = mtcars, times = 5)
 
   tidypredict_sql(model, dbplyr::simulate_mssql())
   #> <SQL> ((((CASE
-  #> WHEN ([wt] < 2.975) THEN 23.0583333333333
-  #> ELSE CASE WHEN ([wt] < 3.545) THEN 16.9125 ELSE 15.125 END
-  #> END + CASE WHEN ([wt] < 3.16) THEN 24.3642857142857 ELSE 15.7444444444444 END) + CASE
-  #> WHEN ([wt] < 2.26) THEN 30.0857142857143
-  #> ELSE CASE WHEN ([cyl] < 7.0) THEN 20.4428571428571 ELSE 14.6454545454545 END
-  #> END) + CASE WHEN ([disp] < 163.8) THEN 25.6733333333333 ELSE 14.6764705882353 END) + CASE
-  #> WHEN ([wt] < 2.41) THEN 29.8
-  #> ELSE CASE WHEN ([disp] < 266.9) THEN 21.325 ELSE 14.6916666666667 END
+  #> WHEN (CASE
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 2.975)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 163.8)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 7.0)
+  #> ELSE 0
+  #> END) THEN 23.0583333333333
+  #> ELSE CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 3.545)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 380.0)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 7.0)
+  #> ELSE 0
+  #> END) THEN 16.9125
+  #> ELSE 15.125
+  #> END
+  #> END + CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 3.16)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 163.8)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 7.0)
+  #> ELSE 0
+  #> END) THEN 24.3642857142857
+  #> ELSE 15.7444444444444
+  #> END) + CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 2.26)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 101.55)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 5.0)
+  #> ELSE 0
+  #> END) THEN 30.0857142857143
+  #> ELSE CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 7.0)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 250.4)
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 3.3125)
+  #> ELSE 1
+  #> END) THEN 20.4428571428571
+  #> ELSE 14.6454545454545
+  #> END
+  #> END) + CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 163.8)
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 3.3125)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 5.0)
+  #> ELSE 0
+  #> END) THEN 25.6733333333333
+  #> ELSE 14.6764705882353
+  #> END) + CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 2.41)
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 120.65)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 5.0)
+  #> ELSE 0
+  #> END) THEN 29.8
+  #> ELSE CASE
+  #> WHEN (CASE
+  #> WHEN (NOT(([disp] IS NULL))) THEN ([disp] < 266.9)
+  #> WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] < 7.0)
+  #> WHEN (NOT(([wt] IS NULL))) THEN ([wt] < 3.325)
+  #> ELSE 0
+  #> END) THEN 21.325
+  #> WHEN (NOT(([disp] IS NULL)) OR NOT(([cyl] IS NULL)) OR NOT(([wt] IS NULL))) THEN 14.6916666666667
+  #> ELSE 18.0083333333333
+  #> END
   #> END) / 5
   ```
 
@@ -153,67 +221,163 @@ model <- bag_tree(mode = "regression") %>%
   fit(mpg ~ wt + cyl + disp, data = mtcars)
 
 tidypredict_fit(model)
-#> (case_when(wt < 2.0775 ~ case_when(wt < 1.674 ~ 30.4, .default = 33.9), 
-#>     .default = case_when(wt < 2.975 ~ case_when(wt < 2.3925 ~ 
-#>         22.8, .default = case_when(cyl < 5 ~ case_when(wt < 2.6225 ~ 
-#>         21.5, .default = 21.4), .default = case_when(disp < 152.5 ~ 
-#>         19.7, .default = 21))), .default = case_when(disp < 450 ~ 
-#>         case_when(disp < 355.5 ~ case_when(disp < 288.4 ~ case_when(wt < 
-#>             3.9 ~ case_when(wt < 3.595 ~ case_when(wt < 3.45 ~ 
-#>             17.8, .default = 18.1), .default = 17.3), .default = 16.4), 
-#>             .default = case_when(disp < 311 ~ case_when(disp < 
-#>                 302.5 ~ 15, .default = 15.2), .default = case_when(wt < 
-#>                 3.345 ~ 15.8, .default = 15.5))), .default = case_when(wt < 
-#>             4.595 ~ case_when(wt < 3.7075 ~ case_when(wt < 3.505 ~ 
-#>             18.7, .default = 14.3), .default = 19.2), .default = 14.7)), 
-#>         .default = 10.4))) + case_when(wt < 2.26 ~ case_when(wt < 
-#>     2.17 ~ case_when(wt < 1.724 ~ 30.4, .default = case_when(wt < 
-#>     2.0375 ~ 27.3, .default = 26)), .default = 32.4), .default = case_when(cyl < 
-#>     7 ~ case_when(wt < 3.3275 ~ case_when(cyl < 5 ~ case_when(wt < 
-#>     2.3925 ~ 22.8, .default = case_when(wt < 2.965 ~ case_when(wt < 
-#>     2.6225 ~ 21.5, .default = 21.4), .default = 22.8)), .default = case_when(disp < 
-#>     152.5 ~ 19.7, .default = case_when(wt < 3.045 ~ 21, .default = 21.4))), 
-#>     .default = case_when(wt < 3.45 ~ 19.2, .default = 18.1)), 
-#>     .default = case_when(disp < 430 ~ case_when(disp < 380 ~ 
-#>         case_when(wt < 3.955 ~ case_when(wt < 3.81 ~ case_when(disp < 
-#>             355.5 ~ case_when(disp < 326 ~ case_when(wt < 3.675 ~ 
-#>             15, .default = 15.2), .default = 15.8), .default = 14.3), 
-#>             .default = 13.3), .default = 16.4), .default = 19.2), 
-#>         .default = 10.4))) + case_when(wt < 2.26 ~ case_when(disp < 
-#>     78.85 ~ case_when(wt < 1.9075 ~ 30.4, .default = 32.4), .default = case_when(wt < 
-#>     1.724 ~ 30.4, .default = 27.3)), .default = case_when(cyl < 
-#>     7 ~ case_when(wt < 3.315 ~ case_when(wt < 3.0325 ~ case_when(wt < 
-#>     2.47 ~ 22.8, .default = case_when(disp < 152.5 ~ case_when(wt < 
-#>     2.775 ~ 19.7, .default = 21.4), .default = 21)), .default = 24.4), 
-#>     .default = case_when(wt < 3.45 ~ 18.5, .default = 18.1)), 
-#>     .default = case_when(wt < 4.49 ~ case_when(disp < 339 ~ case_when(wt < 
-#>         3.65 ~ case_when(disp < 311 ~ case_when(wt < 3.5025 ~ 
-#>         15.2, .default = 15), .default = 15.5), .default = 17.3), 
-#>         .default = case_when(wt < 3.505 ~ 18.7, .default = 14.3)), 
-#>         .default = 10.4))) + case_when(disp < 163.8 ~ case_when(disp < 
-#>     101.55 ~ case_when(wt < 2.0675 ~ case_when(wt < 1.775 ~ case_when(wt < 
-#>     1.564 ~ 30.4, .default = 30.4), .default = 27.3), .default = 32.4), 
-#>     .default = case_when(wt < 2.23 ~ 26, .default = case_when(wt < 
-#>         3.0325 ~ case_when(wt < 2.3925 ~ 22.8, .default = case_when(wt < 
-#>         2.8275 ~ case_when(wt < 2.6225 ~ 21.5, .default = 21.4), 
-#>         .default = 21)), .default = 24.4))), .default = case_when(wt < 
-#>     4.66 ~ case_when(disp < 288.4 ~ case_when(wt < 3.755 ~ case_when(wt < 
-#>     3.585 ~ 17.8, .default = 17.3), .default = case_when(wt < 
-#>     3.925 ~ 15.2, .default = 16.4)), .default = case_when(wt < 
-#>     3.545 ~ case_when(disp < 311 ~ 15.2, .default = case_when(wt < 
-#>     3.345 ~ 15.8, .default = 15.5)), .default = case_when(wt < 
-#>     3.705 ~ case_when(disp < 330.5 ~ 15, .default = 14.3), .default = 13.3))), 
-#>     .default = 10.4)) + case_when(wt < 2.41 ~ case_when(disp < 
-#>     107.7 ~ case_when(wt < 1.9075 ~ 30.4, .default = 32.4), .default = 26), 
-#>     .default = case_when(disp < 266.9 ~ case_when(cyl < 5 ~ case_when(wt < 
-#>         3.17 ~ case_when(wt < 2.965 ~ 21.4, .default = 22.8), 
-#>         .default = 24.4), .default = case_when(wt < 3.3275 ~ 
-#>         case_when(disp < 152.5 ~ 19.7, .default = case_when(wt < 
-#>             3.045 ~ 21, .default = 21.4)), .default = 18.5)), 
-#>         .default = case_when(wt < 4.66 ~ case_when(wt < 3.505 ~ 
-#>             case_when(wt < 3.4375 ~ case_when(disp < 327.5 ~ 
-#>                 15.2, .default = 15.8), .default = 18.7), .default = case_when(wt < 
-#>             3.955 ~ case_when(wt < 3.81 ~ case_when(disp < 330.5 ~ 
-#>             case_when(wt < 3.675 ~ 15, .default = 15.2), .default = 14.3), 
-#>             .default = 13.3), .default = 16.4)), .default = 10.4))))/5L
+#> (case_when(case_when(!is.na(wt) ~ wt < 2.0775, !is.na(disp) ~ 
+#>     disp < 101.55, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ 
+#>     wt < 1.674, .default = FALSE) ~ 30.4, !is.na(wt) ~ 33.9, 
+#>     .default = 32.15), .default = case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.975, !is.na(disp) ~ disp < 163.8, !is.na(cyl) ~ cyl < 
+#>     7, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt < 
+#>     2.3925, !is.na(disp) ~ disp < 114.05, .default = FALSE) ~ 
+#>     22.8, .default = case_when(case_when(!is.na(cyl) ~ cyl < 
+#>     5, !is.na(disp) ~ disp < 133, !is.na(wt) ~ wt < 2.5425, .default = FALSE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 2.6225, .default = TRUE) ~ 
+#>         21.5, .default = 21.4), .default = case_when(case_when(!is.na(disp) ~ 
+#>     disp < 152.5, !is.na(wt) ~ !wt < 2.695, .default = FALSE) ~ 
+#>     19.7, .default = 21))), .default = case_when(case_when(!is.na(disp) ~ 
+#>     disp < 450, !is.na(wt) ~ wt < 4.66, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>     disp < 355.5, !is.na(wt) ~ wt < 3.7875, .default = TRUE) ~ 
+#>     case_when(case_when(!is.na(disp) ~ disp < 288.4, !is.na(wt) ~ 
+#>         !wt < 3.65, !is.na(cyl) ~ cyl < 7, .default = FALSE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.9, .default = TRUE) ~ 
+#>             case_when(case_when(!is.na(wt) ~ wt < 3.595, .default = TRUE) ~ 
+#>                 case_when(case_when(!is.na(wt) ~ wt < 3.45, .default = FALSE) ~ 
+#>                   17.8, !is.na(wt) ~ 18.1, .default = 17.95), 
+#>                 .default = 17.3), .default = 16.4), .default = case_when(case_when(!is.na(disp) ~ 
+#>         disp < 311, !is.na(wt) ~ !wt < 3.545, .default = FALSE) ~ 
+#>         case_when(case_when(!is.na(disp) ~ disp < 302.5, .default = TRUE) ~ 
+#>             15, .default = 15.2), !is.na(disp) | !is.na(wt) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.345, .default = FALSE) ~ 
+#>             15.8, .default = 15.5), .default = 15.3333333333333)), 
+#>     .default = case_when(case_when(!is.na(wt) ~ wt < 4.595, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.7075, !is.na(disp) ~ 
+#>             disp < 380, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.505, .default = TRUE) ~ 18.7, .default = 14.3), 
+#>             !is.na(wt) | !is.na(disp) ~ 19.2, .default = 18.2166666666667), 
+#>         .default = 14.7)), .default = 10.4))) + case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.26, !is.na(disp) ~ disp < 101.55, .default = FALSE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 2.17, !is.na(disp) ~ 
+#>         !disp < 78.85, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>         wt < 1.724, .default = FALSE) ~ 30.4, .default = case_when(case_when(!is.na(wt) ~ 
+#>         wt < 2.0375, .default = FALSE) ~ 27.3, !is.na(wt) ~ 26, 
+#>         .default = 26.65)), .default = 32.4), .default = case_when(case_when(!is.na(cyl) ~ 
+#>     cyl < 7, !is.na(disp) ~ disp < 266.9, !is.na(wt) ~ wt < 3.515, 
+#>     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt < 
+#>     3.3275, !is.na(disp) ~ disp < 163.8, .default = TRUE) ~ case_when(case_when(!is.na(cyl) ~ 
+#>     cyl < 5, !is.na(disp) ~ disp < 142.9, !is.na(wt) ~ wt < 2.5425, 
+#>     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt < 
+#>     2.3925, .default = FALSE) ~ 22.8, .default = case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.965, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.6225, .default = FALSE) ~ 21.5, .default = 21.4), 
+#>     .default = 22.8)), !is.na(cyl) | !is.na(disp) | !is.na(wt) ~ 
+#>     case_when(case_when(!is.na(disp) ~ disp < 152.5, .default = FALSE) ~ 
+#>         19.7, .default = case_when(case_when(!is.na(wt) ~ wt < 
+#>         3.045, .default = TRUE) ~ 21, .default = 21.4)), .default = 21.4), 
+#>     .default = case_when(case_when(!is.na(wt) ~ wt < 3.45, .default = FALSE) ~ 
+#>         19.2, !is.na(wt) ~ 18.1, .default = 18.65)), .default = case_when(case_when(!is.na(disp) ~ 
+#>     disp < 430, !is.na(wt) ~ wt < 4.747, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>     disp < 380, !is.na(wt) ~ wt < 3.8425, .default = TRUE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 3.955, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.81, .default = TRUE) ~ 
+#>             case_when(case_when(!is.na(disp) ~ disp < 355.5, 
+#>                 .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>                 disp < 326, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>                 wt < 3.675, .default = FALSE) ~ 15, .default = 15.2), 
+#>                 .default = 15.8), .default = 14.3), .default = 13.3), 
+#>         .default = 16.4), .default = 19.2), .default = 10.4))) + 
+#>     case_when(case_when(!is.na(wt) ~ wt < 2.26, !is.na(disp) ~ 
+#>         disp < 101.55, !is.na(cyl) ~ cyl < 5, .default = FALSE) ~ 
+#>         case_when(case_when(!is.na(disp) ~ disp < 78.85, !is.na(wt) ~ 
+#>             !wt < 2.0675, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>             wt < 1.9075, !is.na(disp) ~ disp < 77.2, .default = FALSE) ~ 
+#>             30.4, !is.na(wt) | !is.na(disp) ~ 32.4, .default = 31.4), 
+#>             .default = case_when(case_when(!is.na(wt) ~ wt < 
+#>                 1.724, .default = FALSE) ~ 30.4, .default = 27.3)), 
+#>         .default = case_when(case_when(!is.na(cyl) ~ cyl < 7, 
+#>             !is.na(disp) ~ disp < 250.4, !is.na(wt) ~ wt < 3.3125, 
+#>             .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.315, !is.na(disp) ~ disp < 163.8, .default = TRUE) ~ 
+#>             case_when(case_when(!is.na(wt) ~ wt < 3.0325, .default = TRUE) ~ 
+#>                 case_when(case_when(!is.na(wt) ~ wt < 2.47, .default = FALSE) ~ 
+#>                   22.8, .default = case_when(case_when(!is.na(disp) ~ 
+#>                   disp < 152.5, !is.na(wt) ~ !wt < 2.695, .default = FALSE) ~ 
+#>                   case_when(case_when(!is.na(wt) ~ wt < 2.775, 
+#>                     .default = TRUE) ~ 19.7, .default = 21.4), 
+#>                   .default = 21)), .default = 24.4), .default = case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.45, !is.na(disp) ~ disp < 196.3, .default = FALSE) ~ 
+#>             18.5, !is.na(wt) | !is.na(disp) ~ 18.1, .default = 18.3)), 
+#>             .default = case_when(case_when(!is.na(wt) ~ wt < 
+#>                 4.49, !is.na(disp) ~ disp < 410, .default = TRUE) ~ 
+#>                 case_when(case_when(!is.na(disp) ~ disp < 339, 
+#>                   .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>                   wt < 3.65, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>                   disp < 311, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>                   wt < 3.5025, .default = TRUE) ~ 15.2, .default = 15), 
+#>                   .default = 15.5), .default = 17.3), .default = case_when(case_when(!is.na(wt) ~ 
+#>                   wt < 3.505, .default = TRUE) ~ 18.7, .default = 14.3)), 
+#>                 .default = 10.4))) + case_when(case_when(!is.na(disp) ~ 
+#>     disp < 163.8, !is.na(wt) ~ wt < 3.3125, !is.na(cyl) ~ cyl < 
+#>     5, .default = FALSE) ~ case_when(case_when(!is.na(disp) ~ 
+#>     disp < 101.55, !is.na(wt) ~ wt < 2.0375, .default = FALSE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 2.0675, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 1.775, !is.na(disp) ~ 
+#>             !disp < 87.05, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>             wt < 1.564, .default = TRUE) ~ 30.4, .default = 30.4), 
+#>             .default = 27.3), .default = 32.4), .default = case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.23, .default = FALSE) ~ 26, .default = case_when(case_when(!is.na(wt) ~ 
+#>     wt < 3.0325, !is.na(disp) ~ disp < 133.85, .default = TRUE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 2.3925, .default = FALSE) ~ 
+#>         22.8, .default = case_when(case_when(!is.na(wt) ~ wt < 
+#>         2.8275, !is.na(cyl) ~ cyl < 5, !is.na(disp) ~ disp < 
+#>         140.5, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ 
+#>         wt < 2.6225, .default = FALSE) ~ 21.5, !is.na(wt) ~ 21.4, 
+#>         .default = 21.45), !is.na(wt) | !is.na(cyl) | !is.na(disp) ~ 
+#>         21, .default = 21.225)), .default = 24.4))), .default = case_when(case_when(!is.na(wt) ~ 
+#>     wt < 4.66, !is.na(disp) ~ disp < 410, .default = TRUE) ~ 
+#>     case_when(case_when(!is.na(disp) ~ disp < 288.4, !is.na(wt) ~ 
+#>         !wt < 3.65, !is.na(cyl) ~ cyl < 7, .default = FALSE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.755, !is.na(cyl) ~ 
+#>             cyl < 7, !is.na(disp) ~ disp < 221.7, .default = TRUE) ~ 
+#>             case_when(case_when(!is.na(wt) ~ wt < 3.585, .default = TRUE) ~ 
+#>                 17.8, .default = 17.3), .default = case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.925, .default = FALSE) ~ 15.2, !is.na(wt) ~ 
+#>             16.4, .default = 15.8)), .default = case_when(case_when(!is.na(wt) ~ 
+#>         wt < 3.545, !is.na(disp) ~ disp < 334, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(disp) ~ disp < 311, .default = TRUE) ~ 
+#>             15.2, .default = case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.345, .default = FALSE) ~ 15.8, !is.na(wt) ~ 
+#>             15.5, .default = 15.65)), .default = case_when(case_when(!is.na(wt) ~ 
+#>         wt < 3.705, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>         disp < 330.5, .default = FALSE) ~ 15, .default = 14.3), 
+#>         .default = 13.3))), .default = 10.4)) + case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.41, !is.na(disp) ~ disp < 120.65, !is.na(cyl) ~ cyl < 
+#>     5, .default = FALSE) ~ case_when(case_when(!is.na(disp) ~ 
+#>     disp < 107.7, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>     wt < 1.9075, !is.na(disp) ~ !disp < 86.9, .default = TRUE) ~ 
+#>     30.4, .default = 32.4), .default = 26), .default = case_when(case_when(!is.na(disp) ~ 
+#>     disp < 266.9, !is.na(cyl) ~ cyl < 7, !is.na(wt) ~ wt < 3.325, 
+#>     .default = FALSE) ~ case_when(case_when(!is.na(cyl) ~ cyl < 
+#>     5, !is.na(disp) ~ disp < 153.35, !is.na(wt) ~ wt < 3.2025, 
+#>     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt < 
+#>     3.17, !is.na(disp) ~ disp < 143.75, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>     wt < 2.965, .default = TRUE) ~ 21.4, .default = 22.8), .default = 24.4), 
+#>     !is.na(cyl) | !is.na(disp) | !is.na(wt) ~ case_when(case_when(!is.na(wt) ~ 
+#>         wt < 3.3275, !is.na(disp) ~ disp < 163.8, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(disp) ~ disp < 152.5, .default = FALSE) ~ 
+#>             19.7, .default = case_when(case_when(!is.na(wt) ~ 
+#>             wt < 3.045, .default = TRUE) ~ 21, .default = 21.4)), 
+#>         .default = 18.5), .default = 21.325), !is.na(disp) | 
+#>     !is.na(cyl) | !is.na(wt) ~ case_when(case_when(!is.na(wt) ~ 
+#>     wt < 4.66, !is.na(disp) ~ disp < 410, .default = TRUE) ~ 
+#>     case_when(case_when(!is.na(wt) ~ wt < 3.505, !is.na(disp) ~ 
+#>         !disp < 302.5, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ 
+#>         wt < 3.4375, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ 
+#>         disp < 327.5, .default = TRUE) ~ 15.2, .default = 15.8), 
+#>         .default = 18.7), .default = case_when(case_when(!is.na(wt) ~ 
+#>         wt < 3.955, !is.na(disp) ~ !disp < 288.4, .default = TRUE) ~ 
+#>         case_when(case_when(!is.na(wt) ~ wt < 3.81, .default = TRUE) ~ 
+#>             case_when(case_when(!is.na(disp) ~ disp < 330.5, 
+#>                 .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ 
+#>                 wt < 3.675, .default = FALSE) ~ 15, !is.na(wt) ~ 
+#>                 15.2, .default = 15.1), .default = 14.3), .default = 13.3), 
+#>         .default = 16.4)), .default = 10.4), .default = 18.0083333333333)))/5L
 ```

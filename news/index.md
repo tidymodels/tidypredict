@@ -20,6 +20,18 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now routes missing values through surrogate splits for
+  [`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) models,
+  and for
+  [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
+  models using the `"CART"` base model, matching
+  [`predict()`](https://rdrr.io/r/stats/predict.html) instead of sending
+  every missing value down the right branch. All three `usesurrogate`
+  modes are followed, including stopping at the node when no surrogate
+  resolves the row and there is no majority to go with.
+  ([\#294](https://github.com/tidymodels/tidypredict/issues/294))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns `NA` for a row that reaches a split on a predictor it is
   missing, for
   [`partykit::ctree()`](https://rdrr.io/pkg/partykit/man/ctree.html),

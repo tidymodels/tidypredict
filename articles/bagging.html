@@ -169,14 +169,26 @@ the largest average probability.</p>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (case_when(wt &lt; 2.975 ~ 23.0583333333333, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.545 ~ 16.9125, .default = 15.125)) + case_when(wt &lt; 3.16 ~ </span></span>
-<span><span class="co">#&gt;     24.3642857142857, .default = 15.7444444444444) + case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.26 ~ 30.0857142857143, .default = case_when(cyl &lt; 7 ~ 20.4428571428571, </span></span>
-<span><span class="co">#&gt;     .default = 14.6454545454545)) + case_when(disp &lt; 163.8 ~ </span></span>
-<span><span class="co">#&gt;     25.6733333333333, .default = 14.6764705882353) + case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.41 ~ 29.8, .default = case_when(disp &lt; 266.9 ~ 21.325, </span></span>
-<span><span class="co">#&gt;     .default = 14.6916666666667)))/5L</span></span></code></pre></div>
+<span><span class="co">#&gt; (case_when(case_when(!is.na(wt) ~ wt &lt; 2.975, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 163.8, !is.na(cyl) ~ cyl &lt; 7, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     23.0583333333333, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 3.545, !is.na(disp) ~ disp &lt; 380, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     7, .default = FALSE) ~ 16.9125, .default = 15.125)) + case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 3.16, !is.na(disp) ~ disp &lt; 163.8, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     7, .default = FALSE) ~ 24.3642857142857, .default = 15.7444444444444) + </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.26, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         disp &lt; 101.55, !is.na(cyl) ~ cyl &lt; 5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         30.0857142857143, .default = case_when(case_when(!is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;         cyl &lt; 7, !is.na(disp) ~ disp &lt; 250.4, !is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;         3.3125, .default = TRUE) ~ 20.4428571428571, .default = 14.6454545454545)) + </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(disp) ~ disp &lt; 163.8, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.3125, !is.na(cyl) ~ cyl &lt; 5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         25.6733333333333, .default = 14.6764705882353) + case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.41, !is.na(disp) ~ disp &lt; 120.65, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     5, .default = FALSE) ~ 29.8, .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 266.9, !is.na(cyl) ~ cyl &lt; 7, !is.na(wt) ~ wt &lt; 3.325, </span></span>
+<span><span class="co">#&gt;     .default = FALSE) ~ 21.325, !is.na(disp) | !is.na(cyl) | </span></span>
+<span><span class="co">#&gt;     !is.na(wt) ~ 14.6916666666667, .default = 18.0083333333333)))/5L</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -214,14 +226,70 @@ results</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-mssql.html" class="external-link">simulate_mssql</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQL&gt; ((((CASE</span></span>
-<span><span class="co">#&gt; WHEN ([wt] &lt; 2.975) THEN 23.0583333333333</span></span>
-<span><span class="co">#&gt; ELSE CASE WHEN ([wt] &lt; 3.545) THEN 16.9125 ELSE 15.125 END</span></span>
-<span><span class="co">#&gt; END + CASE WHEN ([wt] &lt; 3.16) THEN 24.3642857142857 ELSE 15.7444444444444 END) + CASE</span></span>
-<span><span class="co">#&gt; WHEN ([wt] &lt; 2.26) THEN 30.0857142857143</span></span>
-<span><span class="co">#&gt; ELSE CASE WHEN ([cyl] &lt; 7.0) THEN 20.4428571428571 ELSE 14.6454545454545 END</span></span>
-<span><span class="co">#&gt; END) + CASE WHEN ([disp] &lt; 163.8) THEN 25.6733333333333 ELSE 14.6764705882353 END) + CASE</span></span>
-<span><span class="co">#&gt; WHEN ([wt] &lt; 2.41) THEN 29.8</span></span>
-<span><span class="co">#&gt; ELSE CASE WHEN ([disp] &lt; 266.9) THEN 21.325 ELSE 14.6916666666667 END</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 2.975)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 163.8)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 7.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 23.0583333333333</span></span>
+<span><span class="co">#&gt; ELSE CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 3.545)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 380.0)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 7.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 16.9125</span></span>
+<span><span class="co">#&gt; ELSE 15.125</span></span>
+<span><span class="co">#&gt; END</span></span>
+<span><span class="co">#&gt; END + CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 3.16)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 163.8)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 7.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 24.3642857142857</span></span>
+<span><span class="co">#&gt; ELSE 15.7444444444444</span></span>
+<span><span class="co">#&gt; END) + CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 2.26)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 101.55)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 5.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 30.0857142857143</span></span>
+<span><span class="co">#&gt; ELSE CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 7.0)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 250.4)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 3.3125)</span></span>
+<span><span class="co">#&gt; ELSE 1</span></span>
+<span><span class="co">#&gt; END) THEN 20.4428571428571</span></span>
+<span><span class="co">#&gt; ELSE 14.6454545454545</span></span>
+<span><span class="co">#&gt; END</span></span>
+<span><span class="co">#&gt; END) + CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 163.8)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 3.3125)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 5.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 25.6733333333333</span></span>
+<span><span class="co">#&gt; ELSE 14.6764705882353</span></span>
+<span><span class="co">#&gt; END) + CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 2.41)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 120.65)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 5.0)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 29.8</span></span>
+<span><span class="co">#&gt; ELSE CASE</span></span>
+<span><span class="co">#&gt; WHEN (CASE</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL))) THEN ([disp] &lt; 266.9)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([cyl] IS NULL))) THEN ([cyl] &lt; 7.0)</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([wt] IS NULL))) THEN ([wt] &lt; 3.325)</span></span>
+<span><span class="co">#&gt; ELSE 0</span></span>
+<span><span class="co">#&gt; END) THEN 21.325</span></span>
+<span><span class="co">#&gt; WHEN (NOT(([disp] IS NULL)) OR NOT(([cyl] IS NULL)) OR NOT(([wt] IS NULL))) THEN 14.6916666666667</span></span>
+<span><span class="co">#&gt; ELSE 18.0083333333333</span></span>
+<span><span class="co">#&gt; END</span></span>
 <span><span class="co">#&gt; END) / 5</span></span></code></pre></div>
 </li>
 </ul>
@@ -270,69 +338,165 @@ well.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; (case_when(wt &lt; 2.0775 ~ case_when(wt &lt; 1.674 ~ 30.4, .default = 33.9), </span></span>
-<span><span class="co">#&gt;     .default = case_when(wt &lt; 2.975 ~ case_when(wt &lt; 2.3925 ~ </span></span>
-<span><span class="co">#&gt;         22.8, .default = case_when(cyl &lt; 5 ~ case_when(wt &lt; 2.6225 ~ </span></span>
-<span><span class="co">#&gt;         21.5, .default = 21.4), .default = case_when(disp &lt; 152.5 ~ </span></span>
-<span><span class="co">#&gt;         19.7, .default = 21))), .default = case_when(disp &lt; 450 ~ </span></span>
-<span><span class="co">#&gt;         case_when(disp &lt; 355.5 ~ case_when(disp &lt; 288.4 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;             3.9 ~ case_when(wt &lt; 3.595 ~ case_when(wt &lt; 3.45 ~ </span></span>
-<span><span class="co">#&gt;             17.8, .default = 18.1), .default = 17.3), .default = 16.4), </span></span>
-<span><span class="co">#&gt;             .default = case_when(disp &lt; 311 ~ case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;                 302.5 ~ 15, .default = 15.2), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;                 3.345 ~ 15.8, .default = 15.5))), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;             4.595 ~ case_when(wt &lt; 3.7075 ~ case_when(wt &lt; 3.505 ~ </span></span>
-<span><span class="co">#&gt;             18.7, .default = 14.3), .default = 19.2), .default = 14.7)), </span></span>
-<span><span class="co">#&gt;         .default = 10.4))) + case_when(wt &lt; 2.26 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.17 ~ case_when(wt &lt; 1.724 ~ 30.4, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.0375 ~ 27.3, .default = 26)), .default = 32.4), .default = case_when(cyl &lt; </span></span>
-<span><span class="co">#&gt;     7 ~ case_when(wt &lt; 3.3275 ~ case_when(cyl &lt; 5 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.3925 ~ 22.8, .default = case_when(wt &lt; 2.965 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.6225 ~ 21.5, .default = 21.4), .default = 22.8)), .default = case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;     152.5 ~ 19.7, .default = case_when(wt &lt; 3.045 ~ 21, .default = 21.4))), </span></span>
-<span><span class="co">#&gt;     .default = case_when(wt &lt; 3.45 ~ 19.2, .default = 18.1)), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt; 430 ~ case_when(disp &lt; 380 ~ </span></span>
-<span><span class="co">#&gt;         case_when(wt &lt; 3.955 ~ case_when(wt &lt; 3.81 ~ case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;             355.5 ~ case_when(disp &lt; 326 ~ case_when(wt &lt; 3.675 ~ </span></span>
-<span><span class="co">#&gt;             15, .default = 15.2), .default = 15.8), .default = 14.3), </span></span>
-<span><span class="co">#&gt;             .default = 13.3), .default = 16.4), .default = 19.2), </span></span>
-<span><span class="co">#&gt;         .default = 10.4))) + case_when(wt &lt; 2.26 ~ case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;     78.85 ~ case_when(wt &lt; 1.9075 ~ 30.4, .default = 32.4), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     1.724 ~ 30.4, .default = 27.3)), .default = case_when(cyl &lt; </span></span>
-<span><span class="co">#&gt;     7 ~ case_when(wt &lt; 3.315 ~ case_when(wt &lt; 3.0325 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.47 ~ 22.8, .default = case_when(disp &lt; 152.5 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     2.775 ~ 19.7, .default = 21.4), .default = 21)), .default = 24.4), </span></span>
-<span><span class="co">#&gt;     .default = case_when(wt &lt; 3.45 ~ 18.5, .default = 18.1)), </span></span>
-<span><span class="co">#&gt;     .default = case_when(wt &lt; 4.49 ~ case_when(disp &lt; 339 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.65 ~ case_when(disp &lt; 311 ~ case_when(wt &lt; 3.5025 ~ </span></span>
-<span><span class="co">#&gt;         15.2, .default = 15), .default = 15.5), .default = 17.3), </span></span>
-<span><span class="co">#&gt;         .default = case_when(wt &lt; 3.505 ~ 18.7, .default = 14.3)), </span></span>
-<span><span class="co">#&gt;         .default = 10.4))) + case_when(disp &lt; 163.8 ~ case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;     101.55 ~ case_when(wt &lt; 2.0675 ~ case_when(wt &lt; 1.775 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     1.564 ~ 30.4, .default = 30.4), .default = 27.3), .default = 32.4), </span></span>
-<span><span class="co">#&gt;     .default = case_when(wt &lt; 2.23 ~ 26, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.0325 ~ case_when(wt &lt; 2.3925 ~ 22.8, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         2.8275 ~ case_when(wt &lt; 2.6225 ~ 21.5, .default = 21.4), </span></span>
-<span><span class="co">#&gt;         .default = 21)), .default = 24.4))), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     4.66 ~ case_when(disp &lt; 288.4 ~ case_when(wt &lt; 3.755 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.585 ~ 17.8, .default = 17.3), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.925 ~ 15.2, .default = 16.4)), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.545 ~ case_when(disp &lt; 311 ~ 15.2, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.345 ~ 15.8, .default = 15.5)), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;     3.705 ~ case_when(disp &lt; 330.5 ~ 15, .default = 14.3), .default = 13.3))), </span></span>
-<span><span class="co">#&gt;     .default = 10.4)) + case_when(wt &lt; 2.41 ~ case_when(disp &lt; </span></span>
-<span><span class="co">#&gt;     107.7 ~ case_when(wt &lt; 1.9075 ~ 30.4, .default = 32.4), .default = 26), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt; 266.9 ~ case_when(cyl &lt; 5 ~ case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.17 ~ case_when(wt &lt; 2.965 ~ 21.4, .default = 22.8), </span></span>
-<span><span class="co">#&gt;         .default = 24.4), .default = case_when(wt &lt; 3.3275 ~ </span></span>
-<span><span class="co">#&gt;         case_when(disp &lt; 152.5 ~ 19.7, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;             3.045 ~ 21, .default = 21.4)), .default = 18.5)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(wt &lt; 4.66 ~ case_when(wt &lt; 3.505 ~ </span></span>
-<span><span class="co">#&gt;             case_when(wt &lt; 3.4375 ~ case_when(disp &lt; 327.5 ~ </span></span>
-<span><span class="co">#&gt;                 15.2, .default = 15.8), .default = 18.7), .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;             3.955 ~ case_when(wt &lt; 3.81 ~ case_when(disp &lt; 330.5 ~ </span></span>
-<span><span class="co">#&gt;             case_when(wt &lt; 3.675 ~ 15, .default = 15.2), .default = 14.3), </span></span>
-<span><span class="co">#&gt;             .default = 13.3), .default = 16.4)), .default = 10.4))))/5L</span></span></code></pre></div>
+<span><span class="co">#&gt; (case_when(case_when(!is.na(wt) ~ wt &lt; 2.0775, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 101.55, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 1.674, .default = FALSE) ~ 30.4, !is.na(wt) ~ 33.9, </span></span>
+<span><span class="co">#&gt;     .default = 32.15), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.975, !is.na(disp) ~ disp &lt; 163.8, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     7, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     2.3925, !is.na(disp) ~ disp &lt; 114.05, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     22.8, .default = case_when(case_when(!is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     5, !is.na(disp) ~ disp &lt; 133, !is.na(wt) ~ wt &lt; 2.5425, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.6225, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         21.5, .default = 21.4), .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 152.5, !is.na(wt) ~ !wt &lt; 2.695, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     19.7, .default = 21))), .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 450, !is.na(wt) ~ wt &lt; 4.66, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 355.5, !is.na(wt) ~ wt &lt; 3.7875, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(disp) ~ disp &lt; 288.4, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         !wt &lt; 3.65, !is.na(cyl) ~ cyl &lt; 7, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.9, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             case_when(case_when(!is.na(wt) ~ wt &lt; 3.595, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;                 case_when(case_when(!is.na(wt) ~ wt &lt; 3.45, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;                   17.8, !is.na(wt) ~ 18.1, .default = 17.95), </span></span>
+<span><span class="co">#&gt;                 .default = 17.3), .default = 16.4), .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         disp &lt; 311, !is.na(wt) ~ !wt &lt; 3.545, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(disp) ~ disp &lt; 302.5, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             15, .default = 15.2), !is.na(disp) | !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.345, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;             15.8, .default = 15.5), .default = 15.3333333333333)), </span></span>
+<span><span class="co">#&gt;     .default = case_when(case_when(!is.na(wt) ~ wt &lt; 4.595, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.7075, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;             disp &lt; 380, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.505, .default = TRUE) ~ 18.7, .default = 14.3), </span></span>
+<span><span class="co">#&gt;             !is.na(wt) | !is.na(disp) ~ 19.2, .default = 18.2166666666667), </span></span>
+<span><span class="co">#&gt;         .default = 14.7)), .default = 10.4))) + case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.26, !is.na(disp) ~ disp &lt; 101.55, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.17, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         !disp &lt; 78.85, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 1.724, .default = FALSE) ~ 30.4, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 2.0375, .default = FALSE) ~ 27.3, !is.na(wt) ~ 26, </span></span>
+<span><span class="co">#&gt;         .default = 26.65)), .default = 32.4), .default = case_when(case_when(!is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     cyl &lt; 7, !is.na(disp) ~ disp &lt; 266.9, !is.na(wt) ~ wt &lt; 3.515, </span></span>
+<span><span class="co">#&gt;     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     3.3275, !is.na(disp) ~ disp &lt; 163.8, .default = TRUE) ~ case_when(case_when(!is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     cyl &lt; 5, !is.na(disp) ~ disp &lt; 142.9, !is.na(wt) ~ wt &lt; 2.5425, </span></span>
+<span><span class="co">#&gt;     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     2.3925, .default = FALSE) ~ 22.8, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.965, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.6225, .default = FALSE) ~ 21.5, .default = 21.4), </span></span>
+<span><span class="co">#&gt;     .default = 22.8)), !is.na(cyl) | !is.na(disp) | !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(disp) ~ disp &lt; 152.5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         19.7, .default = case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;         3.045, .default = TRUE) ~ 21, .default = 21.4)), .default = 21.4), </span></span>
+<span><span class="co">#&gt;     .default = case_when(case_when(!is.na(wt) ~ wt &lt; 3.45, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         19.2, !is.na(wt) ~ 18.1, .default = 18.65)), .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 430, !is.na(wt) ~ wt &lt; 4.747, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 380, !is.na(wt) ~ wt &lt; 3.8425, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 3.955, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.81, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             case_when(case_when(!is.na(disp) ~ disp &lt; 355.5, </span></span>
+<span><span class="co">#&gt;                 .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;                 disp &lt; 326, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                 wt &lt; 3.675, .default = FALSE) ~ 15, .default = 15.2), </span></span>
+<span><span class="co">#&gt;                 .default = 15.8), .default = 14.3), .default = 13.3), </span></span>
+<span><span class="co">#&gt;         .default = 16.4), .default = 19.2), .default = 10.4))) + </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.26, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         disp &lt; 101.55, !is.na(cyl) ~ cyl &lt; 5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(disp) ~ disp &lt; 78.85, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             !wt &lt; 2.0675, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 1.9075, !is.na(disp) ~ disp &lt; 77.2, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;             30.4, !is.na(wt) | !is.na(disp) ~ 32.4, .default = 31.4), </span></span>
+<span><span class="co">#&gt;             .default = case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;                 1.724, .default = FALSE) ~ 30.4, .default = 27.3)), </span></span>
+<span><span class="co">#&gt;         .default = case_when(case_when(!is.na(cyl) ~ cyl &lt; 7, </span></span>
+<span><span class="co">#&gt;             !is.na(disp) ~ disp &lt; 250.4, !is.na(wt) ~ wt &lt; 3.3125, </span></span>
+<span><span class="co">#&gt;             .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.315, !is.na(disp) ~ disp &lt; 163.8, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             case_when(case_when(!is.na(wt) ~ wt &lt; 3.0325, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;                 case_when(case_when(!is.na(wt) ~ wt &lt; 2.47, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;                   22.8, .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;                   disp &lt; 152.5, !is.na(wt) ~ !wt &lt; 2.695, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;                   case_when(case_when(!is.na(wt) ~ wt &lt; 2.775, </span></span>
+<span><span class="co">#&gt;                     .default = TRUE) ~ 19.7, .default = 21.4), </span></span>
+<span><span class="co">#&gt;                   .default = 21)), .default = 24.4), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.45, !is.na(disp) ~ disp &lt; 196.3, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;             18.5, !is.na(wt) | !is.na(disp) ~ 18.1, .default = 18.3)), </span></span>
+<span><span class="co">#&gt;             .default = case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;                 4.49, !is.na(disp) ~ disp &lt; 410, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;                 case_when(case_when(!is.na(disp) ~ disp &lt; 339, </span></span>
+<span><span class="co">#&gt;                   .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                   wt &lt; 3.65, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;                   disp &lt; 311, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                   wt &lt; 3.5025, .default = TRUE) ~ 15.2, .default = 15), </span></span>
+<span><span class="co">#&gt;                   .default = 15.5), .default = 17.3), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                   wt &lt; 3.505, .default = TRUE) ~ 18.7, .default = 14.3)), </span></span>
+<span><span class="co">#&gt;                 .default = 10.4))) + case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 163.8, !is.na(wt) ~ wt &lt; 3.3125, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     5, .default = FALSE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 101.55, !is.na(wt) ~ wt &lt; 2.0375, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.0675, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 1.775, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;             !disp &lt; 87.05, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 1.564, .default = TRUE) ~ 30.4, .default = 30.4), </span></span>
+<span><span class="co">#&gt;             .default = 27.3), .default = 32.4), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.23, .default = FALSE) ~ 26, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 3.0325, !is.na(disp) ~ disp &lt; 133.85, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 2.3925, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         22.8, .default = case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;         2.8275, !is.na(cyl) ~ cyl &lt; 5, !is.na(disp) ~ disp &lt; </span></span>
+<span><span class="co">#&gt;         140.5, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 2.6225, .default = FALSE) ~ 21.5, !is.na(wt) ~ 21.4, </span></span>
+<span><span class="co">#&gt;         .default = 21.45), !is.na(wt) | !is.na(cyl) | !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         21, .default = 21.225)), .default = 24.4))), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 4.66, !is.na(disp) ~ disp &lt; 410, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(disp) ~ disp &lt; 288.4, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         !wt &lt; 3.65, !is.na(cyl) ~ cyl &lt; 7, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.755, !is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;             cyl &lt; 7, !is.na(disp) ~ disp &lt; 221.7, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             case_when(case_when(!is.na(wt) ~ wt &lt; 3.585, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;                 17.8, .default = 17.3), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.925, .default = FALSE) ~ 15.2, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             16.4, .default = 15.8)), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.545, !is.na(disp) ~ disp &lt; 334, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(disp) ~ disp &lt; 311, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             15.2, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.345, .default = FALSE) ~ 15.8, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             15.5, .default = 15.65)), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.705, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         disp &lt; 330.5, .default = FALSE) ~ 15, .default = 14.3), </span></span>
+<span><span class="co">#&gt;         .default = 13.3))), .default = 10.4)) + case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.41, !is.na(disp) ~ disp &lt; 120.65, !is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     5, .default = FALSE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 107.7, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 1.9075, !is.na(disp) ~ !disp &lt; 86.9, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     30.4, .default = 32.4), .default = 26), .default = case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;     disp &lt; 266.9, !is.na(cyl) ~ cyl &lt; 7, !is.na(wt) ~ wt &lt; 3.325, </span></span>
+<span><span class="co">#&gt;     .default = FALSE) ~ case_when(case_when(!is.na(cyl) ~ cyl &lt; </span></span>
+<span><span class="co">#&gt;     5, !is.na(disp) ~ disp &lt; 153.35, !is.na(wt) ~ wt &lt; 3.2025, </span></span>
+<span><span class="co">#&gt;     .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     3.17, !is.na(disp) ~ disp &lt; 143.75, .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 2.965, .default = TRUE) ~ 21.4, .default = 22.8), .default = 24.4), </span></span>
+<span><span class="co">#&gt;     !is.na(cyl) | !is.na(disp) | !is.na(wt) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.3275, !is.na(disp) ~ disp &lt; 163.8, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(disp) ~ disp &lt; 152.5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;             19.7, .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;             wt &lt; 3.045, .default = TRUE) ~ 21, .default = 21.4)), </span></span>
+<span><span class="co">#&gt;         .default = 18.5), .default = 21.325), !is.na(disp) | </span></span>
+<span><span class="co">#&gt;     !is.na(cyl) | !is.na(wt) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     wt &lt; 4.66, !is.na(disp) ~ disp &lt; 410, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(wt) ~ wt &lt; 3.505, !is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         !disp &lt; 302.5, .default = FALSE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.4375, .default = TRUE) ~ case_when(case_when(!is.na(disp) ~ </span></span>
+<span><span class="co">#&gt;         disp &lt; 327.5, .default = TRUE) ~ 15.2, .default = 15.8), </span></span>
+<span><span class="co">#&gt;         .default = 18.7), .default = case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 3.955, !is.na(disp) ~ !disp &lt; 288.4, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;         case_when(case_when(!is.na(wt) ~ wt &lt; 3.81, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;             case_when(case_when(!is.na(disp) ~ disp &lt; 330.5, </span></span>
+<span><span class="co">#&gt;                 .default = TRUE) ~ case_when(case_when(!is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                 wt &lt; 3.675, .default = FALSE) ~ 15, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;                 15.2, .default = 15.1), .default = 14.3), .default = 13.3), </span></span>
+<span><span class="co">#&gt;         .default = 16.4)), .default = 10.4), .default = 18.0083333333333)))/5L</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
