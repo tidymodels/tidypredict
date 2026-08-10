@@ -109,7 +109,9 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
     right_subtree <- build_node(right_id)
 
     col_sym <- rlang::sym(split_var)
-    condition <- expr(!!col_sym <= !!split_val)
+    # `ranger` compares as `value > splitval` and a missing value fails that
+    # test, so it takes the same branch as a value at or below the split point.
+    condition <- expr(is.na(!!col_sym) | !!col_sym <= !!split_val)
 
     expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
@@ -370,5 +372,8 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
 }
 
 build_tree_formula.pm_tree_ranger <- function(model) {
-  build_tree_formula_forest(model)
+  expr_mean(map(
+    model$tree_info_list,
+    \(tree_info) generate_nested_case_when_tree(tree_info, missing = "left")
+  ))
 }

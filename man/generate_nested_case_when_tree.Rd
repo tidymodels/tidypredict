@@ -4,13 +4,14 @@
 \alias{generate_nested_case_when_tree}
 \title{Generate nested case_when for a tree}
 \usage{
-generate_nested_case_when_tree(tree_info, na_propagate = FALSE)
+generate_nested_case_when_tree(tree_info, missing = c("default", "na", "left"))
 }
 \arguments{
 \item{tree_info}{A tree info list from \code{rpart_tree_info_full()} or similar}
 
-\item{na_propagate}{Return \code{NA} for a row once its path reaches a split on
-a column it is missing, rather than sending it down the \code{.default} branch.}
+\item{missing}{What a row missing this split's column should do:
+\code{"default"} takes the \code{.default} branch, \code{"na"} returns \code{NA}, and
+\code{"left"} takes the left branch.}
 }
 \description{
 Generate nested case_when for a tree

@@ -179,7 +179,7 @@ parse_model.party <- function(model) {
 #' @export
 tidypredict_fit.party <- function(model, ...) {
   tree_info <- partykit_tree_info_full(model)
-  generate_nested_case_when_tree(tree_info, na_propagate = TRUE)
+  generate_nested_case_when_tree(tree_info, missing = "na")
 }
 
 # For {orbital}
@@ -222,11 +222,11 @@ tidypredict_fit.party <- function(model, ...) {
   map(seq_len(ncol(preds)), function(i) {
     generate_nested_case_when_tree(
       tree_info_with_predictions(tree_info_full, preds[, i]),
-      na_propagate = TRUE
+      missing = "na"
     )
   })
 }
 
 build_tree_formula.pm_tree_party <- function(model) {
-  generate_nested_case_when_tree(model$tree_info, na_propagate = TRUE)
+  generate_nested_case_when_tree(model$tree_info, missing = "na")
 }

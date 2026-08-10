@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "(case_when(hp <= 118 ~ case_when(cyl <= 5 ~ 26.7, .default = 21.1333333333333), \n    .default = case_when(hp <= 205 ~ 17.48, .default = 14.5416666666667)) + \n    case_when(hp <= 80.5 ~ 32.2333333333333, .default = case_when(hp <= \n        118 ~ 21.9545454545455, .default = 16.5722222222222)) + \n    case_when(disp <= 101.55 ~ 31.9, .default = case_when(cyl <= \n        7 ~ 20.8384615384615, .default = 14.8785714285714)))/3"
+      [1] "(case_when(is.na(hp) | hp <= 118 ~ case_when(is.na(cyl) | cyl <= \n    5 ~ 26.7, .default = 21.1333333333333), .default = case_when(is.na(hp) | \n    hp <= 205 ~ 17.48, .default = 14.5416666666667)) + case_when(is.na(hp) | \n    hp <= 80.5 ~ 32.2333333333333, .default = case_when(is.na(hp) | \n    hp <= 118 ~ 21.9545454545455, .default = 16.5722222222222)) + \n    case_when(is.na(disp) | disp <= 101.55 ~ 31.9, .default = case_when(is.na(cyl) | \n        cyl <= 7 ~ 20.8384615384615, .default = 14.8785714285714)))/3"
 
 # classification models error with clear message (#191)
 
