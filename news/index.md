@@ -2,6 +2,17 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+  and
+  [`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+  write a parsed model to a YAML file and read it back. Use them instead
+  of
+  [`yaml::write_yaml()`](https://yaml.r-lib.org/reference/write_yaml.html),
+  which stores only 7 significant digits by default and so rounds split
+  thresholds enough to send rows down a different branch when the model
+  is re-loaded.
+  ([\#307](https://github.com/tidymodels/tidypredict/issues/307))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now picks the right factor predictor when three or more variable names
   are nested prefixes of one another, such as `x`, `xy` and `xyz`. The

@@ -70,29 +70,41 @@ tidypredict_fit(parsed)
 
 ## Saving the model
 
-Saving the model is quite easy, use the package such as `yaml` to write
-the model object as a YAML file. Any format that can persist a ragged
-list object should work as well.
+Use
+[`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+to write the model to a YAML file.
 
 ``` r
 
-library(yaml)
-
-write_yaml(parsed, "my_model.yml")
+tidypredict_save(parsed, "my_model.yml")
 ```
+
+It accepts a fitted model as well, parsing it for you:
+
+``` r
+
+tidypredict_save(model, "my_model.yml")
+```
+
+Write the file with
+[`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+rather than calling
+[`yaml::write_yaml()`](https://yaml.r-lib.org/reference/write_yaml.html)
+yourself. `yaml` writes numbers with 7 significant digits by default,
+which is not enough to store a split threshold exactly. A tree model
+saved that way can send rows down a different branch than the model it
+came from, silently and with no warning.
 
 ## Re-load the model
 
-In a new R session, we can read the YAML file into our environment.
+In a new R session, read the file back with
+[`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md).
 
 ``` r
 
 library(tidypredict)
-library(yaml)
 
-loaded_model <- read_yaml("my_model")
-
-loaded_model <- as_parsed_model(loaded_model)
+loaded_model <- tidypredict_load("my_model.yml")
 ```
 
 The preview of the file looks exactly as the preview of the original
@@ -125,8 +137,9 @@ the formula.
 ``` r
 
 tidypredict_fit(loaded_model)
-#> 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * 
-#>     -3.6302557) + (wt * cyl * 0.5356044) + (disp * cyl * 0.0054062)
+#> 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + 
+#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + 
+#>     (disp * cyl * 0.00540618405824794)
 ```
 
 The same variable can be used with other `tidypredict` functions, such
@@ -136,7 +149,7 @@ as
 ``` r
 
 tidypredict_sql(loaded_model, dbplyr::simulate_odbc())
-#> <SQL> ((((53.5256637 + ("wt" * -6.381546)) + ("disp" * -0.0458427)) + ("cyl" * -3.6302557)) + (("wt" * "cyl") * 0.5356044)) + (("disp" * "cyl") * 0.0054062)
+#> <SQL> ((((53.5256637443325 + ("wt" * -6.38154597431605)) + ("disp" * -0.0458426921825963)) + ("cyl" * -3.63025567939439)) + (("wt" * "cyl") * 0.535604359938273)) + (("disp" * "cyl") * 0.00540618405824794)
 ```
 
 ## `broom`

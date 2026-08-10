@@ -22,6 +22,9 @@
   : Returns a Tidy Eval formula to calculate fitted values
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   : Returns a Tidy Eval formula to calculate prediction interval.
+- [`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+  [`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
+  : Save and re-load a parsed model
 - [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
   : Tests base predict function against tidypredict
 - [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
