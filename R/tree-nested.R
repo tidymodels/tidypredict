@@ -32,9 +32,10 @@
 #' ```
 #'
 #' @details
-#' NA values in predictor columns are not handled by the generated expression.
-#' Users should ensure that predictor columns do not contain NA values before
-#' using the generated expression, or the results will be NA for those rows.
+#' By default a missing predictor takes the `.default` branch of every split it
+#' reaches, which is what the model's own traversal does for some backends but
+#' not others. Pass `na_propagate = TRUE` to return `NA` instead as soon as a
+#' row's path reaches a split on a column it is missing.
 #'
 #' @keywords internal
 #' @noRd
@@ -43,9 +44,11 @@ NULL
 #' Generate nested case_when for a tree
 #'
 #' @param tree_info A tree info list from `rpart_tree_info_full()` or similar
+#' @param na_propagate Return `NA` for a row once its path reaches a split on
+#'   a column it is missing, rather than sending it down the `.default` branch.
 #' @keywords internal
-generate_nested_case_when_tree <- function(tree_info) {
-  build_nested_node(0L, tree_info)
+generate_nested_case_when_tree <- function(tree_info, na_propagate = FALSE) {
+  build_nested_node(0L, tree_info, na_propagate)
 }
 
 # Restate one tree's structure with different leaf values, as classification
@@ -60,8 +63,10 @@ tree_info_with_predictions <- function(tree_info, prediction) {
 #' @param node_id The node ID to build (0-indexed)
 #' @param tree_info Tree info list with nodeID, leftChild, rightChild,
 #'   splitvarName, terminal, prediction, and node_splits
+#' @param na_propagate Return `NA` for a row once its path reaches a split on
+#'   a column it is missing, rather than sending it down the `.default` branch.
 #' @keywords internal
-build_nested_node <- function(node_id, tree_info) {
+build_nested_node <- function(node_id, tree_info, na_propagate = FALSE) {
   node_idx <- which(tree_info$nodeID == node_id)
 
   # Leaf node: return prediction
@@ -81,12 +86,34 @@ build_nested_node <- function(node_id, tree_info) {
   split_info <- tree_info$node_splits[[node_idx]]
 
   # Recursively build subtrees
-  left_subtree <- build_nested_node(left_id, tree_info)
-  right_subtree <- build_nested_node(right_id, tree_info)
+  left_subtree <- build_nested_node(left_id, tree_info, na_propagate)
+  right_subtree <- build_nested_node(right_id, tree_info, na_propagate)
 
   # Build condition
   condition <- build_nested_split_condition(split_info$primary)
+
+  if (na_propagate) {
+    missing <- build_nested_split_missing(split_info$primary)
+    return(expr(case_when(
+      !!missing ~ NA,
+      !!condition ~ !!left_subtree,
+      .default = !!right_subtree
+    )))
+  }
+
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
+# Does this split's own column carry a missing value?
+#
+# Tested on the columns rather than on the split condition, because the two do
+# not agree: `NA %in% c("a", "b")` is `FALSE`, not `NA`, so a categorical split
+# would silently send a missing value down the right branch. The `.default` arm
+# of `case_when()` does the same for a missing numeric comparison, which is the
+# mechanism behind the whole family of missing-value mispredictions.
+build_nested_split_missing <- function(split) {
+  cols <- if (isTRUE(split$is_oblique)) unlist(split$cols) else split$col
+  reduce_or(map(cols, \(col) expr(is.na(!!rlang::sym(col)))))
 }
 
 #' Build a split condition expression for nested trees (left branch)

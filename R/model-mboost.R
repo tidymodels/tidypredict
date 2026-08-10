@@ -52,7 +52,10 @@ mboost_components <- function(model) {
 
 # Combine per-tree expressions into the full boosting prediction.
 mboost_build_formula <- function(tree_info_list, nu, offset) {
-  tree_exprs <- map(tree_info_list, generate_nested_case_when_tree)
+  tree_exprs <- map(
+    tree_info_list,
+    \(tree_info) generate_nested_case_when_tree(tree_info, na_propagate = TRUE)
+  )
   res <- reduce_addition(tree_exprs)
   expr(!!offset + !!nu * !!res)
 }
