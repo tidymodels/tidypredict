@@ -101,7 +101,89 @@ build_nested_node <- function(node_id, tree_info, na_propagate = FALSE) {
     )))
   }
 
+  if (uses_surrogates(tree_info, node_idx)) {
+    return(build_surrogate_node(
+      split_info,
+      condition,
+      left_subtree,
+      right_subtree,
+      tree_info,
+      node_idx
+    ))
+  }
+
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
+}
+
+# `rpart` is the only backend that states what to do with a missing value, so
+# this path is taken only for its trees, which are the only ones carrying
+# `stops_at_node`. Not gated on `use_surrogates`: with `usesurrogate = 0` there
+# are no surrogates to try, but the row still stops at the node rather than
+# taking the `.default` branch.
+uses_surrogates <- function(tree_info, node_idx) {
+  !is.null(tree_info$stops_at_node)
+}
+
+# Route a missing value the way `rpart` does.
+#
+# The primary split decides for a row that has the column. Otherwise each
+# surrogate is tried in turn and the first one the row does have decides. If
+# the row is missing every one of them, `usesurrogate = 2` sends it in the
+# majority direction (the child with more training observations) and
+# `usesurrogate = 1` stops at this node and returns its own fitted value.
+#
+# The direction is built as one `TRUE`/`FALSE` expression rather than by
+# nesting a copy of the subtrees under each surrogate. Nesting would duplicate
+# both subtrees once per surrogate, making the expression grow as
+# `(surrogates + 1) ^ depth`.
+build_surrogate_node <- function(
+  split_info,
+  condition,
+  left_subtree,
+  right_subtree,
+  tree_info,
+  node_idx
+) {
+  surrogates <- split_info$surrogates %||% list()
+
+  present <- build_nested_split_present(split_info$primary)
+  arms <- list(expr(!!present ~ !!condition))
+  for (surrogate in surrogates) {
+    surrogate_condition <- build_nested_split_condition(surrogate)
+    # `needs_swap` is stated relative to the primary split, so a surrogate that
+    # disagrees with it sends a matching row the other way.
+    if (isTRUE(surrogate$needs_swap)) {
+      surrogate_condition <- expr(!(!!surrogate_condition))
+    }
+    surrogate_present <- build_nested_split_present(surrogate)
+    arms <- c(arms, list(expr(!!surrogate_present ~ !!surrogate_condition)))
+  }
+
+  majority_left <- tree_info$majority_left[node_idx]
+
+  # Below `usesurrogate = 2`, and whenever the two children are the same size
+  # so that there is no majority to go with, a row that resolves nowhere stops
+  # here and takes this node's own fitted value.
+  if (isTRUE(tree_info$stops_at_node) || is.na(majority_left)) {
+    goes_left <- expr(case_when(!!!arms, .default = FALSE))
+    known <- reduce_or(map(
+      c(list(split_info$primary), surrogates),
+      build_nested_split_present
+    ))
+    return(expr(case_when(
+      !!goes_left ~ !!left_subtree,
+      !!known ~ !!right_subtree,
+      .default = !!tree_info$prediction[node_idx]
+    )))
+  }
+
+  goes_left <- expr(case_when(!!!arms, .default = !!isTRUE(majority_left)))
+  expr(case_when(!!goes_left ~ !!left_subtree, .default = !!right_subtree))
+}
+
+# Does the row have a value for this split's column?
+build_nested_split_present <- function(split) {
+  expr(!(!!build_nested_split_missing(split)))
 }
 
 # Does this split's own column carry a missing value?

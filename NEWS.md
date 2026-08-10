@@ -4,6 +4,8 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_fit()` now routes missing values through surrogate splits for `rpart::rpart()` models, and for `baguette::bagger()` models using the `"CART"` base model, matching `predict()` instead of sending every missing value down the right branch. All three `usesurrogate` modes are followed, including stopping at the node when no surrogate resolves the row and there is no majority to go with. (#294)
+
 - `tidypredict_fit()` now returns `NA` for a row that reaches a split on a predictor it is missing, for `partykit::ctree()`, `partykit::cforest()` and `mboost::blackboost()` models. These backends resolve a missing value by randomly sampling the split probabilities, so `predict()` returns a different answer on each call and there is no value to reproduce. A row whose path never reaches a split on the missing column is unaffected. (#294)
 
 - `tidypredict_fit()` now returns `NA` for a row with a missing predictor for `randomForest::randomForest()` and `aorsf::orsf()` models, rather than a confident value the model itself would never produce. `randomForest::predict()` returns `NA` for any incomplete row and `aorsf` refuses to predict from one at all, so there is no value to match. Rows are kept rather than dropped. (#294, #325)

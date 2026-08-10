@@ -459,3 +459,32 @@ test_that("small ensembles work", {
     predict(model, mtcars)$.pred
   )
 })
+
+test_that("missing values route through the CART surrogates (#294)", {
+  skip_if_not_installed("baguette")
+
+  set.seed(5)
+  n <- 300
+  df <- data.frame(x = rnorm(n), w = rnorm(n))
+  df$z <- df$x * 0.85 + rnorm(n, 0, 0.4)
+  df$y <- 2 * df$x - df$w + rnorm(n)
+
+  new_df <- df
+  set.seed(9)
+  for (col in c("x", "z", "w")) {
+    new_df[[col]][sample(n, 40)] <- NA_real_
+  }
+
+  set.seed(2)
+  model <- baguette::bagger(
+    y ~ x + z + w,
+    data = df,
+    base_model = "CART",
+    times = 5
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), new_df),
+    predict(model, new_df)$.pred
+  )
+})
