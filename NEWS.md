@@ -1,5 +1,9 @@
 # tidypredict (development version)
 
+- `tidypredict_fit()` now returns correct predictions for `C50::C5.0()` models whose predictor values fall on a split cut point. C5.0 compares cut points as 32-bit floats, so values between a cut and its float image were sent down the wrong branch. (#287)
+
+- `tidypredict_fit()` now returns correct predictions for `catboost` models whose predictor values fall on a split border. catboost compares borders as 32-bit floats, so a value a fraction above a border was sent down the wrong branch. (#298)
+
 - `tidypredict_save()` and `tidypredict_load()` write a parsed model to a YAML file and read it back. Use them instead of `yaml::write_yaml()`, which stores only 7 significant digits by default and so rounds split thresholds enough to send rows down a different branch when the model is re-loaded. (#307)
 
 - `tidypredict_fit()` now picks the right factor predictor when three or more variable names are nested prefixes of one another, such as `x`, `xy` and `xyz`. The longest match was selected by indexing with `rank()`, which silently chose the wrong variable and produced wrong predictions for `lm()`, `glm()`, `quantreg::rq()`, `nnet::multinom()`, `nnet::nnet()` and `earth::earth()`. (#290)
