@@ -20,6 +20,21 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns `NA` for a row that reaches a split on a predictor it is
+  missing, for
+  [`partykit::ctree()`](https://rdrr.io/pkg/partykit/man/ctree.html),
+  [`partykit::cforest()`](https://rdrr.io/pkg/partykit/man/cforest.html)
+  and
+  [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
+  models. These backends resolve a missing value by randomly sampling
+  the split probabilities, so
+  [`predict()`](https://rdrr.io/r/stats/predict.html) returns a
+  different answer on each call and there is no value to reproduce. A
+  row whose path never reaches a split on the missing column is
+  unaffected.
+  ([\#294](https://github.com/tidymodels/tidypredict/issues/294))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns `NA` for a row with a missing predictor for
   [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
   and

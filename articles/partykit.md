@@ -40,11 +40,13 @@ scales the per-tree weights before aggregating.
 ``` r
 
 tidypredict_fit(model)
-#> (case_when(cyl <= 6 ~ 22.08, .default = 15.17) + case_when(wt <= 
-#>     2.78 ~ 27.5428571428571, .default = 17.1384615384615) + case_when(wt <= 
-#>     3.15 ~ 23.7625, .default = 16.5083333333333) + case_when(wt <= 
-#>     2.78 ~ 26.6285714285714, .default = 16.9076923076923) + case_when(wt <= 
-#>     2.465 ~ 28.3857142857143, .default = 16.7769230769231))/5L
+#> (case_when(is.na(cyl) ~ NA, cyl <= 6 ~ 22.08, .default = 15.17) + 
+#>     case_when(is.na(wt) ~ NA, wt <= 2.78 ~ 27.5428571428571, 
+#>         .default = 17.1384615384615) + case_when(is.na(wt) ~ 
+#>     NA, wt <= 3.15 ~ 23.7625, .default = 16.5083333333333) + 
+#>     case_when(is.na(wt) ~ NA, wt <= 2.78 ~ 26.6285714285714, 
+#>         .default = 16.9076923076923) + case_when(is.na(wt) ~ 
+#>     NA, wt <= 2.465 ~ 28.3857142857143, .default = 16.7769230769231))/5L
 ```
 
 From there, the Tidy Eval formula can be used anywhere where it can be
@@ -71,9 +73,11 @@ parsnip_model <- rand_forest(mode = "regression", trees = 5) %>%
   fit(mpg ~ wt + cyl, data = mtcars)
 
 tidypredict_fit(parsnip_model)
-#> (case_when(cyl <= 4 ~ 28.275, .default = 16.1) + case_when(wt <= 
-#>     3.215 ~ 25.2555555555556, .default = 16.0272727272727) + 
-#>     case_when(cyl <= 4 ~ 25.775, .default = 16.675) + case_when(wt <= 
-#>     3.15 ~ 25.1555555555556, .default = 16.1636363636364) + case_when(wt <= 
-#>     2.875 ~ 25.9714285714286, .default = 17))/5L
+#> (case_when(is.na(cyl) ~ NA, cyl <= 4 ~ 28.275, .default = 16.1) + 
+#>     case_when(is.na(wt) ~ NA, wt <= 3.215 ~ 25.2555555555556, 
+#>         .default = 16.0272727272727) + case_when(is.na(cyl) ~ 
+#>     NA, cyl <= 4 ~ 25.775, .default = 16.675) + case_when(is.na(wt) ~ 
+#>     NA, wt <= 3.15 ~ 25.1555555555556, .default = 16.1636363636364) + 
+#>     case_when(is.na(wt) ~ NA, wt <= 2.875 ~ 25.9714285714286, 
+#>         .default = 17))/5L
 ```

@@ -5,7 +5,7 @@ Build a nested case_when expression for a single node
 ## Usage
 
 ``` r
-build_nested_node(node_id, tree_info)
+build_nested_node(node_id, tree_info, na_propagate = FALSE)
 ```
 
 ## Arguments
@@ -18,3 +18,8 @@ build_nested_node(node_id, tree_info)
 
   Tree info list with nodeID, leftChild, rightChild, splitvarName,
   terminal, prediction, and node_splits
+
+- na_propagate:
+
+  Return `NA` for a row once its path reaches a split on a column it is
+  missing, rather than sending it down the `.default` branch.

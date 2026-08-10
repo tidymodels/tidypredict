@@ -45,40 +45,40 @@ model <- MASS::qda(Species ~ ., data = iris)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
   #> exp(-113.714590795937 + (Sepal.Length * 44.5528812152965) + (Sepal.Width * 
-  #>     -7.61595839316376) + (Petal.Length * 33.559537097271) + (Petal.Width * 
+  #>     -7.61595839316377) + (Petal.Length * 33.559537097271) + (Petal.Width * 
   #>     -31.2558694597319) + (Sepal.Length * Sepal.Length * -9.47171939291025) + 
   #>     (Sepal.Length * Sepal.Width * 12.4048261564855) + (Sepal.Length * 
   #>     Petal.Length * 4.50020653857199) + (Sepal.Length * Petal.Width * 
-  #>     4.77612732803424) + (Sepal.Width * Sepal.Width * -7.78527008659406) + 
+  #>     4.77612732803425) + (Sepal.Width * Sepal.Width * -7.78527008659406) + 
   #>     (Sepal.Width * Petal.Length * -1.1110791368753) + (Sepal.Width * 
   #>     Petal.Width * 2.1040978276337) + (Petal.Length * Petal.Length * 
-  #>     -19.3881020632003) + (Petal.Length * Petal.Width * 17.9350353034303) + 
+  #>     -19.3881020632003) + (Petal.Length * Petal.Width * 17.9350353034304) + 
   #>     (Petal.Width * Petal.Width * -53.0229530714453))/(exp(-113.714590795937 + 
-  #>     (Sepal.Length * 44.5528812152965) + (Sepal.Width * -7.61595839316376) + 
+  #>     (Sepal.Length * 44.5528812152965) + (Sepal.Width * -7.61595839316377) + 
   #>     (Petal.Length * 33.559537097271) + (Petal.Width * -31.2558694597319) + 
   #>     (Sepal.Length * Sepal.Length * -9.47171939291025) + (Sepal.Length * 
   #>     Sepal.Width * 12.4048261564855) + (Sepal.Length * Petal.Length * 
-  #>     4.50020653857199) + (Sepal.Length * Petal.Width * 4.77612732803424) + 
+  #>     4.50020653857199) + (Sepal.Length * Petal.Width * 4.77612732803425) + 
   #>     (Sepal.Width * Sepal.Width * -7.78527008659406) + (Sepal.Width * 
   #>     Petal.Length * -1.1110791368753) + (Sepal.Width * Petal.Width * 
   #>     2.1040978276337) + (Petal.Length * Petal.Length * -19.3881020632003) + 
-  #>     (Petal.Length * Petal.Width * 17.9350353034303) + (Petal.Width * 
+  #>     (Petal.Length * Petal.Width * 17.9350353034304) + (Petal.Width * 
   #>     Petal.Width * -53.0229530714453)) + exp(-68.4372876863761 + 
   #>     (Sepal.Length * 18.0128645045466) + (Sepal.Width * 15.9607000492876) + 
-  #>     (Petal.Length * 3.26878502392692) + (Petal.Width * -14.7125574674066) + 
+  #>     (Petal.Length * 3.26878502392694) + (Petal.Width * -14.7125574674066) + 
   #>     (Sepal.Length * Sepal.Length * -4.7513818825332) + (Sepal.Length * 
   #>     Sepal.Width * 3.67621661105371) + (Sepal.Length * Petal.Length * 
-  #>     8.63171191375035) + (Sepal.Length * Petal.Width * -6.45450343914608) + 
+  #>     8.63171191375034) + (Sepal.Length * Petal.Width * -6.45450343914608) + 
   #>     (Sepal.Width * Sepal.Width * -9.85548321295218) + (Sepal.Width * 
   #>     Petal.Length * -2.11602239677401) + (Sepal.Width * Petal.Width * 
   #>     19.4803247040045) + (Petal.Length * Petal.Length * -9.90187886398409) + 
   #>     (Petal.Length * Petal.Width * 26.9372270107537) + (Petal.Width * 
-  #>     Petal.Width * -43.6223969131695)) + exp(-67.7090772023948 + 
+  #>     Petal.Width * -43.6223969131695)) + exp(-67.7090772023947 + 
   #>     (Sepal.Length * 7.37247478397155) + (Sepal.Width * 13.2452613006359) + 
-  #>     (Petal.Length * 6.23406948373779) + (Petal.Width * 9.66197608445424) + 
+  #>     (Petal.Length * 6.23406948373776) + (Petal.Width * 9.66197608445423) + 
   #>     (Sepal.Length * Sepal.Length * -5.26693339970326) + (Sepal.Length * 
   #>     Sepal.Width * 3.47972623582807) + (Sepal.Length * Petal.Length * 
-  #>     9.96014594453994) + (Sepal.Length * Petal.Width * -1.78815223046388) + 
+  #>     9.96014594453995) + (Sepal.Length * Petal.Width * -1.78815223046388) + 
   #>     (Sepal.Width * Sepal.Width * -7.93772112409139) + (Sepal.Width * 
   #>     Petal.Length * -1.10268870214298) + (Sepal.Width * Petal.Width * 
   #>     8.47285053214324) + (Petal.Length * Petal.Length * -6.70291026519806) + 
@@ -134,41 +134,41 @@ p_model <- discrim_quad() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-67.7090772023948 + (Sepal.Length * 7.37247478397155) + (Sepal.Width * 
-#>     13.2452613006359) + (Petal.Length * 6.23406948373779) + (Petal.Width * 
-#>     9.66197608445424) + (Sepal.Length * Sepal.Length * -5.26693339970326) + 
+#> exp(-67.7090772023947 + (Sepal.Length * 7.37247478397155) + (Sepal.Width * 
+#>     13.2452613006359) + (Petal.Length * 6.23406948373776) + (Petal.Width * 
+#>     9.66197608445423) + (Sepal.Length * Sepal.Length * -5.26693339970326) + 
 #>     (Sepal.Length * Sepal.Width * 3.47972623582807) + (Sepal.Length * 
-#>     Petal.Length * 9.96014594453994) + (Sepal.Length * Petal.Width * 
+#>     Petal.Length * 9.96014594453995) + (Sepal.Length * Petal.Width * 
 #>     -1.78815223046388) + (Sepal.Width * Sepal.Width * -7.93772112409139) + 
 #>     (Sepal.Width * Petal.Length * -1.10268870214298) + (Sepal.Width * 
 #>     Petal.Width * 8.47285053214324) + (Petal.Length * Petal.Length * 
 #>     -6.70291026519806) + (Petal.Length * Petal.Width * 2.8909184691834) + 
 #>     (Petal.Width * Petal.Width * -9.65702517612499))/(exp(-113.714590795937 + 
-#>     (Sepal.Length * 44.5528812152965) + (Sepal.Width * -7.61595839316376) + 
+#>     (Sepal.Length * 44.5528812152965) + (Sepal.Width * -7.61595839316377) + 
 #>     (Petal.Length * 33.559537097271) + (Petal.Width * -31.2558694597319) + 
 #>     (Sepal.Length * Sepal.Length * -9.47171939291025) + (Sepal.Length * 
 #>     Sepal.Width * 12.4048261564855) + (Sepal.Length * Petal.Length * 
-#>     4.50020653857199) + (Sepal.Length * Petal.Width * 4.77612732803424) + 
+#>     4.50020653857199) + (Sepal.Length * Petal.Width * 4.77612732803425) + 
 #>     (Sepal.Width * Sepal.Width * -7.78527008659406) + (Sepal.Width * 
 #>     Petal.Length * -1.1110791368753) + (Sepal.Width * Petal.Width * 
 #>     2.1040978276337) + (Petal.Length * Petal.Length * -19.3881020632003) + 
-#>     (Petal.Length * Petal.Width * 17.9350353034303) + (Petal.Width * 
+#>     (Petal.Length * Petal.Width * 17.9350353034304) + (Petal.Width * 
 #>     Petal.Width * -53.0229530714453)) + exp(-68.4372876863761 + 
 #>     (Sepal.Length * 18.0128645045466) + (Sepal.Width * 15.9607000492876) + 
-#>     (Petal.Length * 3.26878502392692) + (Petal.Width * -14.7125574674066) + 
+#>     (Petal.Length * 3.26878502392694) + (Petal.Width * -14.7125574674066) + 
 #>     (Sepal.Length * Sepal.Length * -4.7513818825332) + (Sepal.Length * 
 #>     Sepal.Width * 3.67621661105371) + (Sepal.Length * Petal.Length * 
-#>     8.63171191375035) + (Sepal.Length * Petal.Width * -6.45450343914608) + 
+#>     8.63171191375034) + (Sepal.Length * Petal.Width * -6.45450343914608) + 
 #>     (Sepal.Width * Sepal.Width * -9.85548321295218) + (Sepal.Width * 
 #>     Petal.Length * -2.11602239677401) + (Sepal.Width * Petal.Width * 
 #>     19.4803247040045) + (Petal.Length * Petal.Length * -9.90187886398409) + 
 #>     (Petal.Length * Petal.Width * 26.9372270107537) + (Petal.Width * 
-#>     Petal.Width * -43.6223969131695)) + exp(-67.7090772023948 + 
+#>     Petal.Width * -43.6223969131695)) + exp(-67.7090772023947 + 
 #>     (Sepal.Length * 7.37247478397155) + (Sepal.Width * 13.2452613006359) + 
-#>     (Petal.Length * 6.23406948373779) + (Petal.Width * 9.66197608445424) + 
+#>     (Petal.Length * 6.23406948373776) + (Petal.Width * 9.66197608445423) + 
 #>     (Sepal.Length * Sepal.Length * -5.26693339970326) + (Sepal.Length * 
 #>     Sepal.Width * 3.47972623582807) + (Sepal.Length * Petal.Length * 
-#>     9.96014594453994) + (Sepal.Length * Petal.Width * -1.78815223046388) + 
+#>     9.96014594453995) + (Sepal.Length * Petal.Width * -1.78815223046388) + 
 #>     (Sepal.Width * Sepal.Width * -7.93772112409139) + (Sepal.Width * 
 #>     Petal.Length * -1.10268870214298) + (Sepal.Width * Petal.Width * 
 #>     8.47285053214324) + (Petal.Length * Petal.Length * -6.70291026519806) + 

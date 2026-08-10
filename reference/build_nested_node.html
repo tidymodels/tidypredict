@@ -82,7 +82,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_nested_node</span><span class="op">(</span><span class="va">node_id</span>, <span class="va">tree_info</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">build_nested_node</span><span class="op">(</span><span class="va">node_id</span>, <span class="va">tree_info</span>, na_propagate <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -96,6 +96,11 @@
 <dt id="arg-tree-info">tree_info<a class="anchor" aria-label="anchor" href="#arg-tree-info"></a></dt>
 <dd><p>Tree info list with nodeID, leftChild, rightChild,
 splitvarName, terminal, prediction, and node_splits</p></dd>
+
+
+<dt id="arg-na-propagate">na_propagate<a class="anchor" aria-label="anchor" href="#arg-na-propagate"></a></dt>
+<dd><p>Return <code>NA</code> for a row once its path reaches a split on
+a column it is missing, rather than sending it down the <code>.default</code> branch.</p></dd>
 
 </dl></div>
 

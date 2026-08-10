@@ -99,9 +99,9 @@ fit <- tidypredict_fit(da_model)
 names(fit)
 #> [1] "setosa"     "versicolor" "virginica"
 fit[["setosa"]]
-#> exp(0.391460011724112 + (Sepal.Length * -0.118750531861652) + 
+#> exp(0.391460011724113 + (Sepal.Length * -0.118750531861652) + 
 #>     (Sepal.Width * 0.378311039737146) + (Petal.Length * -0.084556881358667) + 
-#>     (Petal.Width * -0.16933234787912))/(exp(0.391460011724112 + 
+#>     (Petal.Width * -0.16933234787912))/(exp(0.391460011724113 + 
 #>     (Sepal.Length * -0.118750531861652) + (Sepal.Width * 0.378311039737146) + 
 #>     (Petal.Length * -0.084556881358667) + (Petal.Width * -0.16933234787912)) + 
 #>     exp(1.96606184899222 + (Sepal.Length * -0.0303959537594359) + 
