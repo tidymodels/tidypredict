@@ -44,6 +44,8 @@ NULL
 #' Generate nested case_when for a tree
 #'
 #' @param tree_info A tree info list from `rpart_tree_info_full()` or similar
+#' @param na_propagate Return `NA` for a row once its path reaches a split on
+#'   a column it is missing, rather than sending it down the `.default` branch.
 #' @keywords internal
 generate_nested_case_when_tree <- function(tree_info, na_propagate = FALSE) {
   build_nested_node(0L, tree_info, na_propagate)
@@ -61,6 +63,8 @@ tree_info_with_predictions <- function(tree_info, prediction) {
 #' @param node_id The node ID to build (0-indexed)
 #' @param tree_info Tree info list with nodeID, leftChild, rightChild,
 #'   splitvarName, terminal, prediction, and node_splits
+#' @param na_propagate Return `NA` for a row once its path reaches a split on
+#'   a column it is missing, rather than sending it down the `.default` branch.
 #' @keywords internal
 build_nested_node <- function(node_id, tree_info, na_propagate = FALSE) {
   node_idx <- which(tree_info$nodeID == node_id)
