@@ -93,8 +93,16 @@ parse_model_lm <- function(model, call = rlang::caller_env()) {
   pm$general$type <- "regression"
   pm$general$residual <- model$df.residual
 
-  if (length(summary(model)$sigma^2) > 0) {
-    pm$general$sigma2 <- summary(model)$sigma^2
+  # `summary.glm()` reports the residual variance as `dispersion`; only
+  # `summary.lm()` has a `sigma`. Reading `sigma` for a glm gives `NULL`, which
+  # silently drops out of the interval expression and yields no rows.
+  sigma2 <- if (inherits(model, "glm")) {
+    summary(model)$dispersion
+  } else {
+    summary(model)$sigma^2
+  }
+  if (length(sigma2) > 0) {
+    pm$general$sigma2 <- sigma2
   }
   if (!is.null(model$family$family)) {
     pm$general$family <- model$family$family

@@ -1,5 +1,9 @@
 # tidypredict (development version)
 
+- `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
+
+- `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
+
 - `tidypredict_fit()` now returns correct predictions for `C50::C5.0()` models whose predictor values fall on a split cut point. C5.0 compares cut points as 32-bit floats, so values between a cut and its float image were sent down the wrong branch. (#287)
 
 - `tidypredict_fit()` now returns correct predictions for `catboost` models whose predictor values fall on a split border. catboost compares borders as 32-bit floats, so a value a fraction above a border was sent down the wrong branch. (#298)
