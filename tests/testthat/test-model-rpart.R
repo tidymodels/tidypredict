@@ -230,7 +230,8 @@ test_that(".rpart_tree_info_full is exported and works", {
       "prediction",
       "node_splits",
       "majority_left",
-      "use_surrogates"
+      "use_surrogates",
+      "stops_at_node"
     )
   )
 })
@@ -249,5 +250,80 @@ test_that("splits at an observed value use a strict inequality", {
   expect_equal(
     dplyr::mutate(df, pred = !!tidypredict_fit(model))$pred,
     unname(predict(model, df))
+  )
+})
+
+test_that("missing values route through surrogate splits (#294)", {
+  skip_if_not_installed("rpart")
+
+  set.seed(1)
+  n <- 300
+  df <- data.frame(x = rnorm(n), w = rnorm(n))
+  # `z` is correlated with `x`, so it is chosen as a surrogate for it.
+  df$z <- df$x * 0.9 + rnorm(n, 0, 0.3)
+  df$y <- 2 * df$x - df$w + rnorm(n)
+
+  new_df <- df
+  set.seed(2)
+  for (col in c("x", "z", "w")) {
+    new_df[[col]][sample(n, 40)] <- NA_real_
+  }
+
+  model <- rpart::rpart(y ~ x + z + w, data = df)
+  expect_gt(sum(model$frame$nsurrogate), 0)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), new_df),
+    unname(predict(model, new_df))
+  )
+})
+
+test_that("every usesurrogate mode is followed (#294)", {
+  skip_if_not_installed("rpart")
+
+  set.seed(1)
+  n <- 300
+  df <- data.frame(x = rnorm(n), w = rnorm(n))
+  df$z <- df$x * 0.9 + rnorm(n, 0, 0.3)
+  df$y <- 2 * df$x - df$w + rnorm(n)
+
+  new_df <- df
+  set.seed(2)
+  for (col in c("x", "z", "w")) {
+    new_df[[col]][sample(n, 40)] <- NA_real_
+  }
+  # Rows missing every predictor exercise the fallback, which differs by mode:
+  # 2 goes in the majority direction, 0 and 1 stop at the node.
+  new_df[1:6, c("x", "z", "w")] <- NA_real_
+
+  for (mode in 0:2) {
+    model <- rpart::rpart(
+      y ~ x + z + w,
+      data = df,
+      control = rpart::rpart.control(usesurrogate = mode)
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), new_df),
+      unname(predict(model, new_df))
+    )
+  }
+})
+
+test_that("a tied split has no majority to go with (#294)", {
+  skip_if_not_installed("rpart")
+
+  # Both children hold 10 rows, so `rpart` stops at the node rather than
+  # picking a side, and returns the node's own fitted value.
+  df <- data.frame(x = c(1:10, 21:30), y = c(rep(0, 10), rep(1, 10)))
+  model <- rpart::rpart(
+    y ~ x,
+    data = df,
+    control = rpart::rpart.control(cp = 0)
+  )
+
+  new_df <- data.frame(x = NA_real_)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), new_df),
+    unname(predict(model, new_df))
   )
 })

@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "(case_when(wt < 2.975 ~ 23.0583333333333, .default = case_when(wt < \n    3.545 ~ 16.9125, .default = 15.125)) + case_when(wt < 3.16 ~ \n    24.3642857142857, .default = 15.7444444444444) + case_when(wt < \n    2.26 ~ 30.0857142857143, .default = case_when(cyl < 7 ~ 20.4428571428571, \n    .default = 14.6454545454545)))/3L"
+      [1] "(case_when(case_when(!is.na(wt) ~ wt < 2.975, !is.na(disp) ~ \n    disp < 163.8, !is.na(cyl) ~ cyl < 7, .default = FALSE) ~ \n    23.0583333333333, .default = case_when(case_when(!is.na(wt) ~ \n    wt < 3.545, !is.na(disp) ~ disp < 380, !is.na(cyl) ~ cyl < \n    7, .default = FALSE) ~ 16.9125, .default = 15.125)) + case_when(case_when(!is.na(wt) ~ \n    wt < 3.16, !is.na(disp) ~ disp < 163.8, !is.na(cyl) ~ cyl < \n    7, .default = FALSE) ~ 24.3642857142857, .default = 15.7444444444444) + \n    case_when(case_when(!is.na(wt) ~ wt < 2.26, !is.na(disp) ~ \n        disp < 101.55, !is.na(cyl) ~ cyl < 5, .default = FALSE) ~ \n        30.0857142857143, .default = case_when(case_when(!is.na(cyl) ~ \n        cyl < 7, !is.na(disp) ~ disp < 250.4, !is.na(wt) ~ wt < \n        3.3125, .default = TRUE) ~ 20.4428571428571, .default = 14.6454545454545)))/3L"
 
 # unsupported base models error
 
