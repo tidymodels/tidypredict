@@ -40,7 +40,7 @@ tidypredict_fit.cforest <- function(model, ...) {
     seq_len(n_trees),
     function(tree_no) {
       tree_info <- partykit_tree_info_full(partykit::gettree(model, tree_no))
-      generate_nested_case_when_tree(tree_info, na_propagate = TRUE)
+      generate_nested_case_when_tree(tree_info, missing = "na")
     }
   )
 
@@ -50,6 +50,6 @@ tidypredict_fit.cforest <- function(model, ...) {
 build_tree_formula.pm_tree_cforest <- function(model) {
   expr_mean(map(
     model$tree_info_list,
-    \(tree_info) generate_nested_case_when_tree(tree_info, na_propagate = TRUE)
+    \(tree_info) generate_nested_case_when_tree(tree_info, missing = "na")
   ))
 }

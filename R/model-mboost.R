@@ -54,7 +54,7 @@ mboost_components <- function(model) {
 mboost_build_formula <- function(tree_info_list, nu, offset) {
   tree_exprs <- map(
     tree_info_list,
-    \(tree_info) generate_nested_case_when_tree(tree_info, na_propagate = TRUE)
+    \(tree_info) generate_nested_case_when_tree(tree_info, missing = "na")
   )
   res <- reduce_addition(tree_exprs)
   expr(!!offset + !!nu * !!res)

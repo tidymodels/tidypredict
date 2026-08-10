@@ -32,10 +32,9 @@
 #' ```
 #'
 #' @details
-#' By default a missing predictor takes the `.default` branch of every split it
-#' reaches, which is what the model's own traversal does for some backends but
-#' not others. Pass `na_propagate = TRUE` to return `NA` instead as soon as a
-#' row's path reaches a split on a column it is missing.
+#' Backends disagree about what a missing predictor should do, so `missing`
+#' selects between the three behaviours seen in practice. See the `missing`
+#' argument of `generate_nested_case_when_tree()`.
 #'
 #' @keywords internal
 #' @noRd
@@ -44,11 +43,16 @@ NULL
 #' Generate nested case_when for a tree
 #'
 #' @param tree_info A tree info list from `rpart_tree_info_full()` or similar
-#' @param na_propagate Return `NA` for a row once its path reaches a split on
-#'   a column it is missing, rather than sending it down the `.default` branch.
+#' @param missing What a row missing this split's column should do:
+#'   `"default"` takes the `.default` branch, `"na"` returns `NA`, and
+#'   `"left"` takes the left branch.
 #' @keywords internal
-generate_nested_case_when_tree <- function(tree_info, na_propagate = FALSE) {
-  build_nested_node(0L, tree_info, na_propagate)
+generate_nested_case_when_tree <- function(
+  tree_info,
+  missing = c("default", "na", "left")
+) {
+  missing <- rlang::arg_match(missing)
+  build_nested_node(0L, tree_info, missing)
 }
 
 # Restate one tree's structure with different leaf values, as classification
@@ -63,10 +67,11 @@ tree_info_with_predictions <- function(tree_info, prediction) {
 #' @param node_id The node ID to build (0-indexed)
 #' @param tree_info Tree info list with nodeID, leftChild, rightChild,
 #'   splitvarName, terminal, prediction, and node_splits
-#' @param na_propagate Return `NA` for a row once its path reaches a split on
-#'   a column it is missing, rather than sending it down the `.default` branch.
+#' @param missing What a row missing this split's column should do:
+#'   `"default"` takes the `.default` branch, `"na"` returns `NA`, and
+#'   `"left"` takes the left branch.
 #' @keywords internal
-build_nested_node <- function(node_id, tree_info, na_propagate = FALSE) {
+build_nested_node <- function(node_id, tree_info, missing = "default") {
   node_idx <- which(tree_info$nodeID == node_id)
 
   # Leaf node: return prediction
@@ -86,19 +91,26 @@ build_nested_node <- function(node_id, tree_info, na_propagate = FALSE) {
   split_info <- tree_info$node_splits[[node_idx]]
 
   # Recursively build subtrees
-  left_subtree <- build_nested_node(left_id, tree_info, na_propagate)
-  right_subtree <- build_nested_node(right_id, tree_info, na_propagate)
+  left_subtree <- build_nested_node(left_id, tree_info, missing)
+  right_subtree <- build_nested_node(right_id, tree_info, missing)
 
   # Build condition
   condition <- build_nested_split_condition(split_info$primary)
 
-  if (na_propagate) {
-    missing <- build_nested_split_missing(split_info$primary)
+  if (missing == "na") {
+    is_missing <- build_nested_split_missing(split_info$primary)
     return(expr(case_when(
-      !!missing ~ NA,
+      !!is_missing ~ NA,
       !!condition ~ !!left_subtree,
       .default = !!right_subtree
     )))
+  }
+
+  # `ranger` compares as `value > splitval`, which is false for a missing
+  # value, so the row takes the left branch.
+  if (missing == "left") {
+    is_missing <- build_nested_split_missing(split_info$primary)
+    condition <- expr(!!is_missing | !!condition)
   }
 
   if (uses_surrogates(tree_info, node_idx)) {
