@@ -42,6 +42,27 @@ reduce_or <- function(x) {
   reduce(x, expr_or)
 }
 
+# Return `NA` for any row with a missing predictor.
+#
+# Some backends decline to predict from an incomplete row: `randomForest` and
+# `kernlab::ksvm` return nothing for it, and `aorsf` refuses outright. Their
+# trees still contain a complete set of branches, so the generated expression
+# would otherwise route the row on whichever comparisons happen not to involve
+# the missing column and return a confident value the model itself would never
+# produce.
+#
+# The guard is deliberately blanket rather than per split: `randomForest`
+# returns `NA` whenever *any* predictor is missing, even one the row's path
+# never consults, so testing every column is what reproduces it.
+expr_na_if_incomplete <- function(f, cols, missing = NA_real_) {
+  cols <- unique(cols)
+  if (length(cols) == 0) {
+    return(f)
+  }
+  any_missing <- reduce_or(map(cols, \(col) expr(is.na(!!rlang::sym(col)))))
+  expr(ifelse(!!any_missing, !!missing, !!f))
+}
+
 # Average a set of expressions, as forests do over their trees. `n` is taken
 # from the model where it is available, so that the divisor is written the same
 # way as the model reports it.

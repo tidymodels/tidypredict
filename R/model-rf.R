@@ -12,6 +12,9 @@ parse_model.randomForest <- function(model) {
   pm$general$type <- "tree"
   pm$general$version <- 3
   term_labels <- names(model$forest$ncat)
+  # Recorded so the parsed model can reproduce `predict()`'s refusal to score
+  # an incomplete row, including for a predictor that no split happens to use.
+  pm$general$predictors <- term_labels
   pm$tree_info_list <- map(
     seq_len(model$ntree),
     function(tree_no) rf_tree_info_full(model, tree_no, term_labels)
@@ -91,7 +94,9 @@ tidypredict_fit_rf_nested <- function(model) {
     build_nested_rf_tree(model, tree_no, term_labels)
   })
 
-  expr_mean(tree_exprs, n_trees)
+  # `randomForest::predict()` returns `NA` for a row with any missing
+  # predictor, so the forest average is only defined on complete rows.
+  expr_na_if_incomplete(expr_mean(tree_exprs, n_trees), term_labels)
 }
 
 # Build nested case_when for a single randomForest tree
@@ -250,5 +255,8 @@ build_nested_rf_vote_tree <- function(
 }
 
 build_tree_formula.pm_tree_randomForest <- function(model) {
-  build_tree_formula_forest(model)
+  expr_na_if_incomplete(
+    build_tree_formula_forest(model),
+    model$general$predictors
+  )
 }
