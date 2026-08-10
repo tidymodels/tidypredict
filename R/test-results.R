@@ -24,6 +24,51 @@ new_tidypredict_test <- function(
   structure(results, class = c("tidypredict_test", "list"))
 }
 
+# A comparison over no rows cannot tell us anything, but every count below is
+# then zero and the test would report success. That is more likely to be a
+# mistake by the caller than a meaningful pass.
+check_test_rows <- function(n, call = rlang::caller_env()) {
+  if (n == 0) {
+    cli::cli_abort(
+      c(
+        "There is nothing to compare.",
+        i = "The data passed to {.fn tidypredict_test} has no rows."
+      ),
+      call = call
+    )
+  }
+  invisible(n)
+}
+
+# Which rows disagree, when either side may be missing.
+#
+# `NA` is a prediction like any other here: if a model returns `NA` for a row,
+# tidypredict should too. So two `NA`s agree, one `NA` against a number is a
+# mismatch, and the numeric comparison only applies where both sides are
+# present. Without this, `abs(NA) > threshold` makes `alert` itself `NA` and
+# the test errors rather than reporting the difference.
+over_threshold <- function(fit, fit_te, threshold) {
+  one_missing <- xor(is.na(fit), is.na(fit_te))
+  diff <- abs(fit - fit_te)
+  ifelse(one_missing, TRUE, !is.na(diff) & diff > threshold)
+}
+
+# The count of rows where exactly one side is missing, reported on its own so a
+# missing value mismatch is not mistaken for a large numeric difference.
+count_missing <- function(fit, fit_te) {
+  sum(xor(is.na(fit), is.na(fit_te)))
+}
+
+# `max()` of nothing but `NA`s warns and returns `-Inf`, which would be
+# reported as a difference. There is no largest difference when no two values
+# can be compared, so say so.
+safe_max <- function(x) {
+  if (all(is.na(x))) {
+    return(NA_real_)
+  }
+  max(x, na.rm = TRUE)
+}
+
 # Trim `df` when the caller asked for a subset of rows.
 maybe_head <- function(df, max_rows) {
   if (is.numeric(max_rows)) {
@@ -64,11 +109,18 @@ test_results_numeric <- function(
     fit_te = as.vector(fit_te),
     row.names = NULL
   )
+  check_test_rows(nrow(raw_results))
+
   raw_results$fit_diff <- raw_results$fit - raw_results$fit_te
-  raw_results$fit_threshold <- abs(raw_results$fit_diff) > threshold
+  raw_results$fit_threshold <- over_threshold(
+    raw_results$fit,
+    raw_results$fit_te,
+    threshold
+  )
 
   counts <- c(fit = sum(raw_results$fit_threshold))
-  maxima <- c(fit = max(abs(raw_results$fit_diff)))
+  missing <- c(fit = count_missing(raw_results$fit, raw_results$fit_te))
+  maxima <- c(fit = safe_max(abs(raw_results$fit_diff)))
 
   if (!is.null(intervals)) {
     raw_results$lwr <- as.vector(intervals$lwr)
@@ -77,13 +129,23 @@ test_results_numeric <- function(
     raw_results$upr_te <- as.vector(intervals$upr_te)
     raw_results$lwr_diff <- raw_results$lwr - raw_results$lwr_te
     raw_results$upr_diff <- raw_results$upr - raw_results$upr_te
-    raw_results$lwr_threshold <- abs(raw_results$lwr_diff) > threshold
-    raw_results$upr_threshold <- abs(raw_results$upr_diff) > threshold
+    raw_results$lwr_threshold <- over_threshold(
+      raw_results$lwr,
+      raw_results$lwr_te,
+      threshold
+    )
+    raw_results$upr_threshold <- over_threshold(
+      raw_results$upr,
+      raw_results$upr_te,
+      threshold
+    )
 
     counts["lwr"] <- sum(raw_results$lwr_threshold)
     counts["upr"] <- sum(raw_results$upr_threshold)
-    maxima["lwr"] <- max(abs(raw_results$lwr_diff))
-    maxima["upr"] <- max(abs(raw_results$upr_diff))
+    missing["lwr"] <- count_missing(raw_results$lwr, raw_results$lwr_te)
+    missing["upr"] <- count_missing(raw_results$upr, raw_results$upr_te)
+    maxima["lwr"] <- safe_max(abs(raw_results$lwr_diff))
+    maxima["upr"] <- safe_max(abs(raw_results$upr_diff))
   }
 
   alert <- any(counts > 0)
@@ -110,6 +172,13 @@ test_results_numeric <- function(
       counts[["lwr"]],
       "\nUpper interval records above the threshold: ",
       counts[["upr"]]
+    )
+  }
+  if (any(missing > 0)) {
+    message <- paste0(
+      message,
+      "\nRecords missing from only one side: ",
+      sum(missing)
     )
   }
   message <- paste0(message, "\n\nMax difference: ", maxima[["fit"]])
@@ -140,8 +209,14 @@ test_results_class <- function(
     fit_te = as.character(fit_te),
     row.names = NULL
   )
-  raw_results$fit_diff <- as.numeric(raw_results$fit != raw_results$fit_te)
-  raw_results$fit_threshold <- raw_results$fit != raw_results$fit_te
+  check_test_rows(nrow(raw_results))
+
+  # Two missing labels agree; one missing against a label does not.
+  both_missing <- is.na(raw_results$fit) & is.na(raw_results$fit_te)
+  differs <- raw_results$fit != raw_results$fit_te
+  mismatch <- ifelse(both_missing, FALSE, is.na(differs) | differs)
+  raw_results$fit_diff <- as.numeric(mismatch)
+  raw_results$fit_threshold <- mismatch
 
   n_off <- sum(raw_results$fit_threshold)
   alert <- n_off > 0
@@ -164,6 +239,8 @@ test_results_multiclass <- function(
   classes,
   model_call = NULL
 ) {
+  check_test_rows(nrow(fit))
+
   diffs <- abs(fit - fit_te)
 
   raw_results <- data.frame(rowid = seq_len(nrow(fit)))
@@ -172,8 +249,13 @@ test_results_multiclass <- function(
     raw_results[[paste0("te_class_", classes[[i]])]] <- fit_te[, i]
     raw_results[[paste0("diff_class_", classes[[i]])]] <- diffs[, i]
   }
-  raw_results$max_diff <- apply(diffs, 1, max)
-  raw_results$fit_threshold <- raw_results$max_diff > threshold
+  raw_results$max_diff <- apply(diffs, 1, safe_max)
+  one_missing <- apply(xor(is.na(fit), is.na(fit_te)), 1, any)
+  raw_results$fit_threshold <- ifelse(
+    one_missing,
+    TRUE,
+    !is.na(raw_results$max_diff) & raw_results$max_diff > threshold
+  )
 
   n_off <- sum(raw_results$fit_threshold)
   alert <- n_off > 0
@@ -188,7 +270,7 @@ test_results_multiclass <- function(
       "\nFitted records above the threshold: ",
       n_off,
       "\n\nMax difference: ",
-      max(diffs)
+      safe_max(diffs)
     )
   } else {
     test_message_pass(header)
