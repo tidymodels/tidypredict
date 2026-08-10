@@ -111,3 +111,26 @@ test_that("non-numeric predictors error with clear message", {
 
   expect_snapshot(error = TRUE, tidypredict_fit(model))
 })
+
+test_that("a missing predictor gives NA rather than a confident value (#325)", {
+  skip_if_not_installed("aorsf")
+
+  set.seed(1)
+  model <- aorsf::orsf(mtcars, mpg ~ wt + cyl + disp + hp, n_tree = 20)
+
+  nd <- new_data()
+  nd$wt[1:5] <- NA_real_
+  fit <- rlang::eval_tidy(tidypredict_fit(model), nd)
+
+  # `predict()` refuses the incomplete rows outright, so there is no value to
+  # match; the rows are kept rather than dropped.
+  expect_error(predict(model, new_data = nd), "missing values")
+  expect_length(fit, nrow(nd))
+  expect_equal(is.na(fit), c(rep(TRUE, 5), rep(FALSE, nrow(nd) - 5)))
+
+  # The complete rows are unaffected.
+  expect_equal(
+    fit[-(1:5)],
+    as.numeric(predict(model, new_data = nd[-(1:5), ]))
+  )
+})

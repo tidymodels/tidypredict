@@ -299,3 +299,23 @@ test_that("parsed model leaf values carry no names", {
   expect_null(names(info$prediction))
   expect_null(names(info$splitvarName))
 })
+
+test_that("a missing predictor gives NA, matching predict() (#294)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  model <- randomForest::randomForest(mpg ~ wt + cyl + disp, data = mtcars)
+
+  df <- mtcars
+  df$wt[1:5] <- NA_real_
+  # A predictor the row's path may never consult still yields NA, because
+  # `randomForest::predict()` returns NA for any incomplete row.
+  df$disp[6:8] <- NA_real_
+
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+  base <- unname(predict(model, df))
+
+  expect_equal(is.na(fit), is.na(base))
+  expect_equal(fit[-(1:8)], base[-(1:8)])
+  expect_false(tidypredict_test(model, df = df)$alert)
+})

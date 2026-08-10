@@ -4,6 +4,8 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_fit()` now returns `NA` for a row with a missing predictor for `randomForest::randomForest()` and `aorsf::orsf()` models, rather than a confident value the model itself would never produce. `randomForest::predict()` returns `NA` for any incomplete row and `aorsf` refuses to predict from one at all, so there is no value to match. Rows are kept rather than dropped. (#294, #325)
+
 - `tidypredict_test()` now handles missing predictions instead of erroring with "missing value where TRUE/FALSE needed". A row where both the model and tidypredict return `NA` counts as a match, and a row where only one of them does is reported as a mismatch, so the function can be used to check how a model behaves on missing data. (#309)
 
 - `tidypredict_test()` now errors when given data with no rows, rather than reporting that all results are within the difference threshold. (#309)
