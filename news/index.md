@@ -20,6 +20,14 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now sends a missing predictor down the left branch for
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  models, matching [`predict()`](https://rdrr.io/r/stats/predict.html).
+  `ranger` compares as `value > splitval`, which a missing value fails,
+  so it takes the same branch as a value at or below the split point.
+  ([\#294](https://github.com/tidymodels/tidypredict/issues/294))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now routes missing values through surrogate splits for
   [`rpart::rpart()`](https://rdrr.io/pkg/rpart/man/rpart.html) models,
   and for

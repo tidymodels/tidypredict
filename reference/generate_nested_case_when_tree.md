@@ -5,7 +5,7 @@ Generate nested case_when for a tree
 ## Usage
 
 ``` r
-generate_nested_case_when_tree(tree_info, na_propagate = FALSE)
+generate_nested_case_when_tree(tree_info, missing = c("default", "na", "left"))
 ```
 
 ## Arguments
@@ -14,7 +14,8 @@ generate_nested_case_when_tree(tree_info, na_propagate = FALSE)
 
   A tree info list from `rpart_tree_info_full()` or similar
 
-- na_propagate:
+- missing:
 
-  Return `NA` for a row once its path reaches a split on a column it is
-  missing, rather than sending it down the `.default` branch.
+  What a row missing this split's column should do: `"default"` takes
+  the `.default` branch, `"na"` returns `NA`, and `"left"` takes the
+  left branch.
