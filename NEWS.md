@@ -4,6 +4,8 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_fit()` now substitutes the training mean for a missing predictor in `Cubist::cubist()` models, matching `predict()`. The mean is read from the model text at the precision Cubist itself stores it, and is used in the rule conditions as well as in the linear models. (#294)
+
 - `tidypredict_fit()` now sends a missing predictor down the left branch for `ranger::ranger()` models, matching `predict()`. `ranger` compares as `value > splitval`, which a missing value fails, so it takes the same branch as a value at or below the split point. (#294)
 
 - `tidypredict_fit()` now routes missing values through surrogate splits for `rpart::rpart()` models, and for `baguette::bagger()` models using the `"CART"` base model, matching `predict()` instead of sending every missing value down the right branch. All three `usesurrogate` modes are followed, including stopping at the node when no surrogate resolves the row and there is no majority to go with. (#294)

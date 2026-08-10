@@ -142,6 +142,54 @@ test_that("prediction intervals are not supported", {
   expect_snapshot(error = TRUE, tidypredict_interval(model))
 })
 
+test_that("missing predictors match predict() (#294)", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  df <- mtcars
+  df$wt[1:5] <- NA
+  df$disp[4:8] <- NA
+  df$cyl[10] <- NA
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("a row missing every predictor matches predict() (#294)", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  df <- mtcars[1, ]
+  df[, c("wt", "cyl", "disp")] <- NA_real_
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("missing values take the stored training mean (#294)", {
+  skip_if_not_installed("Cubist")
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  means <- cubist_attribute_means(model)
+  expect_setequal(names(means), c("wt", "cyl", "disp"))
+
+  missing_row <- mtcars[1, ]
+  missing_row$wt <- NA_real_
+  filled_row <- mtcars[1, ]
+  filled_row$wt <- means$wt
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), missing_row),
+    rlang::eval_tidy(tidypredict_fit(model), filled_row)
+  )
+})
+
 test_that("rows exactly on a split threshold match predict() (#232)", {
   skip_if_not_installed("Cubist")
   # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus

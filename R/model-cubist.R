@@ -105,7 +105,8 @@ parse_model.cubist <- function(model) {
       version = 3,
       mode = "ifelse",
       n_committees = model$committees,
-      ommittee_id = ommittee_id
+      ommittee_id = ommittee_id,
+      means = cubist_attribute_means(model)
     ),
     trees = list(comm)
   )
@@ -116,6 +117,48 @@ parse_model.cubist <- function(model) {
 tidypredict_fit.cubist <- function(model) {
   parsedmodel <- parse_model(model)
   tidypredict_fit_cubist(parsedmodel)
+}
+
+# The per-predictor training means `Cubist` writes into its model text.
+#
+# `Cubist` substitutes these for a missing value, so they are what
+# `predict()` uses. They are stored at the model's own precision rather than
+# recomputed from the training data, because the rounded value is the one the
+# C code reads back and predicts from.
+cubist_attribute_means <- function(model) {
+  lines <- strsplit(model$model, "\n")[[1]]
+  matches <- regmatches(
+    lines,
+    regexec('^att="([^"]+)" mean="([^"]+)"', lines)
+  )
+  matches <- Filter(\(x) length(x) == 3 && x[[2]] != "outcome", matches)
+
+  means <- lapply(matches, \(x) as.numeric(x[[3]]))
+  names(means) <- vapply(matches, \(x) x[[2]], character(1))
+  means
+}
+
+# Replace every mention of a predictor with its training mean where the value
+# is missing. `Cubist` does this for the rule conditions as well as the linear
+# models, so the substitution is applied to the whole expression rather than to
+# the coefficients alone.
+substitute_missing_means <- function(x, means) {
+  if (is.symbol(x)) {
+    mean <- means[[as.character(x)]]
+    if (is.null(mean)) {
+      return(x)
+    }
+    return(expr(ifelse(is.na(!!x), !!mean, !!x)))
+  }
+  if (is.call(x)) {
+    # Position 1 holds the function being called, not a column.
+    for (i in seq_along(x)[-1]) {
+      if (!identical(x[[i]], quote(expr = ))) {
+        x[[i]] <- substitute_missing_means(x[[i]], means)
+      }
+    }
+  }
+  x
 }
 
 tidypredict_fit_cubist <- function(parsedmodel) {
@@ -135,6 +178,11 @@ tidypredict_fit_cubist <- function(parsedmodel) {
   if (n_committees > 1) {
     # Average the committes
     out <- expr_division(out, n_committees)
+  }
+
+  means <- parsedmodel$general$means
+  if (length(means) > 0) {
+    out <- substitute_missing_means(out, means)
   }
 
   out
