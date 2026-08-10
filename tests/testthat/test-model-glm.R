@@ -106,10 +106,32 @@ test_that("tidypredict works when variable names are subset of other variables",
   )
 })
 
-test_that("tidypredict_interval works for gaussian glm", {
+test_that("tidypredict_interval works for gaussian glm (#293)", {
   model <- glm(mpg ~ wt + cyl, data = mtcars, family = "gaussian")
   interval <- tidypredict_interval(model)
   expect_type(interval, "language")
+
+  # a gaussian glm and the equivalent lm have the same prediction interval
+  fit <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  half_width <- rlang::eval_tidy(interval, mtcars)
+  reference <- predict(
+    lm(mpg ~ wt + cyl, data = mtcars),
+    mtcars,
+    interval = "prediction"
+  )
+
+  expect_equal(fit - half_width, unname(reference[, "lwr"]))
+  expect_equal(fit + half_width, unname(reference[, "upr"]))
+})
+
+test_that("tidypredict_to_column() adds intervals for a glm (#293)", {
+  model <- glm(mpg ~ wt + cyl, data = mtcars, family = "gaussian")
+
+  out <- tidypredict_to_column(mtcars, model, add_interval = TRUE)
+
+  expect_equal(nrow(out), nrow(mtcars))
+  expect_false(anyNA(out$lower))
+  expect_false(anyNA(out$upper))
 })
 
 test_that("tidypredict_interval errors for non-gaussian glm", {
