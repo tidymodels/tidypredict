@@ -20,6 +20,26 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now skips a feature whose value is missing or whose factor level was
+  not seen while fitting, for
+  [`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
+  and
+  [`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+  models, matching both packages’
+  [`predict()`](https://rdrr.io/r/stats/predict.html) instead of
+  returning `NA` for the whole row. A row missing every predictor falls
+  back on the class prior alone.
+  ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer errors with “missing value where TRUE/FALSE needed” for a
+  [`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+  model with an outcome class of fewer than two observations. Such a
+  class has no standard deviation, and the resulting `NA` probabilities
+  now match [`predict()`](https://rdrr.io/r/stats/predict.html).
+  ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now substitutes the training mean for a missing predictor in
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
   models, matching [`predict()`](https://rdrr.io/r/stats/predict.html).
@@ -271,7 +291,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -610,9 +630,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
-  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
-  models.
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -677,9 +697,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
-  use family function syntax (e.g., `family = gaussian()`) instead of
-  string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  that use family function syntax (e.g., `family = gaussian()`) instead
+  of string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
