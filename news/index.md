@@ -20,6 +20,16 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now decodes factor splits for
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  models. An unordered factor’s split point is an integer whose bits
+  name the levels going left, and an ordered factor’s is compared
+  against the level’s integer code; both were read as a numeric
+  threshold on the column itself, which silently produced `NA` or a
+  wrong branch.
+  ([\#282](https://github.com/tidymodels/tidypredict/issues/282))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now skips a feature whose value is missing or whose factor level was
   not seen while fitting, for
   [`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
