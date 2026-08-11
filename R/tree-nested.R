@@ -228,6 +228,11 @@ build_nested_split_condition <- function(split) {
 
   col <- rlang::sym(split$col)
 
+  # An ordered factor is split on its level's integer code, not on its label
+  if (isTRUE(split$as_integer)) {
+    col <- expr(as.integer(!!col))
+  }
+
   if (split$is_categorical) {
     # Categorical split: x %in% c("a", "b")
     vals <- unlist(split$vals)
