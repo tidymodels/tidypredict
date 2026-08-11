@@ -58,6 +58,49 @@ test_that("zero-probability levels use the predict threshold", {
   expect_equal(unname(probs), unname(predict(model, df)$posterior))
 })
 
+test_that("missing predictors are skipped, matching predict() (#300)", {
+  skip_if_not_installed("klaR")
+
+  df <- transform(
+    mtcars,
+    cyl = factor(cyl),
+    gear = factor(gear),
+    vs = vs == 1
+  )
+  model <- klaR::NaiveBayes(cyl ~ mpg + gear + vs, data = df)
+
+  nd <- df[1:8, ]
+  nd$mpg[1:3] <- NA
+  nd$gear[c(2, 4)] <- NA
+  nd$vs[5] <- NA
+  # A row missing every predictor falls back on the class prior alone
+  nd[6, c("mpg", "gear", "vs")] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+
+  expect_equal(
+    unname(probs),
+    unname(suppressWarnings(predict(model, nd)$posterior))
+  )
+})
+
+test_that("unseen factor levels are skipped, matching predict() (#300)", {
+  skip_if_not_installed("klaR")
+
+  df <- transform(mtcars, cyl = factor(cyl), gear = factor(gear))
+  model <- klaR::NaiveBayes(cyl ~ mpg + gear, data = df)
+
+  nd <- df[1:3, ]
+  nd$gear <- factor(c("3", "9", "9"), levels = c(levels(df$gear), "9"))
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+
+  expect_equal(
+    unname(probs),
+    unname(suppressWarnings(predict(model, nd)$posterior))
+  )
+})
+
 test_that("binary outcomes are handled", {
   skip_if_not_installed("klaR")
 
@@ -209,6 +252,53 @@ test_that("naive_bayes handles categorical, logical, and Poisson predictors", {
       unname(predict(model, df[names(model$tables)], type = "prob"))
     )
   }
+})
+
+test_that("naive_bayes skips missing predictors, matching predict() (#300)", {
+  skip_if_not_installed("naivebayes")
+
+  df <- transform(
+    mtcars,
+    cyl = factor(cyl),
+    gear = factor(gear),
+    vs = vs == 1,
+    carb = as.integer(carb)
+  )
+  model <- suppressWarnings(naivebayes::naive_bayes(
+    cyl ~ mpg + gear + vs + carb,
+    data = df,
+    usepoisson = TRUE
+  ))
+
+  nd <- df[1:8, names(model$tables)]
+  nd$mpg[1:3] <- NA
+  nd$gear[c(2, 4)] <- NA
+  nd$vs[5] <- NA
+  nd$carb[c(1, 7)] <- NA
+  nd[6, ] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+
+  expect_equal(unname(probs), unname(predict(model, nd, type = "prob")))
+})
+
+test_that("naive_bayes returns NA for a class with one observation (#300)", {
+  skip_if_not_installed("naivebayes")
+
+  df <- data.frame(
+    x = c(mtcars$mpg, 3),
+    y = factor(c(ifelse(mtcars$am == 1, "a", "b"), "c"))
+  )
+  model <- suppressWarnings(naivebayes::naive_bayes(y ~ x, data = df))
+
+  # `c` has a single observation, so it has no standard deviation
+  expect_true(is.na(model$tables$x[2, "c"]))
+
+  nd <- data.frame(x = c(20, 25))
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+
+  expect_equal(unname(probs), unname(predict(model, nd, type = "prob")))
+  expect_true(all(is.na(probs)))
 })
 
 test_that("naive_bayes zero-probability levels use the predict threshold", {

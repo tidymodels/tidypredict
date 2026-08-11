@@ -4,6 +4,10 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_fit()` now skips a feature whose value is missing or whose factor level was not seen while fitting, for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models, matching both packages' `predict()` instead of returning `NA` for the whole row. A row missing every predictor falls back on the class prior alone. (#300)
+
+- `tidypredict_fit()` no longer errors with "missing value where TRUE/FALSE needed" for a `naivebayes::naive_bayes()` model with an outcome class of fewer than two observations. Such a class has no standard deviation, and the resulting `NA` probabilities now match `predict()`. (#300)
+
 - `tidypredict_fit()` now substitutes the training mean for a missing predictor in `Cubist::cubist()` models, matching `predict()`. The mean is read from the model text at the precision Cubist itself stores it, and is used in the rule conditions as well as in the linear models. (#294)
 
 - `tidypredict_fit()` now sends a missing predictor down the left branch for `ranger::ranger()` models, matching `predict()`. `ranger` compares as `value > splitval`, which a missing value fails, so it takes the same branch as a value at or below the split point. (#294)

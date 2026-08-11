@@ -39,18 +39,22 @@ naive_bayes_term <- function(term) {
     mean <- as.numeric(term$mean)
     scale <- as.numeric(term$scale)
     offset <- as.numeric(term$offset)
-    return(expr(!!offset - ((!!col - !!mean)^2 / !!scale)))
+    return(skip_when_missing(
+      col,
+      expr(!!offset - ((!!col - !!mean)^2 / !!scale))
+    ))
   }
 
   if (term$type == "poisson") {
     # log(dpois(x, lambda)), without the constant `-log(factorial(x))`
     log_lambda <- as.numeric(term$log_lambda)
     lambda <- as.numeric(term$lambda)
-    return(expr(!!col * !!log_lambda - !!lambda))
+    return(skip_when_missing(col, expr(!!col * !!log_lambda - !!lambda)))
   }
 
   if (term$type == "logical") {
     return(expr(case_when(
+      is.na(!!col) ~ 0,
       !!col ~ !!as.numeric(term$log_true),
       .default = !!as.numeric(term$log_false)
     )))
@@ -63,9 +67,22 @@ naive_bayes_term <- function(term) {
     log_probs,
     function(level, log_prob) expr(!!col == !!level ~ !!log_prob)
   )
-  # Levels that were not seen while fitting have no probability, matching the
-  # `NA` that `predict.NaiveBayes()` returns for them
-  expr(case_when(!!!conditions, .default = NA_real_))
+  # A level that was not seen while fitting has no probability, and both
+  # references skip such a feature rather than failing the whole row: `klaR`
+  # coerces it to `NA` and returns a density of 1 for it, `naivebayes` sets the
+  # density to 1 directly. A log density of 0 is a density of 1.
+  expr(case_when(!!!conditions, .default = 0))
+}
+
+# Both references skip a feature whose value is missing rather than letting the
+# whole row go missing, so the row falls back on the remaining features and, if
+# every feature is missing, on the class prior alone. A log density of 0 is a
+# density of 1, which leaves the summed score untouched.
+#
+# The test is on the column rather than on the term, so that an `NA` coming
+# from a degenerate fitted parameter still propagates.
+skip_when_missing <- function(col, term) {
+  expr(ifelse(is.na(!!col), 0, !!term))
 }
 
 # Parse model --------------------------------------
@@ -187,7 +204,10 @@ naive_bayes_var_nb <- function(model, var, i, cond_dist, threshold) {
   if (cond_dist == "Gaussian") {
     mean <- as.numeric(tbl[1, i])
     sd <- as.numeric(tbl[2, i])
-    if (sd <= 0) {
+    # A class with fewer than two observations has no standard deviation.
+    # `predict()` returns `NA` probabilities for every row of such a fit, so the
+    # `NA` is carried through rather than being treated as a zero variance.
+    if (!is.na(sd) && sd <= 0) {
       sd <- threshold
     }
     return(list(
