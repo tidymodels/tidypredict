@@ -319,3 +319,67 @@ test_that("a missing predictor gives NA, matching predict() (#294)", {
   expect_equal(fit[-(1:8)], base[-(1:8)])
   expect_false(tidypredict_test(model, df = df)$alert)
 })
+
+test_that("unordered factor splits match predict() (#282)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear), carb = factor(carb))
+  model <- randomForest::randomForest(mpg ~ wt + gear + carb, data = df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("ordered factor splits match predict() (#282)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear, ordered = TRUE))
+  model <- randomForest::randomForest(mpg ~ wt + gear, data = df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("a factor split reads level bits, not a threshold (#282)", {
+  skip_if_not_installed("randomForest")
+
+  # A split point of 10 is binary 1010, so the 2nd and 4th levels go left
+  split <- rf_split_info("f", 10, 4, c("a", "b", "c", "d"))
+
+  expect_true(split$is_categorical)
+  expect_equal(unlist(split$vals), c("b", "d"))
+})
+
+test_that("factor splits match predict() for class probabilities (#282)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  df <- transform(
+    mtcars,
+    gear = factor(gear),
+    am = factor(am, labels = c("auto", "manual"))
+  )
+  model <- randomForest::randomForest(am ~ wt + gear, data = df)
+
+  trees <- .extract_rf_classprob(model)
+  probs <- sapply(trees, function(exprs) {
+    rowMeans(sapply(exprs, \(e) rlang::eval_tidy(e, df)))
+  })
+
+  base <- unclass(predict(model, df, type = "prob"))[, colnames(probs)]
+  expect_equal(probs, unname(base), ignore_attr = "dimnames")
+})

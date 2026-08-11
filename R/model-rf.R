@@ -48,15 +48,20 @@ rf_tree_info_full <- function(model, tree_no, term_labels) {
   has_split <- split_var_idx != 0
   splitvarName[has_split] <- term_labels[split_var_idx[has_split]]
 
+  levels <- rf_predictor_levels(model, term_labels)
+  ncat <- model$forest$ncat
+
   # Build node_splits list
   node_splits <- vector("list", n_nodes)
   for (i in seq_len(n_nodes)) {
     if (!terminal[i]) {
+      col <- splitvarName[i]
       node_splits[[i]] <- list(
-        primary = list(
-          col = splitvarName[i],
-          val = tree[i, "split point"],
-          is_categorical = FALSE
+        primary = rf_split_info(
+          col,
+          unname(tree[i, "split point"]),
+          ncat[[col]],
+          levels[[col]]
         )
       )
     }
@@ -70,6 +75,66 @@ rf_tree_info_full <- function(model, tree_no, term_labels) {
     terminal = terminal,
     prediction = prediction,
     node_splits = node_splits
+  )
+}
+
+# The levels of each factor predictor, and `NULL` for a numeric one.
+#
+# `randomForest` stores the levels of an unordered factor in `forest$xlevels`
+# and writes a `0` there for everything else, so an ordered factor is only
+# identifiable from the model's terms. Fits made through the `x`/`y` interface
+# carry no terms, in which case an ordered factor is indistinguishable from a
+# numeric predictor and is left alone.
+rf_predictor_levels <- function(model, term_labels) {
+  xlevels <- model$forest$xlevels
+  classes <- attr(model$terms, "dataClasses")
+
+  out <- lapply(term_labels, function(var) {
+    lvls <- xlevels[[var]]
+    if (is.character(lvls)) {
+      return(lvls)
+    }
+    if (identical(unname(classes[var]), "ordered")) {
+      return(NA_character_)
+    }
+    NULL
+  })
+  names(out) <- term_labels
+  out
+}
+
+# `randomForest` encodes a split on a factor predictor in one of two ways, and
+# neither is a threshold on the column itself.
+#
+# An unordered factor has `ncat > 1`, and the split point is an integer whose
+# bits name the levels going left: a split point of 10 on levels a, b, c, d
+# means `{b, d}` go left. An ordered factor has `ncat == 1` and an ordinary
+# numeric split point, but it is compared against the level's integer code, so
+# `<=` against the column itself returns `NA` rather than a branch.
+#
+# The unordered case is expressed as the set of levels going left, which the
+# shared categorical split machinery already handles. The ordered case cannot
+# be, because `randomForest` does not store the levels anywhere, so it stays a
+# numeric comparison against the integer code.
+rf_split_info <- function(col, split_point, ncat, levels) {
+  if (is.null(levels)) {
+    return(list(col = col, val = split_point, is_categorical = FALSE))
+  }
+
+  if (ncat == 1) {
+    return(list(
+      col = col,
+      val = split_point,
+      is_categorical = FALSE,
+      as_integer = TRUE
+    ))
+  }
+
+  bits <- as.integer(intToBits(split_point))[seq_along(levels)]
+  list(
+    col = col,
+    vals = as.list(levels[bits == 1]),
+    is_categorical = TRUE
   )
 }
 
@@ -120,6 +185,9 @@ build_nested_rf_tree <- function(
   split_var <- unname(tree[, "split var"])
   split_point <- unname(tree[, "split point"])
 
+  levels <- rf_predictor_levels(model, term_labels)
+  ncat <- model$forest$ncat
+
   build_node <- function(node_id) {
     # Check if terminal (leaf) node - status == -1
     if (status[node_id] == -1) {
@@ -137,10 +205,13 @@ build_nested_rf_tree <- function(
     right_subtree <- build_node(right_id)
 
     col_name <- term_labels[var_idx]
-    col_sym <- rlang::sym(col_name)
 
-    # Numeric split: left = <= splitval, right = > splitval
-    condition <- expr(!!col_sym <= !!split_val)
+    condition <- build_nested_split_condition(rf_split_info(
+      col_name,
+      split_val,
+      ncat[[col_name]],
+      levels[[col_name]]
+    ))
 
     expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
