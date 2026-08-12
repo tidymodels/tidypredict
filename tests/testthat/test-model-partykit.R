@@ -282,3 +282,77 @@ test_that("only the splits a row reaches propagate NA (#294)", {
   expect_false(anyNA(fit))
   expect_equal(fit, unname(predict(model, mtcars)))
 })
+
+test_that("a `right = FALSE` split excludes the break point (#295)", {
+  skip_if_not_installed("partykit")
+
+  df <- data.frame(x = 1:6, y = c(10, 20, 30, 40, 50, 60))
+  split <- partykit::partysplit(1L, breaks = 3, right = FALSE)
+  node <- partykit::partynode(
+    1L,
+    split = split,
+    kids = list(partykit::partynode(2L), partykit::partynode(3L))
+  )
+  model <- partykit::as.constparty(partykit::party(
+    node,
+    data = df,
+    fitted = data.frame(
+      "(fitted)" = partykit::fitted_node(node, df),
+      "(response)" = df$y,
+      "(weights)" = rep(1, 6),
+      check.names = FALSE
+    )
+  ))
+
+  base <- unname(predict(model, df))
+  # `x == 3` belongs to the right branch, not the left
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    base
+  )
+})
+
+test_that("ordered factor predictors match predict() (#295)", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear, ordered = TRUE))
+  model <- partykit::ctree(mpg ~ wt + gear, data = df)
+  base <- unname(predict(model, df))
+
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
+
+test_that("converted rpart trees are not branch-swapped (#295)", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("rpart")
+
+  # `as.party.rpart()` writes an `index` of `2, 1`, putting the interval below
+  # the break on the second kid
+  model <- partykit::as.party(rpart::rpart(mpg ~ wt + disp, data = mtcars))
+  base <- unname(predict(model, mtcars))
+
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), mtcars), base)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), mtcars),
+    base
+  )
+})
+
+test_that("converted rpart trees with factors match predict() (#295)", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("rpart")
+
+  df <- transform(
+    mtcars,
+    gear = factor(gear, ordered = TRUE),
+    carb = factor(carb)
+  )
+  model <- partykit::as.party(rpart::rpart(mpg ~ wt + gear + carb, data = df))
+  base <- unname(predict(model, df))
+
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
