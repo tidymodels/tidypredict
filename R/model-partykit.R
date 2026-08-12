@@ -40,6 +40,7 @@ partykit_tree_info_full <- function(model) {
             col = var_name,
             val = tree_df$splitval[i],
             is_categorical = FALSE,
+            strict = !tree_df$splitright[i],
             needs_swap = FALSE
           ),
           surrogates = list()
@@ -74,6 +75,10 @@ partykit_tree_info <- function(model) {
   splitvarID <- integer(n_nodes)
   splitval <- numeric(n_nodes)
   split_index <- vector("list", n_nodes)
+  # `partysplit` records which end of the interval the break belongs to. The
+  # default `right = TRUE` puts it on the left branch, `x <= break`; `right =
+  # FALSE` makes the left branch `x < break`.
+  split_right <- rep(TRUE, n_nodes)
   left_child <- integer(n_nodes)
   right_child <- integer(n_nodes)
 
@@ -84,9 +89,20 @@ partykit_tree_info <- function(model) {
       splitvarID[i] <- node$split$varid
       splitval[i] <- node$split$breaks %||% NA_real_
       split_index[[i]] <- node$split$index
+      split_right[i] <- node$split$right %||% TRUE
       kids <- partykit::kids_node(node)
-      left_child[i] <- partykit::id_node(kids[[1]])
-      right_child[i] <- partykit::id_node(kids[[2]])
+
+      # With a break, `index` maps each interval to a kid, and it is not
+      # always the identity: `partykit::as.party.rpart()` writes `2, 1`, which
+      # puts the interval below the break on the *second* kid. Taking the kids
+      # in order silently swaps both branches of every converted rpart tree.
+      bin_kid <- node$split$index
+      if (is.null(node$split$breaks) || is.null(bin_kid)) {
+        bin_kid <- c(1L, 2L)
+      }
+
+      left_child[i] <- partykit::id_node(kids[[bin_kid[1]]])
+      right_child[i] <- partykit::id_node(kids[[bin_kid[2]]])
     } else {
       splitvarID[i] <- NA_integer_
       splitval[i] <- NA_real_
@@ -129,26 +145,46 @@ partykit_tree_info <- function(model) {
   # parties place the response last), so map through the data column names.
   vars <- names(model$data)
 
-  var_details <- map_chr(model$data, class)
-  var_class <- as.character(var_details)
-  var_name <- names(var_details)
+  # `class()` of an ordered factor is `c("ordered", "factor")`, so testing it
+  # against a single string both errors on the length and would miscount an
+  # ordered factor as continuous.
+  is_factor_var <- vapply(model$data, is.factor, logical(1))
+  is_ordered_var <- vapply(model$data, is.ordered, logical(1))
 
   # Build categorical split strings
   class_splits <- character(n_nodes)
   for (i in seq_len(n_nodes)) {
     if (is.na(splitvarID[i])) {
       class_splits[i] <- NA_character_
-    } else {
-      v <- vars[splitvarID[i]]
-      if (var_class[var_name == v] == "factor") {
-        lvls <- levels(model$data[, colnames(model$data) == v])
-        pn <- split_index[[i]]
-        pn <- ifelse(is.na(pn), 0, pn)
-        class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
-      } else {
-        class_splits[i] <- NA_character_
-      }
+      next
     }
+
+    v <- vars[splitvarID[i]]
+    if (!is_factor_var[[v]]) {
+      class_splits[i] <- NA_character_
+      next
+    }
+
+    lvls <- levels(model$data[, colnames(model$data) == v])
+
+    if (is_ordered_var[[v]]) {
+      # An ordered factor is split by a break on the level's integer code
+      # rather than by a set of levels, so the break names how far down the
+      # level order the left branch reaches.
+      # `right` applies to the break here as it does to a numeric one, so it
+      # decides whether the level on the break itself is included. Which kid
+      # the interval reaches is already handled with the other breaks.
+      n_left <- if (split_right[i]) splitval[i] else splitval[i] - 1
+      class_splits[i] <- paste0(lvls[seq_len(n_left)], collapse = ", ")
+      # Recorded as a set of levels, so the break must not also be read as a
+      # numeric threshold on the column
+      splitval[i] <- NA_real_
+      next
+    }
+
+    pn <- split_index[[i]]
+    pn <- ifelse(is.na(pn), 0, pn)
+    class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
   }
 
   data.frame(
@@ -159,6 +195,7 @@ partykit_tree_info <- function(model) {
     splitvarName = vars[splitvarID],
     splitval = splitval,
     splitclass = class_splits,
+    splitright = split_right,
     terminal = !is_split,
     prediction = prediction
   )

@@ -4,6 +4,12 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_fit()` now honours `partysplit(right = FALSE)` for `partykit` models, where the left branch is `x < break` rather than `x <= break`. A value falling exactly on the break took the wrong branch. (#295)
+
+- `tidypredict_fit()` now handles ordered factor predictors for `partykit` models, which previously errored with "Result must be length 1, not 2". `partykit` splits an ordered factor with a break on the level's integer code rather than with a set of levels. (#295)
+
+- `tidypredict_fit()` no longer swaps the two branches of every `partykit::party` converted from an `rpart` model. `as.party.rpart()` maps the interval below the break to the second child, and the child order was read directly instead of through that mapping. (#295)
+
 - `tidypredict_fit()` now decodes factor splits for `ranger::ranger()` models, in all three `respect.unordered.factors` modes and for ordered factors. The split value names a position in the level order stored on the model, or under `"partition"` lists the level indices going right; it was compared as a numeric threshold against the factor column itself. (#283)
 
 - `tidypredict_fit()` now decodes factor splits for `randomForest::randomForest()` models. An unordered factor's split point is an integer whose bits name the levels going left, and an ordered factor's is compared against the level's integer code; both were read as a numeric threshold on the column itself, which silently produced `NA` or a wrong branch. (#282)
