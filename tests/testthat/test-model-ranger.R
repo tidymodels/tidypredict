@@ -646,3 +646,115 @@ test_that("a missing predictor takes the left branch, matching predict() (#294)"
     predict(model, new_df)$predictions
   )
 })
+
+test_that("factor splits match predict() in every mode (#283)", {
+  skip_if_not_installed("ranger")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear), carb = factor(carb))
+
+  for (mode in c("ignore", "order", "partition")) {
+    set.seed(9)
+    model <- ranger::ranger(
+      mpg ~ wt + gear + carb,
+      data = df,
+      num.trees = 10,
+      respect.unordered.factors = mode
+    )
+    base <- predict(model, df)$predictions
+
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+      base
+    )
+  }
+})
+
+test_that("ordered factor splits match predict() (#283)", {
+  skip_if_not_installed("ranger")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear, ordered = TRUE))
+  set.seed(9)
+  model <- ranger::ranger(mpg ~ wt + gear, data = df, num.trees = 10)
+  base <- predict(model, df)$predictions
+
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
+
+test_that("a partition split lists the levels going right (#283)", {
+  skip_if_not_installed("ranger")
+
+  # "1,3" names the levels going right, so the left set is the complement
+  split <- ranger_split_info("f", "1,3", c("a", "b", "c", "d"), FALSE)
+
+  expect_true(split$is_categorical)
+  expect_equal(unlist(split$vals), c("b", "d"))
+  # A missing value is routed as though it were the first level
+  expect_equal(split$missing_level, "a")
+})
+
+test_that("an ordered split names a position in the stored levels (#283)", {
+  skip_if_not_installed("ranger")
+
+  split <- ranger_split_info("f", 2.5, c("a", "b", "c", "d"), TRUE)
+
+  expect_true(split$is_categorical)
+  expect_equal(unlist(split$vals), c("a", "b"))
+})
+
+test_that("missing factor values match predict() (#283)", {
+  skip_if_not_installed("ranger")
+
+  set.seed(1)
+  df <- transform(mtcars, gear = factor(gear), carb = factor(carb))
+
+  for (mode in c("ignore", "order", "partition")) {
+    set.seed(9)
+    model <- ranger::ranger(
+      mpg ~ wt + gear + carb,
+      data = df,
+      num.trees = 10,
+      respect.unordered.factors = mode
+    )
+
+    nd <- df
+    nd$gear[1:5] <- NA
+    nd$carb[4:8] <- NA
+    nd$wt[9:11] <- NA
+
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), nd),
+      predict(model, nd)$predictions
+    )
+  }
+})
+
+test_that("factor splits match predict() for a probability forest (#283)", {
+  skip_if_not_installed("ranger")
+
+  set.seed(1)
+  df <- transform(
+    mtcars,
+    gear = factor(gear),
+    am = factor(am, labels = c("auto", "manual"))
+  )
+  set.seed(9)
+  model <- ranger::ranger(
+    am ~ wt + gear,
+    data = df,
+    num.trees = 10,
+    probability = TRUE,
+    respect.unordered.factors = "partition"
+  )
+
+  trees <- .extract_ranger_classprob(model)
+  probs <- sapply(trees, function(exprs) {
+    rowMeans(sapply(exprs, \(e) rlang::eval_tidy(e, df)))
+  })
+  base <- predict(model, df)$predictions[, colnames(probs)]
+
+  expect_equal(probs, base, ignore_attr = "dimnames")
+})
