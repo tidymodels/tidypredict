@@ -20,6 +20,28 @@
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now honours `partysplit(right = FALSE)` for `partykit` models, where
+  the left branch is `x < break` rather than `x <= break`. A value
+  falling exactly on the break took the wrong branch.
+  ([\#295](https://github.com/tidymodels/tidypredict/issues/295))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now handles ordered factor predictors for `partykit` models, which
+  previously errored with “Result must be length 1, not 2”. `partykit`
+  splits an ordered factor with a break on the level’s integer code
+  rather than with a set of levels.
+  ([\#295](https://github.com/tidymodels/tidypredict/issues/295))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer swaps the two branches of every
+  [`partykit::party`](https://rdrr.io/pkg/partykit/man/party.html)
+  converted from an `rpart` model.
+  [`as.party.rpart()`](https://rdrr.io/pkg/partykit/man/party-coercion.html)
+  maps the interval below the break to the second child, and the child
+  order was read directly instead of through that mapping.
+  ([\#295](https://github.com/tidymodels/tidypredict/issues/295))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now decodes factor splits for
   [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
   models, in all three `respect.unordered.factors` modes and for ordered
