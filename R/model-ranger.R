@@ -20,22 +20,97 @@ parse_model.ranger <- function(model) {
   as_parsed_model(pm)
 }
 
+# The levels of each factor predictor, and `NULL` for a numeric one, paired
+# with whether `ranger` treated the predictor as ordered.
+#
+# Under `respect.unordered.factors = "order"` the levels are not in the
+# factor's own order: `ranger` sorts them by mean response and splits on a
+# position in that sorted sequence, so the stored order is the one to use.
+ranger_predictor_levels <- function(model) {
+  levels <- model$forest$covariate.levels
+  if (is.null(levels)) {
+    return(list(levels = list(), is_ordered = list()))
+  }
+
+  vars <- model$forest$independent.variable.names %||% names(levels)
+  is_ordered <- as.list(model$forest$is.ordered[seq_along(vars)])
+  names(is_ordered) <- vars
+
+  list(levels = levels, is_ordered = is_ordered)
+}
+
+# `ranger` writes a split on a factor predictor in one of two forms, neither of
+# which is a threshold on the column itself.
+#
+# An ordered predictor, which covers `respect.unordered.factors = "ignore"` and
+# `"order"` as well as genuinely ordered factors, gets a numeric split point
+# naming a position in the stored level sequence: everything up to that
+# position goes left.
+#
+# An unordered predictor, which is `"partition"`, gets a comma-separated list
+# of level indices that go *right*. Left is the complement. Reading the list as
+# the left set instead is wrong but plausible, and produces a small enough
+# error to look like a rounding problem.
+ranger_split_info <- function(col, split_val, levels, is_ordered) {
+  if (is.null(levels)) {
+    return(list(col = col, val = as.numeric(split_val), is_categorical = FALSE))
+  }
+
+  if (isTRUE(is_ordered)) {
+    left <- levels[seq_len(floor(as.numeric(split_val)))]
+  } else {
+    right_idx <- as.integer(strsplit(as.character(split_val), ",")[[1]])
+    left <- levels[-right_idx]
+    return(list(
+      col = col,
+      vals = as.list(left),
+      is_categorical = TRUE,
+      missing_level = levels[[1]]
+    ))
+  }
+
+  list(col = col, vals = as.list(left), is_categorical = TRUE)
+}
+
+# `ranger` compares an ordered or numeric split as `value > splitval`, and a
+# missing value fails that test, so it takes the same branch as a value at or
+# below the split point.
+#
+# An unordered split instead indexes a bitmask by the level's position.
+# `ranger` derives that position from the raw value, and a missing value
+# collapses to the position of the first level, so the row goes wherever the
+# first level goes. That is not the same as always going one way: it depends on
+# which side the first level is on at that node.
+ranger_split_condition <- function(split) {
+  condition <- build_nested_split_condition(split)
+
+  if (!is.null(split$missing_level)) {
+    if (split$missing_level %in% unlist(split$vals)) {
+      return(expr(!!build_nested_split_missing(split) | !!condition))
+    }
+    return(condition)
+  }
+
+  expr(!!build_nested_split_missing(split) | !!condition)
+}
+
 # Convert ranger treeInfo to standard tree_info format
 ranger_tree_info_full <- function(model, tree_no) {
   tree <- ranger::treeInfo(model, tree_no)
+  info <- ranger_predictor_levels(model)
 
   # Build node_splits list
   node_splits <- vector("list", nrow(tree))
   for (i in seq_len(nrow(tree))) {
     if (!tree$terminal[i]) {
       var_name <- as.character(tree$splitvarName[i])
-      split_val <- tree$splitval[i]
 
       node_splits[[i]] <- list(
-        primary = list(
-          col = var_name,
-          val = split_val,
-          is_categorical = FALSE
+        primary = ranger_split_info(
+          var_name,
+          tree$splitval[i],
+          info$levels[[var_name]],
+          info$is_ordered[[var_name]]
         )
       )
     }
@@ -91,6 +166,7 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
   splitval <- tree$splitval
   terminal <- tree$terminal
   prediction <- tree[[leaf_col]]
+  info <- ranger_predictor_levels(model)
 
   build_node <- function(node_id) {
     # node_id is 0-indexed, convert to 1-indexed for vector access
@@ -108,10 +184,13 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
     left_subtree <- build_node(left_id)
     right_subtree <- build_node(right_id)
 
-    col_sym <- rlang::sym(split_var)
-    # `ranger` compares as `value > splitval` and a missing value fails that
-    # test, so it takes the same branch as a value at or below the split point.
-    condition <- expr(is.na(!!col_sym) | !!col_sym <= !!split_val)
+    split <- ranger_split_info(
+      split_var,
+      split_val,
+      info$levels[[split_var]],
+      info$is_ordered[[split_var]]
+    )
+    condition <- ranger_split_condition(split)
 
     expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
   }
