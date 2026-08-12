@@ -21,6 +21,16 @@
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now decodes factor splits for
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  models, in all three `respect.unordered.factors` modes and for ordered
+  factors. The split value names a position in the level order stored on
+  the model, or under `"partition"` lists the level indices going right;
+  it was compared as a numeric threshold against the factor column
+  itself.
+  ([\#283](https://github.com/tidymodels/tidypredict/issues/283))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now decodes factor splits for
   [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
   models. An unordered factor’s split point is an integer whose bits
   name the levels going left, and an ordered factor’s is compared
