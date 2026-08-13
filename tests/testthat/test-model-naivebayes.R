@@ -377,6 +377,35 @@ test_that("naive_bayes model can be saved and re-loaded", {
   expect_equal(from_model, from_pm, tolerance = 1e-6)
 })
 
+test_that("an underflowing density is a documented divergence (#300)", {
+  skip_if_not_installed("klaR")
+  # Both references replace a density that underflowed to zero with their
+  # `threshold`, `0.001`. That is enormous next to the other classes' honest
+  # densities, so the class fitting the value worst wins, silently unless every
+  # class underflows. The log scale used here never underflows, so this is left
+  # as a divergence rather than reproduced. See the naive Bayes article.
+  model <- klaR::NaiveBayes(Species ~ ., data = iris)
+
+  outlier <- iris[1, ]
+  outlier$Sepal.Length <- 20
+
+  reference <- predict(model, outlier)$posterior
+  expect_equal(colnames(reference)[which.max(reference)], "setosa")
+
+  probs <- vapply(
+    tidypredict_fit(model),
+    function(f) rlang::eval_tidy(f, outlier),
+    numeric(1)
+  )
+  expect_equal(names(probs)[which.max(probs)], "virginica")
+
+  # Values the model can actually have seen are unaffected
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, iris))),
+    unname(predict(model, iris)$posterior)
+  )
+})
+
 test_that("naive_bayes kernel density fits are rejected", {
   skip_if_not_installed("naivebayes")
 
