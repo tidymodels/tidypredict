@@ -2,6 +2,16 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now supports factor predictors for
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+  models, which previously produced a formula that could not be
+  evaluated (`object '"f"' not found`). Rule conditions are now read
+  from the model text rather than from `model$splits`, which records
+  neither the quoted column name nor a condition naming a single level,
+  so such a rule silently applied to every row.
+  ([\#322](https://github.com/tidymodels/tidypredict/issues/322))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual
@@ -18,6 +28,14 @@
   now check that dbplyr is installed before using it, and are no longer
   marked as internal in the documentation index.
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now supports splits with more than two branches for `partykit` models,
+  such as those from `ctree_control(multiway = TRUE)` or a
+  [`partysplit()`](https://rdrr.io/pkg/partykit/man/partysplit.html)
+  with several breaks. Every branch after the second was previously
+  dropped, silently for a factor split and with a warning for a numeric
+  one. ([\#295](https://github.com/tidymodels/tidypredict/issues/295))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now honours `partysplit(right = FALSE)` for `partykit` models, where
