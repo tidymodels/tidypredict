@@ -35,6 +35,20 @@
   so such a rule silently applied to every row.
   ([\#322](https://github.com/tidymodels/tidypredict/issues/322))
 
+- [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md)
+  now names every category of a `catboost` model, for any number of
+  factor levels. It used to discover the hash CatBoost stores for a
+  level by training probe models and reading back a split, which only
+  worked reliably for a three-level factor; a factor with four or more
+  levels errored with “No category mapping found for hash”, and a
+  two-level one could silently name the levels the wrong way round.
+  Hashes are now taken from CatBoost’s own hash function, and a level
+  that cannot be named is reported at once rather than at fit time. This
+  also affects
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  on a parsnip or bonsai `catboost` fit.
+  ([\#297](https://github.com/tidymodels/tidypredict/issues/297))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual
