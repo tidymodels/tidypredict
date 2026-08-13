@@ -3,6 +3,16 @@
 ## tidypredict (development version)
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now applies the per-rule extrapolation limits for
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+  models. Cubist holds each rule to the span of the training outcomes it
+  covers, widened at both ends by `extrap` times that span and never
+  crossing zero; without it a rule’s linear model runs away on data
+  outside its range. This engages on rows of the training data too, not
+  only on extrapolation.
+  ([\#285](https://github.com/tidymodels/tidypredict/issues/285))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now supports factor predictors for
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
   models, which previously produced a formula that could not be
