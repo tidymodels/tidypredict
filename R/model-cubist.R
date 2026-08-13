@@ -1,17 +1,10 @@
 #' @export
 parse_model.cubist <- function(model) {
   coefs <- model$coefficients
-  splits <- model$splits
-  if (!is.null(splits)) {
-    splits$variable <- as.character(splits$variable)
-    splits$dir <- as.character(splits$dir)
-  }
+  conditions <- cubist_rule_conditions(model)
 
   # Pre-split data by committee and rule to avoid O(n) scans in nested loops
   coefs_by_comm_rule <- split(coefs, list(coefs$committee, coefs$rule))
-  if (!is.null(splits)) {
-    splits_by_comm_rule <- split(splits, list(splits$committee, splits$rule))
-  }
 
   committees2 <- map(
     unique(coefs$committee),
@@ -22,25 +15,10 @@ parse_model.cubist <- function(model) {
         ~ {
           key <- paste(comm, .x, sep = ".")
           cc <- coefs_by_comm_rule[[key]]
-          if (!is.null(model$splits)) {
-            cs <- splits_by_comm_rule[[key]]
-            if (!is.null(cs) && nrow(cs) > 0) {
-              tcs <- transpose(cs)
-              mcs <- map(
-                tcs,
-                ~ list(
-                  type = "conditional",
-                  col = .x$variable,
-                  # Cubist compares as a 32-bit float, so a value that rounds
-                  # to the threshold belongs to the `<=` side.
-                  val = f32_split_boundary(.x$value, "upper"),
-                  op = ifelse(.x$dir == ">", "more", "less-equal")
-                )
-              )
-            } else {
-              mcs <- list(list(type = "all"))
-            }
-          } else {
+          # `committee` and `rule` are character, so they index the parsed
+          # conditions only once converted back to positions.
+          mcs <- conditions[[as.integer(comm)]][[as.integer(.x)]]
+          if (length(mcs) == 0) {
             mcs <- list(list(type = "all"))
           }
           cc_names <- names(cc)
@@ -111,6 +89,79 @@ parse_model.cubist <- function(model) {
     trees = list(comm)
   )
   as_parsed_model(pm)
+}
+
+# The conditions of every rule, as a list of committees of rules of paths.
+#
+# These are read from the model text rather than from `model$splits`, because
+# `Cubist` only records numeric (`type="2"`) and subset (`type="3"`) conditions
+# there. An equality condition on a categorical predictor (`type="1"`) is
+# missing from `model$splits` altogether, which would widen the rule to every
+# row.
+cubist_rule_conditions <- function(model) {
+  lines <- strsplit(model$model, "\n")[[1]]
+
+  committees <- list()
+  rules <- list()
+  i <- 1
+
+  while (i <= length(lines)) {
+    line <- lines[[i]]
+    if (grepl('^rules="', line)) {
+      if (length(rules) > 0) {
+        committees[[length(committees) + 1]] <- rules
+      }
+      rules <- list()
+    } else if (grepl('^conds="', line)) {
+      n <- as.integer(cubist_field(line, "conds"))
+      conds <- lapply(seq_len(n), function(k) cubist_condition(lines[[i + k]]))
+      rules[[length(rules) + 1]] <- conds
+      i <- i + n
+    }
+    i <- i + 1
+  }
+  if (length(rules) > 0) {
+    committees[[length(committees) + 1]] <- rules
+  }
+  committees
+}
+
+# The value of a `name="value"` field, or `NA` when the line has no such field.
+cubist_field <- function(line, name) {
+  match <- regmatches(line, regexec(paste0(name, '="([^"]*)"'), line))[[1]]
+  if (length(match) < 2) {
+    return(NA_character_)
+  }
+  match[[2]]
+}
+
+# Turn one condition line of the model text into a path element.
+cubist_condition <- function(line) {
+  type <- cubist_field(line, "type")
+  col <- cubist_field(line, "att")
+
+  if (type == "2") {
+    return(list(
+      type = "conditional",
+      col = col,
+      # Cubist compares as a 32-bit float, so a value that rounds
+      # to the threshold belongs to the `<=` side.
+      val = f32_split_boundary(as.numeric(cubist_field(line, "cut")), "upper"),
+      op = if (cubist_field(line, "result") == ">") "more" else "less-equal"
+    ))
+  }
+
+  if (type == "1") {
+    vals <- list(cubist_field(line, "val"))
+  } else {
+    # A subset condition writes one quoted level per member, so a level
+    # containing a comma stays in one piece.
+    elts <- sub('^.*elts=', "", line)
+    vals <- as.list(regmatches(elts, gregexpr('"[^"]*"', elts))[[1]])
+    vals <- lapply(vals, \(x) gsub('^"|"$', "", x))
+  }
+
+  list(type = "set", col = col, vals = vals, op = "in")
 }
 
 #' @export
