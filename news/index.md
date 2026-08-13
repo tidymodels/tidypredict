@@ -49,6 +49,17 @@
   on a parsnip or bonsai `catboost` fit.
   ([\#297](https://github.com/tidymodels/tidypredict/issues/297))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects an
+  [`earth::earth()`](https://rdrr.io/pkg/earth/man/earth.html) model fit
+  with a contrast other than the treatment one, with the same message
+  the rest of the linear family gives. An ordered factor, which R fits
+  with `contr.poly` by default, previously produced a formula comparing
+  the factor column against contrast values such as `-0.2236`, which
+  could not be evaluated. `earth` records no contrasts, so they are now
+  read back off the names it gave the columns each factor expanded into.
+  ([\#323](https://github.com/tidymodels/tidypredict/issues/323))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual

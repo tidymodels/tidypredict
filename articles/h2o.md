@@ -970,11 +970,11 @@ model_rules <- rule_fit(mode = "regression") |>
   fit(mpg ~ wt + hp + disp, data = mtcars)
 
 tidypredict_fit(model_rules)
-#> 33.6849250683786 + (-2.98365666456687 * wt + case_when(wt < 2.25968027114868 ~ 
-#>     1.26925770017164, .default = 0) + case_when(disp < 101.545547485352 ~ 
-#>     0.0549192265978107, .default = 0) + case_when(disp < 97.7222671508789 & 
-#>     hp < 118 ~ 0.0549192265954463, .default = 0) + -0.0243188365426764 * 
-#>     hp + -0.00296051728171424 * disp)
+#> 33.6849250683784 + (-2.98365666456686 * wt + case_when(wt < 2.25968027114868 ~ 
+#>     1.26925770017171, .default = 0) + case_when(disp < 101.545547485352 ~ 
+#>     0.0549192265977911, .default = 0) + case_when(disp < 97.7222671508789 & 
+#>     hp < 118 ~ 0.0549192265956115, .default = 0) + -0.0243188365426769 * 
+#>     hp + -0.00296051728171445 * disp)
 ```
 
 ## Limitations
