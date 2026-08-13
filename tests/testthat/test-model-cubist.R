@@ -190,6 +190,67 @@ test_that("missing values take the stored training mean (#294)", {
   )
 })
 
+cubist_factor_data <- function(n_levels, seed = 1) {
+  set.seed(seed)
+  n <- 300
+  lvls <- letters[seq_len(n_levels)]
+  df <- data.frame(
+    x = rnorm(n),
+    z = rnorm(n),
+    f = factor(sample(lvls, n, TRUE), levels = lvls)
+  )
+  df$y <- 2 * df$x + df$z + 2 * as.integer(df$f) + rnorm(n)
+  df
+}
+
+test_that("a subset condition on a factor matches predict() (#322)", {
+  skip_if_not_installed("Cubist")
+  # With several levels Cubist writes a rule as `type="3"`, a subset of the
+  # levels. The column name is quoted in the model text, so it has to be
+  # unquoted before it can name a column.
+  df <- cubist_factor_data(6)
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("an equality condition on a factor matches predict() (#322)", {
+  skip_if_not_installed("Cubist")
+  # A rule that names a single level is written as `type="1"`, which
+  # `model$splits` leaves out entirely; read from there the rule would apply to
+  # every row.
+  df <- cubist_factor_data(2)
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y)
+
+  expect_true(any(grepl('type="1"', strsplit(model$model, "\n")[[1]])))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("a factor condition survives more than one committee (#322)", {
+  skip_if_not_installed("Cubist")
+  df <- cubist_factor_data(4, seed = 3)
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y, committees = 5)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
 test_that("rows exactly on a split threshold match predict() (#232)", {
   skip_if_not_installed("Cubist")
   # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus
