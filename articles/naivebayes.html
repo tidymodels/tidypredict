@@ -230,20 +230,65 @@ results</p>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </li>
 </ul>
+<div class="section level3">
+<h3 id="extreme-values-of-a-numeric-predictor">Extreme values of a numeric predictor<a class="anchor" aria-label="anchor" href="#extreme-values-of-a-numeric-predictor"></a>
+</h3>
+<p>There is one case where <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code> does not
+reproduce <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, and it is deliberately left in
+place.</p>
+<p>Both packages evaluate each normal density and then replace any
+density that came out as exactly zero with their <code>threshold</code>
+argument, <code>0.001</code> by default. A normal density only reaches
+zero by underflowing the smallest number a double can hold, which takes
+a value roughly 38 standard deviations from that class’s mean.
+<code>tidypredict</code> works on the log scale throughout, where such a
+value is an ordinary negative number and nothing underflows, so the
+substitution never happens.</p>
+<p>The substitution is drastic when it fires. Consider an iris with a
+<code>Sepal.Length</code> of 20, well beyond the largest in the
+data:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">outlier</span> <span class="op">&lt;-</span> <span class="va">iris</span><span class="op">[</span><span class="fl">1</span>, <span class="op">]</span></span>
+<span><span class="va">outlier</span><span class="op">$</span><span class="va">Sepal.Length</span> <span class="op">&lt;-</span> <span class="fl">20</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">outlier</span><span class="op">)</span><span class="op">$</span><span class="va">posterior</span></span>
+<span><span class="co">#&gt;   setosa    versicolor     virginica</span></span>
+<span><span class="co">#&gt; 1      1 7.500428e-176 9.059222e-118</span></span></code></pre></div>
+<p><code>setosa</code> has the narrowest spread of the three classes, so
+its density is the first to underflow. Replacing it with
+<code>0.001</code> makes it enormous next to the other two, which are
+around <code>1e-162</code> and <code>1e-97</code> but were computed
+honestly, so the class that fits the value worst is the one that wins.
+This happens silently unless the value is extreme enough for
+<em>every</em> class to underflow, which is the only case either package
+warns about. <code>tidypredict</code> instead continues on the log scale
+and reports the ordering the fitted model implies:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">outlier</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;      setosa  versicolor   virginica </span></span>
+<span><span class="co">#&gt; 0.00000e+00 8.27933e-59 1.00000e+00</span></span></code></pre></div>
+<p>Reproducing the substitution is not possible on the log scale in any
+case. Testing <code>exp(log_density) == 0</code> instead of
+<code>density == 0</code> picks out a different set of values: over
+200,000 draws from the band where the underflow happens the two tests
+disagree on about 1,000 of them, because the two routes round
+differently in the denormal range. A SQL backend, working in its own
+floating point, would disagree again in a third way.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
 </h2>
 <p><code>parsnip</code> fitted models are also supported by
 <code>tidypredict</code>:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/discrim" class="external-link">discrim</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/naive_Bayes.html" class="external-link">naive_Bayes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"klaR"</span>, usekernel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
 <span><span class="co">#&gt; exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - </span></span>
 <span><span class="co">#&gt;     ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), </span></span>
@@ -275,7 +320,7 @@ results</p>
 <code>naivebayes::naive_bayes()</code><a class="anchor" aria-label="anchor" href="#naivebayesnaive_bayes"></a>
 </h2>
 <p>The <code>naivebayes</code> package is supported in the same way:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nb_model</span> <span class="op">&lt;-</span> <span class="fu">naivebayes</span><span class="fu">::</span><span class="fu"><a href="https://majkamichal.github.io/naivebayes/reference/naive_bayes.html" class="external-link">naive_bayes</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">nb_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">nb_model</span><span class="op">)</span></span>
@@ -304,7 +349,7 @@ results</p>
 <span><span class="co">#&gt;         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - </span></span>
 <span><span class="co">#&gt;             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), </span></span>
 <span><span class="co">#&gt;         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))</span></span></code></pre></div>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nb_probs</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">nb_fit</span>, \<span class="op">(</span><span class="va">f</span><span class="op">)</span> <span class="fu">rlang</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/eval_tidy.html" class="external-link">eval_tidy</a></span><span class="op">(</span><span class="va">f</span>, <span class="va">iris</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/pkg/Matrix/man/all.equal-methods.html" class="external-link">all.equal</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/unname.html" class="external-link">unname</a></span><span class="op">(</span><span class="va">nb_probs</span><span class="op">)</span>,</span>
@@ -313,7 +358,7 @@ results</p>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 <p>The <code>"naivebayes"</code> parsnip engine works too, as long as
 <code>usekernel = FALSE</code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">nb_p_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://parsnip.tidymodels.org/reference/naive_Bayes.html" class="external-link">naive_Bayes</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://parsnip.tidymodels.org/reference/set_engine.html" class="external-link">set_engine</a></span><span class="op">(</span><span class="st">"naivebayes"</span>, usekernel <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
@@ -348,7 +393,7 @@ results</p>
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>

@@ -2,6 +2,19 @@
 
 ## tidypredict (development version)
 
+- The naive Bayes article now documents the one case where
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  does not reproduce [`predict()`](https://rdrr.io/r/stats/predict.html)
+  for
+  [`klaR::NaiveBayes()`](https://rdrr.io/pkg/klaR/man/NaiveBayes.html)
+  and
+  [`naivebayes::naive_bayes()`](https://majkamichal.github.io/naivebayes/reference/naive_bayes.html)
+  models: both replace a normal density that underflowed to zero with
+  their `threshold` argument, which takes a value roughly 38 standard
+  deviations from the class mean, and the log scale used throughout
+  never underflows.
+  ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now applies the per-rule extrapolation limits for
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
