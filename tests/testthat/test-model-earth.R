@@ -245,6 +245,59 @@ test_that("formulas produce correct predictions", {
   )
 })
 
+earth_factor_data <- function(ordered, seed = 1) {
+  set.seed(seed)
+  n <- 200
+  d <- data.frame(
+    x = rnorm(n),
+    z = rnorm(n),
+    f = factor(
+      sample(c("a", "b", "c", "d"), n, replace = TRUE),
+      ordered = ordered
+    )
+  )
+  d$y <- rnorm(n) + as.numeric(d$f) + 0.5 * d$x
+  d
+}
+
+test_that("an ordered factor is rejected (#323)", {
+  skip_if_not_installed("earth")
+  # R fits an ordered factor with `contr.poly`, whose columns are named `f.L`,
+  # `f.Q` and `f.C` rather than after the levels. `earth` records no contrasts
+  # for `acceptable_lm()` to read, so the level recovered from those names used
+  # to reach the formula, where it matched no row.
+  d <- earth_factor_data(ordered = TRUE)
+
+  expect_snapshot(
+    tidypredict_fit(earth::earth(y ~ x + z + f, data = d)),
+    error = TRUE
+  )
+})
+
+test_that("an unordered factor still matches predict() (#323)", {
+  skip_if_not_installed("earth")
+  d <- earth_factor_data(ordered = FALSE)
+  model <- earth::earth(y ~ x + z + f, data = d)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), d),
+    as.numeric(predict(model, d))
+  )
+})
+
+test_that("a global non-treatment contrast is rejected (#323)", {
+  skip_if_not_installed("earth")
+  # `contr.sum` names the columns `f1`, `f2` and `f3`, which are no more levels
+  # of `f` than `f.L` is.
+  withr::local_options(contrasts = c("contr.sum", "contr.poly"))
+  d <- earth_factor_data(ordered = FALSE)
+
+  expect_snapshot(
+    tidypredict_fit(earth::earth(y ~ x + z + f, data = d)),
+    error = TRUE
+  )
+})
+
 test_that("probit link works (#194)", {
   skip_if_not_installed("earth")
   model <- earth::earth(

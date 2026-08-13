@@ -8,6 +8,8 @@
 
 - `set_catboost_categories()` now names every category of a `catboost` model, for any number of factor levels. It used to discover the hash CatBoost stores for a level by training probe models and reading back a split, which only worked reliably for a three-level factor; a factor with four or more levels errored with "No category mapping found for hash", and a two-level one could silently name the levels the wrong way round. Hashes are now taken from CatBoost's own hash function, and a level that cannot be named is reported at once rather than at fit time. This also affects `tidypredict_fit()` on a parsnip or bonsai `catboost` fit. (#297)
 
+- `tidypredict_fit()` now rejects an `earth::earth()` model fit with a contrast other than the treatment one, with the same message the rest of the linear family gives. An ordered factor, which R fits with `contr.poly` by default, previously produced a formula comparing the factor column against contrast values such as `-0.2236`, which could not be evaluated. `earth` records no contrasts, so they are now read back off the names it gave the columns each factor expanded into. (#323)
+
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)

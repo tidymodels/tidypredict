@@ -42,6 +42,46 @@ fun_calls <- function(f) {
   }
 }
 
+# Abort unless every column a factor expanded into is named after one of its
+# levels.
+#
+# That is what the treatment contrast does, and what the parsers rely on when
+# they recover a level from a column name. `contr.poly`, which R gives an
+# ordered factor by default, names the columns `.L`, `.Q` and `.C` instead, and
+# `contr.sum` numbers them, so a level recovered from either matches no row.
+#
+# `acceptable_lm()` reads the contrasts off the model instead, which is more
+# direct. This is for the models that do not record them.
+acceptable_contrasts <- function(columns, vars, xlevels) {
+  invalid <- character(0)
+
+  for (column in setdiff(columns, vars)) {
+    # The longest matching variable wins, as it does in `parse_label_lm()`,
+    # so that a column of `xy` is not read as a level of `x`.
+    matches <- vars[startsWith(column, vars)]
+    if (length(matches) == 0) {
+      next
+    }
+    var <- matches[[which.max(nchar(matches))]]
+
+    level <- substr(column, nchar(var) + 1, nchar(column))
+    if (!level %in% xlevels[[var]]) {
+      invalid <- c(invalid, var)
+    }
+  }
+
+  if (length(invalid) > 0) {
+    invalid <- unique(invalid)
+    cli::cli_abort(
+      "The treatment contrast is the only one supported at this time.
+      Field(s) with an invalid contrast are: {.val {invalid}}.",
+      call. = FALSE
+    )
+  }
+
+  invisible()
+}
+
 acceptable_lm <- function(model) {
   # Check for invalid contrasts
   if (length(model$contrasts)) {

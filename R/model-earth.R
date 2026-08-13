@@ -1,5 +1,7 @@
 #' @export
 parse_model.earth <- function(model) {
+  acceptable_formula(model)
+
   is_glm <- !is.null(model$glm.list)
 
   pm <- list()
@@ -17,6 +19,26 @@ parse_model.earth <- function(model) {
   as_parsed_model(pm)
 }
 
+
+#' @export
+acceptable_formula.earth <- function(model) {
+  # An `x`/`y` fit has no formula to check, and records neither the contrasts
+  # nor the levels a factor had, so there is nothing to check.
+  if (is.null(model$terms)) {
+    return(invisible())
+  }
+
+  # `earth` keeps no record of the contrasts it was given, so they have to be
+  # read back off the names it gave the columns a factor expanded into.
+  # `modvars` holds those names, and the variables they came from.
+  acceptable_contrasts(
+    columns = colnames(model$modvars),
+    vars = rownames(model$modvars),
+    xlevels = model$xlevels
+  )
+
+  acceptable_lm(model)
+}
 
 mars_terms <- function(mod, is_glm) {
   feature_types <-
