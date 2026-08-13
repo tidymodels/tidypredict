@@ -143,6 +143,35 @@ test_that("tidypredict_test errors for lda models", {
   expect_snapshot(error = TRUE, tidypredict_test(model, iris))
 })
 
+test_that("an ordered factor is rejected (#343)", {
+  skip_if_not_installed("MASS")
+  # R fits an ordered factor with `contr.poly`, whose columns are named `.L`,
+  # `.Q` and `.C` rather than after the levels. `lda()` records no contrasts,
+  # so the level recovered from those names used to reach the formula, where it
+  # matched no row and the term was silently dropped.
+  df <- transform(
+    mtcars,
+    cyl = factor(cyl),
+    gear = factor(gear, ordered = TRUE)
+  )
+
+  expect_snapshot(
+    tidypredict_fit(MASS::lda(cyl ~ mpg + gear + disp, data = df)),
+    error = TRUE
+  )
+})
+
+test_that("a global non-treatment contrast is rejected (#343)", {
+  skip_if_not_installed("MASS")
+  withr::local_options(contrasts = c("contr.sum", "contr.poly"))
+  df <- transform(mtcars, cyl = factor(cyl), gear = factor(gear))
+
+  expect_snapshot(
+    tidypredict_fit(MASS::lda(cyl ~ mpg + gear + disp, data = df)),
+    error = TRUE
+  )
+})
+
 test_that("inline functions in the formula are rejected", {
   skip_if_not_installed("MASS")
 

@@ -65,7 +65,17 @@ expand_quadratic <- function(a, labels) {
 }
 
 #' @export
-acceptable_formula.qda <- function(model) acceptable_lm(model)
+acceptable_formula.qda <- function(model) {
+  # `qda()` records no `contrasts` for `acceptable_lm()` to read, so they are
+  # read back off the names it gave the columns each factor expanded into.
+  acceptable_contrasts(
+    columns = colnames(model$means),
+    vars = names(attr(model$terms, "dataClasses")),
+    xlevels = model$xlevels
+  )
+
+  acceptable_lm(model)
+}
 
 # Test ---------------------------------------------
 

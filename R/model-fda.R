@@ -99,7 +99,13 @@ fda_regression_coefs <- function(fit, call = rlang::caller_env()) {
 
 
 #' @export
-acceptable_formula.fda <- function(model) acceptable_lm(model)
+acceptable_formula.fda <- function(model) {
+  # `fda()` records neither the contrasts it was given nor the levels its
+  # factors had, so an ordered predictor is as far as the check can get.
+  acceptable_ordered(model)
+
+  acceptable_lm(model)
+}
 
 # Test ---------------------------------------------
 

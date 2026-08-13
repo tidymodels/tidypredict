@@ -58,6 +58,14 @@
       ! `tidypredict_test()` does not support `mda::fda()` models.
       i Use `tidypredict_fit()` directly for multiclass predictions.
 
+# an ordered factor is rejected (#343)
+
+    Code
+      tidypredict_fit(mda::fda(cyl ~ mpg + gear, data = df))
+    Condition
+      Error in `acceptable_ordered()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "gear".
+
 # inline functions in the formula are rejected
 
     Code

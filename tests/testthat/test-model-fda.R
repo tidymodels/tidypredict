@@ -148,6 +148,34 @@ test_that("tidypredict_test errors for fda models", {
   expect_snapshot(error = TRUE, tidypredict_test(model, iris))
 })
 
+test_that("an ordered factor is rejected (#343)", {
+  skip_if_not_installed("mda")
+  # `fda()` records neither the contrasts nor the levels its factors had, so
+  # unlike `lda()` and `qda()` the check is on the predictor being ordered
+  # rather than on the names of the columns it expanded into.
+  df <- transform(
+    mtcars,
+    cyl = factor(cyl),
+    gear = factor(gear, ordered = TRUE)
+  )
+
+  expect_snapshot(
+    tidypredict_fit(mda::fda(cyl ~ mpg + gear, data = df)),
+    error = TRUE
+  )
+})
+
+test_that("an ordered outcome is not mistaken for an ordered predictor (#343)", {
+  skip_if_not_installed("mda")
+  df <- transform(mtcars, cyl = factor(cyl, ordered = TRUE))
+  model <- mda::fda(cyl ~ mpg + disp, data = df)
+
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))),
+    unname(predict(model, df, type = "posterior"))
+  )
+})
+
 test_that("inline functions in the formula are rejected", {
   skip_if_not_installed("mda")
 

@@ -22,6 +22,22 @@
       ! `tidypredict_test()` does not support `MASS::qda()` models.
       i Use `tidypredict_fit()` directly for multiclass predictions.
 
+# an ordered factor is rejected (#343)
+
+    Code
+      tidypredict_fit(MASS::qda(cls ~ x + f, data = d))
+    Condition
+      Error in `acceptable_contrasts()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
+# a global non-treatment contrast is rejected (#343)
+
+    Code
+      tidypredict_fit(MASS::qda(cls ~ x + f, data = d))
+    Condition
+      Error in `acceptable_contrasts()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
 # inline functions in the formula are rejected
 
     Code
