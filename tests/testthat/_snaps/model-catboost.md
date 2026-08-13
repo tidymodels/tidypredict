@@ -40,6 +40,15 @@
       Error in `build_fit_formula_catboost_multiclass_nested()`:
       ! Multiclass model must have num_class >= 2.
 
+# set_catboost_categories errors on levels the model never saw (#297)
+
+    Code
+      set_catboost_categories(parse_model(model), model, wrong)
+    Condition
+      Error in `build_catboost_hash_mapping()`:
+      ! Cannot name 4 categories of "cat_feat".
+      i `data` must have the levels the model was fit on.
+
 # set_catboost_categories validates parsed_model argument
 
     Code

@@ -212,13 +212,7 @@ set_catboost_categories <- function(parsed_model, model, data) {
     }
 
     categories <- levels(col_data)
-    mapping <- build_catboost_hash_mapping(
-      model,
-      data,
-      feat_name,
-      categories,
-      hash_values
-    )
+    mapping <- build_catboost_hash_mapping(feat_name, categories, hash_values)
     parsed_model$general$cat_features[[i]]$hash_to_category <- mapping
   }
 
@@ -226,130 +220,45 @@ set_catboost_categories <- function(parsed_model, model, data) {
 }
 
 # Hash mapping functions --------------------------------------------------
-# Strategy: Train probe models to discover which hash belongs to which category.
-# CatBoost stores categorical features as hashes internally, but doesn't expose
-# the hash function. We identify mappings by training models where each category
-# has a unique target value.
 
-build_catboost_hash_mapping <- function(
-  model,
-  data,
-  feat_name,
-  categories,
-  hash_values
-) {
-  all_hashes <- get_catboost_all_hashes(feat_name, categories)
-  identified <- identify_catboost_hashes(feat_name, categories)
-  complete_mapping <- fill_catboost_hash_mapping(
-    identified$mapping,
-    identified$hashes,
-    all_hashes,
-    categories
+# Name each of `hash_values`, which is what a saved model records for a
+# categorical feature, with the category it stands for.
+build_catboost_hash_mapping <- function(feat_name, categories, hash_values) {
+  by_hash <- stats::setNames(
+    as.list(categories),
+    as.character(catboost_hash(categories))
   )
-  extract_catboost_hash_mapping(complete_mapping, hash_values)
-}
+  hash_values <- as.character(hash_values)
 
-get_catboost_all_hashes <- function(feat_name, categories) {
-  n_cat <- length(categories)
-  train_data <- make_catboost_probe_data(feat_name, categories, seq_len(n_cat))
-  model <- train_catboost_probe_model(train_data, feat_name, n_cat, depth = 3L)
-  extract_catboost_model_hashes(model)
-}
-
-identify_catboost_hashes <- function(feat_name, categories) {
-  n_cat <- length(categories)
-  mapping <- list()
-  identified_hashes <- character(0)
-
-  for (cat in categories) {
-    target <- ifelse(categories == cat, 100, 0)
-    train_data <- make_catboost_probe_data(feat_name, categories, target)
-    model <- train_catboost_probe_model(
-      train_data,
-      feat_name,
-      n_cat,
-      depth = 1L
+  unknown <- setdiff(hash_values, names(by_hash))
+  if (length(unknown) > 0) {
+    cli::cli_abort(
+      c(
+        "Cannot name {length(unknown)} categor{?y/ies} of {.val {feat_name}}.",
+        "i" = "{.arg data} must have the levels the model was fit on."
+      )
     )
-    probe_hashes <- extract_catboost_model_hashes(model)
-
-    if (length(probe_hashes) == 1) {
-      hash_str <- as.character(probe_hashes)
-      mapping[[hash_str]] <- cat
-      identified_hashes <- c(identified_hashes, hash_str)
-    }
   }
 
-  list(mapping = mapping, hashes = identified_hashes)
+  by_hash[hash_values]
 }
 
-fill_catboost_hash_mapping <- function(
-  mapping,
-  identified_hashes,
-  all_hashes,
-  categories
-) {
-  remaining_cats <- setdiff(categories, unlist(mapping))
-  remaining_hashes <- setdiff(as.character(all_hashes), identified_hashes)
-
-  if (length(remaining_cats) == 1 && length(remaining_hashes) == 1) {
-    mapping[[remaining_hashes]] <- remaining_cats
-  }
-
-  mapping
-}
-
-extract_catboost_hash_mapping <- function(complete_mapping, hash_values) {
-  result <- stats::setNames(
-    rep(NA_character_, length(hash_values)),
-    as.character(hash_values)
+# The 32-bit hash CatBoost stores in place of each of `x`.
+#
+# `catboost.load_pool()` hashes the levels of a factor column with this routine
+# and hands the result to the pool as a double, so what comes back is a hash
+# whose bits have been reinterpreted as a 32-bit float. Reading those bits back
+# as an integer gives the value a saved model records.
+catboost_hash <- function(x) {
+  rlang::check_installed("catboost")
+  hash_strings <- get("CatBoostHashStrings_R", envir = asNamespace("catboost"))
+  bits <- .Call(hash_strings, as.character(x))
+  readBin(
+    writeBin(bits, raw(), size = 4),
+    "integer",
+    n = length(bits),
+    size = 4
   )
-
-  for (hash in hash_values) {
-    hash_str <- as.character(hash)
-    if (hash_str %in% names(complete_mapping)) {
-      result[[hash_str]] <- complete_mapping[[hash_str]]
-    }
-  }
-
-  as.list(result)
-}
-
-make_catboost_probe_data <- function(feat_name, categories, target) {
-  train_data <- data.frame(
-    cat_col = factor(categories, levels = categories),
-    target = target
-  )
-  names(train_data)[1] <- feat_name
-  train_data
-}
-
-train_catboost_probe_model <- function(train_data, feat_name, n_cat, depth) {
-  pool <- catboost_catboost.load_pool(
-    train_data[, feat_name, drop = FALSE],
-    label = train_data$target
-  )
-
-  catboost_catboost.train(
-    pool,
-    params = list(
-      iterations = if (depth == 1L) 10L else 100L,
-      depth = depth,
-      learning_rate = 1.0,
-      loss_function = "RMSE",
-      logging_level = "Silent",
-      allow_writing_files = FALSE,
-      one_hot_max_size = n_cat + 1L,
-      min_data_in_leaf = 1L
-    )
-  )
-}
-
-extract_catboost_model_hashes <- function(model) {
-  tmp_file <- tempfile(fileext = ".json")
-  on.exit(unlink(tmp_file), add = TRUE)
-  catboost_catboost.save_model(model, tmp_file, file_format = "json")
-  model_json <- jsonlite::fromJSON(tmp_file, simplifyVector = FALSE)
-  unlist(model_json$features_info$categorical_features[[1]]$values)
 }
 
 process_catboost_trees <- function(

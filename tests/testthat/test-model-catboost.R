@@ -78,6 +78,38 @@ make_categorical_model <- function() {
   )
 }
 
+catboost_factor_data <- function(n_levels, seed = 1) {
+  set.seed(seed)
+  n <- 300
+  lvls <- letters[seq_len(n_levels)]
+  df <- data.frame(
+    num_feat = rnorm(n),
+    cat_feat = factor(sample(lvls, n, replace = TRUE), levels = lvls)
+  )
+  df$target <- as.integer(df$cat_feat) + df$num_feat + rnorm(n)
+  df
+}
+
+make_factor_model <- function(df) {
+  pool <- catboost_catboost.load_pool(
+    df[, c("num_feat", "cat_feat")],
+    label = df$target
+  )
+
+  catboost_catboost.train(
+    pool,
+    params = list(
+      iterations = 15L,
+      depth = 4L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE,
+      one_hot_max_size = 12
+    )
+  )
+}
+
 # Parser tests ---------------------------------------------------------------
 
 test_that("parse_model returns correct structure", {
@@ -1361,6 +1393,36 @@ test_that("set_catboost_categories adds hash mapping", {
   expect_contains(
     unlist(pm$general$cat_features[[1]]$hash_to_category),
     c("A", "B", "C")
+  )
+})
+
+test_that("categorical predictions match for any level count (#297)", {
+  skip_if_not_installed("catboost")
+
+  for (n_levels in 2:8) {
+    df <- catboost_factor_data(n_levels, seed = n_levels)
+    model <- make_factor_model(df)
+
+    pm <- set_catboost_categories(parse_model(model), model, df)
+    preds <- rlang::eval_tidy(tidypredict_fit(pm), df)
+
+    pool <- catboost_catboost.load_pool(df[, c("num_feat", "cat_feat")])
+    expect_equal(preds, catboost_catboost.predict(model, pool))
+  }
+})
+
+test_that("set_catboost_categories errors on levels the model never saw (#297)", {
+  skip_if_not_installed("catboost")
+
+  df <- catboost_factor_data(4, seed = 4)
+  model <- make_factor_model(df)
+
+  wrong <- df
+  levels(wrong$cat_feat) <- c("w", "x", "y", "z")
+
+  expect_snapshot(
+    set_catboost_categories(parse_model(model), model, wrong),
+    error = TRUE
   )
 })
 
