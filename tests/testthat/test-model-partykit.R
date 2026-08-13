@@ -202,6 +202,7 @@ test_that(".partykit_tree_info_full is exported and works", {
       "terminal",
       "prediction",
       "node_splits",
+      "branches",
       "majority_left",
       "use_surrogates"
     )
@@ -355,4 +356,78 @@ test_that("converted rpart trees with factors match predict() (#295)", {
 
   expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
   expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
+
+test_that("multiway factor splits match predict() (#295)", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  df <- transform(mtcars, carb = factor(carb))
+  model <- partykit::ctree(
+    mpg ~ carb,
+    data = df,
+    control = partykit::ctree_control(multiway = TRUE, alpha = 0.9)
+  )
+
+  expect_gt(length(partykit::kids_node(partykit::node_party(model))), 2)
+
+  base <- unname(predict(model, df))
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
+
+test_that("multiway numeric splits match predict() (#295)", {
+  skip_if_not_installed("partykit")
+
+  df <- data.frame(x = c(-1, -0.5, -0.4, 0, 0.4, 0.5, 1))
+  df$y <- seq_len(nrow(df)) * 10
+
+  for (right in c(TRUE, FALSE)) {
+    split <- partykit::partysplit(1L, breaks = c(-0.5, 0.5), right = right)
+    node <- partykit::partynode(
+      1L,
+      split = split,
+      kids = lapply(2:4, partykit::partynode)
+    )
+    model <- partykit::as.constparty(partykit::party(
+      node,
+      data = df,
+      fitted = data.frame(
+        "(fitted)" = partykit::fitted_node(node, df),
+        "(response)" = df$y,
+        "(weights)" = rep(1, nrow(df)),
+        check.names = FALSE
+      )
+    ))
+
+    base <- unname(predict(model, df))
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+      base
+    )
+  }
+})
+
+test_that("a multiway model can be saved and re-loaded (#295)", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("yaml")
+
+  set.seed(1)
+  df <- transform(mtcars, carb = factor(carb))
+  model <- partykit::ctree(
+    mpg ~ carb,
+    data = df,
+    control = partykit::ctree_control(multiway = TRUE, alpha = 0.9)
+  )
+
+  tmp <- withr::local_tempfile(fileext = ".yml")
+  yaml::write_yaml(parse_model(model), tmp)
+  pm <- as_parsed_model(yaml::read_yaml(tmp))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
 })

@@ -55,6 +55,36 @@ generate_nested_case_when_tree <- function(
   build_nested_node(0L, tree_info, missing)
 }
 
+# Build a `case_when` with one clause per kid, for a split with more than two
+# of them.
+#
+# `branches$splits` holds one condition per kid except the last, which is the
+# `.default`. The clauses are stated in order and `case_when` takes the first
+# that matches, so each condition only has to separate its kid from the kids
+# after it: an interval split needs an upper bound, not both bounds.
+build_multiway_node <- function(branches, tree_info, missing) {
+  subtrees <- lapply(
+    branches$kids,
+    function(kid) build_nested_node(kid, tree_info, missing)
+  )
+
+  arms <- map2(
+    branches$splits,
+    subtrees[seq_along(branches$splits)],
+    function(split, subtree) {
+      expr(!!build_nested_split_condition(split) ~ !!subtree)
+    }
+  )
+  default <- subtrees[[length(subtrees)]]
+
+  if (missing == "na") {
+    is_missing <- build_nested_split_missing(branches$splits[[1]])
+    arms <- c(list(expr(!!is_missing ~ NA)), arms)
+  }
+
+  expr(case_when(!!!arms, .default = !!default))
+}
+
 # Restate one tree's structure with different leaf values, as classification
 # models do when they need one tree per class out of a single fitted tree.
 tree_info_with_predictions <- function(tree_info, prediction) {
@@ -81,6 +111,13 @@ build_nested_node <- function(node_id, tree_info, missing = "default") {
       prediction <- as.character(prediction)
     }
     return(prediction)
+  }
+
+  # A node with more than two kids cannot be stated as one condition and a
+  # default, so it gets one clause per kid instead.
+  branches <- tree_info$branches[[node_idx]]
+  if (length(branches$kids) > 2) {
+    return(build_multiway_node(branches, tree_info, missing))
   }
 
   # Internal node: build nested case_when

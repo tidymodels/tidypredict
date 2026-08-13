@@ -57,6 +57,7 @@ partykit_tree_info_full <- function(model) {
     terminal = tree_df$terminal,
     prediction = tree_df$prediction,
     node_splits = node_splits,
+    branches = attr(tree_df, "branches"),
     majority_left = rep(NA, nrow(tree_df)),
     use_surrogates = FALSE
   )
@@ -79,6 +80,8 @@ partykit_tree_info <- function(model) {
   # default `right = TRUE` puts it on the left branch, `x <= break`; `right =
   # FALSE` makes the left branch `x < break`.
   split_right <- rep(TRUE, n_nodes)
+  split_breaks <- vector("list", n_nodes)
+  kid_ids <- vector("list", n_nodes)
   left_child <- integer(n_nodes)
   right_child <- integer(n_nodes)
 
@@ -86,8 +89,12 @@ partykit_tree_info <- function(model) {
     node <- all_nodes[[i]]
     is_split[i] <- !partykit::is.terminal(node)
     if (is_split[i]) {
+      breaks <- node$split$breaks
       splitvarID[i] <- node$split$varid
-      splitval[i] <- node$split$breaks %||% NA_real_
+      # A multiway split carries one break per cut point, which has no single
+      # value to record here; those nodes are described by `branches` instead.
+      splitval[i] <- if (length(breaks) == 1) breaks else NA_real_
+      split_breaks[[i]] <- breaks
       split_index[[i]] <- node$split$index
       split_right[i] <- node$split$right %||% TRUE
       kids <- partykit::kids_node(node)
@@ -97,12 +104,13 @@ partykit_tree_info <- function(model) {
       # puts the interval below the break on the *second* kid. Taking the kids
       # in order silently swaps both branches of every converted rpart tree.
       bin_kid <- node$split$index
-      if (is.null(node$split$breaks) || is.null(bin_kid)) {
-        bin_kid <- c(1L, 2L)
+      if (is.null(breaks) || is.null(bin_kid)) {
+        bin_kid <- seq_along(kids)
       }
 
-      left_child[i] <- partykit::id_node(kids[[bin_kid[1]]])
-      right_child[i] <- partykit::id_node(kids[[bin_kid[2]]])
+      kid_ids[[i]] <- vapply(kids, partykit::id_node, integer(1))[bin_kid]
+      left_child[i] <- kid_ids[[i]][1]
+      right_child[i] <- kid_ids[[i]][2]
     } else {
       splitvarID[i] <- NA_integer_
       splitval[i] <- NA_real_
@@ -187,7 +195,24 @@ partykit_tree_info <- function(model) {
     class_splits[i] <- paste0(lvls[pn == 1], collapse = ", ")
   }
 
-  data.frame(
+  branches <- vector("list", n_nodes)
+  for (i in seq_len(n_nodes)) {
+    if (is.na(splitvarID[i]) || length(kid_ids[[i]]) < 3) {
+      next
+    }
+    v <- vars[splitvarID[i]]
+    branches[[i]] <- partykit_node_branches(
+      col = v,
+      kids = kid_ids[[i]] - 1L,
+      breaks = split_breaks[[i]],
+      index = split_index[[i]],
+      right = split_right[i],
+      levels = levels(model$data[, colnames(model$data) == v]),
+      is_ordered = is_ordered_var[[v]]
+    )
+  }
+
+  out <- data.frame(
     nodeID = all_node_ids - 1L,
     leftChild = left_child - 1L,
     rightChild = right_child - 1L,
@@ -199,6 +224,51 @@ partykit_tree_info <- function(model) {
     terminal = !is_split,
     prediction = prediction
   )
+  attr(out, "branches") <- branches
+  out
+}
+
+# Describe a split with more than two kids as one condition per kid.
+#
+# The kids are already in interval order. Only the first `k - 1` need a
+# condition, because the clauses are tried in order and the last kid is
+# whatever is left over. That also means each condition is a plain upper
+# bound rather than an interval.
+partykit_node_branches <- function(
+  col,
+  kids,
+  breaks,
+  index,
+  right,
+  levels,
+  is_ordered
+) {
+  if (is.null(breaks)) {
+    # An unordered factor has no breaks: `index` names the kid each level
+    # belongs to, so every kid is a set of levels.
+    splits <- lapply(seq_len(length(kids) - 1), function(kid) {
+      list(
+        col = col,
+        vals = as.list(levels[which(index == kid)]),
+        is_categorical = TRUE
+      )
+    })
+    return(list(kids = kids, splits = splits))
+  }
+
+  splits <- lapply(seq_along(breaks), function(b) {
+    if (is_ordered) {
+      n_left <- if (right) breaks[b] else breaks[b] - 1
+      return(list(
+        col = col,
+        vals = as.list(levels[seq_len(n_left)]),
+        is_categorical = TRUE
+      ))
+    }
+    list(col = col, val = breaks[b], is_categorical = FALSE, strict = !right)
+  })
+
+  list(kids = kids, splits = splits)
 }
 
 #' @export
