@@ -80,6 +80,48 @@ probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
 all.equal(unname(probs), unname(predict(model, iris)$posterior))
     ```
 
+### Extreme values of a numeric predictor
+
+There is one case where `tidypredict_fit()` does not reproduce `predict()`, and
+it is deliberately left in place.
+
+Both packages evaluate each normal density and then replace any density that
+came out as exactly zero with their `threshold` argument, `0.001` by default. A
+normal density only reaches zero by underflowing the smallest number a double
+can hold, which takes a value roughly 38 standard deviations from that class's
+mean. `tidypredict` works on the log scale throughout, where such a value is an
+ordinary negative number and nothing underflows, so the substitution never
+happens.
+
+The substitution is drastic when it fires. Consider an iris with a
+`Sepal.Length` of 20, well beyond the largest in the data:
+
+```{r}
+outlier <- iris[1, ]
+outlier$Sepal.Length <- 20
+
+predict(model, outlier)$posterior
+```
+
+`setosa` has the narrowest spread of the three classes, so its density is the
+first to underflow. Replacing it with `0.001` makes it enormous next to the
+other two, which are around `1e-162` and `1e-97` but were computed honestly, so
+the class that fits the value worst is the one that wins. This happens silently
+unless the value is extreme enough for *every* class to underflow, which is the
+only case either package warns about. `tidypredict` instead continues on the
+log scale and reports the ordering the fitted model implies:
+
+```{r}
+sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, outlier))
+```
+
+Reproducing the substitution is not possible on the log scale in any case.
+Testing `exp(log_density) == 0` instead of `density == 0` picks out a different
+set of values: over 200,000 draws from the band where the underflow happens the
+two tests disagree on about 1,000 of them, because the two routes round
+differently in the denormal range. A SQL backend, working in its own floating
+point, would disagree again in a third way.
+
 ## parsnip
 
 `parsnip` fitted models are also supported by `tidypredict`:

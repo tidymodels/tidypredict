@@ -100,7 +100,13 @@ parse_model.NaiveBayes <- function(model) {
   }
 
   classes <- model$levels
-  # `predict.NaiveBayes()` replaces zero densities with `threshold`
+  # `predict.NaiveBayes()` replaces zero densities with `threshold`.
+  #
+  # This is applied to the conditional probabilities of a categorical
+  # predictor, which is reproduced below, and to each evaluated normal density,
+  # which is not. A normal density only reaches zero by underflowing, which the
+  # log scale used here never does. See the naive Bayes article for why that
+  # divergence is left in place.
   threshold <- 0.001
 
   class_terms <- lapply(seq_along(classes), function(i) {
@@ -174,7 +180,8 @@ parse_model.naive_bayes <- function(model) {
   }
 
   classes <- model$levels
-  # `predict.naive_bayes()` replaces zero densities with `threshold`
+  # `predict.naive_bayes()` replaces zero densities with `threshold`, in the
+  # same places and with the same caveat as `predict.NaiveBayes()` above.
   threshold <- 0.001
 
   class_terms <- lapply(seq_along(classes), function(i) {
