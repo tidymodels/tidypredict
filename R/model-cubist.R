@@ -1,7 +1,7 @@
 #' @export
 parse_model.cubist <- function(model) {
   coefs <- model$coefficients
-  conditions <- cubist_rule_conditions(model)
+  rules_text <- cubist_rules(model)
 
   # Pre-split data by committee and rule to avoid O(n) scans in nested loops
   coefs_by_comm_rule <- split(coefs, list(coefs$committee, coefs$rule))
@@ -16,8 +16,9 @@ parse_model.cubist <- function(model) {
           key <- paste(comm, .x, sep = ".")
           cc <- coefs_by_comm_rule[[key]]
           # `committee` and `rule` are character, so they index the parsed
-          # conditions only once converted back to positions.
-          mcs <- conditions[[as.integer(comm)]][[as.integer(.x)]]
+          # rules only once converted back to positions.
+          rule <- rules_text[[as.integer(comm)]][[as.integer(.x)]]
+          mcs <- rule$path
           if (length(mcs) == 0) {
             mcs <- list(list(type = "all"))
           }
@@ -50,7 +51,8 @@ parse_model.cubist <- function(model) {
 
           list(
             prediction = f_coefs,
-            path = mcs
+            path = mcs,
+            limits = rule$limits
           )
         }
       )
@@ -91,15 +93,17 @@ parse_model.cubist <- function(model) {
   as_parsed_model(pm)
 }
 
-# The conditions of every rule, as a list of committees of rules of paths.
+# Every rule of every committee, as a list of committees of rules, each rule a
+# list of its `path` and its `limits`.
 #
 # These are read from the model text rather than from `model$splits`, because
 # `Cubist` only records numeric (`type="2"`) and subset (`type="3"`) conditions
 # there. An equality condition on a categorical predictor (`type="1"`) is
 # missing from `model$splits` altogether, which would widen the rule to every
 # row.
-cubist_rule_conditions <- function(model) {
+cubist_rules <- function(model) {
   lines <- strsplit(model$model, "\n")[[1]]
+  extrap <- as.numeric(cubist_field(lines[[2]], "extrap"))
 
   committees <- list()
   rules <- list()
@@ -115,7 +119,10 @@ cubist_rule_conditions <- function(model) {
     } else if (grepl('^conds="', line)) {
       n <- as.integer(cubist_field(line, "conds"))
       conds <- lapply(seq_len(n), function(k) cubist_condition(lines[[i + k]]))
-      rules[[length(rules) + 1]] <- conds
+      rules[[length(rules) + 1]] <- list(
+        path = conds,
+        limits = cubist_rule_limits(line, extrap)
+      )
       i <- i + n
     }
     i <- i + 1
@@ -124,6 +131,28 @@ cubist_rule_conditions <- function(model) {
     committees[[length(committees) + 1]] <- rules
   }
   committees
+}
+
+# The range a rule's prediction is allowed to take.
+#
+# `Cubist` holds each rule to the span of the training outcomes it covers,
+# widened at both ends by `extrap` times that span. The widened end never
+# crosses zero: a rule that only ever saw non-negative outcomes cannot be
+# extrapolated into negative ones, and the other way around.
+cubist_rule_limits <- function(line, extrap) {
+  lo <- as.numeric(cubist_field(line, "loval"))
+  hi <- as.numeric(cubist_field(line, "hival"))
+  span <- extrap * (hi - lo)
+
+  lower <- lo - span
+  if (lo >= 0) {
+    lower <- max(lower, 0)
+  }
+  upper <- hi + span
+  if (hi <= 0) {
+    upper <- min(upper, 0)
+  }
+  c(lower, upper)
 }
 
 # The value of a `name="value"` field, or `NA` when the line has no such field.

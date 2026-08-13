@@ -146,6 +146,8 @@ generate_tree_node <- function(node, calc_mode = "") {
     pl <- prediction
   }
 
+  pl <- clamp_prediction(pl, node$limits)
+
   if (isTRUE(rcl)) {
     return(pl)
   }
@@ -155,6 +157,24 @@ generate_tree_node <- function(node, calc_mode = "") {
   }
 
   expr(!!rcl ~ !!pl)
+}
+
+# Hold a node's prediction to `limits`, when the model records any.
+#
+# A constant prediction is clamped here rather than in the expression, so that
+# a model with no linear terms keeps a formula of plain numbers.
+clamp_prediction <- function(pl, limits) {
+  if (is.null(limits)) {
+    return(pl)
+  }
+  if (is.numeric(pl)) {
+    return(min(max(pl, limits[[1]]), limits[[2]]))
+  }
+  # SQL's `GREATEST`/`LEAST` always drop nulls, so `na.rm = TRUE` is what the
+  # translation does either way; stating it keeps the R and SQL results the
+  # same and stops dbplyr warning about the difference.
+  lower <- expr(pmax(!!pl, !!limits[[1]], na.rm = TRUE))
+  expr(pmin(!!lower, !!limits[[2]], na.rm = TRUE))
 }
 
 #' Turn a path object into a combined expression

@@ -203,6 +203,49 @@ cubist_factor_data <- function(n_levels, seed = 1) {
   df
 }
 
+test_that("predictions outside a rule's range are clamped (#285)", {
+  skip_if_not_installed("Cubist")
+  # Cubist holds each rule to the span of the training outcomes it covers,
+  # widened at both ends by `extrap` times that span. Without the clamp a
+  # linear model runs away on data outside the training range.
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+
+  far <- mtcars[rep(1, 5), ]
+  far$wt <- c(-50, -10, 3, 20, 100)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), far),
+    unname(predict(model, far)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("the clamp applies on ordinary training rows (#285)", {
+  skip_if_not_installed("Cubist")
+  # The clamp is not only about extrapolation: it engages on rows of the
+  # training data itself, so an unclamped formula is wrong on data the model
+  # was fitted to.
+  df <- cubist_factor_data(6, seed = 5)
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("a rule's widened range does not cross zero (#285)", {
+  line <- 'conds="1" cover="9" mean="1" loval="0.5" hival="4" esterr="1"'
+  expect_equal(cubist_rule_limits(line, 1), c(0, 7.5))
+
+  line <- 'conds="1" cover="9" mean="-1" loval="-4" hival="-0.5" esterr="1"'
+  expect_equal(cubist_rule_limits(line, 1), c(-7.5, 0))
+
+  line <- 'conds="1" cover="9" mean="0" loval="-1" hival="3" esterr="1"'
+  expect_equal(cubist_rule_limits(line, 1), c(-5, 7))
+})
+
 test_that("a subset condition on a factor matches predict() (#322)", {
   skip_if_not_installed("Cubist")
   # With several levels Cubist writes a rule as `type="3"`, a subset of the
