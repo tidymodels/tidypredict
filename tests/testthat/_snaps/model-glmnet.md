@@ -21,6 +21,33 @@
       Error in `parse_model()`:
       ! `tidypredict_fit()` requires that there are only 1 penalty selected, 2 were provided.
 
+# rejects a model fit with an offset (#296)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! Models fit with an `offset` are not supported for glmnet.
+      i glmnet stores only a flag, not the offset values, so the prediction cannot be reproduced.
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! Models fit with an `offset` are not supported for glmnet.
+      i glmnet stores only a flag, not the offset values, so the prediction cannot be reproduced.
+
+---
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! Models fit with an `offset` are not supported for glmnet.
+      i glmnet stores only a flag, not the offset values, so the prediction cannot be reproduced.
+
 # glmnet are handeld neatly with parsnip
 
     Code

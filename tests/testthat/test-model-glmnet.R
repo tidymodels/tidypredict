@@ -111,6 +111,33 @@ test_that("errors if more than 1 penalty is selected", {
   )
 })
 
+test_that("rejects a model fit with an offset (#296)", {
+  skip_if_not_installed("glmnet")
+
+  # glmnet records only a flag, not the offset values, and `predict()` asks for
+  # them again as `newoffset`, so there is nothing to rebuild the offset from.
+  x <- as.matrix(mtcars[, c("wt", "disp")])
+
+  model <- glmnet::glmnet(
+    x,
+    mtcars$cyl,
+    family = "poisson",
+    lambda = 0.05,
+    offset = mtcars$am
+  )
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+  expect_snapshot(error = TRUE, parse_model(model))
+
+  model <- glmnet::glmnet(
+    x,
+    factor(mtcars$gear),
+    family = "multinomial",
+    lambda = 0.05,
+    offset = matrix(rep(mtcars$am, 3), ncol = 3)
+  )
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
 test_that("glmnet are handeld neatly with parsnip", {
   skip_if_not_installed("glmnet")
   spec <- parsnip::linear_reg(engine = "glmnet", penalty = 1)
