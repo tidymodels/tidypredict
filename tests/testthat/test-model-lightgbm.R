@@ -621,6 +621,106 @@ test_that("binary classification predictions match native predict", {
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
 })
 
+test_that("binary honours a non-default sigmoid (#288)", {
+  skip_if_not_installed("lightgbm")
+
+  # `binary` applies `1 / (1 + exp(-sigmoid * x))`, not a plain logistic.
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = mtcars$am,
+    colnames = c("mpg", "cyl", "disp")
+  )
+
+  for (sigmoid in c(0.5, 2, 3)) {
+    set.seed(123)
+    model <- lightgbm::lgb.train(
+      params = list(
+        num_leaves = 4L,
+        objective = "binary",
+        sigmoid = sigmoid,
+        min_data_in_leaf = 1L
+      ),
+      data = dtrain,
+      nrounds = 5L,
+      verbose = -1L
+    )
+
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      as.numeric(predict(model, X)),
+      tolerance = 1e-10
+    )
+  }
+})
+
+test_that("cross_entropy ignores sigmoid, unlike binary (#288)", {
+  skip_if_not_installed("lightgbm")
+
+  # LightGBM takes the parameter for `cross_entropy` but never applies it: the
+  # link stays a plain logistic. Scaling it here would break a correct model.
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = as.numeric(mtcars$am),
+    colnames = c("mpg", "cyl", "disp")
+  )
+
+  set.seed(123)
+  model <- lightgbm::lgb.train(
+    params = list(
+      num_leaves = 4L,
+      objective = "cross_entropy",
+      sigmoid = 2,
+      min_data_in_leaf = 1L
+    ),
+    data = dtrain,
+    nrounds = 5L,
+    verbose = -1L
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    as.numeric(predict(model, X)),
+    tolerance = 1e-10
+  )
+})
+
+test_that("reg_sqrt squares the raw score back onto the response scale (#288)", {
+  skip_if_not_installed("lightgbm")
+
+  # `reg_sqrt` trains on `sqrt(|y|)` keeping the sign, so the raw score has to
+  # be squared back. `huber` takes the parameter but does not act on it.
+  X <- data.matrix(mtcars[, c("cyl", "disp", "hp")])
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = mtcars$mpg,
+    colnames = c("cyl", "disp", "hp")
+  )
+
+  for (objective in c("regression", "regression_l1", "quantile", "huber")) {
+    set.seed(123)
+    model <- lightgbm::lgb.train(
+      params = list(
+        num_leaves = 4L,
+        objective = objective,
+        reg_sqrt = TRUE,
+        min_data_in_leaf = 1L
+      ),
+      data = dtrain,
+      nrounds = 5L,
+      verbose = -1L
+    )
+
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      as.numeric(predict(model, X)),
+      tolerance = 1e-10,
+      info = objective
+    )
+  }
+})
+
 test_that("poisson predictions match native predict", {
   skip_if_not_installed("lightgbm")
 

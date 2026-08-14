@@ -15,6 +15,18 @@ lgb_zero_threshold <- 1e-35
 
 lgb_exp_objectives <- c("poisson", "gamma", "tweedie")
 lgb_sigmoid_objectives <- c("binary", "cross_entropy")
+# `reg_sqrt` trains on `sqrt(|y|)` keeping the sign, so `ConvertOutput` squares
+# the raw score back onto the response scale. Every identity objective takes the
+# parameter, but `huber` does not act on it: its predictions stay on the raw
+# scale whatever `reg_sqrt` says. Verified against `predict()` for all six.
+lgb_reg_sqrt_objectives <- c(
+  "regression",
+  "regression_l2",
+  "regression_l1",
+  "fair",
+  "quantile",
+  "mape"
+)
 lgb_multiclass_objectives <- c("multiclass", "multiclassova")
 lgb_supported_objectives <- c(
   lgb_identity_objectives,
@@ -436,14 +448,40 @@ parse_lgb_categorical_threshold <- function(threshold) {
 
 # Shared helpers -----------------------------------------------
 
-# Helper for sigmoid transformation
-lgb_sigmoid <- function(f) {
-  expr_logistic(f)
+# Helper for sigmoid transformation.
+#
+# LightGBM's `binary`, `cross_entropy` and `multiclassova` objectives apply
+# `1 / (1 + exp(-sigmoid * x))`, where `sigmoid` is a fit parameter defaulting
+# to 1. Fixing it at 1 rescales every probability of a model fit with any other
+# value.
+# The `sigmoid` scaling an objective actually applies.
+#
+# Not every objective that ends in a logistic honours it. `binary` and
+# `multiclassova` do; `cross_entropy` ignores it and is always plain
+# `1 / (1 + exp(-x))`, whatever `sigmoid` was set to. Verified against
+# `predict()` at sigmoid 1, 2 and 3.
+lgb_sigmoid_param <- function(objective, params) {
+  if (identical(objective, "cross_entropy")) {
+    return(1)
+  }
+  params$sigmoid %||% 1
+}
+
+lgb_sigmoid <- function(f, sigmoid = 1) {
+  if (identical(sigmoid, 1) || identical(sigmoid, 1L)) {
+    return(expr_logistic(f))
+  }
+  expr_logistic(expr(!!sigmoid * !!f))
 }
 
 # Apply multiclass transformation to tree expressions
 # Shared by nested and from_parsed multiclass builders
-apply_lgb_multiclass_transformation <- function(trees, num_class, objective) {
+apply_lgb_multiclass_transformation <- function(
+  trees,
+  num_class,
+  objective,
+  sigmoid = 1
+) {
   n_trees <- length(trees)
 
   # Group trees by class: tree i belongs to class (i-1) %% num_class
@@ -461,7 +499,7 @@ apply_lgb_multiclass_transformation <- function(trees, num_class, objective) {
     result <- expr_softmax(raw_scores)
   } else if (objective == "multiclassova") {
     # One-vs-all: sigmoid for each class independently
-    result <- map(raw_scores, lgb_sigmoid)
+    result <- map(raw_scores, \(score) lgb_sigmoid(score, sigmoid))
   }
 
   names(result) <- paste0("class_", seq_len(num_class) - 1)
@@ -503,19 +541,16 @@ build_lgb_linear_prediction <- function(linear) {
 
 # Apply lightgbm objective transformation to formula
 apply_lgb_objective <- function(f, objective, params) {
-  # RF boosting averages trees instead of summing
-  boosting <- params$boosting
-  if (!is.null(boosting) && boosting == "rf") {
-    # f is already averaged by caller
-  }
-
-  # Apply transformation
   if (objective %in% lgb_exp_objectives) {
     return(expr(exp(!!f)))
   }
 
   if (objective %in% lgb_sigmoid_objectives) {
-    return(lgb_sigmoid(f))
+    return(lgb_sigmoid(f, lgb_sigmoid_param(objective, params)))
+  }
+
+  if (objective %in% lgb_reg_sqrt_objectives && isTRUE(params$reg_sqrt)) {
+    return(expr(sign(!!f) * (!!f)^2))
   }
 
   # Identity objectives - return as-is
@@ -580,7 +615,12 @@ assemble_lgb_formula <- function(parsedmodel, build_trees) {
     if (is.null(num_class) || num_class < 2) {
       cli::cli_abort("Multiclass model must have num_class >= 2.")
     }
-    return(apply_lgb_multiclass_transformation(trees, num_class, objective))
+    return(apply_lgb_multiclass_transformation(
+      trees,
+      num_class,
+      objective,
+      parsedmodel$general$params$sigmoid %||% 1
+    ))
   }
 
   f <- reduce_addition(trees)
