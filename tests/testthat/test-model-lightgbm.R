@@ -386,6 +386,102 @@ test_that("mixed default_left values in same tree are handled correctly", {
   expect_equal(tree_result[[3]]$path[[1]]$missing, FALSE)
 })
 
+lgb_missing_data <- function(na, zeros, seed = 1) {
+  set.seed(seed)
+  n <- 400
+  d <- data.frame(x1 = runif(n, -10, -5), x2 = rnorm(n), x3 = rnorm(n))
+  if (na) {
+    d$x1[sample(n, 60)] <- NA
+  }
+  if (zeros) {
+    d$x2[sample(n, 60)] <- 0
+  }
+  d$y <- 2 * ifelse(is.na(d$x1), 0, d$x1) + d$x2 - d$x3 + rnorm(n)
+  d
+}
+
+# Prediction data that exercises missing values, exact zeros, and both at once.
+lgb_missing_newdata <- function(seed = 99) {
+  set.seed(seed)
+  n <- 200
+  d <- data.frame(x1 = runif(n, -10, -5), x2 = rnorm(n), x3 = rnorm(n))
+  d$x1[1:50] <- NA
+  d$x2[51:100] <- 0
+  d$x1[101:120] <- 0
+  d
+}
+
+lgb_missing_model <- function(train, params) {
+  cols <- c("x1", "x2", "x3")
+  params <- c(
+    params,
+    list(objective = "regression", num_leaves = 8L, verbose = -1L)
+  )
+  dtrain <- lightgbm::lgb.Dataset(
+    as.matrix(train[cols]),
+    label = train$y,
+    params = params
+  )
+  lightgbm::lgb.train(params = params, data = dtrain, nrounds = 6L)
+}
+
+test_that("missing values follow missing_type, not default_left (#288)", {
+  skip_if_not_installed("lightgbm")
+  # `Tree::NumericalDecision` consults `default_left` only when the node's
+  # `missing_type` is `NaN` or `Zero`. A feature with no missing value in the
+  # training data gets `None`, where a missing value is coerced to `0` and
+  # compared against the threshold like any other.
+  cases <- list(
+    list(na = TRUE, zeros = FALSE, params = list()),
+    list(na = FALSE, zeros = FALSE, params = list()),
+    list(na = TRUE, zeros = FALSE, params = list(use_missing = FALSE))
+  )
+
+  newdata <- lgb_missing_newdata()
+  mat <- as.matrix(newdata[c("x1", "x2", "x3")])
+
+  for (case in cases) {
+    model <- lgb_missing_model(
+      lgb_missing_data(case$na, case$zeros),
+      case$params
+    )
+    native <- predict(model, mat)
+
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), newdata), native)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), newdata),
+      native
+    )
+  }
+})
+
+test_that("zero_as_missing routes exact zeros as missing (#288)", {
+  skip_if_not_installed("lightgbm")
+  # Every node of such a model gets `missing_type = "Zero"`, where an exact
+  # zero takes the `default_left` side along with a missing value. This is
+  # wrong on the training data itself, not only on new zeros.
+  newdata <- lgb_missing_newdata()
+  mat <- as.matrix(newdata[c("x1", "x2", "x3")])
+
+  for (na in c(FALSE, TRUE)) {
+    train <- lgb_missing_data(na, zeros = TRUE)
+    model <- lgb_missing_model(train, list(zero_as_missing = TRUE))
+    native <- predict(model, mat)
+
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), newdata), native)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), newdata),
+      native
+    )
+
+    # The training rows, which contain the zeros the model was fit on
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), train),
+      predict(model, as.matrix(train[c("x1", "x2", "x3")]))
+    )
+  }
+})
+
 test_that("model with missing values produces valid parse", {
   skip_if_not_installed("lightgbm")
 
@@ -1312,7 +1408,10 @@ test_that("RF boosting in from_parsed averages trees", {
   expect_match(formula_str, "/2")
 })
 
-test_that("from_parsed handles set type with missing", {
+test_that("a categorical split sends a missing value right (#288)", {
+  # `Tree::CategoricalDecision` sends a missing value right whatever
+  # `default_left` says, so a `missing = TRUE` recorded by an older parse is
+  # not honoured.
   pm <- list()
   pm$general$model <- "lgb.Booster"
   pm$general$type <- "lgb"
@@ -1346,9 +1445,10 @@ test_that("from_parsed handles set type with missing", {
 
   fit_formula <- tidypredict_fit(pm)
 
-  formula_str <- deparse(fit_formula)
-  expect_match(formula_str, "%in%")
-  expect_match(formula_str, "is.na")
+  expect_equal(
+    rlang::eval_tidy(fit_formula, data.frame(cat_feat = c(0L, 5L, NA))),
+    c(10, 20, 20)
+  )
 })
 
 test_that("from_parsed handles set type without missing", {
@@ -1426,7 +1526,10 @@ test_that("from_parsed handles conditional without missing", {
 
   formula_str <- deparse(fit_formula)
   expect_match(formula_str, "<=")
-  expect_no_match(formula_str, "is.na")
+  expect_equal(
+    rlang::eval_tidy(fit_formula, data.frame(x = c(1, 9, NA))),
+    c(10, 20, 20)
+  )
 })
 
 test_that("build_lgb_nested_condition errors on unknown type", {
