@@ -61,6 +61,30 @@ test_that("blackboost respects mstop and nu", {
   expect_equal(fit, as.numeric(predict(model, newdata = mtcars)))
 })
 
+test_that("blackboost honours an mstop reduced after fitting (#306)", {
+  skip_if_not_installed("mboost")
+
+  # The `cvrisk()` workflow subsets a fitted model to the best iteration, which
+  # sets `mstop` but leaves the stored ensemble at its full length.
+  set.seed(1)
+  model <- mboost::blackboost(
+    mpg ~ wt + cyl + disp,
+    data = mtcars,
+    control = mboost::boost_control(mstop = 100)
+  )
+  model[30]
+  expect_equal(mboost::mstop(model), 30)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    as.numeric(predict(model, newdata = mtcars))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), mtcars),
+    as.numeric(predict(model, newdata = mtcars))
+  )
+})
+
 test_that("blackboost supports SQL", {
   skip_if_not_installed("mboost")
 
