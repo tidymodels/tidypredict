@@ -111,6 +111,20 @@
   ([\#299](https://github.com/tidymodels/tidypredict/issues/299))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now sends a value sitting exactly on a split boundary the way the
+  model does, for the backends that compare split thresholds as 32-bit
+  floats: `xgboost`, `lightgbm`, `catboost`,
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+  and
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html).
+  The boundary is the midpoint between the stored threshold and the
+  adjacent float, and a value can land precisely on it, where rounding
+  to a float is a tie broken towards the even mantissa. About half of
+  all thresholds resolve that tie towards the neighbour rather than the
+  threshold, and those sent such a value down the wrong branch.
+  ([\#350](https://github.com/tidymodels/tidypredict/issues/350))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now combines the trials of a boosted
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
   model with the confidence C5.0 votes with,
