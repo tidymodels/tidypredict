@@ -3,7 +3,7 @@
     Code
       round_print(tidypredict_fit(model)[["setosa"]])
     Output
-      [1] "exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))/(exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224))) + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.620738 - ((Petal.Width - 1.326)^2/0.07821224))) + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.292258 - ((Petal.Width - 2.026)^2/0.1508653))))"
+      [1] "1/(1 + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.620738 - ((Petal.Width - 1.326)^2/0.07821224)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))) + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.292258 - ((Petal.Width - 2.026)^2/0.1508653)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))))"
 
 # kernel density fits are rejected
 
@@ -37,7 +37,7 @@
     Code
       round_print(tf[["0"]])
     Output
-      [1] "exp(-0.5212969 + ifelse(is.na(mpg), 0, -1.3439 - ((mpg - 17.14737)^2/29.3986)))/(exp(-0.5212969 + ifelse(is.na(mpg), 0, -1.3439 - ((mpg - 17.14737)^2/29.3986))) + exp(-0.9007865 + ifelse(is.na(mpg), 0, -1.819132 - ((mpg - 24.39231)^2/76.05154))))"
+      [1] "1/(1 + exp(-0.9007865 + ifelse(is.na(mpg), 0, -1.819132 - ((mpg - 24.39231)^2/76.05154)) - (-0.5212969 + ifelse(is.na(mpg), 0, -1.3439 - ((mpg - 17.14737)^2/29.3986)))))"
 
 # naive_bayes kernel density fits are rejected
 
