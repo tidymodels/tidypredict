@@ -80,9 +80,24 @@ expr_logistic <- function(f) {
 }
 
 # Turn per-class scores into class probabilities.
+#
+# Written as `1 / sum_j exp(s_j - s_k)` rather than the textbook
+# `exp(s_k) / sum_j exp(s_j)`, which overflows to `Inf / Inf` and returns `NaN`
+# for any score above about 710. Subtracting `s_k` inside each `exp()` is what
+# the reference implementations achieve by subtracting the row maximum, but it
+# needs no `pmax()` and leaves the expression the same size. The `j == k` term
+# is `exp(0)`, written as `1`, so the denominator is never below 1 and cannot
+# underflow to zero either.
 expr_softmax <- function(scores, names = NULL) {
-  denom <- reduce_addition(map(scores, ~ expr(exp(!!.x))))
-  res <- map(scores, ~ expr(exp(!!.x) / (!!denom)))
+  res <- map(seq_along(scores), function(k) {
+    terms <- map(seq_along(scores), function(j) {
+      if (j == k) {
+        return(1)
+      }
+      expr(exp(!!scores[[j]] - !!scores[[k]]))
+    })
+    expr(1 / (!!reduce_addition(terms)))
+  })
   if (!is.null(names)) {
     names(res) <- names
   }

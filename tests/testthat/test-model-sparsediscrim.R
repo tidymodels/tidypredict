@@ -35,6 +35,31 @@ test_that("predictions match native predict", {
   expect_equal(unname(rowSums(probs)), rep(1, nrow(iris)))
 })
 
+test_that("a row far outside the training range is a documented divergence (#299)", {
+  skip_if_not_installed("sparsediscrim")
+  # `sparsediscrim` normalizes its class scores with the textbook softmax, so
+  # it returns `NaN` for a row whose scores are large enough that `exp()`
+  # overflows. `tidypredict` subtracts the class score inside each `exp()` and
+  # returns the distribution those scores imply, which is the one every other
+  # backend's `predict()` gives for such a row.
+  model <- sparsediscrim::lda_diag(as.matrix(iris[1:4]), iris$Species)
+
+  far <- iris[rep(1, 2), ]
+  far[1:4] <- list(c(100, 1e3), c(100, -1e3), c(100, 1e3), c(100, -1e3))
+
+  expect_true(anyNA(as.matrix(predict(model, far, type = "prob"))))
+
+  probs <- sparsediscrim_probs(model, far)
+  expect_false(anyNA(probs))
+  expect_equal(unname(rowSums(probs)), rep(1, nrow(far)))
+
+  # Rows the model can actually have seen are unaffected
+  expect_equal(
+    unname(sparsediscrim_probs(model, iris)),
+    unname(as.matrix(predict(model, iris, type = "prob")))
+  )
+})
+
 test_that("shrink_mean regularization is handled", {
   skip_if_not_installed("sparsediscrim")
 

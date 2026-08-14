@@ -18,6 +18,8 @@
 
 - `tidypredict_fit()` no longer sends a missing value down the left branch of a categorical split for `lightgbm` models. LightGBM sends it right whatever `default_left` says. (#288)
 
+- `tidypredict_fit()` no longer returns `NaN` for every class probability of a row whose class scores are large, for any model whose prediction is a softmax: `MASS::lda()`, `MASS::qda()`, `mda::fda()`, `sparsediscrim`, `sda`, `mixOmics`, `nnet::multinom()`, `nnet::nnet()`, multinomial `glmnet`, naive Bayes, `h2o`, `lightgbm` and `catboost`. The probabilities were written as `exp(s) / sum(exp(s))`, which is `Inf / Inf` once a score passes about 710. They are now written as `1 / sum(exp(s_j - s_k))`, which is the same quantity and cannot overflow. (#299)
+
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
