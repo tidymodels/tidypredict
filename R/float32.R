@@ -36,6 +36,13 @@ f32_from_bits <- function(bits) {
   ))
 }
 
+# One double away from x, in the direction of `dir`. Adjacent floats are about
+# 2^29 doubles apart, so landing a bit or two further than the very next double
+# makes no difference to which floats fall either side of the result.
+next_double <- function(x, dir) {
+  x + dir * pmax(abs(x), .Machine$double.xmin) * .Machine$double.eps
+}
+
 f32_split_boundary <- function(x, side = c("lower", "upper")) {
   side <- match.arg(side)
 
@@ -60,6 +67,21 @@ f32_split_boundary <- function(x, side = c("lower", "upper")) {
   # directly: 0x80000001 below zero, 0x00000001 above it.
   neighbour[f32 == 0] <- if (side == "lower") -2147483647L else 1L
 
-  out[keep] <- (f32_from_bits(neighbour) + f32) / 2
+  mid <- (f32_from_bits(neighbour) + f32) / 2
+
+  # The midpoint of two floats is exactly representable as a double, so a value
+  # can sit precisely on it, and there the boundary cannot express what the
+  # model does: rounding the midpoint to a float is a tie, resolved to whichever
+  # of the two neighbours has an even mantissa. When that is the neighbour rather
+  # than the threshold, the model reads the midpoint as being on the far side of
+  # the split, so the boundary has to move one double past it to agree. About
+  # half of all thresholds land this way.
+  ties_to_neighbour <- as_f32(mid) != f32
+  mid[ties_to_neighbour] <- next_double(
+    mid[ties_to_neighbour],
+    if (side == "lower") 1 else -1
+  )
+
+  out[keep] <- mid
   out
 }
