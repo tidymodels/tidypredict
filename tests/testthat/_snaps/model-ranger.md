@@ -15,6 +15,46 @@
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.
 
+# probability and survival forests error with clear message (#301)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit_ranger_nested()`:
+      ! Probability forests are not supported for ranger.
+      i A forest fit with `probability = TRUE` predicts one probability per class, which cannot be written as a single formula.
+      i Only regression models can be converted to tidy formulas.
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! Probability forests are not supported for ranger.
+      i A forest fit with `probability = TRUE` predicts one probability per class, which cannot be written as a single formula.
+      i Only regression models can be converted to tidy formulas.
+
+---
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `tidypredict_fit_ranger_nested()`:
+      ! Survival forests are not supported for ranger.
+      i A survival forest predicts a curve over time rather than a single value, which cannot be written as a single formula.
+      i Only regression models can be converted to tidy formulas.
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! Survival forests are not supported for ranger.
+      i A survival forest predicts a curve over time rather than a single value, which cannot be written as a single formula.
+      i Only regression models can be converted to tidy formulas.
+
 # .extract_ranger_classprob errors on non-ranger model
 
     Code

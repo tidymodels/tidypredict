@@ -1,13 +1,50 @@
 # Model parser -------------------------------------
 
+# Only a regression forest has a single numeric value per leaf to build a
+# formula from.
+#
+# Read from `treetype` rather than from a leaf's prediction: a probability or
+# survival forest has no `prediction` column in `treeInfo()` at all, so
+# `first_tree$prediction[...]` is `NULL`, `is.character(NULL)` is `FALSE`, and a
+# check on the leaf value lets both straight through.
+#
+# A parsnip fit stores the ranger object one level down, and `treetype` is
+# recorded on the forest as well as on the model, so take whichever is there.
+ranger_check_supported <- function(model, call = rlang::caller_env()) {
+  tree_type <- model$treetype %||% model$forest$treetype
+
+  if (identical(tree_type, "Classification")) {
+    abort_classification_unsupported("ranger", call = call)
+  }
+  if (identical(tree_type, "Probability estimation")) {
+    cli::cli_abort(
+      c(
+        "Probability forests are not supported for ranger.",
+        i = "A forest fit with {.code probability = TRUE} predicts one
+        probability per class, which cannot be written as a single formula.",
+        i = "Only regression models can be converted to tidy formulas."
+      ),
+      call = call
+    )
+  }
+  if (identical(tree_type, "Survival")) {
+    cli::cli_abort(
+      c(
+        "Survival forests are not supported for ranger.",
+        i = "A survival forest predicts a curve over time rather than a single
+        value, which cannot be written as a single formula.",
+        i = "Only regression models can be converted to tidy formulas."
+      ),
+      call = call
+    )
+  }
+
+  invisible(model)
+}
+
 #' @export
 parse_model.ranger <- function(model) {
-  # Check if this is a classification model
-  first_tree <- ranger::treeInfo(model, 1)
-  first_pred <- first_tree$prediction[first_tree$terminal][1]
-  if (is.character(first_pred) || is.factor(first_pred)) {
-    abort_classification_unsupported("ranger")
-  }
+  ranger_check_supported(model)
 
   pm <- list()
   pm$general$model <- "ranger"
@@ -136,12 +173,7 @@ tidypredict_fit.ranger <- function(model, ...) {
 
 # Nested formula builder for ranger
 tidypredict_fit_ranger_nested <- function(model) {
-  # Check if this is a classification model
-  first_tree <- ranger::treeInfo(model, 1)
-  first_pred <- first_tree$prediction[first_tree$terminal][1]
-  if (is.character(first_pred) || is.factor(first_pred)) {
-    abort_classification_unsupported("ranger")
-  }
+  ranger_check_supported(model)
 
   n_trees <- model$num.trees
   tree_exprs <- map(seq_len(n_trees), function(tree_no) {
@@ -204,9 +236,10 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
 
 # Used by tidypredict_fit.pm_tree() for v1/v2 ranger parsed models
 tidypredict_fit_ranger <- function(parsedmodel) {
-  # Check if this is a classification model (string predictions)
+  # Check if this is a classification model (string predictions). A v1/v2 model
+  # saved from a probability or survival forest recorded no leaf value at all.
   first_pred <- parsedmodel$trees[[1]][[1]]$prediction
-  if (is.character(first_pred)) {
+  if (is.character(first_pred) || is.null(first_pred)) {
     abort_classification_unsupported("ranger")
   }
 
