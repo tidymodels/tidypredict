@@ -55,7 +55,11 @@ fun_calls <- function(f) {
 acceptable_contrasts <- function(columns, vars, xlevels) {
   invalid <- character(0)
 
-  for (column in setdiff(columns, vars)) {
+  # An interaction names each of the columns it multiplies, separated by `:`,
+  # which is how `parse_label_lm()` takes them apart too.
+  items <- unlist(strsplit(columns, ":", fixed = TRUE))
+
+  for (column in setdiff(items, vars)) {
     # The longest matching variable wins, as it does in `parse_label_lm()`,
     # so that a column of `xy` is not read as a level of `x`.
     matches <- vars[startsWith(column, vars)]
@@ -75,6 +79,33 @@ acceptable_contrasts <- function(columns, vars, xlevels) {
     cli::cli_abort(
       "The treatment contrast is the only one supported at this time.
       Field(s) with an invalid contrast are: {.val {invalid}}.",
+      call. = FALSE
+    )
+  }
+
+  invisible()
+}
+
+# Abort when a predictor is an ordered factor.
+#
+# A weaker check than `acceptable_contrasts()`, for a model that records
+# neither its contrasts nor the levels its factors had, leaving nothing to
+# compare the expanded column names against. R fits an ordered factor with
+# `contr.poly` unless the global `contrasts` option says otherwise, so this
+# catches the case that reaches the parser in practice, at the cost of missing
+# a non-default contrast on an unordered factor.
+acceptable_ordered <- function(model) {
+  classes <- attr(model$terms, "dataClasses")
+  response <- attr(model$terms, "response")
+  if (length(response) == 1 && response > 0) {
+    classes <- classes[-response]
+  }
+
+  ordered <- names(classes)[classes == "ordered"]
+  if (length(ordered) > 0) {
+    cli::cli_abort(
+      "The treatment contrast is the only one supported at this time.
+      Field(s) with an invalid contrast are: {.val {ordered}}.",
       call. = FALSE
     )
   }

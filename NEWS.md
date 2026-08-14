@@ -10,6 +10,8 @@
 
 - `tidypredict_fit()` now rejects an `earth::earth()` model fit with a contrast other than the treatment one, with the same message the rest of the linear family gives. An ordered factor, which R fits with `contr.poly` by default, previously produced a formula comparing the factor column against contrast values such as `-0.2236`, which could not be evaluated. `earth` records no contrasts, so they are now read back off the names it gave the columns each factor expanded into. (#323)
 
+- `tidypredict_fit()` now rejects a `MASS::lda()`, `MASS::qda()` or `mda::fda()` model fit with a contrast other than the treatment one. None of the three records the contrasts it used, so the existing check was a no-op and an ordered factor, which R fits with `contr.poly` by default, silently produced wrong posterior probabilities: the level recovered from a column named `f.L` matches no row, so the term was dropped without complaint. (#343)
+
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)

@@ -154,6 +154,43 @@ test_that("tidypredict_test errors for qda models", {
   expect_snapshot(error = TRUE, tidypredict_test(model, iris))
 })
 
+qda_factor_data <- function(ordered, seed = 1) {
+  set.seed(seed)
+  n <- 200
+  d <- data.frame(
+    x = rnorm(n),
+    f = factor(
+      sample(c("a", "b", "c", "d"), n, replace = TRUE),
+      ordered = ordered
+    )
+  )
+  d$cls <- factor(ifelse(rnorm(n) + as.numeric(d$f) > 2.5, "hi", "lo"))
+  d
+}
+
+test_that("an ordered factor is rejected (#343)", {
+  skip_if_not_installed("MASS")
+  # `contr.poly` names the columns `.L`, `.Q` and `.C` rather than after the
+  # levels, and `qda()` records no contrasts to catch that with.
+  d <- qda_factor_data(ordered = TRUE)
+
+  expect_snapshot(
+    tidypredict_fit(MASS::qda(cls ~ x + f, data = d)),
+    error = TRUE
+  )
+})
+
+test_that("a global non-treatment contrast is rejected (#343)", {
+  skip_if_not_installed("MASS")
+  withr::local_options(contrasts = c("contr.sum", "contr.poly"))
+  d <- qda_factor_data(ordered = FALSE)
+
+  expect_snapshot(
+    tidypredict_fit(MASS::qda(cls ~ x + f, data = d)),
+    error = TRUE
+  )
+})
+
 test_that("inline functions in the formula are rejected", {
   skip_if_not_installed("MASS")
 
