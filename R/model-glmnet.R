@@ -28,6 +28,23 @@ parse_model.glmnet <- function(model) {
   parse_model_glmnet(model)
 }
 
+# `glmnet` records only whether an offset was used, never the values, and
+# `predict()` requires them again as `newoffset`. There is nothing on the model
+# to rebuild the offset from, so the model cannot be reproduced at all.
+glmnet_check_no_offset <- function(model, call = rlang::caller_env()) {
+  if (isTRUE(model$offset)) {
+    cli::cli_abort(
+      c(
+        "Models fit with an {.arg offset} are not supported for glmnet.",
+        i = "{.pkg glmnet} stores only a flag, not the offset values, so the
+        prediction cannot be reproduced."
+      ),
+      call = call
+    )
+  }
+  invisible(model)
+}
+
 parse_model_glmnet <- function(model, call = rlang::caller_env()) {
   if (length(model$lambda) != 1) {
     cli::cli_abort(
@@ -36,6 +53,7 @@ parse_model_glmnet <- function(model, call = rlang::caller_env()) {
       call = call
     )
   }
+  glmnet_check_no_offset(model, call = call)
   if (inherits(model$beta, "dgCMatrix")) {
     model$beta <- setNames(as.numeric(model$beta), rownames(model$beta))
   }
@@ -94,6 +112,7 @@ parse_model_glmnet_multinom <- function(model, call = rlang::caller_env()) {
       call = call
     )
   }
+  glmnet_check_no_offset(model, call = call)
 
   classes <- model$classnames
   a0 <- model$a0

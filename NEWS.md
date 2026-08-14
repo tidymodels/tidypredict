@@ -20,6 +20,8 @@
 
 - `tidypredict_fit()` no longer returns `NaN` for every class probability of a row whose class scores are large, for any model whose prediction is a softmax: `MASS::lda()`, `MASS::qda()`, `mda::fda()`, `sparsediscrim`, `sda`, `mixOmics`, `nnet::multinom()`, `nnet::nnet()`, multinomial `glmnet`, naive Bayes, `h2o`, `lightgbm` and `catboost`. The probabilities were written as `exp(s) / sum(exp(s))`, which is `Inf / Inf` once a score passes about 710. They are now written as `1 / sum(exp(s_j - s_k))`, which is the same quantity and cannot overflow. (#299)
 
+- `tidypredict_fit()` now rejects a `glmnet` model fit with an `offset` rather than silently dropping it, for both the single-outcome and the multinomial paths. glmnet records only whether an offset was used, never the values, and `predict()` requires them again as `newoffset`, so the prediction cannot be reproduced. Predictions were previously wrong by the size of the offset. (#296)
+
 - `tidypredict_fit()` now rejects a `ranger::ranger()` probability or survival forest rather than producing an unusable formula. Neither records a value per leaf, so a guard that read one let both through and emitted `case_when(x <= 0.0066 ~ NULL, .default = NULL)`, which failed later with an unrelated vctrs error; `parse_model()` returned a parsed model with no predictions and no error at all. The forest type is now read from `treetype`. (#301)
 
 - `tidypredict_fit()` now honours an `mstop` reduced after fitting for `mboost` models, as `model[m]` does. Subsetting a fitted model, which is the standard `cvrisk()` workflow, sets `mstop` but leaves the stored ensemble at its full length, so every boosting iteration was used regardless. (#306)
