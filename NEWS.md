@@ -20,6 +20,8 @@
 
 - `tidypredict_fit()` no longer returns `NaN` for every class probability of a row whose class scores are large, for any model whose prediction is a softmax: `MASS::lda()`, `MASS::qda()`, `mda::fda()`, `sparsediscrim`, `sda`, `mixOmics`, `nnet::multinom()`, `nnet::nnet()`, multinomial `glmnet`, naive Bayes, `h2o`, `lightgbm` and `catboost`. The probabilities were written as `exp(s) / sum(exp(s))`, which is `Inf / Inf` once a score passes about 710. They are now written as `1 / sum(exp(s_j - s_k))`, which is the same quantity and cannot overflow. (#299)
 
+- `tidypredict_fit()` now honours an `mstop` reduced after fitting for `mboost` models, as `model[m]` does. Subsetting a fitted model, which is the standard `cvrisk()` workflow, sets `mstop` but leaves the stored ensemble at its full length, so every boosting iteration was used regardless. (#306)
+
 - `tidypredict_fit()` now combines the trials of a boosted `C50::C5.0()` model with the confidence C5.0 votes with, `(freq + prior) / (n_leaf + 1)`, where `prior` is the class proportion at the root of that trial's own tree. It used the Laplace ratio `(freq + 1) / (n_leaf + 2)` instead, which changed the predicted class for 72 of 720 swept configurations. A tie in the total vote now goes to the default class, as `SelectClass` does. (#287)
 
 - `tidypredict_fit()` no longer reads C5.0's `[ordered]` marker as part of the first level of an ordered predictor. (#287)
