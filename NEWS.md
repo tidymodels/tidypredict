@@ -22,6 +22,10 @@
 
 - `tidypredict_fit()` now rejects a `ranger::ranger()` probability or survival forest rather than producing an unusable formula. Neither records a value per leaf, so a guard that read one let both through and emitted `case_when(x <= 0.0066 ~ NULL, .default = NULL)`, which failed later with an unrelated vctrs error; `parse_model()` returned a parsed model with no predictions and no error at all. The forest type is now read from `treetype`. (#301)
 
+- `tidypredict_fit()` now honours an `mstop` reduced after fitting for `mboost` models, as `model[m]` does. Subsetting a fitted model, which is the standard `cvrisk()` workflow, sets `mstop` but leaves the stored ensemble at its full length, so every boosting iteration was used regardless. (#306)
+
+- `tidypredict_fit()` now sends a value sitting exactly on a split boundary the way the model does, for the backends that compare split thresholds as 32-bit floats: `xgboost`, `lightgbm`, `catboost`, `Cubist::cubist()` and `C50::C5.0()`. The boundary is the midpoint between the stored threshold and the adjacent float, and a value can land precisely on it, where rounding to a float is a tie broken towards the even mantissa. About half of all thresholds resolve that tie towards the neighbour rather than the threshold, and those sent such a value down the wrong branch. (#350)
+
 - `tidypredict_fit()` now combines the trials of a boosted `C50::C5.0()` model with the confidence C5.0 votes with, `(freq + prior) / (n_leaf + 1)`, where `prior` is the class proportion at the root of that trial's own tree. It used the Laplace ratio `(freq + 1) / (n_leaf + 2)` instead, which changed the predicted class for 72 of 720 swept configurations. A tie in the total vote now goes to the default class, as `SelectClass` does. (#287)
 
 - `tidypredict_fit()` no longer reads C5.0's `[ordered]` marker as part of the first level of an ordered predictor. (#287)

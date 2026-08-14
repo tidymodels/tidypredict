@@ -29,6 +29,12 @@ mboost_components <- function(model) {
   nu <- get("nu", envir = e)
   offset <- get("offset", envir = e)
 
+  # Subsetting a fitted model (`model[m]`, as the `cvrisk()` workflow does) sets
+  # `mstop` in this same environment but leaves `ens` at its full length, so the
+  # ensemble has to be truncated to the iterations the model actually uses.
+  # Raising `mstop` grows `ens`, so truncation is always the right operation.
+  ens <- ens[seq_len(get("mstop", envir = e))]
+
   tree_info_list <- map(ens, function(bm) {
     te <- rlang::fn_env(bm$predict)
     tree <- get("tree", envir = te)

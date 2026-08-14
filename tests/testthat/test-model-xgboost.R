@@ -245,6 +245,79 @@ test_that("reg:squarederror predictions match native predict", {
   expect_false(result$alert)
 })
 
+test_that("values sitting on a split boundary match native predict", {
+  skip_if_not_installed("xgboost")
+
+  # Every threshold in the generated formula, probed from both sides and from
+  # exactly on it. The last of those is the one worth having: the boundary is
+  # the midpoint between two floats, so a value can land precisely on it, and
+  # which side it belongs to is decided by how xgboost rounds the tie.
+  #
+  # Not `mtcars`: none of the thresholds xgboost picks there resolve the tie
+  # towards the neighbouring float, so the model agrees either way and the probe
+  # proves nothing.
+  set.seed(42)
+  n <- 200
+  df <- data.frame(
+    x1 = round(rnorm(n), 3),
+    x2 = round(runif(n, 0, 10), 3),
+    x3 = round(rnorm(n, 5, 2), 3),
+    x4 = round(runif(n, -3, 3), 3)
+  )
+  df$y <- 2 * df$x1 - 0.5 * df$x2 + sin(df$x3) + rnorm(n, sd = 0.3)
+  cols <- c("x1", "x2", "x3", "x4")
+
+  model <- xgboost::xgb.train(
+    params = list(
+      max_depth = 3L,
+      objective = "reg:squarederror",
+      base_score = 0.5
+    ),
+    data = xgboost::xgb.DMatrix(as.matrix(df[, cols]), label = df$y),
+    nrounds = 5L,
+    verbose = 0
+  )
+  fit <- tidypredict_fit(model)
+
+  thresholds <- list()
+  collect <- function(e) {
+    if (!is.call(e)) {
+      return()
+    }
+    if (identical(as.character(e[[1]])[1], "<") && is.numeric(e[[3]])) {
+      thresholds[[length(thresholds) + 1L]] <<- list(
+        col = as.character(e[[2]]),
+        val = e[[3]]
+      )
+    }
+    for (i in seq_along(e)) {
+      collect(e[[i]])
+    }
+  }
+  collect(fit)
+  expect_gt(length(thresholds), 0)
+
+  probes <- lapply(thresholds, function(th) {
+    row <- df[rep(1, 3), cols, drop = FALSE]
+    for (col in cols) {
+      row[[col]] <- median(df[[col]])
+    }
+    row[[th$col]] <- c(
+      th$val,
+      next_double(th$val, -1),
+      next_double(th$val, 1)
+    )
+    row
+  })
+  probe <- do.call(rbind, probes)
+
+  expect_equal(
+    rlang::eval_tidy(fit, probe),
+    as.numeric(predict(model, as.matrix(probe[, cols]))),
+    tolerance = 1e-6
+  )
+})
+
 test_that("binary:logistic predictions match native predict", {
   skip_if_not_installed("xgboost")
 
