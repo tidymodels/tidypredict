@@ -110,6 +110,31 @@
   overflow.
   ([\#299](https://github.com/tidymodels/tidypredict/issues/299))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now combines the trials of a boosted
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  model with the confidence C5.0 votes with,
+  `(freq + prior) / (n_leaf + 1)`, where `prior` is the class proportion
+  at the root of that trial’s own tree. It used the Laplace ratio
+  `(freq + 1) / (n_leaf + 2)` instead, which changed the predicted class
+  for 72 of 720 swept configurations. A tie in the total vote now goes
+  to the default class, as `SelectClass` does.
+  ([\#287](https://github.com/tidymodels/tidypredict/issues/287))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer reads C5.0’s `[ordered]` marker as part of the first level
+  of an ordered predictor.
+  ([\#287](https://github.com/tidymodels/tidypredict/issues/287))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reports a
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  model that records no tree, rather than failing with “subscript out of
+  bounds”. [`C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  leaves the tree empty when fitting failed, which a predictor name or
+  level containing `,` or `:` causes.
+  ([\#287](https://github.com/tidymodels/tidypredict/issues/287))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual

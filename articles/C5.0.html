@@ -225,109 +225,112 @@ summing the per-trial votes and picking the winning class:</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">boosted_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.980769230769231, </span></span>
+<span><span class="co">#&gt; case_when(case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.986928104575163, </span></span>
 <span><span class="co">#&gt;     .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;         4.90000033378601 ~ 0, .default = 0), .default = 0)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.974901173370145, </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.980750037544786, </span></span>
 <span><span class="co">#&gt;         .default = case_when(Petal.Width &lt;= 1.80000001192093 ~ </span></span>
 <span><span class="co">#&gt;             case_when(Sepal.Length &lt;= 4.90000033378601 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;                 5.30000042915344 ~ 0, .default = 0)), .default = 0)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.967511159916569, </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.972862992140086, </span></span>
 <span><span class="co">#&gt;         .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ </span></span>
 <span><span class="co">#&gt;             0, .default = 0)) + case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
-<span><span class="co">#&gt;     0.960182840396897, .default = case_when(Petal.Width &lt;= 1.30000001192093 ~ </span></span>
+<span><span class="co">#&gt;     0.964921901349655, .default = case_when(Petal.Width &lt;= 1.30000001192093 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = case_when(Petal.Length &lt;= 5.10000014305115 ~ </span></span>
 <span><span class="co">#&gt;     case_when(Sepal.Width &lt;= 3.00000011920929 ~ case_when(Sepal.Length &lt;= </span></span>
 <span><span class="co">#&gt;         6.40000033378601 ~ 0, .default = 0), .default = 0), .default = 0))) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.949491633289054, </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0.953116864464032, </span></span>
 <span><span class="co">#&gt;         .default = case_when(Petal.Length &lt;= 4.80000042915344 ~ </span></span>
 <span><span class="co">#&gt;             case_when(Petal.Width &lt;= 1.6000000834465 ~ 0, .default = 0), </span></span>
 <span><span class="co">#&gt;             .default = 0)) &gt;= case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 4.90000033378601 ~ 0.96, .default = 0), </span></span>
-<span><span class="co">#&gt;     .default = 0)) + case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = case_when(Petal.Width &lt;= 1.80000001192093 ~ </span></span>
-<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 4.90000033378601 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;         5.30000042915344 ~ 0.912209071754808, .default = 0)), </span></span>
-<span><span class="co">#&gt;     .default = 0)) + case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ </span></span>
-<span><span class="co">#&gt;     0.706144609436937, .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 4.90000033378601 ~ 0.965986394557823, </span></span>
+<span><span class="co">#&gt;         .default = 0), .default = 0)) + case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.30000001192093 ~ 0.946093678405667, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
+<span><span class="co">#&gt;     0, .default = case_when(Petal.Length &lt;= 5.30000042915344 ~ </span></span>
+<span><span class="co">#&gt;     0.917112445140911, .default = 0)), .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.70000010728836 ~ 0.707148809111176, .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.30000001192093 ~ 0.961622081550404, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
-<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0, .default = 0.893828235319099), </span></span>
-<span><span class="co">#&gt;     .default = 0.891442575444509), .default = 0))) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0, .default = 0.919992477064947), </span></span>
+<span><span class="co">#&gt;     .default = 0.904467021089548), .default = 0))) + case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
-<span><span class="co">#&gt;     0.976712070366808, .default = 0), .default = 0)) &amp; case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0.980769230769231, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     0.986753757885141, .default = 0), .default = 0)) &amp; case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0.986928104575163, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;     1.70000010728836 ~ case_when(Petal.Length &lt;= 4.90000033378601 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = 0), .default = 0)) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0.974901173370145, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0.980750037544786, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;     1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = case_when(Petal.Length &lt;= 5.30000042915344 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = 0)), .default = 0)) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0.967511159916569, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0.972862992140086, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;     1.70000010728836 ~ 0, .default = 0)) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0.960182840396897, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0.964921901349655, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;     1.30000001192093 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
 <span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0, .default = 0), </span></span>
 <span><span class="co">#&gt;     .default = 0), .default = 0))) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0.949491633289054, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0.953116864464032, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
 <span><span class="co">#&gt;     0, .default = 0), .default = 0)) &gt;= case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;     1.70000010728836 ~ case_when(Petal.Length &lt;= 4.90000033378601 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = 0.625), .default = 0.958333333333333)) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
-<span><span class="co">#&gt;     0.860919094267197, .default = case_when(Petal.Length &lt;= 5.30000042915344 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = 0.875850270460186)), .default = 0.963941744282062)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;         1.70000010728836 ~ 0, .default = 0.852928413186945)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;         1.30000001192093 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;         5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
-<span><span class="co">#&gt;         case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0.828141362462419, </span></span>
-<span><span class="co">#&gt;             .default = 0), .default = 0), .default = 0.961628192534381))) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;         4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = 0.62012436534794), .default = 0.742434886685921)) ~ </span></span>
-<span><span class="co">#&gt;     "setosa", case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, </span></span>
-<span><span class="co">#&gt;     .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;         4.90000033378601 ~ 0.96, .default = 0), .default = 0)) + </span></span>
+<span><span class="co">#&gt;     0, .default = 0.619047619047619), .default = 0.964539007092199)) + </span></span>
 <span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
 <span><span class="co">#&gt;         1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = case_when(Petal.Length &lt;= 5.30000042915344 ~ </span></span>
-<span><span class="co">#&gt;         0.912209071754808, .default = 0)), .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         0.875877142719671, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         5.30000042915344 ~ 0, .default = 0.902629371911377)), </span></span>
+<span><span class="co">#&gt;         .default = 0.974303972508283)) + case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.70000010728836 ~ 0.706144609436937, .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.70000010728836 ~ 0, .default = 0.858214263292205)) + case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.30000001192093 ~ 0.946093678405667, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.30000001192093 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;     5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
-<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0, .default = 0.893828235319099), </span></span>
-<span><span class="co">#&gt;     .default = 0.891442575444509), .default = 0))) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
-<span><span class="co">#&gt;     0.976712070366808, .default = 0), .default = 0)) &gt;= case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.70000010728836 ~ case_when(Petal.Length &lt;= 4.90000033378601 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = 0.625), .default = 0.958333333333333)) + case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
-<span><span class="co">#&gt;     0.860919094267197, .default = case_when(Petal.Length &lt;= 5.30000042915344 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = 0.875850270460186)), .default = 0.963941744282062)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;         1.70000010728836 ~ 0, .default = 0.852928413186945)) + </span></span>
-<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;         1.30000001192093 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
-<span><span class="co">#&gt;         5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
-<span><span class="co">#&gt;         case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0.828141362462419, </span></span>
-<span><span class="co">#&gt;             .default = 0), .default = 0), .default = 0.961628192534381))) + </span></span>
+<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0.833561955435792, </span></span>
+<span><span class="co">#&gt;         .default = 0), .default = 0), .default = 0.980825060120454))) + </span></span>
 <span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
 <span><span class="co">#&gt;         4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = 0.62012436534794), .default = 0.742434886685921)) ~ </span></span>
+<span><span class="co">#&gt;         0, .default = 0.622397900367951), .default = 0.74506520542373)) ~ </span></span>
+<span><span class="co">#&gt;     "setosa", case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, </span></span>
+<span><span class="co">#&gt;     .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         4.90000033378601 ~ 0.965986394557823, .default = 0), </span></span>
+<span><span class="co">#&gt;         .default = 0)) + case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
+<span><span class="co">#&gt;     0, .default = case_when(Petal.Width &lt;= 1.80000001192093 ~ </span></span>
+<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 4.90000033378601 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         5.30000042915344 ~ 0.917112445140911, .default = 0)), </span></span>
+<span><span class="co">#&gt;     .default = 0)) + case_when(Petal.Length &lt;= 1.90000003576279 ~ </span></span>
+<span><span class="co">#&gt;     0, .default = case_when(Petal.Width &lt;= 1.70000010728836 ~ </span></span>
+<span><span class="co">#&gt;     0.707148809111176, .default = 0)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.30000001192093 ~ 0.961622081550404, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
+<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0, .default = 0.919992477064947), </span></span>
+<span><span class="co">#&gt;     .default = 0.904467021089548), .default = 0))) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
+<span><span class="co">#&gt;     0.986753757885141, .default = 0), .default = 0)) &gt;= case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.70000010728836 ~ case_when(Petal.Length &lt;= 4.90000033378601 ~ </span></span>
+<span><span class="co">#&gt;     0, .default = 0.619047619047619), .default = 0.964539007092199)) + </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;         1.80000001192093 ~ case_when(Sepal.Length &lt;= 4.90000033378601 ~ </span></span>
+<span><span class="co">#&gt;         0.875877142719671, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         5.30000042915344 ~ 0, .default = 0.902629371911377)), </span></span>
+<span><span class="co">#&gt;         .default = 0.974303972508283)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.70000010728836 ~ 0, .default = 0.858214263292205)) + case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     1.90000003576279 ~ 0, .default = case_when(Petal.Width &lt;= </span></span>
+<span><span class="co">#&gt;     1.30000001192093 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;     5.10000014305115 ~ case_when(Sepal.Width &lt;= 3.00000011920929 ~ </span></span>
+<span><span class="co">#&gt;     case_when(Sepal.Length &lt;= 6.40000033378601 ~ 0.833561955435792, </span></span>
+<span><span class="co">#&gt;         .default = 0), .default = 0), .default = 0.980825060120454))) + </span></span>
+<span><span class="co">#&gt;     case_when(Petal.Length &lt;= 1.90000003576279 ~ 0, .default = case_when(Petal.Length &lt;= </span></span>
+<span><span class="co">#&gt;         4.80000042915344 ~ case_when(Petal.Width &lt;= 1.6000000834465 ~ </span></span>
+<span><span class="co">#&gt;         0, .default = 0.622397900367951), .default = 0.74506520542373)) ~ </span></span>
 <span><span class="co">#&gt;     "versicolor", .default = "virginica")</span></span></code></pre></div>
 </div>
 <div class="section level2">
