@@ -156,6 +156,33 @@ test_that("classification models error with clear message (#191)", {
   expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
+test_that("probability and survival forests error with clear message (#301)", {
+  skip_if_not_installed("ranger")
+
+  # Neither has a `prediction` column in `treeInfo()`, so a guard reading a leaf
+  # value let both through and emitted `case_when(... ~ NULL)`.
+  model <- ranger::ranger(
+    Species ~ Sepal.Length + Sepal.Width,
+    data = iris,
+    num.trees = 3,
+    probability = TRUE,
+    seed = 123
+  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
+  expect_snapshot(parse_model(model), error = TRUE)
+
+  skip_if_not_installed("survival")
+  df <- transform(mtcars, status = as.integer(am))
+  model <- ranger::ranger(
+    survival::Surv(mpg, status) ~ wt + disp,
+    data = df,
+    num.trees = 3,
+    seed = 123
+  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
+  expect_snapshot(parse_model(model), error = TRUE)
+})
+
 # Tests for .extract_ranger_classprob()
 
 test_that(".extract_ranger_classprob returns correct structure", {
