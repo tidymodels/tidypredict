@@ -71,6 +71,29 @@
   `f.L` matches no row, so the term was dropped without complaint.
   ([\#343](https://github.com/tidymodels/tidypredict/issues/343))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now routes missing values by each node’s `missing_type` for `lightgbm`
+  models, matching [`predict()`](https://rdrr.io/r/stats/predict.html).
+  LightGBM consults `default_left` only when `missing_type` is `NaN` or
+  `Zero`; a feature with no missing value in the training data gets
+  `None`, where a missing value is coerced to `0` and compared against
+  the threshold like any other. Routing purely by `default_left` was
+  wrong for every model trained without missing data, which is the
+  common case.
+  ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now honours `zero_as_missing` for `lightgbm` models, where an exact
+  zero takes the same branch as a missing value. Predictions were wrong
+  on the training data itself, not only on new zeros.
+  ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer sends a missing value down the left branch of a categorical
+  split for `lightgbm` models. LightGBM sends it right whatever
+  `default_left` says.
+  ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual

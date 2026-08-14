@@ -172,40 +172,39 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 7 | is.na(cyl) ~ 122.371527777778, .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     15.1 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
-<span><span class="co">#&gt;     240.84375, .default = 187.34375), .default = 164.21875)) + </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 20.35 | is.na(mpg) ~ case_when(mpg &lt;= 15.1 | </span></span>
-<span><span class="co">#&gt;         is.na(mpg) ~ 24.7864583333333, .default = 7.36516196529071), </span></span>
-<span><span class="co">#&gt;         .default = case_when(mpg &lt;= 23.6 | is.na(mpg) ~ -9.47147832598005, </span></span>
-<span><span class="co">#&gt;             .default = -24.4000499589103)) + case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     21.45 | is.na(mpg) ~ case_when(mpg &lt;= 17.55 | is.na(mpg) ~ </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 15.65 | is.na(mpg) ~ 6.33150075541602, .default = 18.2080434163411), </span></span>
-<span><span class="co">#&gt;     .default = 0.0642609119415283), .default = -11.2250245332718) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 334 | is.na(disp) ~ case_when(mpg &lt;= 15.1 | </span></span>
-<span><span class="co">#&gt;         is.na(mpg) ~ 31.5191459655761, .default = -4.16611832639445), </span></span>
-<span><span class="co">#&gt;         .default = case_when(disp &lt;= 380 | is.na(disp) ~ 16.3295566439629, </span></span>
-<span><span class="co">#&gt;             .default = -0.254162490367889)) + case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     78.85 | is.na(disp) ~ -10.7901678085327, .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     28.85 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
-<span><span class="co">#&gt;     -0.749505842104554, .default = 4.01884852349758), .default = 15.2098321914673)) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 78.85 | is.na(disp) ~ -5.39508358637492, </span></span>
-<span><span class="co">#&gt;         .default = case_when(disp &lt;= 466 | is.na(disp) ~ case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;             15.1 | is.na(mpg) ~ 4.51956310272216, .default = 0.0956797075012456), </span></span>
-<span><span class="co">#&gt;             .default = -8.61319732666016)) + case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     21.45 | is.na(mpg) ~ case_when(disp &lt;= 153.35 | is.na(disp) ~ </span></span>
-<span><span class="co">#&gt;     case_when(cyl &lt;= 5 | is.na(cyl) ~ 0.427817046642302, .default = 25.0094966888427), </span></span>
-<span><span class="co">#&gt;     .default = -0.436469084024429), .default = -1.67079323530197) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 334 | is.na(disp) ~ case_when(mpg &lt;= 15.1 | </span></span>
-<span><span class="co">#&gt;         is.na(mpg) ~ 14.0927782058715, .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         288.4 | is.na(disp) ~ -0.208523882286889, .default = -11.3294992446899)), </span></span>
-<span><span class="co">#&gt;         .default = 1.61815292341635) + case_when(mpg &lt;= 13.8 | </span></span>
-<span><span class="co">#&gt;     is.na(mpg) ~ -3.70564748346806, .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     17.55 | is.na(mpg) ~ case_when(disp &lt;= 334 | is.na(disp) ~ </span></span>
-<span><span class="co">#&gt;     -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 380 | is.na(disp) ~ case_when(mpg &lt;= 17.55 | </span></span>
-<span><span class="co">#&gt;         is.na(mpg) ~ 1.89159697956509, .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;         18.95 | is.na(mpg) ~ -6.20051162441571, .default = 0.834156103432178)), </span></span>
+<span><span class="co">#&gt; case_when(is.na(cyl) | cyl &lt;= 7 ~ 122.371527777778, .default = case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;     mpg &lt;= 15.1 ~ case_when(is.na(disp) | disp &lt;= 334 ~ 240.84375, </span></span>
+<span><span class="co">#&gt;     .default = 187.34375), .default = 164.21875)) + case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;     mpg &lt;= 20.35 ~ case_when(is.na(mpg) | mpg &lt;= 15.1 ~ 24.7864583333333, </span></span>
+<span><span class="co">#&gt;     .default = 7.36516196529071), .default = case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;     mpg &lt;= 23.6 ~ -9.47147832598005, .default = -24.4000499589103)) + </span></span>
+<span><span class="co">#&gt;     case_when(is.na(mpg) | mpg &lt;= 21.45 ~ case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;         mpg &lt;= 17.55 ~ case_when(is.na(mpg) | mpg &lt;= 15.65 ~ </span></span>
+<span><span class="co">#&gt;         6.33150075541602, .default = 18.2080434163411), .default = 0.0642609119415283), </span></span>
+<span><span class="co">#&gt;         .default = -11.2250245332718) + case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;     disp &lt;= 334 ~ case_when(is.na(mpg) | mpg &lt;= 15.1 ~ 31.5191459655761, </span></span>
+<span><span class="co">#&gt;     .default = -4.16611832639445), .default = case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;     disp &lt;= 380 ~ 16.3295566439629, .default = -0.254162490367889)) + </span></span>
+<span><span class="co">#&gt;     case_when(is.na(disp) | disp &lt;= 78.85 ~ -10.7901678085327, </span></span>
+<span><span class="co">#&gt;         .default = case_when(is.na(mpg) | mpg &lt;= 28.85 ~ case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;             disp &lt;= 334 ~ -0.749505842104554, .default = 4.01884852349758), </span></span>
+<span><span class="co">#&gt;             .default = 15.2098321914673)) + case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;     disp &lt;= 78.85 ~ -5.39508358637492, .default = case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;     disp &lt;= 466 ~ case_when(is.na(mpg) | mpg &lt;= 15.1 ~ 4.51956310272216, </span></span>
+<span><span class="co">#&gt;     .default = 0.0956797075012456), .default = -8.61319732666016)) + </span></span>
+<span><span class="co">#&gt;     case_when(is.na(mpg) | mpg &lt;= 21.45 ~ case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;         disp &lt;= 153.35 ~ case_when(is.na(cyl) | cyl &lt;= 5 ~ 0.427817046642302, </span></span>
+<span><span class="co">#&gt;         .default = 25.0094966888427), .default = -0.436469084024429), </span></span>
+<span><span class="co">#&gt;         .default = -1.67079323530197) + case_when(is.na(disp) | </span></span>
+<span><span class="co">#&gt;     disp &lt;= 334 ~ case_when(is.na(mpg) | mpg &lt;= 15.1 ~ 14.0927782058715, </span></span>
+<span><span class="co">#&gt;     .default = case_when(is.na(disp) | disp &lt;= 288.4 ~ -0.208523882286889, </span></span>
+<span><span class="co">#&gt;         .default = -11.3294992446899)), .default = 1.61815292341635) + </span></span>
+<span><span class="co">#&gt;     case_when(is.na(mpg) | mpg &lt;= 13.8 ~ -3.70564748346806, .default = case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;         mpg &lt;= 17.55 ~ case_when(is.na(disp) | disp &lt;= 334 ~ </span></span>
+<span><span class="co">#&gt;         -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + </span></span>
+<span><span class="co">#&gt;     case_when(is.na(disp) | disp &lt;= 380 ~ case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;         mpg &lt;= 17.55 ~ 1.89159697956509, .default = case_when(is.na(mpg) | </span></span>
+<span><span class="co">#&gt;         mpg &lt;= 18.95 ~ -6.20051162441571, .default = 0.834156103432178)), </span></span>
 <span><span class="co">#&gt;         .default = -2.94233404099941)</span></span></code></pre></div>
 </li>
 <li>
@@ -470,72 +469,90 @@ package) are also supported by <code>tidypredict</code>:</p>
 <span><span class="co">#&gt;   .. ..$ prediction: num 122</span></span>
 <span><span class="co">#&gt;   .. ..$ linear    : NULL</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 1</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "cyl"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 7</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "cyl"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "less-equal"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
 <span><span class="co">#&gt;   ..$ :List of 3</span></span>
 <span><span class="co">#&gt;   .. ..$ prediction: num 241</span></span>
 <span><span class="co">#&gt;   .. ..$ linear    : NULL</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 3</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "cyl"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 7</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "mpg"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 15.1</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "disp"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 334</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "cyl"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "more"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "mpg"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 15.1</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "less-equal"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "disp"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 334</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "less-equal"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
 <span><span class="co">#&gt;   ..$ :List of 3</span></span>
 <span><span class="co">#&gt;   .. ..$ prediction: num 187</span></span>
 <span><span class="co">#&gt;   .. ..$ linear    : NULL</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 3</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "cyl"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 7</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "mpg"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 15.1</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "less-equal"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi TRUE</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "disp"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 334</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "cyl"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "more"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "mpg"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 15.1</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "less-equal"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "disp"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 334</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "more"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
 <span><span class="co">#&gt;   ..$ :List of 3</span></span>
 <span><span class="co">#&gt;   .. ..$ prediction: num 164</span></span>
 <span><span class="co">#&gt;   .. ..$ linear    : NULL</span></span>
 <span><span class="co">#&gt;   .. ..$ path      :List of 2</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "cyl"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 7</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span>
-<span><span class="co">#&gt;   .. .. ..$ :List of 5</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ type   : chr "conditional"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ col    : chr "mpg"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ val    : num 15.1</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ op     : chr "more"</span></span>
-<span><span class="co">#&gt;   .. .. .. ..$ missing: logi FALSE</span></span></code></pre></div>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "cyl"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "more"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span>
+<span><span class="co">#&gt;   .. .. ..$ :List of 7</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ type        : chr "conditional"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ col         : chr "mpg"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ val         : num 15.1</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ op          : chr "more"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing     : logi FALSE</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ missing_type: chr "None"</span></span>
+<span><span class="co">#&gt;   .. .. .. ..$ default_left: logi TRUE</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
