@@ -176,16 +176,16 @@ the output is a list, <code><a href="../reference/tidypredict_to_column.html">ti
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-15.7712902867569 + (Sepal.Length * 6.44363108028106) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;     12.3870583475541) + (Petal.Length * -17.2922700522406) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -21.1939332574676))/(exp(-15.7712902867569 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 6.44363108028106) + (Sepal.Width * 12.3870583475541) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -17.2922700522406) + (Petal.Width * -21.1939332574676)) + </span></span>
-<span><span class="co">#&gt;     exp(-2.040818273459 + (Sepal.Length * -1.5624481512317) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * -4.4653504874401) + (Petal.Length * 4.7914952101148) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 3.12508713229903)) + exp(-34.1997086671406 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.88118292904936) + (Sepal.Width * -7.92170786011395) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.5007748421258) + (Petal.Width * 18.0688461251685)))</span></span></code></pre></div>
+<span><span class="co">#&gt; 1/(1 + exp(-2.040818273459 + (Sepal.Length * -1.5624481512317) + </span></span>
+<span><span class="co">#&gt;     (Sepal.Width * -4.4653504874401) + (Petal.Length * 4.7914952101148) + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * 3.12508713229903) - (-15.7712902867569 + (Sepal.Length * </span></span>
+<span><span class="co">#&gt;     6.44363108028106) + (Sepal.Width * 12.3870583475541) + (Petal.Length * </span></span>
+<span><span class="co">#&gt;     -17.2922700522406) + (Petal.Width * -21.1939332574676))) + </span></span>
+<span><span class="co">#&gt;     exp(-34.1997086671406 + (Sepal.Length * -4.88118292904936) + </span></span>
+<span><span class="co">#&gt;         (Sepal.Width * -7.92170786011395) + (Petal.Length * 12.5007748421258) + </span></span>
+<span><span class="co">#&gt;         (Petal.Width * 18.0688461251685) - (-15.7712902867569 + </span></span>
+<span><span class="co">#&gt;         (Sepal.Length * 6.44363108028106) + (Sepal.Width * 12.3870583475541) + </span></span>
+<span><span class="co">#&gt;         (Petal.Length * -17.2922700522406) + (Petal.Width * -21.1939332574676))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -230,16 +230,17 @@ results</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-33.2183837928001 + (Sepal.Length * -4.41029984072515) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * -6.75173810807853) + (Petal.Length * 12.0386389001351) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * 14.7915580954522))/(exp(-11.9575128198863 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 5.80316342827786) + (Sepal.Width * 10.8028995796442) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -16.5217691675753) + (Petal.Width * -17.3381617005553)) + </span></span>
+<span><span class="co">#&gt; 1/(exp(-11.9575128198863 + (Sepal.Length * 5.80316342827786) + </span></span>
+<span><span class="co">#&gt;     (Sepal.Width * 10.8028995796442) + (Petal.Length * -16.5217691675753) + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * -17.3381617005553) - (-33.2183837928001 + </span></span>
+<span><span class="co">#&gt;     (Sepal.Length * -4.41029984072515) + (Sepal.Width * -6.75173810807853) + </span></span>
+<span><span class="co">#&gt;     (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954522))) + </span></span>
 <span><span class="co">#&gt;     exp(-2.27975663240445 + (Sepal.Length * -1.3928635875527) + </span></span>
 <span><span class="co">#&gt;         (Sepal.Width * -4.05116147156568) + (Petal.Length * 4.48313026744016) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 2.5466036051031)) + exp(-33.2183837928001 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -4.41029984072515) + (Sepal.Width * -6.75173810807853) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954522)))</span></span></code></pre></div>
+<span><span class="co">#&gt;         (Petal.Width * 2.5466036051031) - (-33.2183837928001 + </span></span>
+<span><span class="co">#&gt;         (Sepal.Length * -4.41029984072515) + (Sepal.Width * -6.75173810807853) + </span></span>
+<span><span class="co">#&gt;         (Petal.Length * 12.0386389001351) + (Petal.Width * 14.7915580954522))) + </span></span>
+<span><span class="co">#&gt;     1)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>

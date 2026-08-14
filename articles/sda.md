@@ -38,16 +38,16 @@ model <- sda::sda(as.matrix(iris[1:4]), iris$Species, verbose = FALSE)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(-13.1507094677661 + (Sepal.Length * 5.73266109594551) + (Sepal.Width * 
-  #>     11.3604293693889) + (Petal.Length * -16.8084846238171) + 
-  #>     (Petal.Width * -16.6240117338795))/(exp(-13.1507094677661 + 
-  #>     (Sepal.Length * 5.73266109594551) + (Sepal.Width * 11.3604293693889) + 
-  #>     (Petal.Length * -16.8084846238171) + (Petal.Width * -16.6240117338795)) + 
-  #>     exp(-2.17403913501322 + (Sepal.Length * -1.38327577793292) + 
-  #>         (Sepal.Width * -4.20634050168124) + (Petal.Length * 4.57106120700443) + 
-  #>         (Petal.Width * 2.49705634843865)) + exp(-32.2372116751408 + 
-  #>     (Sepal.Length * -4.3493853180126) + (Sepal.Width * -7.15408886770766) + 
-  #>     (Petal.Length * 12.2374234168126) + (Petal.Width * 14.1269553854408)))
+  #> 1/(1 + exp(-2.17403913501322 + (Sepal.Length * -1.38327577793292) + 
+  #>     (Sepal.Width * -4.20634050168124) + (Petal.Length * 4.57106120700443) + 
+  #>     (Petal.Width * 2.49705634843865) - (-13.1507094677661 + (Sepal.Length * 
+  #>     5.73266109594551) + (Sepal.Width * 11.3604293693889) + (Petal.Length * 
+  #>     -16.8084846238171) + (Petal.Width * -16.6240117338795))) + 
+  #>     exp(-32.2372116751408 + (Sepal.Length * -4.3493853180126) + 
+  #>         (Sepal.Width * -7.15408886770766) + (Petal.Length * 12.2374234168126) + 
+  #>         (Petal.Width * 14.1269553854408) - (-13.1507094677661 + 
+  #>         (Sepal.Length * 5.73266109594551) + (Sepal.Width * 11.3604293693889) + 
+  #>         (Petal.Length * -16.8084846238171) + (Petal.Width * -16.6240117338795))))
   ```
 
 - Add the predictions to the original table
@@ -79,7 +79,7 @@ model <- sda::sda(as.matrix(iris[1:4]), iris$Species, verbose = FALSE)
   probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
   posterior <- sda::predict.sda(model, as.matrix(iris[1:4]), verbose = FALSE)
   all.equal(unname(probs), unname(posterior$posterior))
-  #> [1] "Mean relative difference: 4.212717e-08"
+  #> [1] "Mean relative difference: 4.24967e-08"
   ```
 
 `sda()` rounds its posterior probabilities with
@@ -103,16 +103,17 @@ p_model <- discrim_linear() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-32.2372116751408 + (Sepal.Length * -4.3493853180126) + (Sepal.Width * 
-#>     -7.15408886770766) + (Petal.Length * 12.2374234168126) + 
-#>     (Petal.Width * 14.1269553854408))/(exp(-13.1507094677661 + 
-#>     (Sepal.Length * 5.73266109594551) + (Sepal.Width * 11.3604293693889) + 
-#>     (Petal.Length * -16.8084846238171) + (Petal.Width * -16.6240117338795)) + 
+#> 1/(exp(-13.1507094677661 + (Sepal.Length * 5.73266109594551) + 
+#>     (Sepal.Width * 11.3604293693889) + (Petal.Length * -16.8084846238171) + 
+#>     (Petal.Width * -16.6240117338795) - (-32.2372116751408 + 
+#>     (Sepal.Length * -4.3493853180126) + (Sepal.Width * -7.15408886770766) + 
+#>     (Petal.Length * 12.2374234168126) + (Petal.Width * 14.1269553854408))) + 
 #>     exp(-2.17403913501322 + (Sepal.Length * -1.38327577793292) + 
 #>         (Sepal.Width * -4.20634050168124) + (Petal.Length * 4.57106120700443) + 
-#>         (Petal.Width * 2.49705634843865)) + exp(-32.2372116751408 + 
-#>     (Sepal.Length * -4.3493853180126) + (Sepal.Width * -7.15408886770766) + 
-#>     (Petal.Length * 12.2374234168126) + (Petal.Width * 14.1269553854408)))
+#>         (Petal.Width * 2.49705634843865) - (-32.2372116751408 + 
+#>         (Sepal.Length * -4.3493853180126) + (Sepal.Width * -7.15408886770766) + 
+#>         (Petal.Length * 12.2374234168126) + (Petal.Width * 14.1269553854408))) + 
+#>     1)
 ```
 
 `sda()` is fit from a numeric matrix, so a model fit directly can only
@@ -130,17 +131,19 @@ c_model <- discrim_linear() %>%
   fit(cyl ~ mpg + gear + disp, data = cars)
 
 tidypredict_fit(c_model)[["8"]]
-#> exp(-9.69338951858338 + (mpg * -0.300898442298615) + (ifelse(gear == 
-#>     "4", 1, 0) * -0.288744001063274) + (ifelse(gear == "5", 1, 
-#>     0) * 0.346792280462239) + (disp * 0.0491641125277206))/(exp(-5.90478040863942 + 
-#>     (mpg * 0.450539182424721) + (ifelse(gear == "4", 1, 0) * 
-#>     0.120334811858762) + (ifelse(gear == "5", 1, 0) * -0.326397688436066) + 
-#>     (disp * -0.0361970033802603)) + exp(4.8234106925129 + (mpg * 
-#>     -0.14546309773062) + (ifelse(gear == "4", 1, 0) * 0.18956123261121) + 
-#>     (ifelse(gear == "5", 1, 0) * -0.0358060646840222) + (disp * 
-#>     -0.0157055813201664)) + exp(-9.69338951858338 + (mpg * -0.300898442298615) + 
-#>     (ifelse(gear == "4", 1, 0) * -0.288744001063274) + (ifelse(gear == 
-#>     "5", 1, 0) * 0.346792280462239) + (disp * 0.0491641125277206)))
+#> 1/(exp(-5.90478040863942 + (mpg * 0.450539182424721) + (ifelse(gear == 
+#>     "4", 1, 0) * 0.120334811858762) + (ifelse(gear == "5", 1, 
+#>     0) * -0.326397688436066) + (disp * -0.0361970033802603) - 
+#>     (-9.69338951858338 + (mpg * -0.300898442298615) + (ifelse(gear == 
+#>         "4", 1, 0) * -0.288744001063274) + (ifelse(gear == "5", 
+#>         1, 0) * 0.346792280462239) + (disp * 0.0491641125277206))) + 
+#>     exp(4.8234106925129 + (mpg * -0.14546309773062) + (ifelse(gear == 
+#>         "4", 1, 0) * 0.18956123261121) + (ifelse(gear == "5", 
+#>         1, 0) * -0.0358060646840222) + (disp * -0.0157055813201664) - 
+#>         (-9.69338951858338 + (mpg * -0.300898442298615) + (ifelse(gear == 
+#>             "4", 1, 0) * -0.288744001063274) + (ifelse(gear == 
+#>             "5", 1, 0) * 0.346792280462239) + (disp * 0.0491641125277206))) + 
+#>     1)
 ```
 
 ## Parse model spec

@@ -94,6 +94,22 @@
   `default_left` says.
   ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer returns `NaN` for every class probability of a row whose
+  class scores are large, for any model whose prediction is a softmax:
+  [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html),
+  [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html),
+  [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html), `sparsediscrim`,
+  `sda`, `mixOmics`,
+  [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html),
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html), multinomial
+  `glmnet`, naive Bayes, `h2o`, `lightgbm` and `catboost`. The
+  probabilities were written as `exp(s) / sum(exp(s))`, which is
+  `Inf / Inf` once a score passes about 710. They are now written as
+  `1 / sum(exp(s_j - s_k))`, which is the same quantity and cannot
+  overflow.
+  ([\#299](https://github.com/tidymodels/tidypredict/issues/299))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual

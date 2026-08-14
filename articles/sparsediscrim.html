@@ -174,16 +174,16 @@ are not supported.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-107.930781085437 + (Sepal.Length * 19.2754940163568) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;     30.314821365405) + (Petal.Length * 8.05580657248022) + (Petal.Width * </span></span>
-<span><span class="co">#&gt;     5.99356787837443))/(exp(-107.930781085437 + (Sepal.Length * </span></span>
+<span><span class="co">#&gt; 1/(1 + exp(-174.280588008602 + (Sepal.Length * 22.8564387696952) + </span></span>
+<span><span class="co">#&gt;     (Sepal.Width * 24.4959320834807) + (Petal.Length * 23.4731436380067) + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * 32.3067927102622) - (-107.930781085437 + (Sepal.Length * </span></span>
 <span><span class="co">#&gt;     19.2754940163568) + (Sepal.Width * 30.314821365405) + (Petal.Length * </span></span>
-<span><span class="co">#&gt;     8.05580657248022) + (Petal.Width * 5.99356787837443)) + exp(-174.280588008602 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 22.8564387696952) + (Sepal.Width * 24.4959320834807) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 23.4731436380067) + (Petal.Width * 32.3067927102622)) + </span></span>
+<span><span class="co">#&gt;     8.05580657248022) + (Petal.Width * 5.99356787837443))) + </span></span>
 <span><span class="co">#&gt;     exp(-258.692783489496 + (Sepal.Length * 25.3669505752614) + </span></span>
 <span><span class="co">#&gt;         (Sepal.Width * 26.2999646268129) + (Petal.Length * 30.5922285160124) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 49.3616606568561)))</span></span></code></pre></div>
+<span><span class="co">#&gt;         (Petal.Width * 49.3616606568561) - (-107.930781085437 + </span></span>
+<span><span class="co">#&gt;         (Sepal.Length * 19.2754940163568) + (Sepal.Width * 30.314821365405) + </span></span>
+<span><span class="co">#&gt;         (Petal.Length * 8.05580657248022) + (Petal.Width * 5.99356787837443))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -237,16 +237,17 @@ pseudo-inverse of that covariance, so they agree with the model’s
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;     26.3045842550727) + (Petal.Length * 30.5894466999551) + (Petal.Width * </span></span>
-<span><span class="co">#&gt;     49.3835915687182))/(exp(-107.926997081959 + (Sepal.Length * </span></span>
-<span><span class="co">#&gt;     19.2748057606989) + (Sepal.Width * 30.314250317313) + (Petal.Length * </span></span>
-<span><span class="co">#&gt;     8.05623454310998) + (Petal.Width * 5.99760378610459)) + exp(-174.286289444853 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * 22.8540964892416) + (Sepal.Width * 24.4977601426385) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 23.4721691446234) + (Petal.Width * 32.3208860491096)) + </span></span>
-<span><span class="co">#&gt;     exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * 26.3045842550727) + (Petal.Length * 30.5894466999551) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 49.3835915687182)))</span></span></code></pre></div>
+<span><span class="co">#&gt; 1/(exp(-107.926997081959 + (Sepal.Length * 19.2748057606989) + </span></span>
+<span><span class="co">#&gt;     (Sepal.Width * 30.314250317313) + (Petal.Length * 8.05623454310998) + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * 5.99760378610459) - (-258.712244691324 + (Sepal.Length * </span></span>
+<span><span class="co">#&gt;     25.3634171269089) + (Sepal.Width * 26.3045842550727) + (Petal.Length * </span></span>
+<span><span class="co">#&gt;     30.5894466999551) + (Petal.Width * 49.3835915687182))) + </span></span>
+<span><span class="co">#&gt;     exp(-174.286289444853 + (Sepal.Length * 22.8540964892416) + </span></span>
+<span><span class="co">#&gt;         (Sepal.Width * 24.4977601426385) + (Petal.Length * 23.4721691446234) + </span></span>
+<span><span class="co">#&gt;         (Petal.Width * 32.3208860491096) - (-258.712244691324 + </span></span>
+<span><span class="co">#&gt;         (Sepal.Length * 25.3634171269089) + (Sepal.Width * 26.3045842550727) + </span></span>
+<span><span class="co">#&gt;         (Petal.Length * 30.5894466999551) + (Petal.Width * 49.3835915687182))) + </span></span>
+<span><span class="co">#&gt;     1)</span></span></code></pre></div>
 <p>These models are fit from a numeric matrix, so a model fit with the
 <code>x</code>/<code>y</code> interface can only refer to the matrix
 columns it was given. Categorical predictors work through the formula
@@ -261,15 +262,12 @@ original factors:</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">vs</span> <span class="op">~</span> <span class="va">mpg</span> <span class="op">+</span> <span class="va">gear</span> <span class="op">+</span> <span class="va">disp</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"1"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-19.1256693330579 + (mpg * 1.24829943936813) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "4", 1, 0) * 4.93150684931507) + (ifelse(gear == "5", 1, </span></span>
-<span><span class="co">#&gt;     0) * 0.565815324165029) + (disp * 0.0179710473492101))/(exp(-14.23117559104 + </span></span>
-<span><span class="co">#&gt;     (mpg * 0.844665676493137) + (ifelse(gear == "4", 1, 0) * </span></span>
-<span><span class="co">#&gt;     0.767123287671233) + (ifelse(gear == "5", 1, 0) * 1.76031434184676) + </span></span>
-<span><span class="co">#&gt;     (disp * 0.0416724011574301)) + exp(-19.1256693330579 + (mpg * </span></span>
-<span><span class="co">#&gt;     1.24829943936813) + (ifelse(gear == "4", 1, 0) * 4.93150684931507) + </span></span>
+<span><span class="co">#&gt; 1/(exp(-14.23117559104 + (mpg * 0.844665676493137) + (ifelse(gear == </span></span>
+<span><span class="co">#&gt;     "4", 1, 0) * 0.767123287671233) + (ifelse(gear == "5", 1, </span></span>
+<span><span class="co">#&gt;     0) * 1.76031434184676) + (disp * 0.0416724011574301) - (-19.1256693330579 + </span></span>
+<span><span class="co">#&gt;     (mpg * 1.24829943936813) + (ifelse(gear == "4", 1, 0) * 4.93150684931507) + </span></span>
 <span><span class="co">#&gt;     (ifelse(gear == "5", 1, 0) * 0.565815324165029) + (disp * </span></span>
-<span><span class="co">#&gt;     0.0179710473492101)))</span></span></code></pre></div>
+<span><span class="co">#&gt;     0.0179710473492101))) + 1)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>

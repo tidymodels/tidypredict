@@ -44,16 +44,16 @@ model <- sparsediscrim::lda_diag(Species ~ ., data = iris)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(-107.930781085437 + (Sepal.Length * 19.2754940163568) + (Sepal.Width * 
-  #>     30.314821365405) + (Petal.Length * 8.05580657248022) + (Petal.Width * 
-  #>     5.99356787837443))/(exp(-107.930781085437 + (Sepal.Length * 
+  #> 1/(1 + exp(-174.280588008602 + (Sepal.Length * 22.8564387696952) + 
+  #>     (Sepal.Width * 24.4959320834807) + (Petal.Length * 23.4731436380067) + 
+  #>     (Petal.Width * 32.3067927102622) - (-107.930781085437 + (Sepal.Length * 
   #>     19.2754940163568) + (Sepal.Width * 30.314821365405) + (Petal.Length * 
-  #>     8.05580657248022) + (Petal.Width * 5.99356787837443)) + exp(-174.280588008602 + 
-  #>     (Sepal.Length * 22.8564387696952) + (Sepal.Width * 24.4959320834807) + 
-  #>     (Petal.Length * 23.4731436380067) + (Petal.Width * 32.3067927102622)) + 
+  #>     8.05580657248022) + (Petal.Width * 5.99356787837443))) + 
   #>     exp(-258.692783489496 + (Sepal.Length * 25.3669505752614) + 
   #>         (Sepal.Width * 26.2999646268129) + (Petal.Length * 30.5922285160124) + 
-  #>         (Petal.Width * 49.3616606568561)))
+  #>         (Petal.Width * 49.3616606568561) - (-107.930781085437 + 
+  #>         (Sepal.Length * 19.2754940163568) + (Sepal.Width * 30.314821365405) + 
+  #>         (Petal.Length * 8.05580657248022) + (Petal.Width * 5.99356787837443))))
   ```
 
 - Add the predictions to the original table
@@ -114,16 +114,17 @@ p_model <- discrim_linear(regularization_method = "shrink_mean") %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + (Sepal.Width * 
-#>     26.3045842550727) + (Petal.Length * 30.5894466999551) + (Petal.Width * 
-#>     49.3835915687182))/(exp(-107.926997081959 + (Sepal.Length * 
-#>     19.2748057606989) + (Sepal.Width * 30.314250317313) + (Petal.Length * 
-#>     8.05623454310998) + (Petal.Width * 5.99760378610459)) + exp(-174.286289444853 + 
-#>     (Sepal.Length * 22.8540964892416) + (Sepal.Width * 24.4977601426385) + 
-#>     (Petal.Length * 23.4721691446234) + (Petal.Width * 32.3208860491096)) + 
-#>     exp(-258.712244691324 + (Sepal.Length * 25.3634171269089) + 
-#>         (Sepal.Width * 26.3045842550727) + (Petal.Length * 30.5894466999551) + 
-#>         (Petal.Width * 49.3835915687182)))
+#> 1/(exp(-107.926997081959 + (Sepal.Length * 19.2748057606989) + 
+#>     (Sepal.Width * 30.314250317313) + (Petal.Length * 8.05623454310998) + 
+#>     (Petal.Width * 5.99760378610459) - (-258.712244691324 + (Sepal.Length * 
+#>     25.3634171269089) + (Sepal.Width * 26.3045842550727) + (Petal.Length * 
+#>     30.5894466999551) + (Petal.Width * 49.3835915687182))) + 
+#>     exp(-174.286289444853 + (Sepal.Length * 22.8540964892416) + 
+#>         (Sepal.Width * 24.4977601426385) + (Petal.Length * 23.4721691446234) + 
+#>         (Petal.Width * 32.3208860491096) - (-258.712244691324 + 
+#>         (Sepal.Length * 25.3634171269089) + (Sepal.Width * 26.3045842550727) + 
+#>         (Petal.Length * 30.5894466999551) + (Petal.Width * 49.3835915687182))) + 
+#>     1)
 ```
 
 These models are fit from a numeric matrix, so a model fit with the
@@ -141,15 +142,12 @@ c_model <- discrim_linear() %>%
   fit(vs ~ mpg + gear + disp, data = cars)
 
 tidypredict_fit(c_model)[["1"]]
-#> exp(-19.1256693330579 + (mpg * 1.24829943936813) + (ifelse(gear == 
-#>     "4", 1, 0) * 4.93150684931507) + (ifelse(gear == "5", 1, 
-#>     0) * 0.565815324165029) + (disp * 0.0179710473492101))/(exp(-14.23117559104 + 
-#>     (mpg * 0.844665676493137) + (ifelse(gear == "4", 1, 0) * 
-#>     0.767123287671233) + (ifelse(gear == "5", 1, 0) * 1.76031434184676) + 
-#>     (disp * 0.0416724011574301)) + exp(-19.1256693330579 + (mpg * 
-#>     1.24829943936813) + (ifelse(gear == "4", 1, 0) * 4.93150684931507) + 
+#> 1/(exp(-14.23117559104 + (mpg * 0.844665676493137) + (ifelse(gear == 
+#>     "4", 1, 0) * 0.767123287671233) + (ifelse(gear == "5", 1, 
+#>     0) * 1.76031434184676) + (disp * 0.0416724011574301) - (-19.1256693330579 + 
+#>     (mpg * 1.24829943936813) + (ifelse(gear == "4", 1, 0) * 4.93150684931507) + 
 #>     (ifelse(gear == "5", 1, 0) * 0.565815324165029) + (disp * 
-#>     0.0179710473492101)))
+#>     0.0179710473492101))) + 1)
 ```
 
 ## Parse model spec

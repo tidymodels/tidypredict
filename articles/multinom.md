@@ -40,11 +40,12 @@ model <- multinom(Species ~ ., data = iris, trace = FALSE)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(0)/(exp(0) + exp(18.6903742569359 + (Sepal.Length * -5.458424007004) + 
+  #> 1/(1 + exp(18.6903742569359 + (Sepal.Length * -5.458424007004) + 
   #>     (Sepal.Width * -8.70740085056792) + (Petal.Length * 14.2447701274975) + 
-  #>     (Petal.Width * -3.09768387034398)) + exp(-23.8362760290472 + 
+  #>     (Petal.Width * -3.09768387034398) - 0) + exp(-23.8362760290472 + 
   #>     (Sepal.Length * -7.92363397245864) + (Sepal.Width * -15.3707689334118) + 
-  #>     (Petal.Length * 23.6597792430121) + (Petal.Width * 15.1353005479763)))
+  #>     (Petal.Length * 23.6597792430121) + (Petal.Width * 15.1353005479763) - 
+  #>     0))
   ```
 
 - Add the predictions to the original table
@@ -94,14 +95,14 @@ p_model <- multinom_reg() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-23.8362760290472 + (Sepal.Length * -7.92363397245864) + 
+#> 1/(exp(0 - (-23.8362760290472 + (Sepal.Length * -7.92363397245864) + 
 #>     (Sepal.Width * -15.3707689334118) + (Petal.Length * 23.6597792430121) + 
-#>     (Petal.Width * 15.1353005479763))/(exp(0) + exp(18.6903742569359 + 
+#>     (Petal.Width * 15.1353005479763))) + exp(18.6903742569359 + 
 #>     (Sepal.Length * -5.458424007004) + (Sepal.Width * -8.70740085056792) + 
-#>     (Petal.Length * 14.2447701274975) + (Petal.Width * -3.09768387034398)) + 
-#>     exp(-23.8362760290472 + (Sepal.Length * -7.92363397245864) + 
+#>     (Petal.Length * 14.2447701274975) + (Petal.Width * -3.09768387034398) - 
+#>     (-23.8362760290472 + (Sepal.Length * -7.92363397245864) + 
 #>         (Sepal.Width * -15.3707689334118) + (Petal.Length * 23.6597792430121) + 
-#>         (Petal.Width * 15.1353005479763)))
+#>         (Petal.Width * 15.1353005479763))) + 1)
 ```
 
 ## Parse model spec

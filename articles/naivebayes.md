@@ -50,30 +50,32 @@ model <- klaR::NaiveBayes(Species ~ ., data = iris)
   names(fit)
   #> [1] "setosa"     "versicolor" "virginica"
   fit[["setosa"]]
-  #> exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
-  #>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
-  #>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
-  #>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
-  #>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-  #>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + 
+  #> 1/(1 + exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 
+  #>     0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + 
+  #>     ifelse(is.na(Sepal.Width), 0, 1.15900478165984 - ((Sepal.Width - 
+  #>         2.77)^2/0.196938775510204)) + ifelse(is.na(Petal.Length), 
+  #>     0, 0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + 
+  #>     ifelse(is.na(Petal.Width), 0, 1.620738119938 - ((Petal.Width - 
+  #>         1.326)^2/0.0782122448979592)) - (-1.09861228866811 + 
   #>     ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - ((Sepal.Length - 
   #>         5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
   #>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
   #>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
   #>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-  #>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592))) + 
-  #>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.661316888138019 - 
-  #>         ((Sepal.Length - 5.936)^2/0.532865306122449)) + ifelse(is.na(Sepal.Width), 
-  #>         0, 1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
-  #>         ifelse(is.na(Petal.Length), 0, 0.755212012346146 - ((Petal.Length - 
-  #>             4.26)^2/0.441632653061225)) + ifelse(is.na(Petal.Width), 
-  #>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
+  #>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)))) + 
   #>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
   #>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
   #>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
   #>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
   #>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-  #>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))
+  #>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)) - 
+  #>         (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
+  #>             ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
+  #>             0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
+  #>             ifelse(is.na(Petal.Length), 0, 1.75063290136911 - 
+  #>                 ((Petal.Length - 1.462)^2/0.0603183673469388)) + 
+  #>             ifelse(is.na(Petal.Width), 0, 2.25012937537181 - 
+  #>                 ((Petal.Width - 0.246)^2/0.0222122448979592)))))
   ```
 
 - Add the predictions to the original table
@@ -147,8 +149,8 @@ ordering the fitted model implies:
 ``` r
 
 sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, outlier))
-#>      setosa  versicolor   virginica 
-#> 0.00000e+00 8.27933e-59 1.00000e+00
+#>        setosa    versicolor     virginica 
+#> 1.526098e-273  8.279330e-59  1.000000e+00
 ```
 
 Reproducing the substitution is not possible on the log scale in any
@@ -176,30 +178,32 @@ p_model <- naive_Bayes() %>%
 ``` r
 
 tidypredict_fit(p_model)[["virginica"]]
-#> exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
-#>     ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
-#>     0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
-#>     ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
-#>         5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-#>     0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)))/(exp(-1.09861228866811 + 
-#>     ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - ((Sepal.Length - 
-#>         5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
+#> 1/(exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
+#>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
 #>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
 #>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
 #>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592))) + 
+#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)) - 
+#>     (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
+#>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
+#>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
+#>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
+#>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
+#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)))) + 
 #>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.661316888138019 - 
 #>         ((Sepal.Length - 5.936)^2/0.532865306122449)) + ifelse(is.na(Sepal.Width), 
 #>         0, 1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
 #>         ifelse(is.na(Petal.Length), 0, 0.755212012346146 - ((Petal.Length - 
 #>             4.26)^2/0.441632653061225)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
-#>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
-#>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
-#>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
-#>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
-#>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))
+#>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592)) - 
+#>         (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
+#>             ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
+#>             0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
+#>             ifelse(is.na(Petal.Length), 0, 0.594398019628377 - 
+#>                 ((Petal.Length - 5.552)^2/0.609175510204082)) + 
+#>             ifelse(is.na(Petal.Width), 0, 1.29225751662055 - 
+#>                 ((Petal.Width - 2.026)^2/0.150865306122449)))) + 
+#>     1)
 ```
 
 ## `naivebayes::naive_bayes()`
@@ -212,30 +216,32 @@ nb_model <- naivebayes::naive_bayes(Species ~ ., data = iris)
 
 nb_fit <- tidypredict_fit(nb_model)
 nb_fit[["setosa"]]
-#> exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
-#>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
-#>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
-#>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
-#>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)))/(exp(-1.09861228866811 + 
+#> 1/(1 + exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 
+#>     0.661316888138019 - ((Sepal.Length - 5.936)^2/0.532865306122449)) + 
+#>     ifelse(is.na(Sepal.Width), 0, 1.15900478165984 - ((Sepal.Width - 
+#>         2.77)^2/0.196938775510204)) + ifelse(is.na(Petal.Length), 
+#>     0, 0.755212012346146 - ((Petal.Length - 4.26)^2/0.441632653061225)) + 
+#>     ifelse(is.na(Petal.Width), 0, 1.620738119938 - ((Petal.Width - 
+#>         1.326)^2/0.0782122448979592)) - (-1.09861228866811 + 
 #>     ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - ((Sepal.Length - 
 #>         5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
 #>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
 #>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
 #>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592))) + 
-#>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.661316888138019 - 
-#>         ((Sepal.Length - 5.936)^2/0.532865306122449)) + ifelse(is.na(Sepal.Width), 
-#>         0, 1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
-#>         ifelse(is.na(Petal.Length), 0, 0.755212012346146 - ((Petal.Length - 
-#>             4.26)^2/0.441632653061225)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
+#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)))) + 
 #>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
 #>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
 #>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
 #>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
 #>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))
+#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)) - 
+#>         (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
+#>             ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
+#>             0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
+#>             ifelse(is.na(Petal.Length), 0, 1.75063290136911 - 
+#>                 ((Petal.Length - 1.462)^2/0.0603183673469388)) + 
+#>             ifelse(is.na(Petal.Width), 0, 2.25012937537181 - 
+#>                 ((Petal.Width - 0.246)^2/0.0222122448979592)))))
 ```
 
 ``` r
@@ -258,30 +264,32 @@ nb_p_model <- naive_Bayes() %>%
   fit(Species ~ ., data = iris)
 
 tidypredict_fit(nb_p_model)[["virginica"]]
-#> exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
-#>     ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
-#>     0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
-#>     ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
-#>         5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-#>     0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)))/(exp(-1.09861228866811 + 
-#>     ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - ((Sepal.Length - 
-#>         5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
+#> 1/(exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 1.04273391328984 - 
+#>     ((Sepal.Length - 5.006)^2/0.248497959183673)) + ifelse(is.na(Sepal.Width), 
 #>     0, 0.970049249016581 - ((Sepal.Width - 3.428)^2/0.287379591836735)) + 
 #>     ifelse(is.na(Petal.Length), 0, 1.75063290136911 - ((Petal.Length - 
 #>         1.462)^2/0.0603183673469388)) + ifelse(is.na(Petal.Width), 
-#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592))) + 
+#>     0, 2.25012937537181 - ((Petal.Width - 0.246)^2/0.0222122448979592)) - 
+#>     (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
+#>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
+#>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
+#>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
+#>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
+#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449)))) + 
 #>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.661316888138019 - 
 #>         ((Sepal.Length - 5.936)^2/0.532865306122449)) + ifelse(is.na(Sepal.Width), 
 #>         0, 1.15900478165984 - ((Sepal.Width - 2.77)^2/0.196938775510204)) + 
 #>         ifelse(is.na(Petal.Length), 0, 0.755212012346146 - ((Petal.Length - 
 #>             4.26)^2/0.441632653061225)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592))) + 
-#>     exp(-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
-#>         ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
-#>         0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
-#>         ifelse(is.na(Petal.Length), 0, 0.594398019628377 - ((Petal.Length - 
-#>             5.552)^2/0.609175510204082)) + ifelse(is.na(Petal.Width), 
-#>         0, 1.29225751662055 - ((Petal.Width - 2.026)^2/0.150865306122449))))
+#>         0, 1.620738119938 - ((Petal.Width - 1.326)^2/0.0782122448979592)) - 
+#>         (-1.09861228866811 + ifelse(is.na(Sepal.Length), 0, 0.452746052315965 - 
+#>             ((Sepal.Length - 6.588)^2/0.808685714285714)) + ifelse(is.na(Sepal.Width), 
+#>             0, 1.13166256707153 - ((Sepal.Width - 2.974)^2/0.208008163265306)) + 
+#>             ifelse(is.na(Petal.Length), 0, 0.594398019628377 - 
+#>                 ((Petal.Length - 5.552)^2/0.609175510204082)) + 
+#>             ifelse(is.na(Petal.Width), 0, 1.29225751662055 - 
+#>                 ((Petal.Width - 2.026)^2/0.150865306122449)))) + 
+#>     1)
 ```
 
 ## Parse model spec

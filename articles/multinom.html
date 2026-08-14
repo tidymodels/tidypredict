@@ -167,11 +167,12 @@ with the first level of the outcome acting as the reference class.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(0)/(exp(0) + exp(18.6903742569359 + (Sepal.Length * -5.458424007004) + </span></span>
+<span><span class="co">#&gt; 1/(1 + exp(18.6903742569359 + (Sepal.Length * -5.458424007004) + </span></span>
 <span><span class="co">#&gt;     (Sepal.Width * -8.70740085056792) + (Petal.Length * 14.2447701274975) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -3.09768387034398)) + exp(-23.8362760290472 + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * -3.09768387034398) - 0) + exp(-23.8362760290472 + </span></span>
 <span><span class="co">#&gt;     (Sepal.Length * -7.92363397245864) + (Sepal.Width * -15.3707689334118) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 23.6597792430121) + (Petal.Width * 15.1353005479763)))</span></span></code></pre></div>
+<span><span class="co">#&gt;     (Petal.Length * 23.6597792430121) + (Petal.Width * 15.1353005479763) - </span></span>
+<span><span class="co">#&gt;     0))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the predictions to the original table</p>
@@ -215,14 +216,14 @@ results</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span><span class="op">[[</span><span class="st">"virginica"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; exp(-23.8362760290472 + (Sepal.Length * -7.92363397245864) + </span></span>
+<span><span class="co">#&gt; 1/(exp(0 - (-23.8362760290472 + (Sepal.Length * -7.92363397245864) + </span></span>
 <span><span class="co">#&gt;     (Sepal.Width * -15.3707689334118) + (Petal.Length * 23.6597792430121) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * 15.1353005479763))/(exp(0) + exp(18.6903742569359 + </span></span>
+<span><span class="co">#&gt;     (Petal.Width * 15.1353005479763))) + exp(18.6903742569359 + </span></span>
 <span><span class="co">#&gt;     (Sepal.Length * -5.458424007004) + (Sepal.Width * -8.70740085056792) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * 14.2447701274975) + (Petal.Width * -3.09768387034398)) + </span></span>
-<span><span class="co">#&gt;     exp(-23.8362760290472 + (Sepal.Length * -7.92363397245864) + </span></span>
+<span><span class="co">#&gt;     (Petal.Length * 14.2447701274975) + (Petal.Width * -3.09768387034398) - </span></span>
+<span><span class="co">#&gt;     (-23.8362760290472 + (Sepal.Length * -7.92363397245864) + </span></span>
 <span><span class="co">#&gt;         (Sepal.Width * -15.3707689334118) + (Petal.Length * 23.6597792430121) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 15.1353005479763)))</span></span></code></pre></div>
+<span><span class="co">#&gt;         (Petal.Width * 15.1353005479763))) + 1)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
