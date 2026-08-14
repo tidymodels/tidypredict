@@ -60,6 +60,17 @@
   read back off the names it gave the columns each factor expanded into.
   ([\#323](https://github.com/tidymodels/tidypredict/issues/323))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects a [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html),
+  [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html) or
+  [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html) model fit with a
+  contrast other than the treatment one. None of the three records the
+  contrasts it used, so the existing check was a no-op and an ordered
+  factor, which R fits with `contr.poly` by default, silently produced
+  wrong posterior probabilities: the level recovered from a column named
+  `f.L` matches no row, so the term was dropped without complaint.
+  ([\#343](https://github.com/tidymodels/tidypredict/issues/343))
+
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
   returned `numeric(0)` for every gaussian glm, because the residual
