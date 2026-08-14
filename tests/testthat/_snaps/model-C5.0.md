@@ -5,6 +5,17 @@
     Output
       [1] "case_when(cyl <= 6.00000023841858 ~ case_when(cyl <= 4.00000023841858 ~ \n    \"1\", .default = case_when(wt <= 2.87500011920929 ~ \"0\", .default = \"1\")), \n    .default = \"0\")"
 
+# a model with no tree is reported clearly (#287)
+
+    Code
+      tidypredict_fit(structure(list(tree = "", levels = c("hi", "lo"), names = ""),
+      class = "C5.0"))
+    Condition
+      Error in `parse_c50_trees()`:
+      ! The model records no tree.
+      i `C50::C5.0()` writes one only when fitting succeeded.
+      i A predictor name or level containing "," or ":" is one cause.
+
 # errors on unsupported configurations
 
     Code

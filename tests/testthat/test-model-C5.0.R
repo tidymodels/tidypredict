@@ -119,6 +119,74 @@ test_that("boosted models with categorical splits match predict()", {
   expect_equal(fit_pred, as.character(predict(model, df)))
 })
 
+c50_boost_data <- function(seed, n_class = 4, ordered = TRUE, n = 300) {
+  set.seed(seed)
+  d <- data.frame(
+    x1 = rnorm(n),
+    x2 = runif(n, -5, 5),
+    x3 = rnorm(n, 10, 3),
+    g = factor(sample(c("a", "b", "c"), n, replace = TRUE)),
+    o = factor(
+      sample(c("lo", "mid", "hi"), n, replace = TRUE),
+      levels = c("lo", "mid", "hi"),
+      ordered = ordered
+    )
+  )
+  score <- d$x1 +
+    0.4 * d$x2 -
+    0.2 * d$x3 +
+    as.integer(d$g) +
+    0.8 * as.integer(d$o) +
+    rnorm(n)
+  cuts <- stats::quantile(score, seq(0, 1, length.out = n_class + 1))
+  d$y <- factor(
+    paste0("c", as.integer(cut(score, cuts, include.lowest = TRUE))),
+    levels = paste0("c", seq_len(n_class))
+  )
+  d
+}
+
+test_that("boosted trials vote with the right confidence (#287)", {
+  skip_if_not_installed("C50")
+  # A trial votes with `(freq + prior) / (n_leaf + 1)`, where `prior` is the
+  # class proportion at the root of that trial's own tree, not with the Laplace
+  # ratio `(freq + 1) / (n_leaf + 2)`. The two are close enough that a
+  # disagreement needs several trials and several classes to show up.
+  for (seed in 1:6) {
+    d <- c50_boost_data(seed)
+    for (trials in c(3L, 5L, 10L)) {
+      model <- C50::C5.0(d[c("x1", "x2", "x3", "g", "o")], d$y, trials = trials)
+
+      expect_equal(
+        as.character(rlang::eval_tidy(tidypredict_fit(model), d)),
+        as.character(predict(model, d))
+      )
+    }
+  }
+})
+
+test_that("a boosted vote tie goes to the default class (#287)", {
+  skip_if_not_installed("C50")
+  # `SelectClass` starts from the default class, so it wins any tie. Every
+  # class here gets no vote at all, which is the tie that always exists.
+  tree_info <- list(
+    nodeID = 0L,
+    leftChild = NA_integer_,
+    rightChild = NA_integer_,
+    splitvarName = NA_character_,
+    terminal = TRUE,
+    prediction = "b",
+    confidence = 0,
+    leaf_freq = list(NULL),
+    node_splits = list(list(NULL)),
+    majority_left = NA,
+    use_surrogates = FALSE
+  )
+
+  fit <- c50_boosted_case_when(list(tree_info), c("a", "b", "c"), "c")
+  expect_equal(rlang::eval_tidy(fit, data.frame(x = 1)), "c")
+})
+
 test_that("boosted models round-trip through parse_model()", {
   skip_if_not_installed("C50")
   model <- C50::C5.0(iris[, 1:4], iris$Species, trials = 5)
@@ -126,6 +194,40 @@ test_that("boosted models round-trip through parse_model()", {
   pm <- parse_model(model)
   fit_pred <- as.character(rlang::eval_tidy(tidypredict_fit(pm), iris))
   expect_equal(fit_pred, as.character(predict(model, iris)))
+})
+
+test_that("the [ordered] marker is not read as part of a level (#287)", {
+  # C5.0 declares an ordered predictor as `o: [ordered]lo,mid,hi.`, and the
+  # marker used to be left on the first level, making it unmatchable.
+  model <- list(
+    names = paste(
+      "outcome.",
+      "",
+      "outcome: hi,lo.",
+      "x1: continuous.",
+      "o: [ordered]lo,mid,hi.",
+      "g: a,b,c.",
+      sep = "\n"
+    )
+  )
+
+  expect_equal(
+    c50_attr_levels(model)[["o"]],
+    c("lo", "mid", "hi")
+  )
+  expect_equal(c50_attr_levels(model)[["g"]], c("a", "b", "c"))
+})
+
+test_that("a model with no tree is reported clearly (#287)", {
+  # `C5.0()` leaves the tree empty when fitting failed, which a level
+  # containing a comma does, since that separates the levels in the model text.
+  expect_snapshot(
+    tidypredict_fit(structure(
+      list(tree = "", levels = c("hi", "lo"), names = ""),
+      class = "C5.0"
+    )),
+    error = TRUE
+  )
 })
 
 test_that("errors on unsupported configurations", {

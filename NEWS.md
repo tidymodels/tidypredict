@@ -20,6 +20,12 @@
 
 - `tidypredict_fit()` no longer returns `NaN` for every class probability of a row whose class scores are large, for any model whose prediction is a softmax: `MASS::lda()`, `MASS::qda()`, `mda::fda()`, `sparsediscrim`, `sda`, `mixOmics`, `nnet::multinom()`, `nnet::nnet()`, multinomial `glmnet`, naive Bayes, `h2o`, `lightgbm` and `catboost`. The probabilities were written as `exp(s) / sum(exp(s))`, which is `Inf / Inf` once a score passes about 710. They are now written as `1 / sum(exp(s_j - s_k))`, which is the same quantity and cannot overflow. (#299)
 
+- `tidypredict_fit()` now combines the trials of a boosted `C50::C5.0()` model with the confidence C5.0 votes with, `(freq + prior) / (n_leaf + 1)`, where `prior` is the class proportion at the root of that trial's own tree. It used the Laplace ratio `(freq + 1) / (n_leaf + 2)` instead, which changed the predicted class for 72 of 720 swept configurations. A tie in the total vote now goes to the default class, as `SelectClass` does. (#287)
+
+- `tidypredict_fit()` no longer reads C5.0's `[ordered]` marker as part of the first level of an ordered predictor. (#287)
+
+- `tidypredict_fit()` now reports a `C50::C5.0()` model that records no tree, rather than failing with "subscript out of bounds". `C5.0()` leaves the tree empty when fitting failed, which a predictor name or level containing `,` or `:` causes. (#287)
+
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
