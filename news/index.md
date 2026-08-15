@@ -2,6 +2,17 @@
 
 ## tidypredict (development version)
 
+- The glm article now documents the one inverse link
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  does not reproduce exactly: `probit`, whose inverse is
+  [`pnorm()`](https://rdrr.io/r/stats/Normal.html), is written as the
+  Bowling et al. logistic approximation to the normal CDF because no SQL
+  backend has a normal CDF. It costs about 1e-4 of probability, which is
+  enough for
+  [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  to report a probit model as failing at its default threshold.
+  ([\#355](https://github.com/tidymodels/tidypredict/issues/355))
+
 - The naive Bayes article now documents the one case where
   [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   does not reproduce [`predict()`](https://rdrr.io/r/stats/predict.html)

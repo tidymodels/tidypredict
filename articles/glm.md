@@ -17,6 +17,8 @@
   [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   &
   [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
+- The `probit` link is approximated rather than reproduced exactly. See
+  [The probit link](#the-probit-link).
 
 ## How it works
 
@@ -47,7 +49,7 @@ support the exponent function.
 
 library(tidypredict)
 tidypredict_sql(model, dbplyr::simulate_mssql())
-#> <SQL> 1.0 / (1.0 + EXP(-(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366097))))
+#> <SQL> 1.0 / (1.0 + EXP(-(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366098))))
 ```
 
 Alternatively, use
@@ -71,6 +73,61 @@ df %>%
 #> Merc 230          3.150     cyl4  0 0.01975984
 #> Merc 280          3.440     cyl6  0 0.04399324
 ```
+
+## The probit link
+
+Every inverse link `tidypredict` writes is exact, with one exception:
+`probit`. The probit inverse link is the standard normal CDF,
+[`pnorm()`](https://rdrr.io/r/stats/Normal.html), and no SQL backend has
+one, so it is written as the Bowling et al. logistic approximation
+instead:
+
+``` math
+\frac{1}{1 + \exp(-0.07056\, x^3 - 1.5976\, x)}
+```
+
+The same expression is used on both the R and the SQL paths, so a probit
+model is the one place where
+[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+does not reproduce [`predict()`](https://rdrr.io/r/stats/predict.html)
+to floating-point precision. The approximation’s error is about 0.014%
+of the probability, which works out to roughly 1e-4:
+
+``` r
+
+probit_model <- glm(
+  am ~ wt + mpg,
+  data = mtcars,
+  family = binomial(link = "probit")
+)
+
+max(abs(
+  predict(probit_model, mtcars, type = "response") -
+    rlang::eval_tidy(tidypredict_fit(probit_model), mtcars)
+))
+#> [1] 0.0001389629
+```
+
+That is four orders of magnitude larger than the disagreement any other
+link produces, and larger than
+[`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)’s
+default threshold, so a probit model will be reported as failing:
+
+``` r
+
+tidypredict_test(probit_model)
+#> tidypredict test results
+#> Difference threshold: 1e-12
+#> 
+#> Fitted records above the threshold: 31
+#> 
+#> Max difference: 0.00013896287832874
+```
+
+The difference is the approximation, not a defect in the parsed model.
+If the exact probabilities matter more than a portable formula, pass a
+threshold that reflects the approximation’s error, or use
+[`predict()`](https://rdrr.io/r/stats/predict.html) directly.
 
 ## Under the hood
 
@@ -114,7 +171,7 @@ variables are operated using
 tidypredict_fit(model)
 #> 1/(1 + exp(-(20.8527831345691 + (wt * -7.85934263583836) + (ifelse(char_cyl == 
 #>     "cyl6", 1, 0) * 3.10462643177453) + (ifelse(char_cyl == "cyl8", 
-#>     1, 0) * 5.37942092366097))))
+#>     1, 0) * 5.37942092366098))))
 ```
 
 From there, the Tidy Eval formula can be used anywhere where it can be
@@ -184,6 +241,6 @@ liblinear_model <- logistic_reg(penalty = 0.1) %>%
   fit(factor(am) ~ mpg + cyl, data = mtcars)
 
 tidypredict_fit(liblinear_model)
-#> 1/(1 + exp(-(-1.78560849993735 + (mpg * 0.166363458887311) + 
-#>     (cyl * -0.324861381084945))))
+#> 1/(1 + exp(-(-1.78560849993736 + (mpg * 0.166363458887312) + 
+#>     (cyl * -0.324861381084944))))
 ```
