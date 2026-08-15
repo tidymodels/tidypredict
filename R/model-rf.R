@@ -22,9 +22,56 @@ parse_model.randomForest <- function(model) {
   as_parsed_model(pm)
 }
 
+# The node table of a single tree.
+#
+# `randomForest::getTree()` subsets its assembled matrix without
+# `drop = FALSE`, so a stump (a tree with a single root node and no split)
+# collapses to a plain vector. `nrow()` on that is `NULL`, and the `1:nrow()`
+# that follows aborts with "argument of length 0" before the tree is ever
+# returned. A stump is common whenever the outcome is constant within the
+# bootstrap sample, and `predict()` scores such a forest fine, so the table is
+# assembled here for that case rather than letting the fit fail.
+rf_get_tree <- function(model, tree_no) {
+  n_nodes <- model$forest$ndbigtree[tree_no]
+  if (n_nodes > 1) {
+    return(randomForest::getTree(model, tree_no))
+  }
+
+  forest <- model$forest
+  if (model$type == "regression") {
+    daughters <- cbind(
+      forest$leftDaughter[, tree_no],
+      forest$rightDaughter[, tree_no]
+    )
+  } else {
+    daughters <- forest$treemap[,, tree_no]
+  }
+
+  tree <- cbind(
+    daughters,
+    forest$bestvar[, tree_no],
+    forest$xbestsplit[, tree_no],
+    forest$nodestatus[, tree_no],
+    forest$nodepred[, tree_no]
+  )[seq_len(n_nodes), , drop = FALSE]
+
+  dimnames(tree) <- list(
+    seq_len(n_nodes),
+    c(
+      "left daughter",
+      "right daughter",
+      "split var",
+      "split point",
+      "status",
+      "prediction"
+    )
+  )
+  tree
+}
+
 # Convert randomForest getTree to standard tree_info format
 rf_tree_info_full <- function(model, tree_no, term_labels) {
-  tree <- randomForest::getTree(model, tree_no)
+  tree <- rf_get_tree(model, tree_no)
   n_nodes <- nrow(tree)
 
   # randomForest uses 1-indexed nodes, convert to 0-indexed
@@ -174,7 +221,7 @@ build_nested_rf_tree <- function(
   term_labels,
   leaf_value = identity
 ) {
-  tree <- randomForest::getTree(model, tree_no)
+  tree <- rf_get_tree(model, tree_no)
 
   # Pre-extract columns as vectors for fast indexing (avoids slow row access)
   # Use unname() once here instead of on every recursive call

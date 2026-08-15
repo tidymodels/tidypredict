@@ -60,6 +60,8 @@
 
 - `tidypredict_fit()` now decodes factor splits for `randomForest::randomForest()` models. An unordered factor's split point is an integer whose bits name the levels going left, and an ordered factor's is compared against the level's integer code; both were read as a numeric threshold on the column itself, which silently produced `NA` or a wrong branch. (#282)
 
+- `tidypredict_fit()` and `parse_model()` now handle a stump, a tree with a single root node and no split, in a `randomForest::randomForest()` forest, instead of aborting with "argument of length 0". `randomForest::getTree()` drops its node table to a vector for such a tree and then fails on its own `1:nrow()`, so the table is now assembled directly. A stump appears whenever the outcome is constant within a bootstrap sample, which a constant outcome or a zero-variance predictor makes routine. (#362)
+
 - `tidypredict_fit()` now skips a feature whose value is missing or whose factor level was not seen while fitting, for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models, matching both packages' `predict()` instead of returning `NA` for the whole row. A row missing every predictor falls back on the class prior alone. (#300)
 
 - `tidypredict_fit()` no longer errors with "missing value where TRUE/FALSE needed" for a `naivebayes::naive_bayes()` model with an outcome class of fewer than two observations. Such a class has no standard deviation, and the resulting `NA` probabilities now match `predict()`. (#300)
