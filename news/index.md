@@ -61,6 +61,19 @@
   ([\#323](https://github.com/tidymodels/tidypredict/issues/323))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects an `h2o` model fit with an algorithm other than GBM or
+  RuleFit. Every h2o algorithm returns one of the three model classes
+  tidypredict dispatches on, so nothing had been checking which one was
+  used: `h2o.randomForest()` silently gave predictions that were wrong
+  by a factor of the number of trees, because h2o averages tree
+  predictions where the code summed them, and classification forests use
+  vote proportions rather than a logistic link. The tree-free
+  algorithms, among them `h2o.glm()`, `h2o.deeplearning()` and
+  `h2o.naiveBayes()`, failed with the unhelpful “argument must be
+  coercible to non-negative integer”.
+  ([\#284](https://github.com/tidymodels/tidypredict/issues/284))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now rejects a [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html),
   [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html) or
   [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html) model fit with a
