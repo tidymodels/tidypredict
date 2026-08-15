@@ -29,6 +29,7 @@ library(tidypredict)
      - Not OK - `wt ~ mpg + as.factor(am)`
      - Not OK - `wt ~ mpg + as.character(am)`
 - Interval functions are not supported: `tidypredict_interval()` & `tidypredict_sql_interval()`
+- The `probit` link is approximated rather than reproduced exactly. See [The probit link](#the-probit-link).
 
 ## How it works
 
@@ -59,6 +60,35 @@ df %>%
   tidypredict_to_column(model) %>%
   head(10)
 ```
+
+## The probit link
+
+Every inverse link `tidypredict` writes is exact, with one exception: `probit`. The probit inverse link is the standard normal CDF, `pnorm()`, and no SQL backend has one, so it is written as the Bowling et al. logistic approximation instead:
+
+$$\frac{1}{1 + \exp(-0.07056\, x^3 - 1.5976\, x)}$$
+
+The same expression is used on both the R and the SQL paths, so a probit model is the one place where `tidypredict_fit()` does not reproduce `predict()` to floating-point precision. The approximation's error is about 0.014% of the probability, which works out to roughly 1e-4:
+
+```{r}
+probit_model <- glm(
+  am ~ wt + mpg,
+  data = mtcars,
+  family = binomial(link = "probit")
+)
+
+max(abs(
+  predict(probit_model, mtcars, type = "response") -
+    rlang::eval_tidy(tidypredict_fit(probit_model), mtcars)
+))
+```
+
+That is four orders of magnitude larger than the disagreement any other link produces, and larger than `tidypredict_test()`'s default threshold, so a probit model will be reported as failing:
+
+```{r}
+tidypredict_test(probit_model)
+```
+
+The difference is the approximation, not a defect in the parsed model. If the exact probabilities matter more than a portable formula, pass a threshold that reflects the approximation's error, or use `predict()` directly.
 
 ## Under the hood
 

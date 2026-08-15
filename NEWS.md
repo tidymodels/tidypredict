@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- The glm article now documents the one inverse link `tidypredict_fit()` does not reproduce exactly: `probit`, whose inverse is `pnorm()`, is written as the Bowling et al. logistic approximation to the normal CDF because no SQL backend has a normal CDF. It costs about 1e-4 of probability, which is enough for `tidypredict_test()` to report a probit model as failing at its default threshold. (#355)
+
 - The naive Bayes article now documents the one case where `tidypredict_fit()` does not reproduce `predict()` for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models: both replace a normal density that underflowed to zero with their `threshold` argument, which takes a value roughly 38 standard deviations from the class mean, and the log scale used throughout never underflows. (#300)
 
 - `tidypredict_fit()` now applies the per-rule extrapolation limits for `Cubist::cubist()` models. Cubist holds each rule to the span of the training outcomes it covers, widened at both ends by `extrap` times that span and never crossing zero; without it a rule's linear model runs away on data outside its range. This engages on rows of the training data too, not only on extrapolation. (#285)
