@@ -48,7 +48,12 @@ apply_inverse_link <- function(f, link) {
     "log" = expr(exp(!!f)),
     "inverse" = expr(1 / (!!f)),
     "1/mu^2" = expr(1 / sqrt(!!f)),
-    # Bowling et al. approximation to normal CDF (max error ~0.014%)
+    # The probit inverse link is `pnorm()`, which no SQL backend has, so it is
+    # written as the Bowling et al. logistic approximation to the normal CDF
+    # instead. This is the one inverse link here that is not exact: it costs
+    # about 1e-4 of probability, enough that `tidypredict_test()` reports a
+    # probit model as failing at its default threshold. Documented in the glm
+    # article, since nothing about the returned formula reveals it.
     "probit" = expr(1 / (1 + exp(-0.07056 * (!!f)^3 - 1.5976 * (!!f)))),
     "cloglog" = expr(1 - exp(-exp(!!f))),
     "sqrt" = expr((!!f)^2),
