@@ -63,13 +63,20 @@ get_xgb_tree <- function(tree) {
   x
 }
 
+# Which xgboost API to read a booster with.
+#
+# Not `is.null(attr(model, "param"))`, which was the discriminator before:
+# `xgb.train()` sets that attribute and `xgb.load()` does not, so it records how
+# the object was *made* rather than which API is available. A saved and reloaded
+# booster took the pre-2.0 path and called `xgb.model.dt.tree(text = )`, an
+# argument xgboost 3.x has removed, so it failed with `argument "model" is
+# missing`. The installed version is what actually decides.
+xgb_has_new_api <- function() {
+  utils::packageVersion("xgboost") >= "2.0.0"
+}
+
 get_xgb_trees <- function(model) {
-  xd <- xgboost::xgb.dump(
-    model = model,
-    dump_format = "text",
-    with_stats = TRUE
-  )
-  if (is.null(attr(model, "param"))) {
+  if (!xgb_has_new_api()) {
     # Old xgboost API (< 2.0) - kept for backwards compatibility
     xd <- xgboost::xgb.dump(
       model = model,
@@ -121,7 +128,7 @@ get_xgb_trees_character <- function(x, feature_names) {
 
 #' @export
 parse_model.xgb.Booster <- function(model) {
-  old <- is.null(attr(model, "param"))
+  old <- !xgb_has_new_api()
 
   params <- attr(model, "param") %||% model$params
   wosilent <- params[names(params) != "silent"]
@@ -148,6 +155,7 @@ parse_model.xgb.Booster <- function(model) {
 
   json_params <- get_xgb_json_params(model)
   pm$general$params$base_score <- json_params$base_score
+  pm$general$params$objective <- params$objective %||% json_params$objective
   pm$general$booster_name <- json_params$booster_name
   pm$general$weight_drop <- json_params$weight_drop
 
@@ -219,10 +227,30 @@ get_xgb_json_params <- function(model) {
     }
   }
 
+  # Extract the objective - format is "objective":{"name":"binary:logistic",...
+  #
+  # A reloaded booster carries it nowhere else: `xgb.load()` sets neither
+  # `attr(model, "param")` nor `model$params`, so without this the objective is
+  # `NULL` and the raw margin is returned as though it were a probability.
+  objective_match <- regmatches(
+    txt,
+    regexpr('objective":\\{"name":"[^"]+"', txt, perl = TRUE)
+  )
+  objective <- NULL
+  if (length(objective_match) > 0 && nchar(objective_match) > 0) {
+    objective <- gsub(
+      'objective":\\{"name":"([^"]+)"',
+      "\\1",
+      objective_match,
+      perl = TRUE
+    )
+  }
+
   list(
     base_score = base_score,
     booster_name = booster_name,
-    weight_drop = weight_drop
+    weight_drop = weight_drop,
+    objective = objective
   )
 }
 
@@ -242,7 +270,7 @@ build_fit_formula_xgb_nested <- function(model) {
     extract_xgb_trees_nested(model),
     weight_drop = json_params$weight_drop,
     base_score = json_params$base_score,
-    objective = params$objective
+    objective = params$objective %||% json_params$objective
   )
 }
 
@@ -382,7 +410,7 @@ extract_xgb_trees_nested <- function(model) {
 
 # Get xgboost trees as data frame
 get_xgb_trees_df <- function(model) {
-  if (is.null(attr(model, "param"))) {
+  if (!xgb_has_new_api()) {
     # Old xgboost API (< 2.0) - kept for backwards compatibility
     xd <- xgboost::xgb.dump(
       model = model,
@@ -399,13 +427,22 @@ get_xgb_trees_df <- function(model) {
   trees$Split <- f32_split_boundary(trees$Split)
 
   # Map feature indices to names if needed
-  if (is.null(attr(model, "param"))) {
+  if (!xgb_has_new_api()) {
     feature_names_tbl <- data.frame(
       Feature = as.character(0:(length(feature_names) - 1)),
       feature_name = feature_names,
       stringsAsFactors = FALSE
     )
+    # `merge()` sorts by the join column, and the code below converts node IDs
+    # to row positions assuming row `i` holds node `i - 1`, so the order has to
+    # be put back. `get_xgb_trees_character()` already does this; this path did
+    # not, which only stayed hidden because nothing reached it.
+    original_order <- seq_len(nrow(trees))
+    trees$original_order <- original_order
     trees <- merge(trees, feature_names_tbl, by = "Feature", all.x = TRUE)
+    trees <- trees[order(trees$original_order), , drop = FALSE]
+    trees$original_order <- NULL
+    rownames(trees) <- NULL
   } else {
     trees$feature_name <- ifelse(trees$Feature == "Leaf", NA, trees$Feature)
   }
