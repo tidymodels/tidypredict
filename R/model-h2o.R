@@ -3,7 +3,7 @@
 # H2O models are handles into a running H2O cluster; the tree structure is
 # pulled live with `h2o.getModelTree()`, so these functions require an active
 # `h2o.init()` connection. Only GBM models (gaussian, bernoulli, multinomial
-# distributions) are supported.
+# distributions) and RuleFit are supported; see `h2o_check_gbm()`.
 
 # Tree extraction ----------------------------------------------------
 
@@ -42,6 +42,25 @@ build_h2o_node <- function(node) {
   expr(case_when(!!condition ~ !!left, .default = !!right))
 }
 
+# Every H2O algorithm returns one of `H2ORegressionModel`, `H2OBinomialModel` or
+# `H2OMultinomialModel`, so the class a model dispatches on says nothing about
+# how it was fit. Only GBM (and RuleFit, handled separately) is supported, and
+# the rest fail in ways that are easy to miss: DRF sums tree predictions where
+# H2O averages them, and the tree-free algorithms report no trees at all, which
+# used to surface as `seq_len(NULL)` complaining about a non-negative integer.
+h2o_check_gbm <- function(model, call = rlang::caller_env()) {
+  if (!identical(model@algorithm, "gbm")) {
+    cli::cli_abort(
+      c(
+        "Only h2o GBM and RuleFit models are supported.",
+        i = "This model was fit with {.val {model@algorithm}}."
+      ),
+      call = call
+    )
+  }
+  invisible(model)
+}
+
 h2o_n_trees <- function(model) {
   model@model$model_summary$number_of_trees
 }
@@ -75,6 +94,7 @@ tidypredict_fit.H2ORegressionModel <- function(model, ...) {
   if (identical(model@algorithm, "rulefit")) {
     return(tidypredict_fit_h2o_rulefit_regression(model))
   }
+  h2o_check_gbm(model)
   f <- reduce_addition(h2o_tree_exprs(model))
   init_f <- model@model$init_f
   if (!is.null(init_f) && init_f != 0) {
@@ -88,6 +108,7 @@ tidypredict_fit.H2OBinomialModel <- function(model, ...) {
   if (identical(model@algorithm, "rulefit")) {
     return(tidypredict_fit_h2o_rulefit_binomial(model))
   }
+  h2o_check_gbm(model)
   f <- reduce_addition(h2o_tree_exprs(model))
   init_f <- model@model$init_f %||% 0
   # Probability of the second (positive) domain level: logistic link.
@@ -99,6 +120,7 @@ tidypredict_fit.H2OMultinomialModel <- function(model, ...) {
   if (identical(model@algorithm, "rulefit")) {
     return(tidypredict_fit_h2o_rulefit_multinomial(model))
   }
+  h2o_check_gbm(model)
   domain <- h2o_response_domain(model)
   init_f <- model@model$init_f %||% 0
 
