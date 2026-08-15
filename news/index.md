@@ -154,6 +154,24 @@
   ([\#350](https://github.com/tidymodels/tidypredict/issues/350))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now honours `sigmoid` for `lightgbm` models fit with the `binary` or
+  `multiclassova` objective, which apply `1 / (1 + exp(-sigmoid * x))`
+  rather than a plain logistic. Every probability of a model fit with
+  any other value was rescaled. `cross_entropy` accepts the parameter
+  but never applies it, and is left alone.
+  ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now honours `reg_sqrt` for `lightgbm` models, which trains on
+  `sqrt(|y|)` keeping the sign and squares the raw score back onto the
+  response scale. Predictions were left on the square-root scale, which
+  can be further from
+  [`predict()`](https://rdrr.io/r/stats/predict.html) than the response
+  itself. The `huber` objective accepts the parameter but does not act
+  on it, and is left alone.
+  ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now combines the trials of a boosted
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
   model with the confidence C5.0 votes with,
