@@ -3,7 +3,7 @@
     Code
       round_print(tf)
     Output
-      [1] "35.31378 + (cyl * -0.8714512) + ((hp * -0.0101174) + (wt * -2.594437))"
+      [1] "35.31378 + (cyl * -0.8714512) + (hp * -0.0101174) + (wt * -2.594437)"
 
 # errors if more than 1 penalty is selected
 
@@ -53,7 +53,7 @@
     Code
       round_print(tf)
     Output
-      [1] "35.31405 + (cyl * -0.8716234) + ((hp * -0.01011579) + (wt * -2.594265))"
+      [1] "35.31405 + (cyl * -0.8716234) + (hp * -0.01011579) + (wt * -2.594265)"
 
 # multinomial family is supported (#198)
 
@@ -61,7 +61,7 @@
       lapply(lps, round_print)
     Output
       [[1]]
-      [1] "2.863134 + ((Sepal.Width * 0.7426522) + (Petal.Length * -1.359936))"
+      [1] "2.863134 + (Sepal.Width * 0.7426522) + (Petal.Length * -1.359936)"
       
       [[2]]
       [1] "1.384489 + (Sepal.Width * -0.05721863)"

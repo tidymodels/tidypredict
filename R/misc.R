@@ -18,14 +18,37 @@ expr_and <- function(x, y) {
   expr(!!x & !!y)
 }
 
-# Sum a set of expressions with a balanced, divide and conquer reduction.
+# Number of terms above which `reduce_addition()` sums in a balanced shape
+# rather than from the left.
 #
-# A left fold would nest the `+` calls `length(x)` deep, and R's evaluator gives
-# up somewhere in the low thousands ("evaluation nested too deeply"). An
-# ensemble reaches that easily: a `bart()` fit at its package defaults sums
-# `n_draws * ntree` leaf values. Splitting the terms in half at every step makes
-# the nesting depth `log2(length(x))` instead, so the same fit evaluates.
+# Measured rather than guessed. A left fold of `n` terms nests the `+` calls `n`
+# deep, and at the default `options(expressions = 5000)` the deepest that still
+# evaluates is about 4990 terms, falling to about 4890 when the call arrives 100
+# frames down, as it does through dplyr. Both numbers move with `expressions`
+# and with how deep the caller already is, so the threshold wants a wide margin
+# rather than a close one: 1000 sits a fivefold margin under the wall and still
+# well above every ensemble at its package default, the largest of which sums
+# 500 terms.
+addition_balance_at <- 1000L
+
+# Sum a set of expressions.
+#
+# The left fold is preferred: it is what the modelling packages do themselves,
+# so the result usually agrees with `predict()` bit for bit, and it prints as
+# the flat `a + b + c` rather than a thicket of parentheses. Its nesting depth
+# is the number of terms, though, and past a few thousand R gives up with
+# "evaluation nested too deeply". Only an ensemble gets near that, and only a
+# large one: a `bart()` fit sums `n_draws * ntree` leaf values, which is 10,000
+# terms at dbarts' default `ntree`. Those are summed in a balanced shape
+# instead, which nests `log2(length(x))` deep and so always evaluates.
 reduce_addition <- function(x) {
+  if (length(x) < addition_balance_at) {
+    return(reduce(x, expr_addition))
+  }
+  reduce_addition_balanced(x)
+}
+
+reduce_addition_balanced <- function(x) {
   n <- length(x)
   if (n == 0) {
     return(NULL)
@@ -35,8 +58,8 @@ reduce_addition <- function(x) {
   }
   mid <- n %/% 2
   expr_addition(
-    reduce_addition(x[seq_len(mid)]),
-    reduce_addition(x[seq.int(mid + 1, n)])
+    reduce_addition_balanced(x[seq_len(mid)]),
+    reduce_addition_balanced(x[seq.int(mid + 1, n)])
   )
 }
 

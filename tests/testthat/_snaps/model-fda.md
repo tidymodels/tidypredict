@@ -4,13 +4,13 @@
       lapply(lps, round_print)
     Output
       [[1]]
-      [1] "-15.77129 + (Sepal.Length * 6.443631) + ((Sepal.Width * 12.38706) + ((Petal.Length * -17.29227) + (Petal.Width * -21.19393)))"
+      [1] "-15.77129 + (Sepal.Length * 6.443631) + (Sepal.Width * 12.38706) + (Petal.Length * -17.29227) + (Petal.Width * -21.19393)"
       
       [[2]]
-      [1] "-2.040818 + (Sepal.Length * -1.562448) + ((Sepal.Width * -4.46535) + ((Petal.Length * 4.791495) + (Petal.Width * 3.125087)))"
+      [1] "-2.040818 + (Sepal.Length * -1.562448) + (Sepal.Width * -4.46535) + (Petal.Length * 4.791495) + (Petal.Width * 3.125087)"
       
       [[3]]
-      [1] "-34.19971 + (Sepal.Length * -4.881183) + ((Sepal.Width * -7.921708) + ((Petal.Length * 12.50077) + (Petal.Width * 18.06885)))"
+      [1] "-34.19971 + (Sepal.Length * -4.881183) + (Sepal.Width * -7.921708) + (Petal.Length * 12.50077) + (Petal.Width * 18.06885)"
       
 
 # unsupported fda fits are rejected

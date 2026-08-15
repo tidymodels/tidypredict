@@ -1,7 +1,3 @@
-# Terms are summed with a balanced reduction, so the intercept is added to the
-# sum of the remaining terms rather than to the running total of a left fold.
-pred_sum <- rlang::expr(14 + !!rlang::expr(hp * 4 + drat * 2))
-
 test_that("generate_case_when_trees() works", {
   node <- list(
     path = list(
@@ -24,7 +20,7 @@ test_that("generate_case_when_trees() works", {
   expect_identical(
     generate_case_when_trees(parsedmodel, default = FALSE),
     list(
-      rlang::expr(case_when(disp > 100 ~ !!pred_sum))
+      quote(case_when(disp > 100 ~ 14 + hp * 4 + drat * 2))
     )
   )
 
@@ -36,7 +32,7 @@ test_that("generate_case_when_trees() works", {
   expect_identical(
     generate_case_when_trees(parsedmodel, default = FALSE),
     list(
-      rlang::expr(case_when(ifelse(disp > 100, !!pred_sum, 0)))
+      quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
     )
   )
 
@@ -48,14 +44,14 @@ test_that("generate_case_when_trees() works", {
   expect_identical(
     generate_case_when_trees(parsedmodel, default = FALSE),
     list(
-      rlang::expr(
+      quote(
         case_when(
-          disp > 100 ~ !!pred_sum
+          disp > 100 ~ 14 + hp * 4 + drat * 2
         )
       ),
-      rlang::expr(
+      quote(
         case_when(
-          disp > 100 ~ !!pred_sum
+          disp > 100 ~ 14 + hp * 4 + drat * 2
         )
       )
     )
@@ -69,14 +65,14 @@ test_that("generate_case_when_trees() works", {
   expect_identical(
     generate_case_when_trees(parsedmodel, default = FALSE),
     list(
-      rlang::expr(
+      quote(
         case_when(
-          ifelse(disp > 100, !!pred_sum, 0)
+          ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)
         )
       ),
-      rlang::expr(
+      quote(
         case_when(
-          ifelse(disp > 100, !!pred_sum, 0)
+          ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)
         )
       )
     )
@@ -99,30 +95,30 @@ test_that("generate_case_when_tree() works", {
 
   expect_identical(
     generate_case_when_tree(nodes, mode = "", default = FALSE),
-    rlang::expr(case_when(disp > 100 ~ !!pred_sum))
+    quote(case_when(disp > 100 ~ 14 + hp * 4 + drat * 2))
   )
   expect_identical(
     generate_case_when_tree(nodes, mode = "ifelse", default = FALSE),
-    rlang::expr(case_when(ifelse(disp > 100, !!pred_sum, 0)))
+    quote(case_when(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)))
   )
 
   nodes <- list(node, node)
 
   expect_identical(
     generate_case_when_tree(nodes, mode = "", default = FALSE),
-    rlang::expr(
+    quote(
       case_when(
-        disp > 100 ~ !!pred_sum,
-        disp > 100 ~ !!pred_sum
+        disp > 100 ~ 14 + hp * 4 + drat * 2,
+        disp > 100 ~ 14 + hp * 4 + drat * 2
       )
     )
   )
   expect_identical(
     generate_case_when_tree(nodes, mode = "ifelse", default = FALSE),
-    rlang::expr(
+    quote(
       case_when(
-        ifelse(disp > 100, !!pred_sum, 0),
-        ifelse(disp > 100, !!pred_sum, 0)
+        ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0),
+        ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)
       )
     )
   )
@@ -155,11 +151,7 @@ test_that("generate_case_when_tree() works", {
 
   expect_identical(
     generate_case_when_tree(nodes, mode = "", default = TRUE),
-    rlang::expr(case_when(
-      cyl <= 4 ~ 25,
-      cyl <= 6 & cyl > 4 ~ 20,
-      .default = 15
-    ))
+    quote(case_when(cyl <= 4 ~ 25, cyl <= 6 & cyl > 4 ~ 20, .default = 15))
   )
 })
 
@@ -180,13 +172,13 @@ test_that("generate_tree_nodes() works", {
   expect_identical(
     generate_tree_nodes(nodes, mode = ""),
     list(
-      rlang::expr(disp > 100 ~ !!pred_sum)
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
     )
   )
   expect_identical(
     generate_tree_nodes(nodes, mode = "ifelse"),
     list(
-      rlang::expr(ifelse(disp > 100, !!pred_sum, 0))
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
     )
   )
 
@@ -195,15 +187,15 @@ test_that("generate_tree_nodes() works", {
   expect_identical(
     generate_tree_nodes(nodes, mode = ""),
     list(
-      rlang::expr(disp > 100 ~ !!pred_sum),
-      rlang::expr(disp > 100 ~ !!pred_sum)
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2),
+      quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
     )
   )
   expect_identical(
     generate_tree_nodes(nodes, mode = "ifelse"),
     list(
-      rlang::expr(ifelse(disp > 100, !!pred_sum, 0)),
-      rlang::expr(ifelse(disp > 100, !!pred_sum, 0))
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0)),
+      quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
     )
   )
 })
@@ -221,11 +213,11 @@ test_that("generate_tree_node() works", {
   )
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(ifelse(disp > 100, !!pred_sum, 0))
+    quote(ifelse(disp > 100, 14 + hp * 4 + drat * 2, 0))
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(disp > 100 ~ !!pred_sum)
+    quote(disp > 100 ~ 14 + hp * 4 + drat * 2)
   )
 
   node <- list(
@@ -238,11 +230,11 @@ test_that("generate_tree_node() works", {
   )
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(!!pred_sum)
+    quote(14 + hp * 4 + drat * 2)
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(!!pred_sum)
+    quote(14 + hp * 4 + drat * 2)
   )
 
   node <- list(
@@ -253,11 +245,11 @@ test_that("generate_tree_node() works", {
   )
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(ifelse(disp > 100, 3, 0))
+    quote(ifelse(disp > 100, 3, 0))
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(disp > 100 ~ 3)
+    quote(disp > 100 ~ 3)
   )
 
   node <- list(
@@ -270,11 +262,11 @@ test_that("generate_tree_node() works", {
   )
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(ifelse(disp > 100, 14, 0))
+    quote(ifelse(disp > 100, 14, 0))
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(disp > 100 ~ 14)
+    quote(disp > 100 ~ 14)
   )
 })
 
@@ -290,12 +282,12 @@ test_that("generate_tree_node() avoids ifelse if path is always TRUE (#143)", {
 
   expect_identical(
     expr_text(generate_tree_node(node, calc_mode = "ifelse")),
-    "37.2 + (hp * -0.0318 + wt * -3.88)"
+    "37.2 + hp * -0.0318 + wt * -3.88"
   )
 
   expect_identical(
     expr_text(generate_tree_node(node, calc_mode = "")),
-    "37.2 + (hp * -0.0318 + wt * -3.88)"
+    "37.2 + hp * -0.0318 + wt * -3.88"
   )
 })
 
@@ -313,11 +305,11 @@ test_that("generate_tree_node() avoids multipliying with 0 and 1 (#152)", {
 
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(ifelse(disp > 100, hp * 4 + drat * 2, 0))
+    quote(ifelse(disp > 100, hp * 4 + drat * 2, 0))
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(disp > 100 ~ hp * 4 + drat * 2)
+    quote(disp > 100 ~ hp * 4 + drat * 2)
   )
 
   node <- list(
@@ -333,11 +325,11 @@ test_that("generate_tree_node() avoids multipliying with 0 and 1 (#152)", {
 
   expect_identical(
     generate_tree_node(node, calc_mode = "ifelse"),
-    rlang::expr(ifelse(disp > 100, 14 + hp, 0))
+    quote(ifelse(disp > 100, 14 + hp, 0))
   )
   expect_identical(
     generate_tree_node(node, calc_mode = ""),
-    rlang::expr(disp > 100 ~ 14 + hp)
+    quote(disp > 100 ~ 14 + hp)
   )
 })
 
@@ -346,7 +338,7 @@ test_that("path_formulas() works", {
     path_formulas(
       list()
     ),
-    rlang::expr(TRUE)
+    quote(TRUE)
   )
 
   expect_identical(
@@ -355,7 +347,7 @@ test_that("path_formulas() works", {
         list(type = "all", op = "more", col = "x", val = 0)
       )
     ),
-    rlang::expr(TRUE)
+    quote(TRUE)
   )
 
   expect_identical(
@@ -364,7 +356,7 @@ test_that("path_formulas() works", {
         list(type = "conditional", op = "more", col = "x", val = 0)
       )
     ),
-    rlang::expr(x > 0)
+    quote(x > 0)
   )
 
   expect_identical(
@@ -374,7 +366,7 @@ test_that("path_formulas() works", {
         list(type = "conditional", op = "less", col = "y", val = 0)
       )
     ),
-    rlang::expr(x > 0 & y < 0)
+    quote(x > 0 & y < 0)
   )
 
   expect_identical(
@@ -385,7 +377,7 @@ test_that("path_formulas() works", {
         list(type = "conditional", op = "less", col = "z", val = 0)
       )
     ),
-    rlang::expr(x > 0 & y < 0 & z < 0)
+    quote(x > 0 & y < 0 & z < 0)
   )
 })
 
@@ -397,7 +389,7 @@ test_that("path_formula() works", {
       col = "x",
       val = 0
     )),
-    rlang::expr(x > 0)
+    quote(x > 0)
   )
   expect_identical(
     path_formula(list(
@@ -406,7 +398,7 @@ test_that("path_formula() works", {
       col = "x",
       val = 0
     )),
-    rlang::expr(x >= 0)
+    quote(x >= 0)
   )
   expect_identical(
     path_formula(list(
@@ -415,7 +407,7 @@ test_that("path_formula() works", {
       col = "x",
       val = 0
     )),
-    rlang::expr(x < 0)
+    quote(x < 0)
   )
   expect_identical(
     path_formula(list(
@@ -424,7 +416,7 @@ test_that("path_formula() works", {
       col = "x",
       val = 0
     )),
-    rlang::expr(x <= 0)
+    quote(x <= 0)
   )
   expect_identical(
     path_formula(list(
@@ -433,7 +425,7 @@ test_that("path_formula() works", {
       col = "x",
       val = "h"
     )),
-    rlang::expr(x > "h")
+    quote(x > "h")
   )
   expect_identical(
     path_formula(list(
@@ -442,7 +434,7 @@ test_that("path_formula() works", {
       col = "x",
       val = "h"
     )),
-    rlang::expr(x >= "h")
+    quote(x >= "h")
   )
   expect_identical(
     path_formula(list(
@@ -451,7 +443,7 @@ test_that("path_formula() works", {
       col = "x",
       val = "h"
     )),
-    rlang::expr(x < "h")
+    quote(x < "h")
   )
   expect_identical(
     path_formula(list(
@@ -460,7 +452,7 @@ test_that("path_formula() works", {
       col = "x",
       val = "h"
     )),
-    rlang::expr(x <= "h")
+    quote(x <= "h")
   )
   expect_identical(
     path_formula(list(
@@ -469,7 +461,7 @@ test_that("path_formula() works", {
       col = "x",
       vals = 0
     )),
-    rlang::expr(x %in% 0)
+    quote(x %in% 0)
   )
   expect_identical(
     path_formula(list(
@@ -478,7 +470,7 @@ test_that("path_formula() works", {
       col = "x",
       vals = 0
     )),
-    rlang::expr((x %in% 0) == FALSE)
+    quote((x %in% 0) == FALSE)
   )
   expect_identical(
     path_formula(list(
@@ -487,7 +479,7 @@ test_that("path_formula() works", {
       col = "x",
       vals = "h"
     )),
-    rlang::expr(x %in% "h")
+    quote(x %in% "h")
   )
   expect_identical(
     path_formula(list(
@@ -496,7 +488,7 @@ test_that("path_formula() works", {
       col = "x",
       vals = "h"
     )),
-    rlang::expr((x %in% "h") == FALSE)
+    quote((x %in% "h") == FALSE)
   )
 
   res <- path_formula(list(

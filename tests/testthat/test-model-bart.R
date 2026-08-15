@@ -77,8 +77,17 @@ test_that("predictions match at dbarts' default `ntree` (#305)", {
   df <- bart_data(n = 40)
   model <- bart_fit(df, ntree = 200, ndpost = 50)
 
+  # 10,000 leaf values, well over the point at which the terms are summed in a
+  # balanced shape rather than from the left. A left fold of them nests deeper
+  # than R will evaluate.
+  pm <- parse_model(model)
+  expect_gt(length(pm$trees), addition_balance_at)
+
+  tf <- tidypredict_fit(model)
+  expect_lt(expr_depth(tf), 100)
+
   expect_equal(
-    rlang::eval_tidy(tidypredict_fit(model), df),
+    rlang::eval_tidy(tf, df),
     colMeans(predict(model, df))
   )
 })

@@ -3,7 +3,7 @@
     Code
       round_print(tidypredict_fit(model)[["setosa"]])
     Output
-      [1] "1/(1 + (exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.620738 - ((Petal.Width - 1.326)^2/0.07821224)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))) + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.292258 - ((Petal.Width - 2.026)^2/0.1508653)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224))))))"
+      [1] "1/(1 + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.620738 - ((Petal.Width - 1.326)^2/0.07821224)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))) + exp(-1.098612 + ifelse(is.na(Petal.Width), 0, 1.292258 - ((Petal.Width - 2.026)^2/0.1508653)) - (-1.098612 + ifelse(is.na(Petal.Width), 0, 2.250129 - ((Petal.Width - 0.246)^2/0.02221224)))))"
 
 # kernel density fits are rejected
 
