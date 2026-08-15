@@ -147,3 +147,34 @@ test_that("multiclass H2O RuleFit models are not supported", {
 
   expect_snapshot(tidypredict_fit(model$fit), error = TRUE)
 })
+
+test_that("non-GBM H2O models are not supported", {
+  skip_if_no_h2o()
+
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  hf <- h2o::as.h2o(df)
+  x <- c("wt", "cyl", "hp")
+
+  # A tree ensemble that is not a GBM, dispatching on all three model classes.
+  drf_reg <- h2o::h2o.randomForest(x, "mpg", hf, ntrees = 5)
+  drf_bin <- h2o::h2o.randomForest(x, "vs", hf, ntrees = 5)
+  drf_mul <- h2o::h2o.randomForest(
+    x,
+    "gear",
+    h2o::as.h2o(
+      transform(df, gear = factor(paste0("g", df$gear)))
+    ),
+    ntrees = 5
+  )
+
+  expect_snapshot(tidypredict_fit(drf_reg), error = TRUE)
+  expect_snapshot(tidypredict_fit(drf_bin), error = TRUE)
+  expect_snapshot(tidypredict_fit(drf_mul), error = TRUE)
+
+  # An algorithm with no trees at all, which used to fail inside `seq_len()`.
+  expect_snapshot(
+    tidypredict_fit(h2o::h2o.glm(x, "mpg", hf)),
+    error = TRUE
+  )
+})
