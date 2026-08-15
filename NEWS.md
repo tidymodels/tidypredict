@@ -44,6 +44,10 @@
 
 - `tidypredict_fit()` now reports a `C50::C5.0()` model that records no tree, rather than failing with "subscript out of bounds". `C5.0()` leaves the tree empty when fitting failed, which a predictor name or level containing `,` or `:` causes. (#287)
 
+- `tidypredict_fit()` now works for rank-deficient `lm()` and `glm()` models, which aborted with "Unable to calculate inverse of QR decomposition" even though it needs no QR decomposition at all. Two everyday shapes hit this: a duplicated predictor column, and a predictor with no variance. The aliased coefficients R leaves as `NA` are now dropped, as `predict()` drops them, and the QR decomposition the prediction interval needs is built from the columns the fit actually identified, so `tidypredict_interval()` keeps working for these models too. (#308)
+
+- `tidypredict_interval()` now reports a parsed model that carries no QR decomposition, instead of failing with "Must supply `.init` when `.x` is empty". (#308)
+
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
