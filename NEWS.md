@@ -1,3 +1,7 @@
+# tidypredict 1.1.1
+
+- `parse_model()` and `tidypredict_fit()` now detect xgboost dropout (DART) models from the saved dropout weights rather than the serialised booster name, so they keep applying `weight_drop` with xgboost 3.4.0 and later, which canonicalises `booster = "dart"` to `"gbtree"`. (#238)
+
 # tidypredict 1.1.0
 
 ## New Model Supports

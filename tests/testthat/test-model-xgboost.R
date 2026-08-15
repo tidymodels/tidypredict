@@ -633,6 +633,33 @@ test_that("gbtree booster has no weight_drop", {
   expect_null(pm$general$weight_drop)
 })
 
+test_that("dropout weights are found when the booster is saved as gbtree", {
+  # xgboost >= 3.4 canonicalises `booster = "dart"` to `"gbtree"`
+  txt <- paste0(
+    '{"learner":{"gradient_booster":{"name":"gbtree",',
+    '"weight_drop":[1E0,7E-1,5E-1],"model":{}},',
+    '"learner_model_param":{"base_score":"[5E-1]"}}}'
+  )
+
+  params <- parse_xgb_json_params(txt)
+
+  expect_equal(params$booster_name, "dart")
+  expect_equal(params$weight_drop, c(1, 0.7, 0.5))
+})
+
+test_that("all-ones dropout weights are not treated as dropout", {
+  txt <- paste0(
+    '{"learner":{"gradient_booster":{"name":"gbtree",',
+    '"weight_drop":[1E0,1E0],"model":{}},',
+    '"learner_model_param":{"base_score":"[5E-1]"}}}'
+  )
+
+  params <- parse_xgb_json_params(txt)
+
+  expect_equal(params$booster_name, "gbtree")
+  expect_null(params$weight_drop)
+})
+
 test_that("model with custom base_score works correctly", {
   skip_if_not_installed("xgboost")
 
