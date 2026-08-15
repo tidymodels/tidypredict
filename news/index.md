@@ -111,6 +111,35 @@
   ([\#299](https://github.com/tidymodels/tidypredict/issues/299))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects a `glmnet` model fit with an `offset` rather than silently
+  dropping it, for both the single-outcome and the multinomial paths.
+  glmnet records only whether an offset was used, never the values, and
+  [`predict()`](https://rdrr.io/r/stats/predict.html) requires them
+  again as `newoffset`, so the prediction cannot be reproduced.
+  Predictions were previously wrong by the size of the offset.
+  ([\#296](https://github.com/tidymodels/tidypredict/issues/296))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects a
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  probability or survival forest rather than producing an unusable
+  formula. Neither records a value per leaf, so a guard that read one
+  let both through and emitted
+  `case_when(x <= 0.0066 ~ NULL, .default = NULL)`, which failed later
+  with an unrelated vctrs error;
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  returned a parsed model with no predictions and no error at all. The
+  forest type is now read from `treetype`.
+  ([\#301](https://github.com/tidymodels/tidypredict/issues/301))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now honours an `mstop` reduced after fitting for `mboost` models, as
+  `model[m]` does. Subsetting a fitted model, which is the standard
+  `cvrisk()` workflow, sets `mstop` but leaves the stored ensemble at
+  its full length, so every boosting iteration was used regardless.
+  ([\#306](https://github.com/tidymodels/tidypredict/issues/306))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now sends a value sitting exactly on a split boundary the way the
   model does, for the backends that compare split thresholds as 32-bit
   floats: `xgboost`, `lightgbm`, `catboost`,
