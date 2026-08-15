@@ -4,6 +4,10 @@
 
 - The naive Bayes article now documents the one case where `tidypredict_fit()` does not reproduce `predict()` for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models: both replace a normal density that underflowed to zero with their `threshold` argument, which takes a value roughly 38 standard deviations from the class mean, and the log scale used throughout never underflows. (#300)
 
+- `tidypredict_fit()` now returns correct predictions for `kernlab::ksvm()` models with a single numeric predictor, which previously produced a bare constant. kernlab leaves the column names of a one-column model matrix empty, so every term was dropped and only the intercept remained. (#289)
+
+- `tidypredict_fit()` now undoes kernlab's predictor scaling when exactly one column was scaled for `kernlab::ksvm()` models. This covers any fit with one numeric predictor plus factor predictors, since kernlab does not scale dummy columns, and the weights were left on the scaled scale because the centers and scales lose their names in that case. (#289)
+
 - `tidypredict_fit()` now applies the per-rule extrapolation limits for `Cubist::cubist()` models. Cubist holds each rule to the span of the training outcomes it covers, widened at both ends by `extrap` times that span and never crossing zero; without it a rule's linear model runs away on data outside its range. This engages on rows of the training data too, not only on extrapolation. (#285)
 
 - `tidypredict_fit()` now supports factor predictors for `Cubist::cubist()` models, which previously produced a formula that could not be evaluated (`object '"f"' not found`). Rule conditions are now read from the model text rather than from `model$splits`, which records neither the quoted column name nor a condition naming a single level, so such a rule silently applied to every row. (#322)
