@@ -1,9 +1,9 @@
 # returns the right output
 
     Code
-      rlang::expr_text(tf)
+      round_print(tf)
     Output
-      [1] "35.3137765116027 + (cyl * -0.871451193824228) + (hp * -0.0101173960249783) + \n    (wt * -2.59443677687505)"
+      [1] "35.31378 + (cyl * -0.8714512) + (hp * -0.0101174) + (wt * -2.594437)"
 
 # formulas produces correct predictions
 
@@ -57,9 +57,9 @@
 # glmnet are handeld neatly with parsnip
 
     Code
-      rlang::expr_text(tf)
+      round_print(tf)
     Output
-      [1] "35.3140536966127 + (cyl * -0.871623418095165) + (hp * -0.0101157918502673) + \n    (wt * -2.59426484734253)"
+      [1] "35.31405 + (cyl * -0.8716234) + (hp * -0.01011579) + (wt * -2.594265)"
 
 # multinomial family errors with helpful message (#198)
 
