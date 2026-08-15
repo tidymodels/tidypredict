@@ -172,6 +172,23 @@
   ([\#288](https://github.com/tidymodels/tidypredict/issues/288))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  and
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now work on an `xgboost` booster that has been saved and reloaded with
+  [`xgb.save()`](https://rdrr.io/pkg/xgboost/man/xgb.save.html) /
+  [`xgb.load()`](https://rdrr.io/pkg/xgboost/man/xgb.load.html). Such a
+  booster was routed to the pre-2.0 code path and failed with
+  `argument "model" is missing, with no default`, because the attribute
+  used to tell the two APIs apart is set by
+  [`xgb.train()`](https://rdrr.io/pkg/xgboost/man/xgb.train.html) but
+  not by [`xgb.load()`](https://rdrr.io/pkg/xgboost/man/xgb.load.html).
+  The objective is also recovered from the saved model now, which a
+  reloaded booster records nowhere else; without it the raw margin was
+  returned as though it were a probability, behind a warning about
+  custom objectives.
+  ([\#292](https://github.com/tidymodels/tidypredict/issues/292))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now combines the trials of a boosted
   [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
   model with the confidence C5.0 votes with,
