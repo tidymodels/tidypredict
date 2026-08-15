@@ -111,12 +111,12 @@ test_that("expr_and works", {
 test_that("reduce_addition works", {
   expect_identical(
     reduce_addition(list(2, 5, 6)),
-    quote(2 + 5 + 6)
+    rlang::expr(2 + !!quote(5 + 6))
   )
 
   expect_identical(
     reduce_addition(list(2, quote(hp), quote(vp))),
-    quote(2 + hp + vp)
+    rlang::expr(2 + !!quote(hp + vp))
   )
 
   expect_identical(
@@ -137,6 +137,18 @@ test_that("reduce_addition works", {
   expect_identical(
     reduce_addition(list(quote(vp + vp), quote((vp + vp)))),
     quote(vp + vp + (vp + vp))
+  )
+})
+
+test_that("reduce_addition nests shallowly enough to evaluate", {
+  expect_identical(
+    reduce_addition(list(1, 2, 3, 4)),
+    rlang::expr(!!quote(1 + 2) + !!quote(3 + 4))
+  )
+
+  expect_equal(
+    rlang::eval_tidy(reduce_addition(as.list(rep(1, 20000)))),
+    20000
   )
 })
 

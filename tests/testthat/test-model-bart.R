@@ -70,6 +70,19 @@ test_that("predictions match native predict", {
   expect_false(tidypredict_test(model, df)$alert)
 })
 
+test_that("predictions match at dbarts' default `ntree` (#305)", {
+  skip_if_not_installed("dbarts")
+
+  set.seed(104)
+  df <- bart_data(n = 40)
+  model <- bart_fit(df, ntree = 200, ndpost = 50)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    colMeans(predict(model, df))
+  )
+})
+
 test_that("predictions match with a matrix of predictors", {
   skip_if_not_installed("dbarts")
 

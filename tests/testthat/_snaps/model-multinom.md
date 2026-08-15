@@ -7,10 +7,10 @@
       [1] "0"
       
       [[2]]
-      [1] "18.69037 + (Sepal.Length * -5.458424) + (Sepal.Width * -8.707401) + (Petal.Length * 14.24477) + (Petal.Width * -3.097684)"
+      [1] "18.69037 + (Sepal.Length * -5.458424) + ((Sepal.Width * -8.707401) + ((Petal.Length * 14.24477) + (Petal.Width * -3.097684)))"
       
       [[3]]
-      [1] "-23.83628 + (Sepal.Length * -7.923634) + (Sepal.Width * -15.37077) + (Petal.Length * 23.65978) + (Petal.Width * 15.1353)"
+      [1] "-23.83628 + (Sepal.Length * -7.923634) + ((Sepal.Width * -15.37077) + ((Petal.Length * 23.65978) + (Petal.Width * 15.1353)))"
       
 
 # tidypredict_test errors for multinom models

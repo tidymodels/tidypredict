@@ -18,8 +18,26 @@ expr_and <- function(x, y) {
   expr(!!x & !!y)
 }
 
+# Sum a set of expressions with a balanced, divide and conquer reduction.
+#
+# A left fold would nest the `+` calls `length(x)` deep, and R's evaluator gives
+# up somewhere in the low thousands ("evaluation nested too deeply"). An
+# ensemble reaches that easily: a `bart()` fit at its package defaults sums
+# `n_draws * ntree` leaf values. Splitting the terms in half at every step makes
+# the nesting depth `log2(length(x))` instead, so the same fit evaluates.
 reduce_addition <- function(x) {
-  reduce(x, expr_addition)
+  n <- length(x)
+  if (n == 0) {
+    return(NULL)
+  }
+  if (n == 1) {
+    return(x[[1]])
+  }
+  mid <- n %/% 2
+  expr_addition(
+    reduce_addition(x[seq_len(mid)]),
+    reduce_addition(x[seq.int(mid + 1, n)])
+  )
 }
 
 reduce_subtraction <- function(x) {

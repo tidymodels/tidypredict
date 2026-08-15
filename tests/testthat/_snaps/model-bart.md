@@ -3,7 +3,7 @@
     Code
       rlang::expr_text(tidypredict_fit(bart_round(pm)))
     Output
-      [1] "(case_when(x1 <= -1.319 ~ -0.271, .default = case_when(x1 <= \n    2.265 ~ case_when(x1 <= 1.04 ~ 0.014, .default = 0.152), \n    .default = -0.059)) + case_when(x1 <= 0.087 ~ -0.061, .default = 0.041) + \n    case_when(x1 <= -1.365 ~ -0.217, .default = case_when(x1 <= \n        2.265 ~ case_when(x1 <= 1.04 ~ -0.061, .default = 0.176), \n        .default = 0.434)) + case_when(x1 <= 0.087 ~ -0.081, \n    .default = 0.025))/2 * 13.631 + 3.022"
+      [1] "(case_when(x1 <= -1.319 ~ -0.271, .default = case_when(x1 <= \n    2.265 ~ case_when(x1 <= 1.04 ~ 0.014, .default = 0.152), \n    .default = -0.059)) + case_when(x1 <= 0.087 ~ -0.061, .default = 0.041) + \n    (case_when(x1 <= -1.365 ~ -0.217, .default = case_when(x1 <= \n        2.265 ~ case_when(x1 <= 1.04 ~ -0.061, .default = 0.176), \n        .default = 0.434)) + case_when(x1 <= 0.087 ~ -0.081, \n        .default = 0.025)))/2 * 13.631 + 3.022"
 
 # classification models are not supported
 
