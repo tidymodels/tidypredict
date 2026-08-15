@@ -220,6 +220,22 @@ test_that("multiple non classification outputs are rejected", {
   expect_snapshot(error = TRUE, tidypredict_fit(model))
 })
 
+test_that("matrix interface fits are rejected", {
+  skip_if_not_installed("nnet")
+
+  set.seed(100)
+  model <- nnet::nnet(
+    as.matrix(mtcars[, c("wt", "hp")]),
+    mtcars$mpg,
+    size = 2,
+    linout = TRUE,
+    trace = FALSE
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+  expect_snapshot(error = TRUE, parse_model(model))
+})
+
 test_that("tidypredict_test errors for classification nnet models", {
   skip_if_not_installed("nnet")
 
