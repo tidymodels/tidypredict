@@ -245,6 +245,62 @@ test_that("reg:squarederror predictions match native predict", {
   expect_false(result$alert)
 })
 
+test_that("a saved and reloaded booster still predicts correctly (#292)", {
+  skip_if_not_installed("xgboost")
+
+  # `xgb.load()` sets neither `attr(model, "param")` nor `model$params`, so a
+  # reloaded booster used to take the pre-2.0 code path and fail outright, and
+  # once past that had no objective to apply, returning the raw margin as
+  # though it were a probability.
+  X <- as.matrix(mtcars[, c("wt", "disp", "hp")])
+
+  for (objective in c("reg:squarederror", "binary:logistic", "count:poisson")) {
+    label <- switch(
+      objective,
+      "binary:logistic" = mtcars$am,
+      "count:poisson" = mtcars$carb,
+      mtcars$mpg
+    )
+
+    set.seed(1)
+    model <- xgboost::xgb.train(
+      params = list(max_depth = 3L, objective = objective),
+      data = xgboost::xgb.DMatrix(X, label = label),
+      nrounds = 5L,
+      verbose = 0
+    )
+
+    path <- withr::local_tempfile(fileext = ".ubj")
+    xgboost::xgb.save(model, path)
+    reloaded <- xgboost::xgb.load(path)
+
+    # The objective has to survive the round trip, or a logit is returned as a
+    # probability without anything to signal it.
+    expect_equal(
+      parse_model(reloaded)$general$params$objective,
+      objective
+    )
+
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(reloaded), mtcars),
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      info = objective
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(reloaded), mtcars),
+      as.numeric(predict(reloaded, X)),
+      tolerance = 1e-5,
+      info = objective
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(reloaded)), mtcars),
+      as.numeric(predict(reloaded, X)),
+      tolerance = 1e-5,
+      info = objective
+    )
+  }
+})
+
 test_that("values sitting on a split boundary match native predict", {
   skip_if_not_installed("xgboost")
 

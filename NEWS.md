@@ -32,6 +32,8 @@
 
 - `tidypredict_fit()` now honours `reg_sqrt` for `lightgbm` models, which trains on `sqrt(|y|)` keeping the sign and squares the raw score back onto the response scale. Predictions were left on the square-root scale, which can be further from `predict()` than the response itself. The `huber` objective accepts the parameter but does not act on it, and is left alone. (#288)
 
+- `tidypredict_fit()` and `parse_model()` now work on an `xgboost` booster that has been saved and reloaded with `xgb.save()` / `xgb.load()`. Such a booster was routed to the pre-2.0 code path and failed with `argument "model" is missing, with no default`, because the attribute used to tell the two APIs apart is set by `xgb.train()` but not by `xgb.load()`. The objective is also recovered from the saved model now, which a reloaded booster records nowhere else; without it the raw margin was returned as though it were a probability, behind a warning about custom objectives. (#292)
+
 - `tidypredict_fit()` now combines the trials of a boosted `C50::C5.0()` model with the confidence C5.0 votes with, `(freq + prior) / (n_leaf + 1)`, where `prior` is the class proportion at the root of that trial's own tree. It used the Laplace ratio `(freq + 1) / (n_leaf + 2)` instead, which changed the predicted class for 72 of 720 swept configurations. A tie in the total vote now goes to the default class, as `SelectClass` does. (#287)
 
 - `tidypredict_fit()` no longer reads C5.0's `[ordered]` marker as part of the first level of an ordered predictor. (#287)
