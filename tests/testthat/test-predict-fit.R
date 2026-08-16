@@ -40,6 +40,69 @@ test_that("tidypredict_fit.pm_tree works for v2 randomForest (backwards compat)"
   expect_type(fit, "language")
 })
 
+test_that("tidypredict_fit.pm_tree works for v2 party (backwards compat)", {
+  skip_if_not_installed("partykit")
+  pm <- readRDS(test_path("backwards-compat", "party-v2-regression.rds"))
+  model <- partykit::ctree(mpg ~ wt + disp + hp, data = mtcars)
+
+  fit <- tidypredict_fit(pm)
+  res <- dplyr::mutate(mtcars, .fit = !!fit)$.fit
+
+  expect_equal(res, unname(predict(model, mtcars)))
+})
+
+test_that("tidypredict_fit.pm_tree works for v2 rpart surrogates (backwards compat)", {
+  skip_if_not_installed("rpart")
+  pm <- readRDS(test_path("backwards-compat", "rpart-v2-surrogates.rds"))
+  data <- readRDS(test_path("backwards-compat", "rpart-v2-data.rds"))
+  model <- rpart::rpart(
+    mpg ~ wt + disp + hp + drat,
+    data = data,
+    control = rpart::rpart.control(minsplit = 5, cp = 0.01)
+  )
+
+  fit <- tidypredict_fit(pm)
+  res <- dplyr::mutate(data, .fit = !!fit)$.fit
+
+  expect_equal(res, unname(predict(model, data)))
+})
+
+test_that("tidypredict_fit.pm_tree works for v2 rpart without surrogates (backwards compat)", {
+  skip_if_not_installed("rpart")
+  pm <- readRDS(test_path("backwards-compat", "rpart-v2-nosurrogate.rds"))
+  data <- readRDS(test_path("backwards-compat", "rpart-v2-data.rds"))
+  model <- rpart::rpart(
+    mpg ~ wt + disp + hp + drat,
+    data = data,
+    control = rpart::rpart.control(minsplit = 5, cp = 0.01, usesurrogate = 0)
+  )
+
+  fit <- tidypredict_fit(pm)
+  res <- dplyr::mutate(data, .fit = !!fit)$.fit
+
+  expect_equal(res, unname(predict(model, data)))
+})
+
+test_that("tidypredict_to_column() and tidypredict_sql() work for v2 party", {
+  skip_if_not_installed("partykit")
+  skip_if_not_installed("dbplyr")
+  pm <- readRDS(test_path("backwards-compat", "party-v2-regression.rds"))
+  model <- partykit::ctree(mpg ~ wt + disp + hp, data = mtcars)
+
+  res <- tidypredict_to_column(mtcars, pm)
+
+  expect_equal(res$fit, unname(predict(model, mtcars)))
+  expect_s3_class(tidypredict_sql(pm, dbplyr::simulate_dbi()), "sql")
+})
+
+test_that("tidypredict_fit.pm_tree errors for unsupported v2 models", {
+  pm <- structure(
+    list(general = list(model = "made_up", version = 2, type = "tree")),
+    class = c("parsed_model", "pm_tree", "list")
+  )
+  expect_snapshot(error = TRUE, tidypredict_fit(pm))
+})
+
 test_that("tidypredict_fit() errors for a model class it has no parser for", {
   expect_snapshot(
     error = TRUE,
