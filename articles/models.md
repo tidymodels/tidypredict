@@ -17,7 +17,7 @@ route, not that it is known to fail.
 |----|----|----|----|
 | Linear regression | [`stats::lm()`](https://rdrr.io/r/stats/lm.html) | `linear_reg(engine = "lm")` | [article](https://tidypredict.tidymodels.org/articles/lm.md) |
 | Generalized linear regression | [`stats::glm()`](https://rdrr.io/r/stats/glm.html) | `linear_reg(engine = "glm")`, `logistic_reg(engine = "glm")` | [article](https://tidypredict.tidymodels.org/articles/glm.md) |
-| Regularized regression | [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) | [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html), [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html), [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html) with `engine = "glmnet"` | [article](https://tidypredict.tidymodels.org/articles/glmnet.md) |
+| Regularized regression | [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) | [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html), [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html), [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html) with `engine = "glmnet"` | [article](https://tidypredict.tidymodels.org/articles/glmnet.md) |
 | Regularized linear models | [`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html) | `logistic_reg(engine = "LiblineaR")`, `svm_linear(engine = "LiblineaR")` |  |
 | Quantile regression | [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html), `quantreg::rqs()` | `linear_reg(engine = "quantreg")` |  |
 | Multinomial regression | [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html) | `multinom_reg(engine = "nnet")` | [article](https://tidypredict.tidymodels.org/articles/multinom.md) |
@@ -36,7 +36,7 @@ route, not that it is known to fail.
 | Quadratic discriminant analysis | [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html) | `discrim_quad(engine = "MASS")` | [article](https://tidypredict.tidymodels.org/articles/qda.md) |
 | Flexible discriminant analysis | [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html) | `discrim_linear(engine = "mda")` | [article](https://tidypredict.tidymodels.org/articles/fda.md) |
 | Shrinkage discriminant analysis | [`sda::sda()`](https://rdrr.io/pkg/sda/man/sda.html) | `discrim_linear(engine = "sda")` | [article](https://tidypredict.tidymodels.org/articles/sda.md) |
-| Regularized discriminant analysis | [`sparsediscrim::lda_diag()`](https://rdrr.io/pkg/sparsediscrim/man/lda_diag.html), `lda_shrink_mean()`, `lda_shrink_cov()`, `lda_emp_bayes_eigen()` | `discrim_linear(engine = "sparsediscrim")` | [article](https://tidypredict.tidymodels.org/articles/sparsediscrim.md) |
+| Regularized discriminant analysis | [`sparsediscrim::lda_diag()`](https://topepo.github.io/sparsediscrim/reference/lda_diag.html), `lda_shrink_mean()`, `lda_shrink_cov()`, `lda_emp_bayes_eigen()` | `discrim_linear(engine = "sparsediscrim")` | [article](https://tidypredict.tidymodels.org/articles/sparsediscrim.md) |
 
 ## Trees and forests
 
