@@ -416,10 +416,11 @@ get_lgb_path_fast <- function(
       )
     } else if (dec_type == "==") {
       # Categorical split: threshold is "0||1||3" format
+      check_lgb_categorical_default_left(def_left)
       category_set <- parse_lgb_categorical_threshold(threshold[parent_row])
 
-      # `Tree::CategoricalDecision` sends a missing value right whatever
-      # `default_left` says, so it is never carried with the left branch.
+      # A missing value always goes right, so it is never carried with the
+      # left branch.
       op <- if (is_left_child) "in" else "not-in"
 
       condition <- list(
@@ -444,6 +445,21 @@ get_lgb_path_fast <- function(
 # Parse LightGBM categorical threshold format "0||1||3" -> c(0, 1, 3)
 parse_lgb_categorical_threshold <- function(threshold) {
   as.integer(strsplit(threshold, "[|][|]")[[1]])
+}
+
+# `Tree::CategoricalDecision` sends a missing value, and any negative value,
+# right whatever `default_left` says, and `Tree::SplitCategorical` never sets
+# the bit in the first place, so a categorical split with `default_left` set is
+# a state LightGBM does not produce. Nothing here could route it correctly, so
+# it is refused rather than silently mishandled.
+check_lgb_categorical_default_left <- function(default_left) {
+  if (isTRUE(default_left)) {
+    cli::cli_abort(
+      "A categorical split cannot set {.field default_left}.",
+      .internal = TRUE
+    )
+  }
+  invisible(NULL)
 }
 
 # Shared helpers -----------------------------------------------
@@ -806,8 +822,8 @@ build_nested_lgb_node <- function(
   } else if (decision_type == "==") {
     # Categorical split: LEFT = (in set), RIGHT = (not in set).
     #
-    # `Tree::CategoricalDecision` sends a missing value right whatever
-    # `default_left` says, which `%in%` does too.
+    # A missing value always goes right, which `%in%` does too.
+    check_lgb_categorical_default_left(default_left)
     category_set <- parse_lgb_categorical_threshold(threshold)
     condition <- expr(!!col_sym %in% !!category_set)
   } else {

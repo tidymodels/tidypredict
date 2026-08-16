@@ -386,6 +386,25 @@ test_that("mixed default_left values in same tree are handled correctly", {
   expect_equal(tree_result[[3]]$path[[1]]$missing, FALSE)
 })
 
+test_that("a categorical split with default_left set is refused (#288)", {
+  tree_df <- data.frame(
+    tree_index = c(0L, 0L, 0L),
+    split_index = c(0L, NA, NA),
+    split_feature = c("x", NA, NA),
+    node_parent = c(NA, NA, NA),
+    leaf_index = c(NA, 0L, 1L),
+    leaf_parent = c(NA, 0L, 0L),
+    threshold = c("1||3", NA, NA),
+    decision_type = c("==", NA, NA),
+    default_left = c("TRUE", NA, NA),
+    leaf_value = c(NA, 1.0, 2.0),
+    stringsAsFactors = FALSE
+  )
+
+  expect_snapshot(error = TRUE, tidypredict:::get_lgb_tree(tree_df))
+  expect_snapshot(error = TRUE, tidypredict:::build_nested_lgb_tree(tree_df))
+})
+
 lgb_missing_data <- function(na, zeros, seed = 1) {
   set.seed(seed)
   n <- 400
