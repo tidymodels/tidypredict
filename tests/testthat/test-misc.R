@@ -140,6 +140,21 @@ test_that("reduce_addition works", {
   )
 })
 
+test_that("reduce_addition balances only above the threshold (#305)", {
+  terms <- as.list(rep(1, addition_balance_at - 1))
+  expect_identical(reduce_addition(terms), reduce(terms, expr_addition))
+
+  above <- reduce_addition(as.list(rep(1, addition_balance_at)))
+  expect_identical(expr_depth(above), 10L)
+  expect_identical(rlang::eval_tidy(above), as.numeric(addition_balance_at))
+
+  # Far past the depth at which R stops evaluating a left fold
+  expect_identical(
+    rlang::eval_tidy(reduce_addition(as.list(rep(1, 20000)))),
+    20000
+  )
+})
+
 test_that("reduce_subtraction works", {
   expect_identical(
     reduce_subtraction(list(2, 5, 6)),

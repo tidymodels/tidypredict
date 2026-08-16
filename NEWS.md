@@ -4,6 +4,8 @@
 
 - The naive Bayes article now documents the one case where `tidypredict_fit()` does not reproduce `predict()` for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models: both replace a normal density that underflowed to zero with their `threshold` argument, which takes a value roughly 38 standard deviations from the class mean, and the log scale used throughout never underflows. (#300)
 
+- `tidypredict_fit()` now produces a formula R can evaluate for a `dbarts::bart()` fit at the package default `ntree`. Terms are summed left to right, which nests the `+` calls as deeply as there are terms, and a bart fit sums `ndpost * ntree` leaf values: at the defaults R gave up with "evaluation nested too deeply". A model with 1000 terms or more is now summed in a balanced shape instead, nesting `log2(n)` deep. Only a large ensemble reaches that, so every other model keeps the flat left-to-right sum it had before, along with the exact result and the formula layout that go with it. (#305)
+
 - `.build_case_when_tree()`, which {orbital} calls, now returns the bare prediction of a stump tree whether that prediction is a number or a class label. A classification stump previously produced `case_when(.default = "a")`, which dplyr rejects with "`...` can't be empty". (#310)
 
 - `tidypredict_fit()` no longer fails with "`x` must be a formula" on a parsed model saved by tidypredict 1.0.1 or earlier that contains a `ranger::ranger()` or `randomForest::randomForest()` stump, a tree whose root is its only node. Such a tree is now written as its constant prediction. (#310)
