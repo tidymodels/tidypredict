@@ -75,6 +75,16 @@
   ([\#289](https://github.com/tidymodels/tidypredict/issues/289))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now assigns rules to the right committee for
+  [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
+  models fitted with more than 20 committees. The committee each rule
+  belonged to was scraped from the printed model, whose “Number of rules
+  per committee” line is truncated at 20 committees, so the rules beyond
+  that point were recycled across the wrong committees and the average
+  was taken over 20 committees instead of the number requested.
+  ([\#286](https://github.com/tidymodels/tidypredict/issues/286))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now applies the per-rule extrapolation limits for
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
   models. Cubist holds each rule to the span of the training outcomes it
