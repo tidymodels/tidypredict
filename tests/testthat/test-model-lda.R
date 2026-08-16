@@ -161,6 +161,21 @@ test_that("a row far outside the training range matches predict() (#299)", {
   expect_equal(unname(probs), unname(predict(model, far)$posterior))
 })
 
+test_that("an unused outcome level is handled (#302)", {
+  skip_if_not_installed("MASS")
+
+  df <- iris
+  df$Species <- factor(df$Species, levels = c(levels(df$Species), "unused"))
+  model <- suppressWarnings(MASS::lda(Species ~ ., data = df))
+
+  tf <- tidypredict_fit(model)
+  expect_named(tf, levels(iris$Species))
+
+  probs <- sapply(tf, \(f) rlang::eval_tidy(f, df))
+
+  expect_equal(unname(probs), unname(predict(model, df)$posterior))
+})
+
 test_that("an ordered factor is rejected (#343)", {
   skip_if_not_installed("MASS")
   # R fits an ordered factor with `contr.poly`, whose columns are named `.L`,

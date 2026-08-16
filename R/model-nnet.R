@@ -158,7 +158,15 @@ parse_model.nnet <- function(model) {
   pm$general$n_units <- n_units
   pm$general$n_outputs <- n_outputs
   pm$general$softmax <- isTRUE(model$softmax)
-  pm$classes <- model$lev
+  # `lev` keeps every level of the outcome factor, but `nnet()` drops the levels
+  # no observation fell in, so with more than one output unit the classes are
+  # read off the fitted values, which is also what `predict()` labels its
+  # columns with. A binary outcome has a single, unnamed output unit.
+  pm$classes <- if (n_outputs > 1) {
+    colnames(model$fitted.values) %||% model$lev
+  } else {
+    model$lev
+  }
   pm$inputs <- inputs
   pm$units <- units
 

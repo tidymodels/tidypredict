@@ -12,8 +12,11 @@ parse_model.lda <- function(model) {
     vars <- names(attr(model$terms, "dataClasses"))
   }
 
-  classes <- model$lev
+  # `lev` keeps every level of the outcome factor, but `lda()` drops the levels
+  # no observation fell in, so `prior`, `means` and the posterior returned by
+  # `predict()` only cover the groups that were actually fit.
   prior <- model$prior
+  classes <- names(prior)
 
   # `predict.lda()` centers the model matrix at the prior-weighted grand mean,
   # projects it onto the discriminant space, and then compares the result to

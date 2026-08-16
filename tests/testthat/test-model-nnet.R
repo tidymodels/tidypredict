@@ -179,6 +179,24 @@ test_that("binary outcomes are handled", {
   expect_equal(unname(rowSums(probs)), rep(1, nrow(df)))
 })
 
+test_that("an unused outcome level is handled (#302)", {
+  skip_if_not_installed("nnet")
+
+  df <- iris
+  df$Species <- factor(df$Species, levels = c(levels(df$Species), "unused"))
+  set.seed(100)
+  model <- suppressWarnings(
+    nnet::nnet(Species ~ ., data = df, size = 3, trace = FALSE)
+  )
+
+  tf <- tidypredict_fit(model)
+  expect_named(tf, levels(iris$Species))
+
+  probs <- sapply(tf, \(f) rlang::eval_tidy(f, df))
+
+  expect_equal(unname(probs), unname(predict(model, df, type = "raw")))
+})
+
 test_that("model can be saved and re-loaded", {
   skip_if_not_installed("nnet")
   skip_if_not_installed("yaml")
