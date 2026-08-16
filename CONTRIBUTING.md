@@ -18,6 +18,25 @@ Tests for `R/model-{name}.R` go in `tests/testthat/test-model-{name}.R`. Work th
 10. **Factor predictors**, if the model accepts them.
 11. **`NA` handling.** Predict on data that actually contains `NA`, not just a structural check that a missing-value branch was generated.
 
+### Edge cases every parser must cover
+
+Items 10 and 11 above are the short form of a longer list. A triage of the bug-labelled issues found that almost all of them shared one root cause: each model's tests fit a clean numeric model on clean data and compared against `predict()`, and every bug lived somewhere else. Five sweeps across the supported model classes each turned up several independent bugs, in these five categories. Work through all five for any model you add or change.
+
+The reasons matter more than the list. A new model class will have edge cases nobody anticipated, and the way to find them is to ask the same underlying questions.
+
+1. **Factors and categorical splits.** Test a factor predictor with contrast coding other than `contr.treatment`, since an ordered factor gets `contr.poly` and produces `.L`/`.Q` columns whose names and values a parser written against dummy variables will not reconstruct. Test a factor with an unused level, a level whose name collides with another variable in the data, and a level containing a special character such as `:`. The parser has to recover the mapping from model matrix column names back to variable and level, and every one of these breaks a naive string split.
+2. **Missing values.** Predict on newdata containing `NA` and compare against `predict()`, for every model. Eight of sixteen regression models disagreed with their own `predict()` here. Also fit a model whose *training* data contains `NA`, which is a different case: it changes what the model stores (LightGBM's `missing_type`) and can add surrogate splits (rpart) that the generated formula has to honor. A structural check that a missing-value branch was generated is not enough; the branch has to produce the right number.
+3. **Threshold precision.** Models that store thresholds in float32 are compared against float64 data at prediction time, so test a value exactly at a split threshold, a value at the float32 representation of that threshold, and a boundary tie. Whether the comparison is `<` or `<=`, and at what precision, decides which leaf a row lands in.
+4. **Options the parser might ignore.** Any model argument that changes `predict()` output but that the parser never reads is a silent wrong answer. Fit the model with such arguments set to non-default values and compare numerically. Past examples: LightGBM's `sigmoid`, `reg_sqrt`, and `zero_as_missing`, catboost objectives with a link function, glmnet offsets, and mboost's `mstop`.
+5. **Degenerate fit shapes.** Fit a stump (a root-only tree), a single-column model matrix, a rank-deficient fit with `NA` coefficients, a model on a constant outcome, and single-row or single-class training data. These produce structures the parser's loops were never written for: an empty split table, a vector where a matrix was assumed, a level that never appears.
+
+### Fixing a bug reported in an issue
+
+Two habits, both learned from getting them wrong:
+
+- **Check the stated mechanism against the code before implementing the proposed fix.** Six issues in the last triage proposed changes that would have been regressions, because they reasoned from the symptom rather than from the source. One named `"partykit"` as the stored model type when parsed models actually store `"party"`. One asserted that `cross_entropy` applies LightGBM's `sigmoid` scaling, which it does not. One proposed returning `TRUE` from a path handler in a way that would have emitted `TRUE & x > 4` into the generated SQL. Read the parser and confirm the described behavior is real before changing it.
+- **Verify numerically, not structurally.** A regression test for a bug fix has to compare against the modelling package's own `predict()` on data that reproduces the bug. Assertions of the form `expect_false(is.null(x))`, or that the call runs without error, have repeatedly passed while the computed prediction was wrong. If the test would still pass with the fix reverted, it is not a test of the fix.
+
 ### Conventions
 
 - Use `skip_if_not_installed("pkg")` in every test that needs a suggested package, rather than `skip_on_cran()`.
