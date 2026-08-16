@@ -6,8 +6,10 @@ parse_model.cubist <- function(model) {
   # Pre-split data by committee and rule to avoid O(n) scans in nested loops
   coefs_by_comm_rule <- split(coefs, list(coefs$committee, coefs$rule))
 
+  committee_levels <- unique(coefs$committee)
+
   committees2 <- map(
-    unique(coefs$committee),
+    committee_levels,
     ~ {
       comm <- .x
       rules <- map(
@@ -60,23 +62,18 @@ parse_model.cubist <- function(model) {
   )
   comm <- purrr::list_flatten(committees2)
 
-  if (model$committees == 1) {
-    ommittee_id <- rep(1, length(comm))
-  } else {
-    model_print <- utils::capture.output(print(model))
-    model_print <- model_print[grep(
-      "Number of rules per committee",
-      model_print
-    )]
-    model_print <- regmatches(
-      model_print,
-      m = gregexpr("[0-9]+", model_print)
-    )[[
-      1
-    ]]
-    ommittee_id <- as.integer(model_print)
-    ommittee_id <- rep(seq_along(ommittee_id), times = ommittee_id)
-  }
+  # Which committee each flattened rule belongs to, taken from
+  # `model$coefficients` in the same order `comm` was built in. `print.Cubist`
+  # truncates its "Number of rules per committee" line at 20 committees, so it
+  # cannot be scraped for this.
+  ommittee_id <- rep(
+    seq_along(committee_levels),
+    times = vapply(
+      committee_levels,
+      function(x) sum(coefs$committee == x),
+      integer(1)
+    )
+  )
 
   pm <- list(
     general = list(

@@ -14,6 +14,8 @@
 
 - `tidypredict_fit()` now undoes kernlab's predictor scaling when exactly one column was scaled for `kernlab::ksvm()` models. This covers any fit with one numeric predictor plus factor predictors, since kernlab does not scale dummy columns, and the weights were left on the scaled scale because the centers and scales lose their names in that case. (#289)
 
+- `tidypredict_fit()` now assigns rules to the right committee for `Cubist::cubist()` models fitted with more than 20 committees. The committee each rule belonged to was scraped from the printed model, whose "Number of rules per committee" line is truncated at 20 committees, so the rules beyond that point were recycled across the wrong committees and the average was taken over 20 committees instead of the number requested. (#286)
+
 - `tidypredict_fit()` now applies the per-rule extrapolation limits for `Cubist::cubist()` models. Cubist holds each rule to the span of the training outcomes it covers, widened at both ends by `extrap` times that span and never crossing zero; without it a rule's linear model runs away on data outside its range. This engages on rows of the training data too, not only on extrapolation. (#285)
 
 - `tidypredict_fit()` now supports factor predictors for `Cubist::cubist()` models, which previously produced a formula that could not be evaluated (`object '"f"' not found`). Rule conditions are now read from the model text rather than from `model$splits`, which records neither the quoted column name nor a condition naming a single level, so such a rule silently applied to every row. (#322)
