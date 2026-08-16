@@ -96,6 +96,16 @@
   ([\#343](https://github.com/tidymodels/tidypredict/issues/343))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now rejects an
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html) model fit
+  with the matrix interface instead of returning an unusable formula.
+  Such a fit keeps neither `terms` nor `coefnames`, so the names of the
+  predictors are lost and every reference to an input unit was written
+  as `NULL`. The formula did not error: it evaluated to a zero length
+  result. Refit the model with the formula interface.
+  ([\#303](https://github.com/tidymodels/tidypredict/issues/303))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now routes missing values by each node’s `missing_type` for `lightgbm`
   models, matching [`predict()`](https://rdrr.io/r/stats/predict.html).
   LightGBM consults `default_left` only when `missing_type` is `NaN` or
@@ -576,7 +586,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -915,9 +925,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
-  now support `Gamma` family and Cox proportional hazards
-  (`family = "cox"`) models.
+- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
+  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
+  models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -982,9 +992,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
-  that use family function syntax (e.g., `family = gaussian()`) instead
-  of string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
+  use family function syntax (e.g., `family = gaussian()`) instead of
+  string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
