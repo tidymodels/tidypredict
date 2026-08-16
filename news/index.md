@@ -2,6 +2,18 @@
 
 ## tidypredict (development version)
 
+- The Cubist article now documents two limits on how closely
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  can match `Cubist::predict()`. The instance-based correction that
+  [`predict()`](https://rdrr.io/r/stats/predict.html) applies when
+  `neighbors` is greater than zero is not reproduced, because it adjusts
+  each prediction using training rows that are not part of the fitted
+  model. Separately, Cubist stores its coefficients as 32-bit floats, so
+  the agreement has a relative ceiling near 1e-7 rather than an absolute
+  one, and an outcome on a large scale leaves a proportionally large
+  absolute difference.
+  ([\#375](https://github.com/tidymodels/tidypredict/issues/375))
+
 - The glm article now documents the one inverse link
   [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   does not reproduce exactly: `probit`, whose inverse is
@@ -33,6 +45,53 @@
   with the usual “the treatment contrast is the only one supported”
   error, which also names the offending field rather than the contrast.
   ([\#291](https://github.com/tidymodels/tidypredict/issues/291))
+
+- [`acceptable_formula()`](https://tidypredict.tidymodels.org/reference/acceptable_formula.md)
+  and
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now report a model class they do not support, rather than failing with
+  R’s “no applicable method” error.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)
+  now rejects an object that is not a parsed model. A list without a
+  `general$type` element was given a class of `pm_` that no method
+  matches, so the failure surfaced much later and said nothing about the
+  real problem.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now sends a split threshold that is not finite, or that overflows the
+  32-bit float range, down the branch the model does. Such a threshold
+  was moved to a boundary of `NaN`, which makes every comparison
+  `FALSE`, so the model silently mispredicted.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now rejects an `interval` that is not a single number strictly between
+  0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so
+  every prediction bound came back missing.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now reports a parsed model of a type it does not support with the same
+  message it gives for a fitted model, rather than “Model type not
+  supported.”, and reports a list that is not a parsed model rather than
+  failing with “argument is of length zero”.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)
+  now returns a single query for an intercept-only model. Such a model’s
+  formula is a bare number rather than a call, which was mistaken for
+  the list of formulas a multiclass model produces, so the query came
+  back wrapped in a one element list.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
+
+- [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
+  now validates `vars`, `add_interval` and `interval`. Passing fewer
+  than three names in `vars` alongside `add_interval = TRUE` produced a
+  data frame with a column literally named `NA`.
+  ([\#313](https://github.com/tidymodels/tidypredict/issues/313))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now produces a formula R can evaluate for a

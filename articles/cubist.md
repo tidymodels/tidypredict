@@ -242,4 +242,14 @@ str(pm$terms[1:2])
 - Cubist uses 32-bit floats internally, which may cause prediction
   discrepancies at exact split boundaries. See the [float
   precision](https://tidypredict.tidymodels.org/articles/float-precision.md)
-  article for details.
+  article for details. The same 32-bit storage puts a *relative* ceiling
+  of roughly `1e-7` on the agreement with
+  [`predict()`](https://rdrr.io/r/stats/predict.html), so an outcome on
+  a large scale leaves a correspondingly large absolute difference.
+- The instance-based correction that
+  [`predict()`](https://rdrr.io/r/stats/predict.html) applies when
+  `neighbors` is greater than zero is not reproduced. It adjusts each
+  prediction using the nearest training rows, which are not part of the
+  fitted model, so no formula can stand in for it. Formulas from
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  match `predict(model, newdata)` with its default `neighbors = 0` only.
