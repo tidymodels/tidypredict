@@ -118,6 +118,18 @@ parse_model.nnet <- function(model) {
     )
   }
 
+  # `nnet.default()` fits keep neither `terms` nor `coefnames`, so the names of
+  # the input columns are lost and the input units cannot be tied to columns of
+  # the new data
+  if (is.null(model$terms) && is.null(model$coefnames)) {
+    cli::cli_abort(c(
+      "{.fn tidypredict_fit} does not support {.fn nnet::nnet} models fit with
+       the matrix interface.",
+      "i" = "Refit the model with the formula interface, so that the names of
+             the predictors are available."
+    ))
+  }
+
   vars <- names(attr(model$terms, "dataClasses")) %||% model$coefnames
   inputs <- map(
     model$coefnames,

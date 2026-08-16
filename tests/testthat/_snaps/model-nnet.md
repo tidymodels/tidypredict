@@ -13,6 +13,24 @@
       Error in `parse_model()`:
       ! `tidypredict_fit()` does not support `nnet::nnet()` models with multiple outputs that are not a classification.
 
+# matrix interface fits are rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` does not support `nnet::nnet()` models fit with the matrix interface.
+      i Refit the model with the formula interface, so that the names of the predictors are available.
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! `tidypredict_fit()` does not support `nnet::nnet()` models fit with the matrix interface.
+      i Refit the model with the formula interface, so that the names of the predictors are available.
+
 # tidypredict_test errors for classification nnet models
 
     Code
