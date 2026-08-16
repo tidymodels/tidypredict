@@ -126,6 +126,28 @@
   instead of guessed at.
   ([\#308](https://github.com/tidymodels/tidypredict/issues/308))
 
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reads coefficient labels from the model’s own term structure for
+  [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html),
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html),
+  [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html),
+  [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html),
+  [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html),
+  [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html) and
+  [`sda::sda()`](https://rdrr.io/pkg/sda/man/sda.html) models too,
+  extending the fix that landed for
+  [`lm()`](https://rdrr.io/r/stats/lm.html),
+  [`glm()`](https://rdrr.io/r/stats/glm.html) and
+  [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html). A dummy
+  column whose name happened to equal another predictor’s name was read
+  as that predictor, silently giving wrong predictions: a `y ~ g + gy2`
+  fit where the factor `g` has a level `y2` was out by a full unit of
+  probability. The levels are worked out from how many columns each term
+  expanded into for the models that record no `xlevels`, which also
+  fixes [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html)
+  fits whose duplicate model matrix column names were made unique.
+  ([\#376](https://github.com/tidymodels/tidypredict/issues/376))
+
 - [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md)
   now names every category of a `catboost` model, for any number of
   factor levels. It used to discover the hash CatBoost stores for a
