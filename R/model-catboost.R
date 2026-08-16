@@ -5,16 +5,18 @@ catboost_identity_objectives <- c(
   "MAE",
   "Quantile",
   "MAPE",
-  "Poisson",
   "Huber",
   "LogCosh",
-  "Expectile",
-  "Tweedie"
+  "Expectile"
 )
+# Log-link objectives. CatBoost's `prediction_type = "Exponent"` is exactly
+# `exp()` of the raw formula value for these, which is the response scale.
+catboost_exp_objectives <- c("Poisson", "Tweedie")
 catboost_sigmoid_objectives <- c("Logloss", "CrossEntropy")
 catboost_multiclass_objectives <- c("MultiClass", "MultiClassOneVsAll")
 catboost_supported_objectives <- c(
   catboost_identity_objectives,
+  catboost_exp_objectives,
   catboost_sigmoid_objectives,
   catboost_multiclass_objectives
 )
@@ -739,6 +741,10 @@ build_fit_formula_catboost_nested <- function(parsedmodel) {
 
   if (objective %in% catboost_sigmoid_objectives) {
     f <- expr_logistic(f)
+  }
+
+  if (objective %in% catboost_exp_objectives) {
+    f <- expr(exp(!!f))
   }
 
   f

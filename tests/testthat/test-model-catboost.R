@@ -750,7 +750,11 @@ test_that("Poisson predictions match catboost.predict", {
     )
   )
 
-  native_preds <- catboost_catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(
+    model,
+    pool,
+    prediction_type = "Exponent"
+  )
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
@@ -818,11 +822,36 @@ test_that("Tweedie predictions match catboost.predict (#188)", {
     feature_names = as.list(c("mpg", "cyl", "disp"))
   )
 
-  native_preds <- catboost_catboost.predict(model, pool)
+  native_preds <- catboost_catboost.predict(
+    model,
+    pool,
+    prediction_type = "Exponent"
+  )
   formula <- tidypredict_fit(model)
   tidy_preds <- rlang::eval_tidy(formula, mtcars)
 
   expect_equal(tidy_preds, native_preds)
+})
+
+test_that("Poisson and Tweedie predictions are on the response scale (#356)", {
+  skip_if_not_installed("catboost")
+
+  pool <- catboost_catboost.load_pool(
+    data.matrix(mtcars[, c("mpg", "cyl", "disp")]),
+    label = mtcars$hp,
+    feature_names = as.list(c("mpg", "cyl", "disp"))
+  )
+
+  for (loss in c("Poisson", "Tweedie:variance_power=1.5")) {
+    model <- make_catboost_model(loss_function = loss)
+    tidy_preds <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+
+    expect_true(all(tidy_preds > 0))
+    expect_equal(
+      tidy_preds,
+      exp(catboost_catboost.predict(model, pool))
+    )
+  }
 })
 
 test_that("CrossEntropy predictions match catboost.predict", {

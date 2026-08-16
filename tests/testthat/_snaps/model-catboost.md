@@ -5,7 +5,7 @@
     Condition
       Error in `build_fit_formula_catboost_nested()`:
       ! Unsupported objective: "UnsupportedObjective".
-      i Supported objectives: "RMSE", "MAE", "Quantile", "MAPE", "Poisson", "Huber", "LogCosh", "Expectile", "Tweedie", "Logloss", "CrossEntropy", "MultiClass", and "MultiClassOneVsAll".
+      i Supported objectives: "RMSE", "MAE", "Quantile", "MAPE", "Huber", "LogCosh", "Expectile", "Poisson", "Tweedie", "Logloss", "CrossEntropy", "MultiClass", and "MultiClassOneVsAll".
 
 # empty trees throws error
 
