@@ -27,6 +27,54 @@
   ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now produces a formula R can evaluate for a
+  [`dbarts::bart()`](https://rdrr.io/pkg/dbarts/man/bart.html) fit at
+  the package default `ntree`. Terms are summed left to right, which
+  nests the `+` calls as deeply as there are terms, and a bart fit sums
+  `ndpost * ntree` leaf values: at the defaults R gave up with
+  “evaluation nested too deeply”. A model with 1000 terms or more is now
+  summed in a balanced shape instead, nesting `log2(n)` deep. Only a
+  large ensemble reaches that, so every other model keeps the flat
+  left-to-right sum it had before, along with the exact result and the
+  formula layout that go with it.
+  ([\#305](https://github.com/tidymodels/tidypredict/issues/305))
+
+- [`.build_case_when_tree()`](https://tidypredict.tidymodels.org/reference/dot-build_case_when_tree.md),
+  which {orbital} calls, now returns the bare prediction of a stump tree
+  whether that prediction is a number or a class label. A classification
+  stump previously produced `case_when(.default = "a")`, which dplyr
+  rejects with “`...` can’t be empty”.
+  ([\#310](https://github.com/tidymodels/tidypredict/issues/310))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer fails with “`x` must be a formula” on a parsed model saved
+  by tidypredict 1.0.1 or earlier that contains a
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  or
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  stump, a tree whose root is its only node. Such a tree is now written
+  as its constant prediction.
+  ([\#310](https://github.com/tidymodels/tidypredict/issues/310))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now returns correct predictions for
+  [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) models
+  with a single numeric predictor, which previously produced a bare
+  constant. kernlab leaves the column names of a one-column model matrix
+  empty, so every term was dropped and only the intercept remained.
+  ([\#289](https://github.com/tidymodels/tidypredict/issues/289))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now undoes kernlab’s predictor scaling when exactly one column was
+  scaled for
+  [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) models.
+  This covers any fit with one numeric predictor plus factor predictors,
+  since kernlab does not scale dummy columns, and the weights were left
+  on the scaled scale because the centers and scales lose their names in
+  that case.
+  ([\#289](https://github.com/tidymodels/tidypredict/issues/289))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now applies the per-rule extrapolation limits for
   [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md)
   models. Cubist holds each rule to the span of the training outcomes it
@@ -188,6 +236,20 @@
   ([\#350](https://github.com/tidymodels/tidypredict/issues/350))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now handles a [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html)
+  or [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html) model
+  whose outcome factor has a level no observation fell in. Both drop the
+  empty group when fitting but keep the full level set in `lev`, which
+  the code used to name the classes, so
+  [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html) failed with
+  “subscript out of bounds” and a classification
+  [`nnet::nnet()`](https://rdrr.io/pkg/nnet/man/nnet.html) with “‘names’
+  attribute \[4\] must be the same length as the vector \[3\]”. The
+  classes are now read from the fitted quantities, which is what
+  [`predict()`](https://rdrr.io/r/stats/predict.html) labels its output
+  with. ([\#302](https://github.com/tidymodels/tidypredict/issues/302))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now honours `sigmoid` for `lightgbm` models fit with the `binary` or
   `multiclassova` objective, which apply `1 / (1 + exp(-sigmoid * x))`
   rather than a plain logistic. Every probability of a model fit with
@@ -246,6 +308,25 @@
   leaves the tree empty when fitting failed, which a predictor name or
   level containing `,` or `:` causes.
   ([\#287](https://github.com/tidymodels/tidypredict/issues/287))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now works for rank-deficient [`lm()`](https://rdrr.io/r/stats/lm.html)
+  and [`glm()`](https://rdrr.io/r/stats/glm.html) models, which aborted
+  with “Unable to calculate inverse of QR decomposition” even though it
+  needs no QR decomposition at all. Two everyday shapes hit this: a
+  duplicated predictor column, and a predictor with no variance. The
+  aliased coefficients R leaves as `NA` are now dropped, as
+  [`predict()`](https://rdrr.io/r/stats/predict.html) drops them, and
+  the QR decomposition the prediction interval needs is built from the
+  columns the fit actually identified, so
+  [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  keeps working for these models too.
+  ([\#308](https://github.com/tidymodels/tidypredict/issues/308))
+
+- [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+  now reports a parsed model that carries no QR decomposition, instead
+  of failing with “Must supply `.init` when `.x` is empty”.
+  ([\#308](https://github.com/tidymodels/tidypredict/issues/308))
 
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now works for [`glm()`](https://rdrr.io/r/stats/glm.html) models. It
@@ -313,6 +394,19 @@
   threshold on the column itself, which silently produced `NA` or a
   wrong branch.
   ([\#282](https://github.com/tidymodels/tidypredict/issues/282))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  and
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now handle a stump, a tree with a single root node and no split, in a
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  forest, instead of aborting with “argument of length 0”.
+  [`randomForest::getTree()`](https://rdrr.io/pkg/randomForest/man/getTree.html)
+  drops its node table to a vector for such a tree and then fails on its
+  own `1:nrow()`, so the table is now assembled directly. A stump
+  appears whenever the outcome is constant within a bootstrap sample,
+  which a constant outcome or a zero-variance predictor makes routine.
+  ([\#362](https://github.com/tidymodels/tidypredict/issues/362))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now skips a feature whose value is missing or whose factor level was
@@ -586,7 +680,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -925,9 +1019,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
-  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
-  models.
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -992,9 +1086,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
-  use family function syntax (e.g., `family = gaussian()`) instead of
-  string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  that use family function syntax (e.g., `family = gaussian()`) instead
+  of string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
