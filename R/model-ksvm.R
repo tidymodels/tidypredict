@@ -43,6 +43,8 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
     )
   }
 
+  terms_obj <- tryCatch(model@terms, error = function(cnd) NULL)
+
   # For a linear kernel the decision function collapses to a weighted sum of
   # the (scaled) predictors: `w = sum_i coef_i * support_vector_i`.
   sv <- kernlab::xmatrix(model)
@@ -54,22 +56,29 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
     cf <- cf[[1]]
   }
   weights <- as.numeric(crossprod(sv, cf))
-  names(weights) <- colnames(sv)
+  names(weights) <- ksvm_feature_names(sv, terms_obj, call = call)
   bias <- as.numeric(kernlab::b(model))
 
   # kernlab scales predictors before fitting. Undo the scaling so the weights
   # apply to the predictors on their original scale. `x.scale` only covers the
-  # columns that were scaled (e.g. dummy columns are left untouched).
-  x_scale <- kernlab::scaling(model)$x.scale
+  # columns that were scaled (e.g. dummy columns are left untouched), so match
+  # it positionally against `scaled`, the logical vector of scaled columns.
+  # `x.scale` loses its names when a single column was scaled, which makes
+  # matching by name unreliable.
+  scaling <- kernlab::scaling(model)
+  x_scale <- scaling$x.scale
   centers <- if (!is.null(x_scale)) x_scale[["scaled:center"]] else numeric(0)
   scales <- if (!is.null(x_scale)) x_scale[["scaled:scale"]] else numeric(0)
 
   linear <- weights
   intercept <- -bias
-  for (nm in names(weights)) {
-    if (nm %in% names(scales)) {
-      linear[[nm]] <- weights[[nm]] / scales[[nm]]
-      intercept <- intercept - weights[[nm]] * centers[[nm]] / scales[[nm]]
+  if (length(scales) > 0) {
+    scaled <- rep_len(scaling$scaled, length(weights))
+    idx <- which(scaled)
+    for (j in seq_along(idx)) {
+      k <- idx[[j]]
+      linear[[k]] <- weights[[k]] / scales[[j]]
+      intercept <- intercept - weights[[k]] * centers[[j]] / scales[[j]]
     }
   }
 
@@ -111,7 +120,6 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
     pm$general$link <- "logit"
   }
 
-  terms_obj <- tryCatch(model@terms, error = function(cnd) NULL)
   vars <- if (!is.null(terms_obj)) {
     names(attr(terms_obj, "dataClasses"))
   } else {
@@ -139,6 +147,32 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
   as_parsed_model(pm)
 }
 
+ksvm_feature_names <- function(sv, terms_obj, call = rlang::caller_env()) {
+  features <- colnames(sv)
+  if (!is.null(features)) {
+    return(features)
+  }
+
+  # kernlab drops the column names of a single-column model matrix. Such a
+  # matrix can only come from a single numeric predictor, since a factor
+  # predictor expands to one dummy column per level.
+  if (ncol(sv) == 1 && !is.null(terms_obj)) {
+    predictors <- names(attr(terms_obj, "dataClasses"))
+    response <- attr(terms_obj, "response")
+    if (length(response) == 1 && response > 0) {
+      predictors <- predictors[-response]
+    }
+    if (length(predictors) == 1) {
+      return(predictors)
+    }
+  }
+
+  cli::cli_abort(
+    "Unable to recover the predictor names from the {.pkg kernlab} SVM model.",
+    call = call
+  )
+}
+
 #' @export
 acceptable_formula.ksvm <- function(model) {
   terms_obj <- tryCatch(model@terms, error = function(cnd) NULL)
@@ -155,7 +189,7 @@ acceptable_formula.ksvm <- function(model) {
         i = "Functions detected: {.val {funs}}.
             Use `dplyr` transformations to prepare the data."
       ),
-      call. = FALSE
+      call = NULL
     )
   }
 }

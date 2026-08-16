@@ -320,6 +320,47 @@ test_that("a missing predictor gives NA, matching predict() (#294)", {
   expect_false(tidypredict_test(model, df = df)$alert)
 })
 
+test_that("a stump in the forest matches predict() (#362)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  df <- data.frame(x1 = rnorm(120), x2 = runif(120))
+  df$y <- 3
+  model <- suppressWarnings(
+    randomForest::randomForest(y ~ x1 + x2, data = df, ntree = 10)
+  )
+  expect_true(any(model$forest$ndbigtree == 1))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+  expect_false(tidypredict_test(model, df = df)$alert)
+})
+
+test_that("a stump from a zero-variance predictor matches predict() (#362)", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  df <- data.frame(x1 = rnorm(120), xconst = 1)
+  df$y <- 2 * df$x1 + rnorm(120, sd = 0.3)
+  model <- randomForest::randomForest(y ~ x1 + xconst, data = df, ntree = 10)
+  expect_true(any(model$forest$ndbigtree == 1))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+})
+
 test_that("unordered factor splits match predict() (#282)", {
   skip_if_not_installed("randomForest")
 
