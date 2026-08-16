@@ -26,6 +26,14 @@
   never underflows.
   ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
 
+- [`acceptable_formula()`](https://tidypredict.tidymodels.org/reference/acceptable_formula.md)
+  now checks the contrast of every factor predictor. A model that used
+  the treatment contrast for one field and something else for another
+  was accepted and then silently mis-parsed; such a model now aborts
+  with the usual “the treatment contrast is the only one supported”
+  error, which also names the offending field rather than the contrast.
+  ([\#291](https://github.com/tidymodels/tidypredict/issues/291))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now produces a formula R can evaluate for a
   [`dbarts::bart()`](https://rdrr.io/pkg/dbarts/man/bart.html) fit at
@@ -103,6 +111,20 @@
   neither the quoted column name nor a condition naming a single level,
   so such a rule silently applied to every row.
   ([\#322](https://github.com/tidymodels/tidypredict/issues/322))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reads the coefficient labels of an
+  [`lm()`](https://rdrr.io/r/stats/lm.html),
+  [`glm()`](https://rdrr.io/r/stats/glm.html) or
+  [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html) model
+  from the model’s own term structure rather than from the spelling of
+  the label. A factor level containing a `:` was taken apart as if it
+  were an interaction, giving a formula that could not be evaluated, and
+  a label that happened to equal another predictor’s name was read as
+  that predictor, silently giving wrong predictions. A label that still
+  cannot be resolved to one combination of levels is now reported
+  instead of guessed at.
+  ([\#308](https://github.com/tidymodels/tidypredict/issues/308))
 
 - [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md)
   now names every category of a `catboost` model, for any number of
