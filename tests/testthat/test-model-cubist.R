@@ -294,6 +294,25 @@ test_that("a factor condition survives more than one committee (#322)", {
   )
 })
 
+test_that("rules are assigned to the right committee above 20 (#286)", {
+  skip_if_not_installed("Cubist")
+  df <- cubist_factor_data(4, seed = 3)
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y, committees = 25)
+
+  parsed <- parse_model(model)
+  expect_equal(
+    length(parsed$general$ommittee_id),
+    nrow(model$coefficients)
+  )
+  expect_equal(length(unique(parsed$general$ommittee_id)), 25)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
 test_that("rows exactly on a split threshold match predict() (#232)", {
   skip_if_not_installed("Cubist")
   # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus
