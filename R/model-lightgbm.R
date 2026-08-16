@@ -539,6 +539,30 @@ build_lgb_linear_prediction <- function(linear) {
   expr(ifelse(!!any_na, !!fallback, !!linear_formula))
 }
 
+# A leaf of a linear tree stores its coefficients under `linear` and leaves
+# `prediction` empty, so the parsed path has to turn that back into an
+# expression before the shared tree builder reads `prediction`. Saving and
+# loading a parsed model can turn the numeric vectors into lists, so they are
+# flattened here.
+resolve_lgb_leaf_prediction <- function(leaf) {
+  linear <- leaf$linear
+
+  if (is.null(linear)) {
+    if (is.null(leaf$prediction)) {
+      cli::cli_abort("Leaf has no prediction.", .internal = TRUE)
+    }
+    return(leaf)
+  }
+
+  linear$intercept <- unlist(linear$intercept)
+  linear$fallback <- unlist(linear$fallback)
+  linear$feature_names <- as.character(unlist(linear$feature_names))
+  linear$coefficients <- as.numeric(unlist(linear$coefficients))
+
+  leaf$prediction <- build_lgb_linear_prediction(linear)
+  leaf
+}
+
 # Apply lightgbm objective transformation to formula
 apply_lgb_objective <- function(f, objective, params) {
   if (objective %in% lgb_exp_objectives) {
@@ -578,7 +602,7 @@ build_fit_formula_lgb_from_parsed <- function(parsedmodel) {
   assemble_lgb_formula(parsedmodel, function() {
     map(parsedmodel$trees, function(tree) {
       build_nested_from_flat_paths(
-        tree,
+        map(tree, resolve_lgb_leaf_prediction),
         build_lgb_nested_condition,
         lgb_is_left_op
       )

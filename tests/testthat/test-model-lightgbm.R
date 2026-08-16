@@ -2629,3 +2629,54 @@ test_that("linear tree handles NA values correctly when trained with NAs (#186)"
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
 })
+
+test_that("parsed linear tree model can be fitted (#346)", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(1)
+  n <- 500
+  test_df <- data.frame(
+    x1 = runif(n, -10, -5),
+    x2 = rnorm(n),
+    x3 = rnorm(n),
+    cat = sample(0:4, n, TRUE)
+  )
+  y <- 2 * test_df$x1 + test_df$x2 - test_df$x3 + test_df$cat + rnorm(n)
+
+  X <- as.matrix(test_df)
+  params <- list(
+    objective = "regression",
+    linear_tree = TRUE,
+    num_leaves = 8L
+  )
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    categorical_feature = 4L,
+    params = params
+  )
+  model <- lightgbm::lgb.train(
+    params = params,
+    data = dtrain,
+    nrounds = 8L,
+    verbose = -1L
+  )
+
+  # The model must have both intercept-only and coefficient-carrying leaves
+  leaves <- unlist(parse_model(model)$trees, recursive = FALSE)
+  n_terms <- vapply(leaves, \(x) length(x$linear$feature_names), integer(1))
+  expect_true(any(n_terms == 0))
+  expect_true(any(n_terms > 0))
+
+  native_preds <- predict(model, X)
+
+  fit_formula <- tidypredict_fit(parse_model(model))
+  tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
+  expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
+
+  path <- withr::local_tempfile(fileext = ".yml")
+  tidypredict_save(model, path)
+  loaded_formula <- tidypredict_fit(tidypredict_load(path))
+  loaded_preds <- dplyr::mutate(test_df, pred = !!loaded_formula)$pred
+  expect_equal(unname(loaded_preds), unname(native_preds), tolerance = 1e-10)
+})

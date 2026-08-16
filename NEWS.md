@@ -14,6 +14,8 @@
 
 - `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
 
+- `tidypredict_fit()` now works on a parsed LightGBM model fit with `linear_tree = TRUE`. A leaf of a linear tree stores its coefficients separately and leaves its constant prediction empty, which the parsed path never read, so the formula failed with "`..1 (right)` must be a vector, not `NULL`". This also affected such a model saved with `tidypredict_save()` and read back with `tidypredict_load()`. (#346)
+
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 
 - `tidypredict_interval()` now reports a parsed model of a type it does not support with the same message it gives for a fitted model, rather than "Model type not supported.", and reports a list that is not a parsed model rather than failing with "argument is of length zero". (#313)
