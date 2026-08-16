@@ -4,6 +4,10 @@
 
 - The naive Bayes article now documents the one case where `tidypredict_fit()` does not reproduce `predict()` for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models: both replace a normal density that underflowed to zero with their `threshold` argument, which takes a value roughly 38 standard deviations from the class mean, and the log scale used throughout never underflows. (#300)
 
+- `.build_case_when_tree()`, which {orbital} calls, now returns the bare prediction of a stump tree whether that prediction is a number or a class label. A classification stump previously produced `case_when(.default = "a")`, which dplyr rejects with "`...` can't be empty". (#310)
+
+- `tidypredict_fit()` no longer fails with "`x` must be a formula" on a parsed model saved by tidypredict 1.0.1 or earlier that contains a `ranger::ranger()` or `randomForest::randomForest()` stump, a tree whose root is its only node. Such a tree is now written as its constant prediction. (#310)
+
 - `tidypredict_fit()` now returns correct predictions for `kernlab::ksvm()` models with a single numeric predictor, which previously produced a bare constant. kernlab leaves the column names of a one-column model matrix empty, so every term was dropped and only the intercept remained. (#289)
 
 - `tidypredict_fit()` now undoes kernlab's predictor scaling when exactly one column was scaled for `kernlab::ksvm()` models. This covers any fit with one numeric predictor plus factor predictors, since kernlab does not scale dummy columns, and the weights were left on the scaled scale because the centers and scales lose their names in that case. (#289)

@@ -155,6 +155,51 @@ test_that("generate_case_when_tree() works", {
   )
 })
 
+test_that("generate_case_when_tree() works with a stump tree", {
+  nodes <- list(list(path = list(), prediction = 1.5))
+
+  expect_identical(generate_case_when_tree(nodes, mode = ""), 1.5)
+  expect_identical(generate_case_when_tree(nodes, mode = "ifelse"), 1.5)
+  expect_identical(
+    generate_case_when_tree(nodes, mode = "", default = FALSE),
+    1.5
+  )
+
+  nodes <- list(list(path = list(), prediction = "a"))
+
+  expect_identical(generate_case_when_tree(nodes, mode = ""), "a")
+})
+
+test_that("generate_case_when_trees() works with a stump tree", {
+  skip_if_not_installed("ranger")
+
+  parsedmodel <- readRDS(test_path("backwards-compat", "ranger-v2-parsed.rds"))
+  parsedmodel$trees[[1]] <- list(list(path = list(), prediction = 20.1))
+
+  expect_no_error(fit <- tidypredict_fit(parsedmodel))
+  expect_type(rlang::eval_tidy(fit, mtcars), "double")
+})
+
+test_that("generate_case_when_trees() does not partial match `general$mode`", {
+  parsedmodel <- list(
+    general = list(version = 2),
+    trees = list(list(list(
+      path = list(list(
+        type = "conditional",
+        col = "cyl",
+        val = 4,
+        op = "more"
+      )),
+      prediction = 25
+    )))
+  )
+
+  expect_identical(
+    generate_case_when_trees(parsedmodel, default = FALSE),
+    list(quote(case_when(cyl > 4 ~ 25)))
+  )
+})
+
 test_that("generate_tree_nodes() works", {
   node <- list(
     path = list(
@@ -569,6 +614,12 @@ test_that(".build_case_when_tree handles stump tree (no conditions)", {
   nodes <- list(list(prediction = 0.5, path = list()))
 
   expect_identical(.build_case_when_tree(nodes), 0.5)
+})
+
+test_that(".build_case_when_tree handles a stump tree with a class label", {
+  nodes <- list(list(prediction = "a", path = list()))
+
+  expect_identical(.build_case_when_tree(nodes), "a")
 })
 
 test_that(".build_case_when_tree handles single node with condition", {
