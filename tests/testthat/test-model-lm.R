@@ -113,6 +113,104 @@ test_that("longest variable name wins with three nested prefixes (#290)", {
   expect_false(tidypredict_test(glm(y ~ x + xyz + xy, data = df), df)$alert)
 })
 
+test_that("factor levels containing a colon work (#308)", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    x = rnorm(60),
+    g = factor(rep(c("a", "b:2", "c"), length.out = 60))
+  )
+
+  expect_false(tidypredict_test(lm(y ~ x + g, data = df), df)$alert)
+  expect_false(tidypredict_test(lm(y ~ x * g, data = df), df)$alert)
+  expect_false(tidypredict_test(glm(y ~ x + g, data = df), df)$alert)
+
+  model <- suppressWarnings(quantreg::rq(y ~ x + g, data = df))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("a coefficient label colliding with a variable name works (#308)", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+
+  expect_false(tidypredict_test(lm(y ~ g + gy2, data = df), df)$alert)
+  expect_false(tidypredict_test(glm(y ~ g + gy2, data = df), df)$alert)
+
+  model <- suppressWarnings(quantreg::rq(y ~ g + gy2, data = df))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("an unresolvable factor level is reported (#308)", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(40),
+    g = factor(rep(c("a", "a:hb"), length.out = 40)),
+    h = factor(rep(c("b:hc", "c"), each = 2, length.out = 40))
+  )
+
+  expect_error(
+    tidypredict_fit(lm(y ~ g:h, data = df)),
+    "Unable to tell which factor levels"
+  )
+})
+
+test_that("four nested prefixes and interactions between them work (#308)", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    a = rnorm(60),
+    ab = rnorm(60),
+    abc = rnorm(60),
+    abcd = factor(rep(c("l1", "l2"), length.out = 60)),
+    abcde = factor(rep(c("p", "q", "r"), length.out = 60))
+  )
+
+  expect_false(
+    tidypredict_test(lm(y ~ a + ab + abc + abcd + abcde, data = df), df)$alert
+  )
+  expect_false(
+    tidypredict_test(lm(y ~ a * abcd + ab:abcde, data = df), df)$alert
+  )
+})
+
+test_that("logical predictors work", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    x = rnorm(60),
+    flag = rep(c(TRUE, FALSE), 30)
+  )
+
+  expect_false(tidypredict_test(lm(y ~ x + flag, data = df), df)$alert)
+})
+
+test_that("weighted fits match the interval `predict()` returns (#308)", {
+  set.seed(1)
+  weights <- runif(nrow(mtcars), 1, 5)
+  model <- lm(mpg ~ wt + disp, data = mtcars, weights = weights)
+
+  # `predict.lm()` assumes a constant prediction variance whenever `newdata` is
+  # given, which is the only case a translated formula covers.
+  expected <- suppressWarnings(
+    predict(model, mtcars, interval = "prediction")
+  )
+  fit <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  half <- rlang::eval_tidy(tidypredict_interval(model), mtcars)
+
+  expect_equal(unname(fit + half), unname(expected[, "upr"]))
+  expect_equal(unname(fit - half), unname(expected[, "lwr"]))
+})
+
 test_that("tidy() works", {
   expect_s3_class(
     tidy(parse_model(lm(mpg ~ ., mtcars))),
