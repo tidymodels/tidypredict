@@ -66,6 +66,23 @@ tidypredict_fit.pm_tree <- function(model) {
   if (model$general$model == "ranger") {
     return(tidypredict_fit_ranger(model))
   }
+  # Single trees were handled by the generic tail of this method until it was
+  # removed as apparently dead code. `party` is the name partykit models are
+  # stored under; `partykit` never appears in a parsed model.
+  if (model$general$model %in% c("party", "rpart")) {
+    return(generate_case_when_tree(
+      model$trees[[1]],
+      model$general[["mode"]] %||% ""
+    ))
+  }
+
+  # Erroring rather than falling off the end keeps any future gap from
+  # silently returning `NULL`.
+  cli::cli_abort(
+    "Version {version} parsed models of type {.val {model$general$model}} are
+     not supported.",
+    .internal = TRUE
+  )
 }
 
 # Tree parsed models all share the `pm_tree` class, so the model they came from

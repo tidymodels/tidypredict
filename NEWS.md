@@ -10,6 +10,8 @@
 
 - `.build_case_when_tree()`, which {orbital} calls, now returns the bare prediction of a stump tree whether that prediction is a number or a class label. A classification stump previously produced `case_when(.default = "a")`, which dplyr rejects with "`...` can't be empty". (#310)
 
+- `tidypredict_fit()` no longer returns `NULL` for a parsed model saved by tidypredict 1.0.1 or earlier that came from a `partykit` or `rpart` single tree. The handler for single trees was removed as apparently dead code, leaving those models to fall off the end of a whitelist, so `tidypredict_to_column()` returned the data frame unchanged and `tidypredict_sql()` returned an empty list. Any parsed model type that is still unhandled now raises an error rather than returning `NULL`. (#304)
+
 - `tidypredict_fit()` no longer fails with "`x` must be a formula" on a parsed model saved by tidypredict 1.0.1 or earlier that contains a `ranger::ranger()` or `randomForest::randomForest()` stump, a tree whose root is its only node. Such a tree is now written as its constant prediction. (#310)
 
 - `tidypredict_fit()` now returns correct predictions for `kernlab::ksvm()` models with a single numeric predictor, which previously produced a bare constant. kernlab leaves the column names of a one-column model matrix empty, so every term was dropped and only the intercept remained. (#289)
