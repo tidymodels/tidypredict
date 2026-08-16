@@ -78,8 +78,7 @@ acceptable_contrasts <- function(columns, vars, xlevels) {
     invalid <- unique(invalid)
     cli::cli_abort(
       "The treatment contrast is the only one supported at this time.
-      Field(s) with an invalid contrast are: {.val {invalid}}.",
-      call. = FALSE
+      Field(s) with an invalid contrast are: {.val {invalid}}."
     )
   }
 
@@ -105,8 +104,7 @@ acceptable_ordered <- function(model) {
   if (length(ordered) > 0) {
     cli::cli_abort(
       "The treatment contrast is the only one supported at this time.
-      Field(s) with an invalid contrast are: {.val {ordered}}.",
-      call. = FALSE
+      Field(s) with an invalid contrast are: {.val {ordered}}."
     )
   }
 
@@ -116,13 +114,16 @@ acceptable_ordered <- function(model) {
 acceptable_lm <- function(model) {
   # Check for invalid contrasts
   if (length(model$contrasts)) {
+    # Every field is checked on its own. `"contr.treatment" %in% contrasts`
+    # collapses to a single logical, so one treatment-coded field used to let
+    # every other field through, whatever its contrast (#291).
     contr <- model$contrasts
-    contr <- contr[!("contr.treatment" %in% contr)]
-    if (length(contr) > 0) {
+    invalid <- !vapply(contr, identical, logical(1), "contr.treatment")
+    if (any(invalid)) {
+      invalid <- names(contr)[invalid]
       cli::cli_abort(
         "The treatment contrast is the only one supported at this time.
-        Field(s) with an invalid contrast are: {.val {contr}}.",
-        call. = FALSE
+        Field(s) with an invalid contrast are: {.val {invalid}}."
       )
     }
   }
@@ -162,6 +163,6 @@ acceptable_lm <- function(model) {
             Use `dplyr` transformations to prepare the data."
       )
     }
-    cli::cli_abort(msg, call. = FALSE)
+    cli::cli_abort(msg)
   }
 }
