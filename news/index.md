@@ -55,6 +55,18 @@
   ([\#310](https://github.com/tidymodels/tidypredict/issues/310))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer returns `NULL` for a parsed model saved by tidypredict 1.0.1
+  or earlier that came from a `partykit` or `rpart` single tree. The
+  handler for single trees was removed as apparently dead code, leaving
+  those models to fall off the end of a whitelist, so
+  [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
+  returned the data frame unchanged and
+  [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md)
+  returned an empty list. Any parsed model type that is still unhandled
+  now raises an error rather than returning `NULL`.
+  ([\#304](https://github.com/tidymodels/tidypredict/issues/304))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   no longer fails with “`x` must be a formula” on a parsed model saved
   by tidypredict 1.0.1 or earlier that contains a
   [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
