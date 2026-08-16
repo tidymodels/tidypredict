@@ -6,6 +6,14 @@
 
 - `tidypredict_fit()` now produces a formula R can evaluate for a `dbarts::bart()` fit at the package default `ntree`. Terms are summed left to right, which nests the `+` calls as deeply as there are terms, and a bart fit sums `ndpost * ntree` leaf values: at the defaults R gave up with "evaluation nested too deeply". A model with 1000 terms or more is now summed in a balanced shape instead, nesting `log2(n)` deep. Only a large ensemble reaches that, so every other model keeps the flat left-to-right sum it had before, along with the exact result and the formula layout that go with it. (#305)
 
+- `.build_case_when_tree()`, which {orbital} calls, now returns the bare prediction of a stump tree whether that prediction is a number or a class label. A classification stump previously produced `case_when(.default = "a")`, which dplyr rejects with "`...` can't be empty". (#310)
+
+- `tidypredict_fit()` no longer fails with "`x` must be a formula" on a parsed model saved by tidypredict 1.0.1 or earlier that contains a `ranger::ranger()` or `randomForest::randomForest()` stump, a tree whose root is its only node. Such a tree is now written as its constant prediction. (#310)
+
+- `tidypredict_fit()` now returns correct predictions for `kernlab::ksvm()` models with a single numeric predictor, which previously produced a bare constant. kernlab leaves the column names of a one-column model matrix empty, so every term was dropped and only the intercept remained. (#289)
+
+- `tidypredict_fit()` now undoes kernlab's predictor scaling when exactly one column was scaled for `kernlab::ksvm()` models. This covers any fit with one numeric predictor plus factor predictors, since kernlab does not scale dummy columns, and the weights were left on the scaled scale because the centers and scales lose their names in that case. (#289)
+
 - `tidypredict_fit()` now applies the per-rule extrapolation limits for `Cubist::cubist()` models. Cubist holds each rule to the span of the training outcomes it covers, widened at both ends by `extrap` times that span and never crossing zero; without it a rule's linear model runs away on data outside its range. This engages on rows of the training data too, not only on extrapolation. (#285)
 
 - `tidypredict_fit()` now supports factor predictors for `Cubist::cubist()` models, which previously produced a formula that could not be evaluated (`object '"f"' not found`). Rule conditions are now read from the model text rather than from `model$splits`, which records neither the quoted column name nor a condition naming a single level, so such a rule silently applied to every row. (#322)
@@ -17,6 +25,8 @@
 - `tidypredict_fit()` now rejects an `h2o` model fit with an algorithm other than GBM or RuleFit. Every h2o algorithm returns one of the three model classes tidypredict dispatches on, so nothing had been checking which one was used: `h2o.randomForest()` silently gave predictions that were wrong by a factor of the number of trees, because h2o averages tree predictions where the code summed them, and classification forests use vote proportions rather than a logistic link. The tree-free algorithms, among them `h2o.glm()`, `h2o.deeplearning()` and `h2o.naiveBayes()`, failed with the unhelpful "argument must be coercible to non-negative integer". (#284)
 
 - `tidypredict_fit()` now rejects a `MASS::lda()`, `MASS::qda()` or `mda::fda()` model fit with a contrast other than the treatment one. None of the three records the contrasts it used, so the existing check was a no-op and an ordered factor, which R fits with `contr.poly` by default, silently produced wrong posterior probabilities: the level recovered from a column named `f.L` matches no row, so the term was dropped without complaint. (#343)
+
+- `tidypredict_fit()` now rejects an `nnet::nnet()` model fit with the matrix interface instead of returning an unusable formula. Such a fit keeps neither `terms` nor `coefnames`, so the names of the predictors are lost and every reference to an input unit was written as `NULL`. The formula did not error: it evaluated to a zero length result. Refit the model with the formula interface. (#303)
 
 - `tidypredict_fit()` now routes missing values by each node's `missing_type` for `lightgbm` models, matching `predict()`. LightGBM consults `default_left` only when `missing_type` is `NaN` or `Zero`; a feature with no missing value in the training data gets `None`, where a missing value is coerced to `0` and compared against the threshold like any other. Routing purely by `default_left` was wrong for every model trained without missing data, which is the common case. (#288)
 
@@ -34,6 +44,8 @@
 
 - `tidypredict_fit()` now sends a value sitting exactly on a split boundary the way the model does, for the backends that compare split thresholds as 32-bit floats: `xgboost`, `lightgbm`, `catboost`, `Cubist::cubist()` and `C50::C5.0()`. The boundary is the midpoint between the stored threshold and the adjacent float, and a value can land precisely on it, where rounding to a float is a tie broken towards the even mantissa. About half of all thresholds resolve that tie towards the neighbour rather than the threshold, and those sent such a value down the wrong branch. (#350)
 
+- `tidypredict_fit()` now handles a `MASS::lda()` or `nnet::nnet()` model whose outcome factor has a level no observation fell in. Both drop the empty group when fitting but keep the full level set in `lev`, which the code used to name the classes, so `MASS::lda()` failed with "subscript out of bounds" and a classification `nnet::nnet()` with "'names' attribute [4] must be the same length as the vector [3]". The classes are now read from the fitted quantities, which is what `predict()` labels its output with. (#302)
+
 - `tidypredict_fit()` now honours `sigmoid` for `lightgbm` models fit with the `binary` or `multiclassova` objective, which apply `1 / (1 + exp(-sigmoid * x))` rather than a plain logistic. Every probability of a model fit with any other value was rescaled. `cross_entropy` accepts the parameter but never applies it, and is left alone. (#288)
 
 - `tidypredict_fit()` now honours `reg_sqrt` for `lightgbm` models, which trains on `sqrt(|y|)` keeping the sign and squares the raw score back onto the response scale. Predictions were left on the square-root scale, which can be further from `predict()` than the response itself. The `huber` objective accepts the parameter but does not act on it, and is left alone. (#288)
@@ -45,6 +57,10 @@
 - `tidypredict_fit()` no longer reads C5.0's `[ordered]` marker as part of the first level of an ordered predictor. (#287)
 
 - `tidypredict_fit()` now reports a `C50::C5.0()` model that records no tree, rather than failing with "subscript out of bounds". `C5.0()` leaves the tree empty when fitting failed, which a predictor name or level containing `,` or `:` causes. (#287)
+
+- `tidypredict_fit()` now works for rank-deficient `lm()` and `glm()` models, which aborted with "Unable to calculate inverse of QR decomposition" even though it needs no QR decomposition at all. Two everyday shapes hit this: a duplicated predictor column, and a predictor with no variance. The aliased coefficients R leaves as `NA` are now dropped, as `predict()` drops them, and the QR decomposition the prediction interval needs is built from the columns the fit actually identified, so `tidypredict_interval()` keeps working for these models too. (#308)
+
+- `tidypredict_interval()` now reports a parsed model that carries no QR decomposition, instead of failing with "Must supply `.init` when `.x` is empty". (#308)
 
 - `tidypredict_interval()` now works for `glm()` models. It returned `numeric(0)` for every gaussian glm, because the residual variance was read from `summary()$sigma`, which only `summary.lm()` has; `summary.glm()` reports it as `dispersion`. `tidypredict_to_column(add_interval = TRUE)` errored as a result. (#293)
 
@@ -61,6 +77,8 @@
 - `tidypredict_fit()` now decodes factor splits for `ranger::ranger()` models, in all three `respect.unordered.factors` modes and for ordered factors. The split value names a position in the level order stored on the model, or under `"partition"` lists the level indices going right; it was compared as a numeric threshold against the factor column itself. (#283)
 
 - `tidypredict_fit()` now decodes factor splits for `randomForest::randomForest()` models. An unordered factor's split point is an integer whose bits name the levels going left, and an ordered factor's is compared against the level's integer code; both were read as a numeric threshold on the column itself, which silently produced `NA` or a wrong branch. (#282)
+
+- `tidypredict_fit()` and `parse_model()` now handle a stump, a tree with a single root node and no split, in a `randomForest::randomForest()` forest, instead of aborting with "argument of length 0". `randomForest::getTree()` drops its node table to a vector for such a tree and then fails on its own `1:nrow()`, so the table is now assembled directly. A stump appears whenever the outcome is constant within a bootstrap sample, which a constant outcome or a zero-variance predictor makes routine. (#362)
 
 - `tidypredict_fit()` now skips a feature whose value is missing or whose factor level was not seen while fitting, for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models, matching both packages' `predict()` instead of returning `NA` for the whole row. A row missing every predictor falls back on the class prior alone. (#300)
 

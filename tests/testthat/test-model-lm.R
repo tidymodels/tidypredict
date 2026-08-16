@@ -120,15 +120,76 @@ test_that("tidy() works", {
   )
 })
 
-test_that("we get better error from QR decomposition issues (#124)", {
+test_that("rank-deficient fits drop aliased coefficients (#124, #308)", {
   mtcars$vs2 <- mtcars$disp - mtcars$vs
 
   lm_fit <- lm(mpg ~ ., mtcars)
 
-  expect_snapshot(
-    error = TRUE,
-    tidypredict::tidypredict_fit(lm_fit)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), mtcars),
+    unname(predict(lm_fit, mtcars))
   )
+})
+
+test_that("duplicated predictor columns work (#308)", {
+  set.seed(1)
+  df <- data.frame(x1 = rnorm(50), x2 = runif(50, 0, 10))
+  df$y <- 2 * df$x1 - 0.5 * df$x2 + rnorm(50, sd = 0.3)
+  df$xdup <- df$x1
+
+  lm_fit <- lm(y ~ x1 + xdup, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), df),
+    unname(predict(lm_fit, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_interval(lm_fit), df) +
+      unname(predict(lm_fit, df)),
+    unname(predict(lm_fit, df, interval = "prediction")[, "upr"])
+  )
+
+  glm_fit <- glm(y ~ x1 + xdup, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(glm_fit), df),
+    unname(predict(glm_fit, df, type = "response"))
+  )
+})
+
+test_that("zero-variance predictors work (#308)", {
+  set.seed(1)
+  df <- data.frame(x1 = rnorm(50), x2 = runif(50, 0, 10))
+  df$y <- 2 * df$x1 - 0.5 * df$x2 + rnorm(50, sd = 0.3)
+  df$yb <- as.integer(df$y > 0)
+  df$xconst <- 1
+
+  lm_fit <- lm(y ~ x1 + xconst, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), df),
+    unname(predict(lm_fit, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_interval(lm_fit), df) +
+      unname(predict(lm_fit, df)),
+    unname(predict(lm_fit, df, interval = "prediction")[, "upr"])
+  )
+
+  glm_fit <- suppressWarnings(
+    glm(yb ~ x1 + xconst, data = df, family = binomial())
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(glm_fit), df),
+    unname(predict(glm_fit, df, type = "response"))
+  )
+})
+
+test_that("prediction intervals need a QR decomposition (#308)", {
+  pm <- parse_model(lm(mpg ~ wt + cyl, data = mtcars))
+  pm$terms <- lapply(pm$terms, function(term) {
+    term$qr <- NULL
+    term
+  })
+
+  expect_snapshot(error = TRUE, tidypredict_interval(pm))
 })
 
 test_that("don't add with 0 (#147)", {

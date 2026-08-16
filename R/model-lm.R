@@ -66,31 +66,22 @@ apply_inverse_link <- function(f, link) {
 #' @export
 parse_model.lm <- function(model) parse_model_lm(model)
 
-parse_model_lm <- function(model, call = rlang::caller_env()) {
+parse_model_lm <- function(model) {
   acceptable_formula(model)
 
   coefs <- as.numeric(model$coefficients)
   labels <- names(model$coefficients)
   vars <- names(attr(model$terms, "dataClasses"))
-  qr <- NULL
-  if (!is.null(model$qr)) {
-    qr <- tryCatch(
-      qr.solve(qr.R(model$qr)),
-      error = function(cnd) {
-        if (grepl("singular matrix", cnd$message)) {
-          cli::cli_abort(
-            c(
-              x = "Unable to calculate inverse of QR decomposition.",
-              i = "This is likely happening because the predictors contain a 
-              linear combination of predictors. Please remove and try again."
-            ),
-            call = call
-          )
-        }
-        stop(cnd)
-      }
-    )
-  }
+
+  # A rank-deficient (aliased) fit leaves the coefficients it could not
+  # identify as `NA`. `predict()` drops those terms and still returns fitted
+  # values, so the fit is well defined; dropping them here means
+  # `tidypredict_fit()` works for such a model too.
+  keep <- !is.na(coefs)
+  coefs <- coefs[keep]
+  labels <- labels[keep]
+
+  qr <- qr_inverse_lm(model)
 
   pm <- list()
   pm$general$model <- class(model)[[1]]
@@ -124,6 +115,25 @@ parse_model_lm <- function(model, call = rlang::caller_env()) {
   }
   pm$terms <- build_terms(coefs, labels, vars, qr = qr)
   as_parsed_model(pm)
+}
+
+# Inverse of the R factor of the model's QR decomposition, which the prediction
+# interval is built from. `tidypredict_fit()` never needs it.
+#
+# For a rank-deficient fit the full R factor is singular, but its leading
+# `rank` rows and columns are not, and they are exactly the columns whose
+# coefficients are not `NA`. Returning `NULL` rather than aborting keeps
+# `parse_model()` working for models that only need fitted values; the abort
+# happens in `te_interval_lm()`, where the QR is actually required.
+qr_inverse_lm <- function(model) {
+  if (is.null(model$qr)) {
+    return(NULL)
+  }
+  r <- qr.R(model$qr)
+  rank <- model$qr$rank %||% min(dim(r))
+  rank <- min(rank, nrow(r), ncol(r))
+  r <- r[seq_len(rank), seq_len(rank), drop = FALSE]
+  tryCatch(solve(r), error = function(cnd) NULL)
 }
 
 # Build the `terms` entries of a parsed model from a set of coefficients.
@@ -235,8 +245,22 @@ get_qr_lm <- function(qr_name, parsedmodel) {
   expr(((!!f)) * ((!!f)) * !!parsedmodel$general$sigma2)
 }
 
-te_interval_lm <- function(parsedmodel, interval = 0.95) {
+te_interval_lm <- function(
+  parsedmodel,
+  interval = 0.95,
+  call = rlang::caller_env()
+) {
   qr_names <- names(parsedmodel$terms[[1]]$qr)
+  if (length(qr_names) == 0) {
+    cli::cli_abort(
+      c(
+        x = "Unable to calculate the inverse of the QR decomposition.",
+        i = "Prediction intervals are not available for this model, but
+        {.fun tidypredict_fit} is."
+      ),
+      call = call
+    )
+  }
   qrs_map <- map(
     qr_names,
     ~ get_qr_lm(.x, parsedmodel)

@@ -53,13 +53,22 @@ generate_case_when_trees <- function(parsedmodel, default = TRUE) {
   map(
     parsedmodel$trees,
     generate_case_when_tree,
-    mode = parsedmodel$general$mode,
+    # `[[` rather than `$`, so a parsed model without a `mode` field (ranger
+    # and randomForest) does not partial match `general$model`.
+    mode = parsedmodel$general[["mode"]] %||% "",
     default = default
   )
 }
 
 generate_case_when_tree <- function(tree, mode, default = TRUE) {
   nodes <- generate_tree_nodes(tree, mode)
+
+  # A stump has a single node with no conditions, for which
+  # `generate_tree_node()` returns a bare prediction rather than a formula.
+  # There is nothing to turn into a `case_when()`.
+  if (length(tree) == 1 && isTRUE(path_formulas(tree[[1]]$path))) {
+    return(nodes[[1]])
+  }
 
   if (default) {
     default <- nodes[[length(nodes)]]
@@ -291,8 +300,10 @@ build_set_expr <- function(col, vals, op) {
     expr(!!rcl ~ !!node$prediction)
   })
 
-  # Handle stump trees (single node with no conditions)
-  if (length(node_exprs) == 1 && is.numeric(node_exprs[[1]])) {
+  # Handle stump trees (single node with no conditions). The prediction can be
+  # a class label as well as a number, so test for the absence of a condition
+  # rather than for a numeric prediction.
+  if (length(node_exprs) == 1 && !rlang::is_formula(node_exprs[[1]])) {
     return(node_exprs[[1]])
   }
 
