@@ -52,15 +52,37 @@ mtcars %\>% tidypredict_to_column(model) %\>% glimpse() \`\`\`
 CatBoost supports many objective functions. The following objectives are
 supported by `tidypredict`:
 
+`tidypredict` always returns predictions on the response scale, so the
+link implied by the objective is inverted for you. This does not always
+agree with
+[`catboost.predict()`](https://rdrr.io/pkg/catboost/man/catboost.predict.html),
+whose default `prediction_type = "RawFormulaVal"` returns the
+untransformed score. The equivalent
+[`catboost.predict()`](https://rdrr.io/pkg/catboost/man/catboost.predict.html)
+call is listed for each group below.
+
 ### Regression objectives (identity transform)
+
+Equivalent to `prediction_type = "RawFormulaVal"`.
 
 - `RMSE` (default)
 - `MAE`
 - `Quantile`
 - `MAPE`
+- `Huber`
+- `LogCosh`
+- `Expectile`
+
+### Log-link regression objectives (exponential transform)
+
+Equivalent to `prediction_type = "Exponent"`.
+
 - `Poisson`
+- `Tweedie`
 
 ### Binary classification (sigmoid transform)
+
+Equivalent to `prediction_type = "Probability"`.
 
 - `Logloss`
 - `CrossEntropy`

@@ -190,21 +190,40 @@ the matrix data set.
 </h2>
 <p>CatBoost supports many objective functions. The following objectives
 are supported by <code>tidypredict</code>:</p>
+<p><code>tidypredict</code> always returns predictions on the response
+scale, so the link implied by the objective is inverted for you. This
+does not always agree with <code><a href="https://rdrr.io/pkg/catboost/man/catboost.predict.html" class="external-link">catboost.predict()</a></code>, whose
+default <code>prediction_type = "RawFormulaVal"</code> returns the
+untransformed score. The equivalent <code><a href="https://rdrr.io/pkg/catboost/man/catboost.predict.html" class="external-link">catboost.predict()</a></code> call
+is listed for each group below.</p>
 <div class="section level3">
 <h3 id="regression-objectives-identity-transform">Regression objectives (identity transform)<a class="anchor" aria-label="anchor" href="#regression-objectives-identity-transform"></a>
 </h3>
+<p>Equivalent to <code>prediction_type = "RawFormulaVal"</code>.</p>
 <ul>
 <li>
 <code>RMSE</code> (default)</li>
 <li><code>MAE</code></li>
 <li><code>Quantile</code></li>
 <li><code>MAPE</code></li>
+<li><code>Huber</code></li>
+<li><code>LogCosh</code></li>
+<li><code>Expectile</code></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="log-link-regression-objectives-exponential-transform">Log-link regression objectives (exponential transform)<a class="anchor" aria-label="anchor" href="#log-link-regression-objectives-exponential-transform"></a>
+</h3>
+<p>Equivalent to <code>prediction_type = "Exponent"</code>.</p>
+<ul>
 <li><code>Poisson</code></li>
+<li><code>Tweedie</code></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="binary-classification-sigmoid-transform">Binary classification (sigmoid transform)<a class="anchor" aria-label="anchor" href="#binary-classification-sigmoid-transform"></a>
 </h3>
+<p>Equivalent to <code>prediction_type = "Probability"</code>.</p>
 <ul>
 <li><code>Logloss</code></li>
 <li><code>CrossEntropy</code></li>
