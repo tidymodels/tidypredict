@@ -77,9 +77,16 @@ parse_model_lm <- function(model) {
   # identify as `NA`. `predict()` drops those terms and still returns fitted
   # values, so the fit is well defined; dropping them here means
   # `tidypredict_fit()` works for such a model too.
+  # Decompose the coefficient labels using the model's own term structure
+  # rather than by guessing at their spelling. `NULL` when the model does not
+  # record enough to do so, in which case `build_terms()` falls back to
+  # `parse_label_lm()`.
+  fields <- lm_fields(model, labels)
+
   keep <- !is.na(coefs)
   coefs <- coefs[keep]
   labels <- labels[keep]
+  fields <- fields[keep]
 
   qr <- qr_inverse_lm(model)
 
@@ -113,7 +120,7 @@ parse_model_lm <- function(model) {
   if (class(model)[[1]] == "glm") {
     pm$general$is_glm <- 1
   }
-  pm$terms <- build_terms(coefs, labels, vars, qr = qr)
+  pm$terms <- build_terms(coefs, labels, vars, qr = qr, fields = fields)
   as_parsed_model(pm)
 }
 
@@ -143,14 +150,26 @@ qr_inverse_lm <- function(model) {
 # fit from a numeric matrix, where each coefficient names a column directly.
 # `qr` adds the inverse QR decomposition needed for prediction intervals, and
 # `drop_zero` discards zero coefficients, as the penalised models do.
+#
+# `fields` short-circuits the label parsing: a list, parallel to `labels`, of
+# ready-made field decompositions. `lm_fields()` builds it from the model's
+# term structure, which is exact, where `parse_label_lm()` can only guess from
+# the spelling of the label.
 build_terms <- function(
   values,
   labels,
   vars = NULL,
   qr = NULL,
-  drop_zero = FALSE
+  drop_zero = FALSE,
+  fields = NULL
 ) {
-  terms <- map2(as.numeric(values), labels, function(value, label) {
+  values <- as.numeric(values)
+  if (is.null(fields)) {
+    fields <- vector("list", length(values))
+  }
+  terms <- map(seq_along(values), function(i) {
+    value <- values[[i]]
+    label <- labels[[i]]
     if (drop_zero && value == 0) {
       return(NULL)
     }
@@ -158,7 +177,9 @@ build_terms <- function(
       label = label,
       coef = value,
       is_intercept = as.integer(label == "(Intercept)"),
-      fields = if (is.null(vars)) {
+      fields = if (!is.null(fields[[i]])) {
+        fields[[i]]
+      } else if (is.null(vars)) {
         list(list(type = "ordinary", col = label))
       } else {
         parse_label_lm(label, vars)
@@ -174,6 +195,160 @@ build_terms <- function(
     return(purrr::discard(terms, is.null))
   }
   terms
+}
+
+# Decompose every coefficient label of an `lm`-like model into fields.
+#
+# `parse_label_lm()` has to work out from the spelling of a label alone which
+# variables it came from, which is ambiguous in both directions: a factor level
+# containing `:` looks like an interaction, and a label that happens to equal
+# another variable's name looks like an ordinary column. Neither can be
+# resolved from the string.
+#
+# The model itself is not ambiguous. The `assign` attribute says which term
+# each coefficient belongs to, `term.labels` names the variables that term
+# multiplies, and `xlevels` lists the levels each of those variables had. That
+# is enough to say exactly what a label means.
+#
+# Returns `NULL` when the model records too little to do this, so that the
+# caller falls back to `parse_label_lm()`.
+lm_fields <- function(model, labels, call = rlang::caller_env()) {
+  terms <- model$terms
+  # `lm()` records `assign` directly. `glm()` and `rq()` do not, but they keep
+  # the model frame, which is enough to rebuild the model matrix that carries
+  # it. Rebuilding from the frame, rather than from the formula, avoids needing
+  # the data the model was fit on to still exist.
+  assign <- model$assign %||%
+    attr(model$qr$qr, "assign") %||%
+    attr(model$x, "assign") %||%
+    tryCatch(
+      attr(
+        stats::model.matrix(
+          terms,
+          model$model,
+          contrasts.arg = model$contrasts
+        ),
+        "assign"
+      ),
+      error = function(cnd) NULL
+    )
+  term_labels <- attr(terms, "term.labels")
+
+  if (is.null(terms) || is.null(assign) || length(assign) != length(labels)) {
+    return(NULL)
+  }
+
+  classes <- attr(terms, "dataClasses")
+  xlevels <- model$xlevels
+
+  map2(labels, assign, function(label, term) {
+    # `assign` marks the intercept with `0`.
+    if (term == 0) {
+      return(list(list(type = "ordinary", col = label)))
+    }
+    vars <- strsplit(term_labels[[term]], ":", fixed = TRUE)[[1]]
+    matches <- match_label_fields(label, vars, xlevels, classes)
+    if (length(matches) == 1) {
+      return(matches[[1]])
+    }
+    if (length(matches) > 1) {
+      cli::cli_abort(
+        c(
+          x = "Unable to tell which factor levels the coefficient
+          {.val {label}} refers to.",
+          i = "A level containing {.val :} makes it match
+          {length(matches)} combinations of {.val {vars}}."
+        ),
+        call = call
+      )
+    }
+    # No decomposition fits, which happens for a contrast that does not name
+    # its columns after the levels. Leave it to the older parser.
+    NULL
+  })
+}
+
+# Every way `label` can be read as the `:`-separated expansion of `vars`.
+#
+# Each element of the result is a field list of the same shape
+# `parse_label_lm()` returns. More than one element means the label is
+# genuinely ambiguous.
+match_label_fields <- function(label, vars, xlevels, classes) {
+  levels_of <- function(var) {
+    if (!is.null(xlevels[[var]])) {
+      return(xlevels[[var]])
+    }
+    # A logical predictor expands to a single `<var>TRUE` column and is not
+    # recorded in `xlevels`.
+    if (identical(unname(classes[var]), "logical")) {
+      return(c("TRUE", "FALSE"))
+    }
+    NULL
+  }
+
+  step <- function(rest, i) {
+    var <- vars[[i]]
+    last <- i == length(vars)
+    levels <- levels_of(var)
+    out <- list()
+
+    # Candidate pieces of `rest` that `var` could have produced, paired with
+    # the field each implies.
+    pieces <- list()
+    if (is.null(levels)) {
+      # A numeric predictor names its column after itself. It may carry a
+      # suffix when it is a matrix column, so allow the piece to run to any
+      # later `:` as well.
+      ends <- unique(c(nchar(var), which(strsplit(rest, "")[[1]] == ":") - 1))
+      ends <- ends[ends >= nchar(var) & ends <= nchar(rest)]
+      for (end in ends) {
+        piece <- substr(rest, 1, end)
+        if (startsWith(piece, var)) {
+          pieces <- c(
+            pieces,
+            list(list(
+              piece = piece,
+              field = list(type = "ordinary", col = piece)
+            ))
+          )
+        }
+      }
+    } else {
+      for (level in levels) {
+        pieces <- c(
+          pieces,
+          list(list(
+            piece = paste0(var, level),
+            field = list(
+              type = "conditional",
+              col = var,
+              val = level,
+              op = "equal"
+            )
+          ))
+        )
+      }
+    }
+
+    for (piece in pieces) {
+      if (!startsWith(rest, piece$piece)) {
+        next
+      }
+      tail <- substr(rest, nchar(piece$piece) + 1, nchar(rest))
+      if (last) {
+        if (tail == "") {
+          out <- c(out, list(list(piece$field)))
+        }
+      } else if (startsWith(tail, ":")) {
+        for (sub in step(substr(tail, 2, nchar(tail)), i + 1)) {
+          out <- c(out, list(c(list(piece$field), sub)))
+        }
+      }
+    }
+    out
+  }
+
+  step(label, 1)
 }
 
 parse_label_lm <- function(label, vars) {
@@ -266,6 +441,15 @@ te_interval_lm <- function(
     ~ get_qr_lm(.x, parsedmodel)
   )
   qrs <- reduce_addition(qrs_map)
+  # `sigma2` is added as a constant, which is the residual variance of an
+  # unweighted observation.
+  #
+  # For a weighted fit `predict.lm()` scales it by the per-row `weights`
+  # argument, but that argument defaults to `1` whenever `newdata` is given: it
+  # warns and assumes a constant prediction variance, exactly as here. Since a
+  # translated formula is always evaluated against new data, and nothing in it
+  # names a weight column, matching that default is the only behavior available
+  # and it is the one `predict()` itself takes.
   tfrac <- qt(1 - (1 - interval) / 2, parsedmodel$general$residual)
   expr(!!tfrac * sqrt((!!qrs) + (!!parsedmodel$general$sigma2)))
 }
