@@ -1,8 +1,8 @@
 # aorsf uses observed linear-combination values as split cutpoints, so training
-# rows can land exactly on a split boundary where floating-point drift between
-# aorsf's C++ traversal and the generated formula flips the branch. These tests
-# therefore evaluate agreement on jittered data, where such exact ties do not
-# occur. On genuinely new data the formula reproduces `predict()` exactly.
+# rows land exactly on a split boundary, where the formula cannot reproduce the
+# last bit of aorsf's fused-multiply-add traversal. The split thresholds are
+# calibrated against the training data to compensate, so agreement is checked on
+# the training rows as well as on new data.
 
 new_data <- function() {
   set.seed(99)
@@ -24,6 +24,36 @@ test_that("aorsf regression predictions match", {
   base <- as.numeric(predict(model, new_data = nd))
   expect_equal(fit, base)
   expect_false(tidypredict_test(model, df = nd)$alert)
+})
+
+test_that("aorsf predictions match on the training data (#351)", {
+  skip_if_not_installed("aorsf")
+
+  set.seed(1)
+  model <- aorsf::orsf(mtcars, mpg ~ wt + cyl + disp + hp, n_tree = 20)
+
+  fit <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  base <- as.numeric(predict(model, new_data = mtcars))
+  expect_equal(fit, base)
+  expect_false(tidypredict_test(model, df = mtcars)$alert)
+})
+
+test_that("training data agreement holds across forest sizes (#351)", {
+  skip_if_not_installed("aorsf")
+
+  set.seed(3)
+  df <- as.data.frame(matrix(rnorm(150 * 5), 150, 5))
+  names(df) <- paste0("x", 1:5)
+  df$y <- rowSums(df) + rnorm(150)
+
+  for (n_tree in c(1, 5, 50)) {
+    for (vars in list(c("x1", "x2"), paste0("x", 1:5))) {
+      f <- stats::reformulate(vars, "y")
+      model <- aorsf::orsf(df[c(vars, "y")], f, n_tree = n_tree)
+      fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+      expect_equal(fit, as.numeric(predict(model, new_data = df)))
+    }
+  }
 })
 
 test_that("aorsf supports SQL", {
@@ -70,6 +100,11 @@ test_that("parse_model roundtrips and produces correct predictions", {
   base <- as.numeric(predict(model, new_data = nd))
   parsed <- rlang::eval_tidy(tidypredict_fit(pm), nd)
   expect_equal(parsed, base)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    as.numeric(predict(model, new_data = mtcars))
+  )
 })
 
 test_that("model can be saved and re-loaded", {
@@ -87,6 +122,11 @@ test_that("model can be saved and re-loaded", {
   base <- as.numeric(predict(model, new_data = nd))
   parsed <- rlang::eval_tidy(tidypredict_fit(reloaded), nd)
   expect_equal(parsed, base)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(reloaded), mtcars),
+    as.numeric(predict(model, new_data = mtcars))
+  )
 })
 
 test_that("classification errors with clear message", {
