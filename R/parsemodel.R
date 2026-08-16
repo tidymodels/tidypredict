@@ -56,3 +56,11 @@
 parse_model <- function(model) {
   UseMethod("parse_model")
 }
+
+# Without this, an unsupported model gets R's "no applicable method" error,
+# which names an internal generic rather than saying the model is not
+# supported (#313).
+#' @export
+parse_model.default <- function(model) {
+  abort_model_unsupported(model)
+}

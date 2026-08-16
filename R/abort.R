@@ -32,3 +32,67 @@ abort_test_unsupported <- function(
     call = call
   )
 }
+
+# Raised for a model class, or a parsed model type, that no method knows how to
+# handle.
+abort_model_unsupported <- function(model, call = rlang::caller_env()) {
+  if (inherits(model, "parsed_model")) {
+    cli::cli_abort(
+      "Parsed models of type {.val {model$general$type}} are not supported.",
+      call = call
+    )
+  }
+  cli::cli_abort(
+    "Models of class {.cls {class(model)[[1]]}} are not supported.",
+    call = call
+  )
+}
+
+# Every parsed model is a list with a `general` element, and every method that
+# takes one reads from it. A list without one is not a parsed model, and used to
+# reach code that indexed `NULL` instead of saying so.
+check_parsed_model <- function(
+  x,
+  arg = "model",
+  call = rlang::caller_env()
+) {
+  if (!is.list(x) || !is.list(x$general)) {
+    cli::cli_abort(
+      c(
+        "{.arg {arg}} must be a fitted model or a parsed model.",
+        i = "A parsed model is a list with a {.field general} element,
+             as returned by {.fn parse_model}."
+      ),
+      call = call
+    )
+  }
+
+  invisible(x)
+}
+
+# `interval` is used as a probability, so anything outside (0, 1) either makes
+# `qt()` return `NaN`, which silently poisons the whole formula, or collapses
+# the interval to zero.
+check_interval <- function(
+  interval,
+  arg = rlang::caller_arg(interval),
+  call = rlang::caller_env()
+) {
+  if (!is.numeric(interval) || length(interval) != 1 || is.na(interval)) {
+    cli::cli_abort(
+      "{.arg {arg}} must be a single number between 0 and 1,
+       not {.obj_type_friendly {interval}}.",
+      call = call
+    )
+  }
+
+  if (interval <= 0 || interval >= 1) {
+    cli::cli_abort(
+      "{.arg {arg}} must be a single number between 0 and 1,
+       not {.val {interval}}.",
+      call = call
+    )
+  }
+
+  invisible(interval)
+}

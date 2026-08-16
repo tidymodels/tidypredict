@@ -77,3 +77,16 @@ test_that("f32_split_boundary() preserves NA and length", {
 test_that("f32_split_boundary() rejects an unknown side", {
   expect_error(f32_split_boundary(1, "sideways"))
 })
+
+test_that("f32_split_boundary() leaves non-finite thresholds alone (#313)", {
+  expect_equal(f32_split_boundary(Inf, "upper"), Inf)
+  expect_equal(f32_split_boundary(-Inf, "lower"), -Inf)
+  expect_equal(f32_split_boundary(1e40, "upper"), 1e40)
+  expect_equal(f32_split_boundary(-1e40, "lower"), -1e40)
+  expect_equal(f32_split_boundary(c(Inf, 1.5), "upper")[[1]], Inf)
+})
+
+test_that("as_f32() coerces integer input (#313)", {
+  expect_equal(as_f32(3L), 3)
+  expect_equal(as_f32(1:3), c(1, 2, 3))
+})

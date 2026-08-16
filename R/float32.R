@@ -19,7 +19,10 @@
 #   float, so Cubist takes the `<=` branch where a naive translation does not.
 #   Every value that rounds to the threshold must land below the boundary.
 
+# `writeBin()` writes an integer vector as an integer, which then reads back as
+# a float made of those bits, so the coercion has to happen first (#313).
 as_f32 <- function(x) {
+  x <- as.numeric(x)
   readBin(writeBin(x, raw(), size = 4), "double", size = 4, n = length(x))
 }
 
@@ -47,7 +50,12 @@ f32_split_boundary <- function(x, side = c("lower", "upper")) {
   side <- match.arg(side)
 
   out <- as.numeric(x)
-  keep <- !is.na(out)
+
+  # A threshold that is not finite, or that overflows the float range, has no
+  # adjacent float to take a midpoint with: incrementing the bit pattern of
+  # `Inf` crosses into `NaN`, and a `NaN` boundary makes every comparison
+  # `FALSE`, so the model silently mispredicts. Those are left alone (#313).
+  keep <- !is.na(out) & is.finite(as_f32(out))
   if (!any(keep)) {
     return(out)
   }

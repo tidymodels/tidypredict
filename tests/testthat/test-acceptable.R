@@ -38,6 +38,11 @@ test_that("glm family function syntax does not trigger error (#202)", {
   expect_no_error(acceptable_formula(model))
 })
 
+test_that("acceptable_formula() errors for unsupported objects (#313)", {
+  expect_snapshot(error = TRUE, acceptable_formula(NULL))
+  expect_snapshot(error = TRUE, acceptable_formula(list()))
+})
+
 test_that("glm family string syntax works (#202)", {
   model <- glm(mpg ~ wt + hp, data = mtcars, family = "gaussian")
   expect_no_error(acceptable_formula(model))

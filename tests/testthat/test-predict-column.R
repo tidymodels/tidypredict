@@ -60,6 +60,42 @@ test_that("tidypredict_to_column() works on a database backend", {
   expect_no_error(tidypredict_to_column(db, model))
 })
 
+test_that("tidypredict_to_column() validates `vars` (#313)", {
+  model <- lm(mpg ~ wt, data = mtcars)
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_to_column(mtcars, model, add_interval = TRUE, vars = "f")
+  )
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_to_column(mtcars, model, vars = 1)
+  )
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_to_column(mtcars, model, vars = character(0))
+  )
+})
+
+test_that("tidypredict_to_column() validates `add_interval` and `interval` (#313)", {
+  model <- lm(mpg ~ wt, data = mtcars)
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_to_column(mtcars, model, add_interval = "yes")
+  )
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_to_column(mtcars, model, add_interval = TRUE, interval = 1.5)
+  )
+})
+
+test_that("tidypredict_to_column() ignores `interval` when not adding one", {
+  model <- lm(mpg ~ wt, data = mtcars)
+
+  expect_no_error(tidypredict_to_column(mtcars, model, interval = 2))
+})
+
 test_that("tidypredict_to_column() errors for models returning many formulas", {
   skip_if_not_installed("MASS")
   model <- MASS::lda(Species ~ ., data = iris)

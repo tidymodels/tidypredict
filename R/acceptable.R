@@ -16,6 +16,13 @@ acceptable_formula <- function(model) {
   UseMethod("acceptable_formula")
 }
 
+# Mirrors `parse_model.default()`, so a class with no check reports the same
+# thing as a class with no parser (#313).
+#' @export
+acceptable_formula.default <- function(model) {
+  abort_model_unsupported(model)
+}
+
 #' @export
 acceptable_formula.lm <- function(model) {
   acceptable_lm(model)

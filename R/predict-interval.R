@@ -22,10 +22,26 @@ tidypredict_interval <- function(model, interval = 0.95) {
 # lands here rather than on R's "no applicable method" error.
 #' @export
 tidypredict_interval.default <- function(model, interval = 0.95) {
-  cli::cli_abort(c(
-    "Prediction intervals are not supported for {.cls {class(model)[[1]]}} models.",
-    i = "Only {.cls lm} and {.cls glm} models have prediction intervals."
-  ))
+  abort_interval_unsupported(model)
+}
+
+# A parsed model always inherits `"list"`, so `tidypredict_interval.list()`
+# lands here too rather than repeating the wording.
+abort_interval_unsupported <- function(model, call = rlang::caller_env()) {
+  what <- if (is.list(model) && is.list(model$general)) {
+    mt <- model$general$model %||% model$general$type %||% "unknown"
+    "{.val {mt}} parsed models"
+  } else {
+    "{.cls {class(model)[[1]]}} models"
+  }
+
+  cli::cli_abort(
+    c(
+      "Prediction intervals are not supported for {cli::format_inline(what)}.",
+      i = "Only {.cls lm} and {.cls glm} models have prediction intervals."
+    ),
+    call = call
+  )
 }
 
 #' @export
@@ -35,16 +51,18 @@ tidypredict_interval.default <- function(model, interval = 0.95) {
 
 #' @export
 tidypredict_interval.list <- function(model, interval = 0.95) {
-  mt <- model$general$model
-  fit <- NULL
-  if (mt == "lm") {
-    fit <- te_interval_lm(model, interval)
-  }
-  if (mt == "glm") {
-    fit <- te_interval_glm(model, interval)
-  }
-  if (is.null(fit)) {
-    cli::cli_abort("Model type not supported.")
-  }
-  fit
+  check_parsed_model(model)
+  check_interval(interval)
+
+  # `mt` is `NULL` for a list that is not a parsed model at all, and `switch()`
+  # needs a string, so the comparison used to fail with "argument is of length
+  # zero" instead of saying what was wrong.
+  mt <- model$general$model %||% ""
+
+  switch(
+    mt,
+    lm = te_interval_lm(model, interval),
+    glm = te_interval_glm(model, interval),
+    abort_interval_unsupported(model)
+  )
 }

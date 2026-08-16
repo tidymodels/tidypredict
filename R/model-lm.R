@@ -603,6 +603,7 @@ parse_qr_lm <- function(label, qr) {
 
 #' @export
 tidypredict_interval.lm <- function(model, interval = 0.95) {
+  check_interval(interval)
   parsedmodel <- parse_model(model)
   te_interval_lm(parsedmodel, interval)
 }
