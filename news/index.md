@@ -77,6 +77,17 @@
   ([\#310](https://github.com/tidymodels/tidypredict/issues/310))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now handles three parsed model shapes that no released
+  [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  writes but that a hand-written or edited parsed model can contain: a
+  path that mixes a `type = "all"` element with real conditions, which
+  aborted with an internal error; a rule whose linear prediction is a
+  single non-intercept term, which produced a garbled formula; and a
+  rule whose terms are all zero, which aborted with “`.x` must not be
+  empty” and is now written as `0`.
+  ([\#310](https://github.com/tidymodels/tidypredict/issues/310))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns correct predictions for
   [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) models
   with a single numeric predictor, which previously produced a bare
