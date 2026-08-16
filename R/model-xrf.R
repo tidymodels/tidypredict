@@ -153,8 +153,7 @@ acceptable_formula.xrf <- function(model) {
         x = "Functions inside the formula are not supported.",
         i = "Functions detected: {.val {funs}}.
             Use `dplyr` transformations to prepare the data."
-      ),
-      call. = FALSE
+      )
     )
   }
 }

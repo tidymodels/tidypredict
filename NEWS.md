@@ -8,6 +8,20 @@
 
 - `acceptable_formula()` now checks the contrast of every factor predictor. A model that used the treatment contrast for one field and something else for another was accepted and then silently mis-parsed; such a model now aborts with the usual "the treatment contrast is the only one supported" error, which also names the offending field rather than the contrast. (#291)
 
+- `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
+
+- `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
+
+- `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
+
+- `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
+
+- `tidypredict_interval()` now reports a parsed model of a type it does not support with the same message it gives for a fitted model, rather than "Model type not supported.", and reports a list that is not a parsed model rather than failing with "argument is of length zero". (#313)
+
+- `tidypredict_sql()` now returns a single query for an intercept-only model. Such a model's formula is a bare number rather than a call, which was mistaken for the list of formulas a multiclass model produces, so the query came back wrapped in a one element list. (#313)
+
+- `tidypredict_to_column()` now validates `vars`, `add_interval` and `interval`. Passing fewer than three names in `vars` alongside `add_interval = TRUE` produced a data frame with a column literally named `NA`. (#313)
+
 - `tidypredict_fit()` now produces a formula R can evaluate for a `dbarts::bart()` fit at the package default `ntree`. Terms are summed left to right, which nests the `+` calls as deeply as there are terms, and a bart fit sums `ndpost * ntree` leaf values: at the defaults R gave up with "evaluation nested too deeply". A model with 1000 terms or more is now summed in a balanced shape instead, nesting `log2(n)` deep. Only a large ensemble reaches that, so every other model keeps the flat left-to-right sum it had before, along with the exact result and the formula layout that go with it. (#305)
 
 - `.build_case_when_tree()`, which {orbital} calls, now returns the bare prediction of a stump tree whether that prediction is a number or a class label. A classification stump previously produced `case_when(.default = "a")`, which dplyr rejects with "`...` can't be empty". (#310)

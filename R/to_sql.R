@@ -37,10 +37,13 @@ tidypredict_sql_interval <- function(model, con, interval = 0.95) {
 }
 
 # Multiclass and multivariate models return a list of expressions rather than a
-# single one, so each element is translated separately.
+# single one, so each element is translated separately. Everything else is one
+# expression, which for an intercept-only model is a bare number rather than a
+# call, so branching on `is.list()` is what keeps that from being wrapped in a
+# one element list (#313).
 translate_fit <- function(f, con) {
-  if (inherits(f, "call")) {
-    return(dbplyr::translate_sql(!!f, con = con))
+  if (is.list(f)) {
+    return(map(f, ~ dbplyr::translate_sql(!!.x, con = con)))
   }
-  map(f, ~ dbplyr::translate_sql(!!.x, con = con))
+  dbplyr::translate_sql(!!f, con = con)
 }

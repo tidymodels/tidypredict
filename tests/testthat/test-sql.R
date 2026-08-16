@@ -59,6 +59,22 @@ test_that("tidypredict_sql_interval() widens with `interval`", {
   ))
 })
 
+test_that("tidypredict_sql() returns one query for intercept-only models (#313)", {
+  sql <- tidypredict_sql(lm(mpg ~ 1, data = mtcars), dbplyr::simulate_dbi())
+
+  expect_s3_class(sql, "sql")
+  expect_length(sql, 1)
+})
+
+test_that("tidypredict_sql_interval() validates `interval` (#313)", {
+  model <- lm(mpg ~ wt, data = mtcars)
+
+  expect_snapshot(
+    error = TRUE,
+    tidypredict_sql_interval(model, dbplyr::simulate_dbi(), interval = 1.5)
+  )
+})
+
 test_that("tidypredict_sql_interval() errors for unsupported models", {
   skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ wt, data = mtcars)

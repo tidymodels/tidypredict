@@ -20,6 +20,39 @@ tidypredict_to_column <- function(
   interval = 0.95,
   vars = c("fit", "upper", "lower")
 ) {
+  if (!rlang::is_bool(add_interval)) {
+    cli::cli_abort(
+      "{.arg add_interval} must be {.code TRUE} or {.code FALSE}, not
+       {.obj_type_friendly {add_interval}}."
+    )
+  }
+
+  # `vars` is indexed positionally, so a shorter vector used to name a column
+  # `NA` rather than error (#313).
+  if (!is.character(vars) || anyNA(vars)) {
+    cli::cli_abort(
+      "{.arg vars} must be a character vector, not
+       {.obj_type_friendly {vars}}."
+    )
+  }
+  n_needed <- if (add_interval) 3 else 1
+  if (length(vars) < n_needed) {
+    cli::cli_abort(
+      c(
+        "{.arg vars} must name at least {n_needed} column{?s}, not
+         {length(vars)}.",
+        i = if (add_interval) {
+          "The fit, upper and lower bound columns all need a name when
+           {.arg add_interval} is {.code TRUE}."
+        }
+      )
+    )
+  }
+
+  if (add_interval) {
+    check_interval(interval)
+  }
+
   fit_model <- tidypredict_fit(model)
 
   # Multiclass and multivariate models return one formula per outcome, and there

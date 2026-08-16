@@ -9,9 +9,29 @@ as_parsed_model <- function(x) {
 
 #' @export
 as_parsed_model.list <- function(x) {
-  t <- paste0("pm_", x$general$type)
-  class(x) <- c("parsed_model", t, class(x))
+  # `general$type` is what the `pm_*` dispatch class is built from, so without
+  # it the object gets a class of `pm_` that no method matches, and the failure
+  # surfaces much later (#313).
+  type <- x$general$type
+  if (!rlang::is_string(type) || type == "") {
+    cli::cli_abort(
+      c(
+        "{.arg x} is not a valid parsed model.",
+        i = "{.code x$general$type} must be a single string, not
+             {.obj_type_friendly {type}}."
+      )
+    )
+  }
+
+  class(x) <- c("parsed_model", paste0("pm_", type), class(x))
   x
+}
+
+#' @export
+as_parsed_model.default <- function(x) {
+  cli::cli_abort(
+    "{.arg x} must be a parsed model, not {.obj_type_friendly {x}}."
+  )
 }
 
 # Models whose fit is one linear predictor per class, combined with a softmax.
