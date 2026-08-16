@@ -14,6 +14,8 @@
 
 - `tidypredict_fit()` no longer fails with "`x` must be a formula" on a parsed model saved by tidypredict 1.0.1 or earlier that contains a `ranger::ranger()` or `randomForest::randomForest()` stump, a tree whose root is its only node. Such a tree is now written as its constant prediction. (#310)
 
+- `tidypredict_fit()` now handles three parsed model shapes that no released `parse_model()` writes but that a hand-written or edited parsed model can contain: a path that mixes a `type = "all"` element with real conditions, which aborted with an internal error; a rule whose linear prediction is a single non-intercept term, which produced a garbled formula; and a rule whose terms are all zero, which aborted with "`.x` must not be empty" and is now written as `0`. (#310)
+
 - `tidypredict_fit()` now returns correct predictions for `kernlab::ksvm()` models with a single numeric predictor, which previously produced a bare constant. kernlab leaves the column names of a one-column model matrix empty, so every term was dropped and only the intercept remained. (#289)
 
 - `tidypredict_fit()` now undoes kernlab's predictor scaling when exactly one column was scaled for `kernlab::ksvm()` models. This covers any fit with one numeric predictor plus factor predictors, since kernlab does not scale dummy columns, and the weights were left on the scaled scale because the centers and scales lose their names in that case. (#289)

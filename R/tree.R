@@ -124,7 +124,11 @@ generate_tree_node <- function(node, calc_mode = "") {
   prediction <- node$prediction
   rcl <- path_formulas(path)
 
-  if (length(prediction) > 1) {
+  # A linear prediction is a list of terms, of any length. The branch is taken
+  # on the shape of the first element rather than on the number of terms, so
+  # that a single term is summed the same way as several, whether or not it is
+  # the intercept.
+  if (is.list(prediction) && is.list(prediction[[1]])) {
     pl <- map(
       prediction,
       ~ {
@@ -147,11 +151,10 @@ generate_tree_node <- function(node, calc_mode = "") {
       }
     )
     pl <- purrr::discard(pl, is.null)
-    pl <- reduce_addition(pl)
+    # Every term dropped out, which happens when they are all zero. The sum of
+    # no terms is zero; `reduce_addition()` would abort on the empty list.
+    pl <- if (length(pl) == 0) 0 else reduce_addition(pl)
   } else {
-    if (is.list(prediction) && prediction[[1]]$is_intercept) {
-      prediction <- prediction[[1]]$val
-    }
     pl <- prediction
   }
 
@@ -207,7 +210,12 @@ path_formulas <- function(path) {
     return(TRUE)
   }
 
-  if (length(path) == 1 && path[[1]]$type == "all") {
+  # `"all"` matches every row, so it contributes nothing to the condition. It
+  # is dropped here rather than reduced in as a `TRUE` term, so that a path made
+  # up only of `"all"` elements is still recognized as unconditional.
+  path <- purrr::discard(path, \(x) identical(x$type, "all"))
+
+  if (length(path) == 0) {
     return(TRUE)
   }
 
