@@ -170,6 +170,39 @@ test_that("generate_case_when_tree() works with a stump tree", {
   expect_identical(generate_case_when_tree(nodes, mode = ""), "a")
 })
 
+test_that("path_formulas() ignores `all` elements in a mixed path", {
+  path <- list(
+    list(type = "all"),
+    list(type = "conditional", col = "cyl", val = 4, op = "more")
+  )
+
+  expect_identical(path_formulas(path), quote(cyl > 4))
+  expect_true(path_formulas(list(list(type = "all"), list(type = "all"))))
+})
+
+test_that("generate_tree_node() handles a single non-intercept term", {
+  node <- list(
+    path = list(),
+    prediction = list(
+      list(col = "hp", val = 4, op = "multiply", is_intercept = 0)
+    )
+  )
+
+  expect_identical(generate_tree_node(node), quote(hp * 4))
+})
+
+test_that("generate_tree_node() handles an all-zero prediction", {
+  node <- list(
+    path = list(),
+    prediction = list(
+      list(col = "(Intercept)", val = 0, op = "none", is_intercept = 1),
+      list(col = "hp", val = 0, op = "multiply", is_intercept = 0)
+    )
+  )
+
+  expect_identical(generate_tree_node(node), 0)
+})
+
 test_that("generate_case_when_trees() works with a stump tree", {
   skip_if_not_installed("ranger")
 

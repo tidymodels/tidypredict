@@ -104,6 +104,17 @@ tree_info_with_predictions <- function(tree_info, prediction) {
 build_nested_node <- function(node_id, tree_info, missing = "default") {
   node_idx <- which(tree_info$nodeID == node_id)
 
+  # A child id that names no node, or names more than one, leaves `node_idx`
+  # unusable and every line below it fails with a base error that says nothing
+  # about the tree.
+  if (length(node_idx) != 1) {
+    cli::cli_abort(
+      "Tree info has {length(node_idx)} nodes with {.field nodeID} \\
+       {.value {node_id}}, not 1.",
+      .internal = TRUE
+    )
+  }
+
   # Leaf node: return prediction
   if (tree_info$terminal[node_idx]) {
     prediction <- tree_info$prediction[node_idx]
@@ -277,9 +288,17 @@ build_nested_split_condition <- function(split) {
     col <- expr(as.integer(!!col))
   }
 
-  if (split$is_categorical) {
+  if (isTRUE(split$is_categorical)) {
     # Categorical split: x %in% c("a", "b")
     vals <- unlist(split$vals)
+    # `x %in% NULL` is `FALSE` for every row, which would quietly send the whole
+    # split down the `.default` branch instead of failing.
+    if (length(vals) == 0) {
+      cli::cli_abort(
+        "Categorical split on {.field {split$col}} has no values.",
+        .internal = TRUE
+      )
+    }
     expr(!!col %in% !!vals)
   } else if (isTRUE(split$strict)) {
     # Continuous split where the left branch is strictly less than the
@@ -370,9 +389,16 @@ build_nested_from_paths_recursive <- function(
     return(leaves[[1]]$prediction)
   }
 
+  # Leaf paths form a prefix code, so a leaf whose path has run out is the only
+  # leaf left in its branch. Returning its prediction with others still present
+  # would drop those silently.
   first_leaf <- leaves[[1]]
   if (path_depth > length(first_leaf$path)) {
-    return(first_leaf$prediction)
+    cli::cli_abort(
+      "A leaf path ended with {length(leaves) - 1} other leaf{?/s} still in \\
+       the same branch.",
+      .internal = TRUE
+    )
   }
 
   # Partition leaves by left vs right condition based on operator name.

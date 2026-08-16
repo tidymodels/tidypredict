@@ -89,6 +89,52 @@ test_that("build_nested_split_condition handles categorical splits", {
   expect_equal(result, c(TRUE, TRUE, FALSE, FALSE))
 })
 
+test_that("build_nested_split_condition() errors on an empty categorical set", {
+  split <- list(col = "x", vals = list(), is_categorical = TRUE)
+
+  expect_error(build_nested_split_condition(split), "no values")
+})
+
+test_that("build_nested_split_condition() treats a missing flag as continuous", {
+  split <- list(col = "x", val = 5)
+
+  expect_equal(
+    rlang::expr_deparse(build_nested_split_condition(split)),
+    "x <= 5"
+  )
+})
+
+test_that("build_nested_from_paths_recursive() errors on a truncated path", {
+  leaves <- list(
+    list(prediction = 1, path = list()),
+    list(prediction = 2, path = list(list(op = "less-equal")))
+  )
+
+  expect_error(
+    build_nested_from_paths_recursive(
+      leaves,
+      build_condition_fn = \(x) TRUE,
+      is_left_op = \(op) TRUE,
+      path_depth = 1
+    ),
+    "still in"
+  )
+})
+
+test_that("build_nested_node() errors on a dangling child id", {
+  tree_info <- list(
+    nodeID = 0L,
+    leftChild = 1L,
+    rightChild = 2L,
+    terminal = FALSE,
+    prediction = 1,
+    branches = list(NULL),
+    node_splits = list(list(primary = list(col = "x", val = 5)))
+  )
+
+  expect_error(build_nested_node(0L, tree_info), "not 1")
+})
+
 test_that(".build_nested_case_when_tree is exported and works", {
   skip_if_not_installed("rpart")
 
