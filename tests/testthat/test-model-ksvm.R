@@ -41,6 +41,27 @@ test_that("regression predictions match predict()", {
   }
 })
 
+test_that("regression predictions match predict() with a single scaled column", {
+  skip_if_not_installed("kernlab")
+
+  df <- mtcars
+  df$gear <- factor(df$gear)
+
+  for (fo in c(mpg ~ wt, mpg ~ wt + gear)) {
+    set.seed(1)
+    model <- kernlab::ksvm(
+      fo,
+      data = df,
+      kernel = "vanilladot",
+      type = "eps-svr"
+    )
+    te <- rlang::eval_tidy(tidypredict_fit(model), df)
+    base <- as.numeric(kernlab::predict(model, df))
+    expect_equal(te, base, tolerance = 1e-10)
+    expect_false(tidypredict_test(model, df)$alert)
+  }
+})
+
 test_that("binary classification probabilities match predict()", {
   skip_if_not_installed("kernlab")
 
@@ -55,6 +76,29 @@ test_that("binary classification probabilities match predict()", {
       data = df,
       kernel = "vanilladot",
       type = svm_type,
+      prob.model = TRUE
+    )
+    te <- rlang::eval_tidy(tidypredict_fit(model), df)
+    base <- kernlab::predict(model, df, type = "probabilities")[, "yes"]
+    expect_equal(te, unname(base), tolerance = 1e-10)
+    expect_false(tidypredict_test(model, df)$alert)
+  }
+})
+
+test_that("classification probabilities match predict() with a single scaled column", {
+  skip_if_not_installed("kernlab")
+
+  df <- mtcars
+  df$am <- factor(ifelse(df$am == 1, "yes", "no"))
+  df$gear <- factor(df$gear)
+
+  for (fo in c(am ~ wt, am ~ wt + gear)) {
+    set.seed(1)
+    model <- kernlab::ksvm(
+      fo,
+      data = df,
+      kernel = "vanilladot",
+      type = "C-svc",
       prob.model = TRUE
     )
     te <- rlang::eval_tidy(tidypredict_fit(model), df)
