@@ -27,12 +27,17 @@ parse_model.lda_emp_bayes_eigen <- function(model) {
   parse_model_sparsediscrim(model)
 }
 
-parse_model_sparsediscrim <- function(model, vars = character(0)) {
+parse_model_sparsediscrim <- function(
+  model,
+  vars = character(0),
+  preproc = NULL
+) {
   # The `x`/`y` interface keeps no formula, in which case every column of the
   # model matrix is used as-is.
   if (!is.null(model$.terms)) {
     acceptable_formula(model)
     vars <- names(attr(model$.terms, "dataClasses"))
+    preproc <- preproc %||% list(terms = model$.terms, xlevels = model$.xlevels)
   }
 
   # The posterior probabilities are the softmax of
@@ -41,7 +46,8 @@ parse_model_sparsediscrim <- function(model, vars = character(0)) {
   # so it cancels in the softmax and what is left is one linear predictor per
   # class.
   precision <- sparsediscrim_precision(model)
-  labels <- model$col_names
+  labels <- c("(Intercept)", model$col_names)
+  fields <- preproc_fields(labels, preproc)
 
   class_terms <- lapply(model$est, function(class_est) {
     xbar <- class_est$xbar
@@ -50,8 +56,9 @@ parse_model_sparsediscrim <- function(model, vars = character(0)) {
 
     build_terms(
       c(intercept, coefs),
-      c("(Intercept)", labels),
-      vars
+      labels,
+      vars,
+      fields = fields
     )
   })
 

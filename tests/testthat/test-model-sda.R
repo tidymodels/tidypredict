@@ -160,3 +160,25 @@ test_that("categorical predictors are handled with parsnip", {
 
   expect_equal(unname(probs), unname(native), tolerance = sda_tolerance)
 })
+
+test_that("a coefficient label colliding with a variable name works (#376)", {
+  skip_if_not_installed("sda")
+  skip_if_not_installed("discrim")
+
+  set.seed(1)
+  df <- data.frame(
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+  df$cls <- factor(ifelse(df$gy2 + as.numeric(df$g) > 2, "a", "b"))
+
+  spec <- parsnip::discrim_linear(engine = "sda")
+  model <- parsnip::fit(spec, cls ~ g + gy2, df)
+  probs <- rlang::eval_tidy(tidypredict_fit(model)[["b"]], df)
+
+  expect_equal(
+    probs,
+    predict(model, df, type = "prob")$.pred_b,
+    tolerance = 1e-6
+  )
+})

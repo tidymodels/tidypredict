@@ -131,10 +131,15 @@ parse_model.nnet <- function(model) {
   }
 
   vars <- names(attr(model$terms, "dataClasses")) %||% model$coefnames
-  inputs <- map(
-    model$coefnames,
-    ~ list(label = .x, fields = parse_label_lm(.x, vars))
-  )
+  fields <- lm_fields(model, model$coefnames) %||%
+    vector("list", length(model$coefnames))
+  inputs <- map(seq_along(model$coefnames), function(i) {
+    label <- model$coefnames[[i]]
+    list(
+      label = label,
+      fields = fields[[i]] %||% parse_label_lm(label, vars)
+    )
+  })
 
   # Every unit with incoming weights, which is every unit but the bias and the
   # inputs. `nconn` holds the cumulative number of weights, so the weights of

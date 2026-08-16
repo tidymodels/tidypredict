@@ -177,3 +177,23 @@ test_that("errors on unsupported models", {
   )
   expect_snapshot(tidypredict_fit(noprob), error = TRUE)
 })
+
+test_that("a coefficient label colliding with a variable name works (#376)", {
+  skip_if_not_installed("kernlab")
+
+  set.seed(1)
+  df <- data.frame(
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+  df$y <- rnorm(60) + as.numeric(df$g) + df$gy2
+
+  model <- kernlab::ksvm(
+    y ~ g + gy2,
+    data = df,
+    kernel = "vanilladot",
+    type = "eps-svr"
+  )
+
+  expect_false(tidypredict_test(model, df)$alert)
+})

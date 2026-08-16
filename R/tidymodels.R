@@ -12,6 +12,13 @@ parsnip_vars <- function(model) {
   names(attr(terms, "dataClasses"))
 }
 
+# The exact decomposition of a set of model matrix column names, taken from the
+# term structure a parsnip fit kept alongside the model. `NULL` when there is
+# none, in which case `build_terms()` falls back to reading the names.
+preproc_fields <- function(labels, preproc) {
+  term_fields(labels, preproc$terms, xlevels = preproc$xlevels)
+}
+
 #' @export
 tidypredict_fit._xgb.Booster <- function(model) {
   tidypredict_fit(model$fit)
@@ -35,7 +42,11 @@ tidypredict_fit.model_fit <- function(model) {
   # {mixOmics} models only see the model matrix, so the formula is needed to map
   # dummy columns back onto the original factors
   if (inherits(model$fit, mixomics_classes)) {
-    return(tidypredict_fit_mixomics(model$fit, parsnip_vars(model)))
+    return(tidypredict_fit_mixomics(
+      model$fit,
+      parsnip_vars(model),
+      model$preproc
+    ))
   }
 
   # `mlp()` models need the extra softmax that parsnip applies to the class
@@ -53,18 +64,23 @@ parse_model.model_fit <- function(model) {
   model <- glmnet_set_lambda(model)
 
   if (inherits(model$fit, "sda")) {
-    return(parse_model_sda(model$fit, parsnip_vars(model)))
+    return(parse_model_sda(model$fit, parsnip_vars(model), model$preproc))
   }
 
   if (inherits(model$fit, sparsediscrim_classes)) {
     return(parse_model_sparsediscrim(
       model$fit,
-      parsnip_vars(model)
+      parsnip_vars(model),
+      model$preproc
     ))
   }
 
   if (inherits(model$fit, mixomics_classes)) {
-    return(parse_model_mixomics(model$fit, parsnip_vars(model)))
+    return(parse_model_mixomics(
+      model$fit,
+      parsnip_vars(model),
+      model$preproc
+    ))
   }
 
   parse_model(model$fit)

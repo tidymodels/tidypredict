@@ -134,12 +134,19 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
       fields = list()
     )
   )
-  for (feature in names(linear)) {
+  # `ksvm()` records neither `assign` nor `xlevels`, and makes the model matrix
+  # column names unique, so the decomposition has to be worked out from the term
+  # structure rather than from the names.
+  fields <- term_fields(names(linear), terms_obj, call = call) %||%
+    vector("list", length(linear))
+
+  for (i in seq_along(linear)) {
+    feature <- names(linear)[[i]]
     terms[[length(terms) + 1]] <- list(
       label = feature,
       coef = unname(linear[[feature]]),
       is_intercept = 0,
-      fields = parse_label_lm(feature, vars)
+      fields = fields[[i]] %||% parse_label_lm(feature, vars)
     )
   }
 

@@ -213,59 +213,268 @@ build_terms <- function(
 # Returns `NULL` when the model records too little to do this, so that the
 # caller falls back to `parse_label_lm()`.
 lm_fields <- function(model, labels, call = rlang::caller_env()) {
-  terms <- model$terms
-  # `lm()` records `assign` directly. `glm()` and `rq()` do not, but they keep
-  # the model frame, which is enough to rebuild the model matrix that carries
-  # it. Rebuilding from the frame, rather than from the formula, avoids needing
-  # the data the model was fit on to still exist.
-  assign <- model$assign %||%
-    attr(model$qr$qr, "assign") %||%
-    attr(model$x, "assign") %||%
-    tryCatch(
-      attr(
-        stats::model.matrix(
-          terms,
-          model$model,
-          contrasts.arg = model$contrasts
-        ),
-        "assign"
-      ),
-      error = function(cnd) NULL
-    )
-  term_labels <- attr(terms, "term.labels")
+  term_fields(
+    labels,
+    model$terms,
+    xlevels = model$xlevels,
+    contrasts = model$contrasts,
+    frame = model$model,
+    # `lm()` records `assign` directly. Most other models do not.
+    assign = model$assign %||%
+      attr(model$qr$qr, "assign") %||%
+      attr(model$x, "assign"),
+    call = call
+  )
+}
 
-  if (is.null(terms) || is.null(assign) || length(assign) != length(labels)) {
+# The same decomposition, for a model that keeps its term structure somewhere
+# other than the usual `lm` components. `labels` are the coefficient labels, in
+# model matrix order, with or without a leading `"(Intercept)"`.
+term_fields <- function(
+  labels,
+  terms,
+  xlevels = NULL,
+  contrasts = NULL,
+  frame = NULL,
+  assign = NULL,
+  call = rlang::caller_env()
+) {
+  if (is.null(terms) || length(labels) == 0) {
+    return(NULL)
+  }
+  intercept <- labels == "(Intercept)"
+  cols <- labels[!intercept]
+
+  fields <- term_column_fields(
+    terms,
+    cols,
+    xlevels,
+    contrasts,
+    frame,
+    assign,
+    call = call
+  )
+  if (is.null(fields)) {
     return(NULL)
   }
 
-  classes <- attr(terms, "dataClasses")
-  xlevels <- model$xlevels
+  out <- vector("list", length(labels))
+  out[intercept] <- list(list(list(type = "ordinary", col = "(Intercept)")))
+  out[!intercept] <- fields
+  out
+}
 
-  map2(labels, assign, function(label, term) {
-    # `assign` marks the intercept with `0`.
-    if (term == 0) {
-      return(list(list(type = "ordinary", col = label)))
+term_column_fields <- function(
+  terms,
+  cols,
+  xlevels,
+  contrasts,
+  frame,
+  assign,
+  call = rlang::caller_env()
+) {
+  exact <- term_assign(terms, cols, xlevels, contrasts, frame, assign)
+  fields <- NULL
+  if (!is.null(exact$assign)) {
+    term_labels <- attr(terms, "term.labels")
+    classes <- attr(terms, "dataClasses")
+    fields <- map2(exact$cols, exact$assign, function(col, term) {
+      vars <- strsplit(term_labels[[term]], ":", fixed = TRUE)[[1]]
+      matches <- match_label_fields(col, vars, xlevels, classes)
+      if (length(matches) == 1) {
+        return(matches[[1]])
+      }
+      if (length(matches) > 1) {
+        cli::cli_abort(
+          c(
+            x = "Unable to tell which factor levels the coefficient
+            {.val {col}} refers to.",
+            i = "A level containing {.val :} makes it match
+            {length(matches)} combinations of {.val {vars}}."
+          ),
+          call = call
+        )
+      }
+      # No decomposition fits, which happens for a contrast that does not name
+      # its columns after the levels.
+      NULL
+    })
+    if (!any(map_lgl(fields, is.null))) {
+      return(fields)
     }
-    vars <- strsplit(term_labels[[term]], ":", fixed = TRUE)[[1]]
-    matches <- match_label_fields(label, vars, xlevels, classes)
-    if (length(matches) == 1) {
-      return(matches[[1]])
+  }
+
+  # Nothing recorded the levels each factor had, so fall back to working the
+  # decomposition out from how many columns there are. That counting argument
+  # only holds when `cols` is the whole model matrix, so it is skipped when the
+  # model matrix is known to have a different number of columns.
+  if (!isTRUE(exact$complete)) {
+    return(fields)
+  }
+  infer_term_fields(terms, cols) %||% fields
+}
+
+# The `assign` vector of the model matrix, restricted to its non-intercept
+# columns, paired with the names that model matrix gave those columns.
+#
+# The names matter because some models mangle the labels they carry (duplicate
+# model matrix column names get made unique downstream), while the names the
+# model matrix itself hands out are the ones the decomposition understands.
+term_assign <- function(terms, cols, xlevels, contrasts, frame, assign) {
+  if (!is.null(assign)) {
+    a <- assign[assign != 0]
+    if (length(a) == length(cols)) {
+      return(list(assign = a, cols = cols, complete = TRUE))
     }
-    if (length(matches) > 1) {
-      cli::cli_abort(
-        c(
-          x = "Unable to tell which factor levels the coefficient
-          {.val {label}} refers to.",
-          i = "A level containing {.val :} makes it match
-          {length(matches)} combinations of {.val {vars}}."
-        ),
-        call = call
-      )
+  }
+
+  mm <- term_model_matrix(terms, xlevels, contrasts, frame)
+  if (is.null(mm)) {
+    # Nothing is known about the model matrix, not even how wide it is.
+    return(list(assign = NULL, cols = NULL, complete = TRUE))
+  }
+  a <- attr(mm, "assign")
+  keep <- a != 0
+  a <- a[keep]
+  nms <- colnames(mm)[keep]
+
+  if (length(a) == length(cols)) {
+    return(list(assign = a, cols = nms, complete = TRUE))
+  }
+  # A model that only keeps some of the columns, such as one that drops the
+  # features shrinkage removed. Names are the only way back, so they have to be
+  # unambiguous.
+  if (anyDuplicated(nms) == 0) {
+    idx <- match(cols, nms)
+    if (!anyNA(idx)) {
+      return(list(assign = a[idx], cols = nms[idx], complete = FALSE))
     }
-    # No decomposition fits, which happens for a contrast that does not name
-    # its columns after the levels. Leave it to the older parser.
-    NULL
+  }
+  list(assign = NULL, cols = NULL, complete = FALSE)
+}
+
+# Rebuild the model matrix, so that its `assign` attribute can be read off.
+#
+# The model frame is used when the model kept one. Otherwise a stand-in frame
+# is built from the levels the model recorded, which gives a model matrix with
+# the same columns without needing the fitting data to still exist.
+term_model_matrix <- function(terms, xlevels, contrasts, frame) {
+  mm <- NULL
+  if (!is.null(frame)) {
+    mm <- tryCatch(
+      stats::model.matrix(terms, frame, contrasts.arg = contrasts),
+      error = function(cnd) NULL
+    )
+  }
+  if (!is.null(mm)) {
+    return(mm)
+  }
+
+  frame <- synthetic_frame(terms, xlevels)
+  if (is.null(frame)) {
+    return(NULL)
+  }
+  tryCatch(
+    stats::model.matrix(
+      stats::delete.response(terms),
+      frame,
+      contrasts.arg = contrasts
+    ),
+    error = function(cnd) NULL
+  )
+}
+
+synthetic_frame <- function(terms, xlevels) {
+  if (length(xlevels) == 0) {
+    return(NULL)
+  }
+  classes <- attr(terms, "dataClasses")
+  vars <- unique(unlist(
+    strsplit(attr(terms, "term.labels"), ":", fixed = TRUE)
+  ))
+  n <- max(2, lengths(xlevels))
+
+  out <- map(vars, function(var) {
+    if (!is.null(xlevels[[var]])) {
+      return(factor(rep_len(xlevels[[var]], n), levels = xlevels[[var]]))
+    }
+    if (identical(unname(classes[var]), "logical")) {
+      return(rep_len(c(TRUE, FALSE), n))
+    }
+    if (!identical(unname(classes[var]), "numeric")) {
+      return(NULL)
+    }
+    as.numeric(seq_len(n))
   })
+  if (any(map_lgl(out, is.null))) {
+    return(NULL)
+  }
+
+  names(out) <- vars
+  attr(out, "row.names") <- seq_len(n)
+  class(out) <- "data.frame"
+  out
+}
+
+# Work out the decomposition from the number of columns alone, for a model that
+# recorded no levels at all.
+#
+# Every term made only of numeric predictors takes exactly one column, so with
+# at most one factor in the formula the number of columns that factor expanded
+# into is fixed, and the level each of those columns stands for is whatever
+# follows the variable name. Anything less clear cut is left alone.
+infer_term_fields <- function(terms, cols) {
+  term_labels <- attr(terms, "term.labels")
+  classes <- attr(terms, "dataClasses")
+  n_terms <- length(term_labels)
+  if (n_terms == 0 || length(cols) == 0) {
+    return(NULL)
+  }
+
+  term_vars <- strsplit(term_labels, ":", fixed = TRUE)
+  if (!all(unlist(term_vars) %in% names(classes))) {
+    return(NULL)
+  }
+  # `ordered` is left out: its columns are named after the polynomial contrast,
+  # not after the levels.
+  cat_classes <- c("factor", "character", "logical")
+  var_classes <- map(term_vars, ~ unname(classes[.x]))
+  if (!all(map_lgl(var_classes, ~ all(.x %in% c("numeric", cat_classes))))) {
+    return(NULL)
+  }
+  is_cat <- map_lgl(var_classes, ~ any(.x %in% cat_classes))
+
+  sizes <- rep(1L, n_terms)
+  cat_term <- which(is_cat)
+  if (length(cat_term) > 1) {
+    return(NULL)
+  }
+  if (length(cat_term) == 1) {
+    if (length(term_vars[[cat_term]]) != 1) {
+      return(NULL)
+    }
+    sizes[[cat_term]] <- length(cols) - (n_terms - 1L)
+  }
+  if (any(sizes < 1) || sum(sizes) != length(cols)) {
+    return(NULL)
+  }
+
+  assign <- rep(seq_len(n_terms), sizes)
+  out <- map2(cols, assign, function(col, term) {
+    vars <- term_vars[[term]]
+    if (!is_cat[[term]]) {
+      return(map(vars, ~ list(type = "ordinary", col = .x)))
+    }
+    level <- substr(col, nchar(vars) + 1, nchar(col))
+    if (!startsWith(col, vars) || level == "") {
+      return(NULL)
+    }
+    list(list(type = "conditional", col = vars, val = level, op = "equal"))
+  })
+  if (any(map_lgl(out, is.null))) {
+    return(NULL)
+  }
+  out
 }
 
 # Every way `label` can be read as the `:`-separated expansion of `vars`.

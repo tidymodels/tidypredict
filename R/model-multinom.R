@@ -26,12 +26,15 @@ parse_model.multinom <- function(model) {
     )
   }
 
+  labels <- colnames(coefs)
+  fields <- lm_fields(model, labels)
+
   # The first level is the reference class, its linear predictor is 0
   class_terms <- c(
     list(multinom_reference_terms()),
     lapply(
       classes[-1],
-      \(cl) build_terms(coefs[cl, ], colnames(coefs), vars)
+      \(cl) build_terms(coefs[cl, ], labels, vars, fields = fields)
     )
   )
 

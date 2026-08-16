@@ -20,8 +20,12 @@ tidypredict_fit.mixo_plsda <- function(model) tidypredict_fit_mixomics(model)
 #' @export
 tidypredict_fit.mixo_splsda <- function(model) tidypredict_fit_mixomics(model)
 
-tidypredict_fit_mixomics <- function(model, vars = character(0)) {
-  parsedmodel <- parse_model_mixomics(model, vars)
+tidypredict_fit_mixomics <- function(
+  model,
+  vars = character(0),
+  preproc = NULL
+) {
+  parsedmodel <- parse_model_mixomics(model, vars, preproc)
 
   if (inherits(parsedmodel, "pm_multiclass_regression")) {
     return(build_fit_formula_multinom(parsedmodel))
@@ -49,17 +53,24 @@ parse_model.mixo_plsda <- function(model) parse_model_mixomics(model)
 #' @export
 parse_model.mixo_splsda <- function(model) parse_model_mixomics(model)
 
-parse_model_mixomics <- function(model, vars = character(0)) {
+parse_model_mixomics <- function(
+  model,
+  vars = character(0),
+  preproc = NULL
+) {
   coefs <- mixomics_coefs(model)
   labels <- rownames(coefs)
   outcomes <- colnames(coefs)
+  fields <- preproc_fields(labels, preproc)
 
   if (inherits(model, "DA")) {
     # `predict()` returns one linear predictor per class, which {plsmod} turns
     # into class probabilities with a softmax.
     class_terms <- lapply(
       outcomes,
-      function(outcome) build_terms(coefs[, outcome], labels, vars)
+      function(outcome) {
+        build_terms(coefs[, outcome], labels, vars, fields = fields)
+      }
     )
 
     pm <- list()
@@ -83,7 +94,7 @@ parse_model_mixomics <- function(model, vars = character(0)) {
       pm$general$type <- "regression"
       pm$general$is_glm <- 0
       pm$general$ncomp <- model$ncomp
-      pm$terms <- build_terms(coefs[, outcome], labels, vars)
+      pm$terms <- build_terms(coefs[, outcome], labels, vars, fields = fields)
       as_parsed_model(pm)
     }
   )

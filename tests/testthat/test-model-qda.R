@@ -228,3 +228,19 @@ test_that("qda is handled with parsnip", {
 
   expect_equal(unname(probs), unname(native))
 })
+
+test_that("a coefficient label colliding with a variable name works (#376)", {
+  skip_if_not_installed("MASS")
+
+  set.seed(1)
+  df <- data.frame(
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+  df$cls <- factor(ifelse(df$gy2 + as.numeric(df$g) > 2, "a", "b"))
+
+  model <- MASS::qda(cls ~ g + gy2, data = df)
+  probs <- rlang::eval_tidy(tidypredict_fit(model)[["b"]], df)
+
+  expect_equal(probs, unname(predict(model, df)$posterior[, "b"]))
+})

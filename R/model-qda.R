@@ -16,6 +16,7 @@ parse_model.qda <- function(model) {
   prior <- model$prior
   labels <- colnames(model$means)
   p <- length(labels)
+  fields <- lm_fields(model, labels)
 
   # `predict.qda()` scores each class with
   # `-0.5 * ||(x - m_k) S_k||^2 - 0.5 * ldet_k + log(prior_k)` and turns those
@@ -34,11 +35,17 @@ parse_model.qda <- function(model) {
       log(prior[[i]])
 
     pairs <- expand_quadratic(a, labels)
+    pair_fields <- NULL
+    if (!is.null(fields)) {
+      pair_fields <- map2(pairs$j, pairs$k, ~ c(fields[[.x]], fields[[.y]]))
+      pair_fields <- c(list(NULL), fields, pair_fields)
+    }
 
     build_terms(
       c(intercept, linear, pairs$coefs),
       c("(Intercept)", labels, pairs$labels),
-      vars
+      vars,
+      fields = pair_fields
     )
   })
 
@@ -55,13 +62,17 @@ parse_model.qda <- function(model) {
 expand_quadratic <- function(a, labels) {
   coefs <- numeric(0)
   pair_labels <- character(0)
+  js <- integer(0)
+  ks <- integer(0)
   for (j in seq_along(labels)) {
     for (k in j:length(labels)) {
       coefs <- c(coefs, if (j == k) -0.5 * a[j, k] else -a[j, k])
       pair_labels <- c(pair_labels, paste0(labels[j], ":", labels[k]))
+      js <- c(js, j)
+      ks <- c(ks, k)
     }
   }
-  list(coefs = coefs, labels = pair_labels)
+  list(coefs = coefs, labels = pair_labels, j = js, k = ks)
 }
 
 #' @export

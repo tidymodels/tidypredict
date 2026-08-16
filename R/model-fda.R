@@ -41,11 +41,16 @@ parse_model_fda <- function(model, call = rlang::caller_env()) {
     log(prior)
 
   labels <- rownames(coefs$slopes)
+  fields <- lm_fields(model, labels)
+  if (!is.null(fields)) {
+    fields <- c(list(NULL), fields)
+  }
   class_terms <- lapply(seq_along(classes), function(i) {
     build_terms(
       c(intercepts[[i]], betas[, i]),
       c("(Intercept)", labels),
-      vars
+      vars,
+      fields = fields
     )
   })
 
