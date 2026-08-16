@@ -32,11 +32,16 @@ parse_model.lda <- function(model) {
     log(prior)
 
   labels <- rownames(coefs)
+  fields <- lm_fields(model, labels)
+  if (!is.null(fields)) {
+    fields <- c(list(NULL), fields)
+  }
   class_terms <- lapply(seq_along(classes), function(i) {
     build_terms(
       c(intercepts[[i]], coefs[, i]),
       c("(Intercept)", labels),
-      vars
+      vars,
+      fields = fields
     )
   })
 

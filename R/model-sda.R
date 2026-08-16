@@ -5,18 +5,20 @@
 #' @export
 parse_model.sda <- function(model) parse_model_sda(model)
 
-parse_model_sda <- function(model, vars = character(0)) {
+parse_model_sda <- function(model, vars = character(0), preproc = NULL) {
   # `predict.sda()` computes `Xtest %*% t(beta) + alpha` and takes the softmax of
   # the result, so each class is already a plain linear predictor. Only the
   # features that survived shrinkage appear in `beta`.
   classes <- names(model$alpha)
-  labels <- colnames(model$beta)
+  labels <- c("(Intercept)", colnames(model$beta))
+  fields <- preproc_fields(labels, preproc)
 
   class_terms <- lapply(seq_along(classes), function(i) {
     build_terms(
       c(model$alpha[[i]], model$beta[i, ]),
-      c("(Intercept)", labels),
-      vars
+      labels,
+      vars,
+      fields = fields
     )
   })
 

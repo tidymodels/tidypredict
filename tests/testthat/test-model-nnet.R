@@ -317,3 +317,25 @@ test_that("SQL predictions match native predict", {
 
   expect_equal(res$fit, as.numeric(predict(model, mtcars)))
 })
+
+test_that("a coefficient label colliding with a variable name works (#376)", {
+  skip_if_not_installed("nnet")
+
+  set.seed(1)
+  df <- data.frame(
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+  df$y <- rnorm(60) + as.numeric(df$g) + df$gy2
+
+  set.seed(2)
+  model <- nnet::nnet(
+    y ~ g + gy2,
+    data = df,
+    size = 2,
+    linout = TRUE,
+    trace = FALSE
+  )
+
+  expect_false(tidypredict_test(model, df)$alert)
+})
