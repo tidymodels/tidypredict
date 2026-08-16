@@ -313,6 +313,48 @@ test_that("rules are assigned to the right committee above 20 (#286)", {
   )
 })
 
+cubist_numeric_data <- function(seed = 1, n = 400) {
+  set.seed(seed)
+  df <- data.frame(
+    x1 = rnorm(n),
+    x2 = rnorm(n),
+    x3 = rnorm(n),
+    x4 = rnorm(n),
+    x5 = rnorm(n)
+  )
+  df$y <- 2 * df$x1 - df$x2 + 0.5 * df$x3 * df$x4 + df$x5 + rnorm(n)
+  df
+}
+
+test_that("all-numeric training data matches predict() (#375)", {
+  skip_if_not_installed("Cubist")
+  df <- cubist_numeric_data()
+  for (committees in c(1, 5, 15, 20)) {
+    model <- Cubist::cubist(df[, 1:5], df$y, committees = committees)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), df),
+      unname(predict(model, df)),
+      tolerance = 1e-6
+    )
+  }
+})
+
+test_that("the residual against predict() is relative, not absolute (#375)", {
+  skip_if_not_installed("Cubist")
+  # Cubist holds its coefficients as 32-bit floats, so the agreement with
+  # `predict()` has a relative ceiling near 1e-7. A large outcome therefore
+  # leaves a large absolute difference while the relative one is unchanged.
+  df <- cubist_numeric_data()
+  df$y <- df$y * 1e6
+
+  model <- Cubist::cubist(df[, 1:5], df$y, committees = 5)
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+  reference <- unname(predict(model, df))
+
+  expect_gt(max(abs(fit - reference)), 1e-3)
+  expect_equal(fit, reference, tolerance = 1e-6)
+})
+
 test_that("rows exactly on a split threshold match predict() (#232)", {
   skip_if_not_installed("Cubist")
   # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus
