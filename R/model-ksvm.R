@@ -139,6 +139,7 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
   # structure rather than from the names.
   fields <- term_fields(names(linear), terms_obj, call = call) %||%
     vector("list", length(linear))
+  ksvm_check_levels(fields, call = call)
 
   for (i in seq_along(linear)) {
     feature <- names(linear)[[i]]
@@ -152,6 +153,40 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
 
   pm$terms <- terms
   as_parsed_model(pm)
+}
+
+# `ksvm()` collects its model matrix with `data.frame(y, x)`, which runs the
+# column names through `make.names(unique = TRUE)`. A level such as `c:d` is
+# therefore stored as the column `fc.d`, and two levels that mangle to the same
+# name are told apart with a `.1` suffix. Neither the levels nor the original
+# column names are recorded anywhere else on the fitted object, so a level that
+# reads back containing a `.` cannot be told apart from the levels that mangle
+# to it, and the comparison written out would match no row.
+ksvm_check_levels <- function(fields, call = rlang::caller_env()) {
+  vals <- lapply(fields, function(term) {
+    if (is.null(term)) {
+      return(character(0))
+    }
+    conditional <- Filter(\(f) identical(f$type, "conditional"), term)
+    vapply(conditional, \(f) as.character(f$val), character(1))
+  })
+  vals <- unlist(vals, use.names = FALSE)
+  bad <- unique(vals[grepl(".", vals, fixed = TRUE)])
+  if (length(bad) == 0) {
+    return(invisible())
+  }
+
+  cli::cli_abort(
+    c(
+      x = "Unable to recover the factor level{?s} behind {.val {bad}}.",
+      i = "{.fun kernlab::ksvm} only keeps the {.fun make.names} form of the
+      model matrix column names, so a level containing {.val .} cannot be told
+      apart from a level such as {.val {gsub('.', ':', bad[[1]], fixed = TRUE)}}
+      that mangles to the same name.",
+      i = "Rename the factor levels to syntactic names before fitting."
+    ),
+    call = call
+  )
 }
 
 ksvm_feature_names <- function(sv, terms_obj, call = rlang::caller_env()) {
