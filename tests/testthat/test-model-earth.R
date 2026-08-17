@@ -298,6 +298,104 @@ test_that("a global non-treatment contrast is rejected (#323)", {
   )
 })
 
+test_that("an unused factor level still matches predict()", {
+  skip_if_not_installed("earth")
+  d <- earth_factor_data(ordered = FALSE)
+  d$f <- factor(d$f, levels = c(levels(d$f), "unused"))
+  model <- earth::earth(y ~ x + z + f, data = d)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), d),
+    as.numeric(predict(model, d))
+  )
+})
+
+test_that("a factor level colliding with a variable name works", {
+  skip_if_not_installed("earth")
+  d <- earth_factor_data(ordered = FALSE)
+  d$f <- factor(c(a = "x", b = "z", c = "x2", d = "q")[as.character(d$f)])
+  model <- earth::earth(y ~ x + z + f, data = d)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), d),
+    as.numeric(predict(model, d))
+  )
+})
+
+test_that("a factor level containing a colon is rejected", {
+  skip_if_not_installed("earth")
+  # `earth` names the model matrix column `fb:1`, which `acceptable_lm()` reads
+  # as an interaction term and so reports as an unsupported contrast. `predict()`
+  # handles the fit fine, so this rejection is a false negative.
+  d <- earth_factor_data(ordered = FALSE)
+  d$f <- factor(paste0(as.character(d$f), ":1"))
+
+  expect_snapshot(
+    tidypredict_fit(earth::earth(y ~ x + z + f, data = d)),
+    error = TRUE
+  )
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  skip_if_not_installed("earth")
+  d <- earth_factor_data(ordered = FALSE)
+  model <- earth::earth(y ~ x + z + f, data = d)
+
+  na_d <- d
+  na_d$x[c(2, 5)] <- NA
+  na_d$f[c(1, 3)] <- NA
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), na_d),
+    as.numeric(predict(model, na_d))
+  )
+})
+
+test_that("a knot boundary lands on the same side as predict()", {
+  skip_if_not_installed("earth")
+  model <- earth::earth(mpg ~ wt, data = mtcars)
+  knots <- sort(unique(as.numeric(
+    model$cuts[model$selected.terms, , drop = FALSE]
+  )))
+  expect_gt(length(knots), 1)
+
+  # exactly at each knot, and one ulp either side of it
+  nd <- data.frame(wt = c(knots, knots - 1e-12, knots + 1e-12))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), nd),
+    as.numeric(predict(model, nd))
+  )
+})
+
+test_that("degenerate fit shapes work", {
+  skip_if_not_installed("earth")
+
+  # Pure noise prunes back to the intercept, so the formula is a constant
+  set.seed(2)
+  noise <- data.frame(wt = mtcars$wt, disp = mtcars$disp, mpg = rnorm(32))
+  intercept_only <- earth::earth(mpg ~ wt + disp, data = noise)
+  expect_length(intercept_only$selected.terms, 1)
+  expect_equal(
+    rep(rlang::eval_tidy(tidypredict_fit(intercept_only), noise), nrow(noise)),
+    as.numeric(predict(intercept_only, noise))
+  )
+
+  constant <- mtcars
+  constant$mpg <- 5
+  model <- earth::earth(mpg ~ wt + disp, data = constant)
+  expect_equal(
+    rep(rlang::eval_tidy(tidypredict_fit(model), constant), nrow(constant)),
+    as.numeric(predict(model, constant))
+  )
+
+  single_predictor <- earth::earth(mpg ~ wt, data = mtcars)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single_predictor), mtcars),
+    as.numeric(predict(single_predictor, mtcars))
+  )
+})
+
 test_that("probit link works (#194)", {
   skip_if_not_installed("earth")
   model <- earth::earth(

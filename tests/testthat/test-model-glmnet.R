@@ -94,6 +94,101 @@ test_that("family string syntax works (#197)", {
   expect_no_error(tidypredict_fit(model))
 })
 
+test_that("fitting options the parser never reads still agree with predict()", {
+  skip_if_not_installed("glmnet")
+  x <- as.matrix(mtcars[, c("wt", "disp", "hp")])
+
+  models <- list(
+    ridge = glmnet::glmnet(x, mtcars$mpg, lambda = 0.5, alpha = 0),
+    unstandardized = glmnet::glmnet(
+      x,
+      mtcars$mpg,
+      lambda = 0.5,
+      standardize = FALSE
+    ),
+    no_intercept = glmnet::glmnet(
+      x,
+      mtcars$mpg,
+      lambda = 0.5,
+      intercept = FALSE
+    ),
+    penalty_factor = glmnet::glmnet(
+      x,
+      mtcars$mpg,
+      lambda = 0.5,
+      penalty.factor = c(0, 1, 5)
+    ),
+    limits = glmnet::glmnet(
+      x,
+      mtcars$mpg,
+      lambda = 0.5,
+      lower.limits = -1,
+      upper.limits = 0.5
+    ),
+    weights = glmnet::glmnet(
+      x,
+      mtcars$mpg,
+      lambda = 0.5,
+      weights = rep(c(1, 3), 16)
+    )
+  )
+
+  for (model in models) {
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      unname(predict(model, x, type = "response")[, 1])
+    )
+  }
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  skip_if_not_installed("glmnet")
+  x <- as.matrix(mtcars[, c("wt", "disp", "hp")])
+  na_df <- mtcars
+  na_df$wt[c(2, 5)] <- NA
+  na_x <- as.matrix(na_df[, c("wt", "disp", "hp")])
+
+  model <- glmnet::glmnet(x, mtcars$mpg, lambda = 0.5)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), na_df),
+    unname(predict(model, na_x, type = "response")[, 1])
+  )
+
+  model <- glmnet::glmnet(x, mtcars$am, family = "binomial", lambda = 0.1)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), na_df),
+    unname(predict(model, na_x, type = "response")[, 1])
+  )
+})
+
+test_that("a factor response works", {
+  skip_if_not_installed("glmnet")
+  x <- as.matrix(mtcars[, c("wt", "disp", "hp")])
+  model <- glmnet::glmnet(
+    x,
+    factor(mtcars$am),
+    family = "binomial",
+    lambda = 0.1
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    unname(predict(model, x, type = "response")[, 1])
+  )
+})
+
+test_that("a penalty that zeroes every coefficient works", {
+  skip_if_not_installed("glmnet")
+  x <- as.matrix(mtcars[, c("wt", "disp", "hp")])
+  model <- glmnet::glmnet(x, mtcars$mpg, lambda = 1e6)
+
+  # Only the intercept survives, so the formula is a constant
+  expect_equal(
+    rep(rlang::eval_tidy(tidypredict_fit(model), mtcars), nrow(mtcars)),
+    unname(predict(model, x, type = "response")[, 1])
+  )
+})
+
 test_that("errors if more than 1 penalty is selected", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg)
@@ -241,6 +336,29 @@ test_that("multinomial model can be saved and re-loaded", {
   from_pm <- sapply(tidypredict_fit(pm), \(f) rlang::eval_tidy(f, iris))
 
   expect_equal(from_model, from_pm, tolerance = 1e-6)
+})
+
+test_that("multinomial handles `NA` in newdata like predict()", {
+  skip_if_not_installed("glmnet")
+  x <- as.matrix(iris[, 1:4])
+  model <- glmnet::glmnet(
+    x,
+    iris$Species,
+    family = "multinomial",
+    lambda = 0.05
+  )
+
+  na_df <- iris
+  na_df$Petal.Length[c(2, 5)] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, na_df))
+  native <- predict(
+    model,
+    as.matrix(na_df[, 1:4]),
+    type = "response"
+  )[,, 1]
+
+  expect_equal(unname(probs), unname(native))
 })
 
 test_that("multinomial errors with multiple penalties", {

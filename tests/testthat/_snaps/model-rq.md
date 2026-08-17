@@ -20,3 +20,11 @@
       [1] "40.9812164579606 + (wt * -3.5778175313059) + (cyl * -1.2919946332737)"
       
 
+# an ordered factor is rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_lm()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "g".
+

@@ -5,6 +5,22 @@
     Output
       [1] "1.520331147866 + (wt * -0.372988616484) + (cyl * 0.013885491477)"
 
+# an ordered factor is rejected
+
+    Code
+      tidypredict_fit(lm(y ~ x + g, data = df))
+    Condition
+      Error in `acceptable_lm()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "g".
+
+---
+
+    Code
+      tidypredict_fit(glm(y ~ x + g, data = df))
+    Condition
+      Error in `acceptable_lm()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "g".
+
 # prediction intervals need a QR decomposition (#308)
 
     Code

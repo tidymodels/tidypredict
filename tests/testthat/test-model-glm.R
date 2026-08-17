@@ -106,6 +106,50 @@ test_that("tidypredict works when variable names are subset of other variables",
   )
 })
 
+test_that("an offset is applied", {
+  set.seed(1)
+  df <- data.frame(x = rnorm(60), off = runif(60))
+  df$y <- rpois(60, exp(0.5 + df$x + df$off))
+
+  model <- glm(y ~ x, data = df, family = poisson(), offset = off)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df, type = "response"))
+  )
+})
+
+test_that("prior weights do not change the prediction formula", {
+  set.seed(1)
+  df <- data.frame(x = rnorm(60), z = rnorm(60))
+  df$y <- as.integer(df$x + rnorm(60) > 0)
+  df$w <- rep(c(1, 3), 30)
+
+  model <- glm(y ~ x + z, data = df, family = binomial(), weights = w)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df, type = "response"))
+  )
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  set.seed(1)
+  df <- data.frame(x = rnorm(60), z = rnorm(60))
+  df$y <- as.integer(df$x + rnorm(60) > 0)
+
+  na_df <- df
+  na_df$x[c(2, 5)] <- NA
+
+  for (fam in list(gaussian(), binomial(), poisson())) {
+    model <- suppressWarnings(glm(y ~ x + z, data = df, family = fam))
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), na_df),
+      unname(predict(model, na_df, type = "response"))
+    )
+  }
+})
+
 test_that("tidypredict_interval works for gaussian glm (#293)", {
   model <- glm(mpg ~ wt + cyl, data = mtcars, family = "gaussian")
   interval <- tidypredict_interval(model)
