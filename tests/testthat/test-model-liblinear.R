@@ -113,6 +113,51 @@ test_that("predictions match predict() for regression types", {
   }
 })
 
+test_that("a non-default bias, cost and class weights are handled", {
+  skip_if_not_installed("LiblineaR")
+
+  df <- mtcars
+  df$am <- factor(df$am)
+  x <- as.matrix(df[, c("mpg", "cyl")])
+
+  # `bias` is folded into the intercept, so a value other than the default `1`
+  # scales the weight the model stores for it.
+  model <- LiblineaR::LiblineaR(data = x, target = df$am, type = 0, bias = 5)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, x, proba = TRUE)$probabilities[, "1"]),
+    tolerance = 1e-10
+  )
+
+  model <- LiblineaR::LiblineaR(
+    data = x,
+    target = df$am,
+    type = 0,
+    cost = 10,
+    wi = c("0" = 1, "1" = 4)
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, x, proba = TRUE)$probabilities[, "1"]),
+    tolerance = 1e-10
+  )
+})
+
+test_that("a single-column model matrix is handled", {
+  skip_if_not_installed("LiblineaR")
+
+  df <- mtcars
+  df$am <- factor(df$am)
+  x <- as.matrix(df[, "mpg", drop = FALSE])
+  model <- LiblineaR::LiblineaR(data = x, target = df$am, type = 0)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, x, proba = TRUE)$probabilities[, "1"]),
+    tolerance = 1e-10
+  )
+})
+
 test_that("errors on unsupported and multiclass models", {
   skip_if_not_installed("LiblineaR")
 

@@ -161,6 +161,96 @@ test_that("categorical predictors are handled with parsnip", {
   expect_equal(unname(probs), unname(native), tolerance = sda_tolerance)
 })
 
+sda_factor_data <- function(levels, ordered = FALSE, seed = 1) {
+  set.seed(seed)
+  df <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(levels, length.out = 90), levels = levels, ordered = ordered)
+  )
+  df$cls <- factor(ifelse(df$x + as.numeric(df$f) > 1.5, "a", "b"))
+  df
+}
+
+test_that("a single predictor is handled", {
+  skip_if_not_installed("sda")
+
+  df <- sda_factor_data(c("p", "q", "r"))
+  x <- as.matrix(df["x"])
+  model <- sda::sda(x, df$cls, verbose = FALSE)
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+
+  expect_equal(
+    unname(probs),
+    unname(sda::predict.sda(model, x, verbose = FALSE)$posterior),
+    tolerance = sda_tolerance
+  )
+})
+
+test_that("special-character and unused factor levels work with parsnip", {
+  skip_if_not_installed("sda")
+  skip_if_not_installed("discrim")
+
+  df <- sda_factor_data(c("a:b", "c:d", "e"))
+  spec <- parsnip::discrim_linear(engine = "sda")
+  model <- parsnip::fit(spec, cls ~ x + f, df)
+
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))),
+    unname(as.matrix(predict(model, df, type = "prob"))),
+    tolerance = sda_tolerance
+  )
+
+  unused <- sda_factor_data(c("p", "q", "r"))
+  unused$f <- factor(unused$f, levels = c("p", "q", "r", "unused"))
+  model <- suppressWarnings(parsnip::fit(spec, cls ~ x + f, unused))
+
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, unused))),
+    unname(as.matrix(predict(model, unused, type = "prob"))),
+    tolerance = sda_tolerance
+  )
+})
+
+test_that("newdata containing NA matches predict() with parsnip", {
+  skip_if_not_installed("sda")
+  skip_if_not_installed("discrim")
+
+  df <- sda_factor_data(c("p", "q", "r"))
+  spec <- parsnip::discrim_linear(engine = "sda")
+  model <- parsnip::fit(spec, cls ~ x + f, df)
+
+  nd <- df
+  nd$x[1:3] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+  native <- as.matrix(predict(model, nd, type = "prob"))
+
+  expect_true(anyNA(native))
+  expect_equal(unname(probs), unname(native), tolerance = sda_tolerance)
+})
+
+test_that("an ordered factor is silently wrong with parsnip", {
+  skip_if_not_installed("sda")
+  skip_if_not_installed("discrim")
+  skip(
+    "`parse_model_sda()` has no contrast check, so the `contr.poly` columns
+     `f.L` and `f.Q` that an ordered predictor expands into are read as levels
+     of `f`. The generated formula compares `f` against level names that never
+     match and the probabilities are off by up to 0.79. `MASS::lda()` and
+     `mda::fda()` reject the same fit."
+  )
+  df <- sda_factor_data(c("p", "q", "r"), ordered = TRUE)
+  spec <- parsnip::discrim_linear(engine = "sda")
+  model <- parsnip::fit(spec, cls ~ x + f, df)
+
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))),
+    unname(as.matrix(predict(model, df, type = "prob"))),
+    tolerance = sda_tolerance
+  )
+})
+
 test_that("a coefficient label colliding with a variable name works (#376)", {
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")

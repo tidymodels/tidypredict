@@ -57,6 +57,47 @@ test_that("categorical predictors are ignored", {
   expect_equal(tidypredict_fit(model), mean(df$mpg))
 })
 
+test_that("an unused outcome level gets a probability of zero", {
+  y <- factor(c(rep("a", 10), rep("b", 5)), levels = c("a", "b", "unused"))
+  model <- parsnip::nullmodel(data.frame(x = seq_along(y)), y)
+
+  tf <- tidypredict_fit(model)
+  expect_named(tf, c("a", "b", "unused"))
+
+  probs <- vapply(tf, as.numeric, numeric(1))
+  native <- parsnip:::predict.nullmodel(model, data.frame(x = 1), type = "prob")
+
+  expect_equal(unname(probs), unname(unlist(native[1, ])))
+})
+
+test_that("NA in the outcome and in the newdata are handled", {
+  model <- parsnip::nullmodel(data.frame(x = 1:5), c(1, 2, NA, 4, 5))
+
+  expect_equal(
+    tidypredict_fit(model),
+    parsnip:::predict.nullmodel(model, data.frame(x = 1))
+  )
+
+  # The predictors are ignored, so a missing one cannot change the prediction.
+  model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
+  nd <- mtcars
+  nd$wt[1:2] <- NA
+
+  expect_equal(
+    rep(rlang::eval_tidy(tidypredict_fit(model), nd), nrow(nd)),
+    parsnip:::predict.nullmodel(model, nd)
+  )
+})
+
+test_that("single-row training data is handled", {
+  model <- parsnip::nullmodel(data.frame(x = 1), 5)
+
+  expect_equal(
+    tidypredict_fit(model),
+    parsnip:::predict.nullmodel(model, data.frame(x = 1))
+  )
+})
+
 test_that("model can be saved and re-loaded", {
   skip_if_not_installed("yaml")
 

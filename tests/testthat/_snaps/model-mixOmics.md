@@ -5,6 +5,14 @@
     Output
       [1] "24.29374 + (cyl * -0.8899314) + (disp * -0.01305656) + (hp * -0.02281096) + (drat * 2.130328)"
 
+# training data containing NA is rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model_mixomics()`:
+      ! Models fit on data with missing values are not supported.
+
 # tidypredict_test errors for discriminant and multivariate models
 
     Code

@@ -168,6 +168,58 @@ qda_factor_data <- function(ordered, seed = 1) {
   d
 }
 
+test_that("newdata containing NA matches predict()", {
+  skip_if_not_installed("MASS")
+
+  d <- qda_factor_data(ordered = FALSE)
+  model <- MASS::qda(cls ~ x + f, data = d)
+
+  nd <- d
+  nd$x[1:3] <- NA
+  nd$f[4:5] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+  native <- suppressWarnings(predict(model, nd)$posterior)
+
+  expect_true(anyNA(native))
+  expect_equal(unname(probs), unname(native))
+})
+
+test_that("training data containing NA matches predict()", {
+  skip_if_not_installed("MASS")
+
+  d <- qda_factor_data(ordered = FALSE)
+  d$x[1:5] <- NA
+  model <- MASS::qda(cls ~ x + f, data = d)
+  complete <- d[stats::complete.cases(d), ]
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, complete))
+
+  expect_equal(unname(probs), unname(predict(model, complete)$posterior))
+})
+
+test_that("a factor level containing a colon is wrongly rejected", {
+  skip_if_not_installed("MASS")
+  skip(
+    "`acceptable_contrasts()` splits the column names on `:` before matching
+     them against the levels, so a level named `c:d` is read as the level `c`
+     of an unknown variable and the fit is rejected as a non-treatment
+     contrast. Bypassing the check makes the parse agree with `predict()` to
+     3e-16."
+  )
+  set.seed(1)
+  d <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(c("a:b", "c:d", "e"), length.out = 90))
+  )
+  d$cls <- factor(ifelse(d$x + as.numeric(d$f) > 1.5, "a", "b"))
+
+  model <- MASS::qda(cls ~ x + f, data = d)
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, d))
+
+  expect_equal(unname(probs), unname(predict(model, d)$posterior))
+})
+
 test_that("an ordered factor is rejected (#343)", {
   skip_if_not_installed("MASS")
   # `contr.poly` names the columns `.L`, `.Q` and `.C` rather than after the
