@@ -164,6 +164,105 @@ test_that("binary outcomes are handled", {
   expect_equal(unname(probs), softmax_rows(mixomics_native(model, x)))
 })
 
+mixomics_factor_data <- function(levels, ordered = FALSE, seed = 1) {
+  set.seed(seed)
+  df <- data.frame(
+    x = rnorm(90),
+    x2 = rnorm(90),
+    f = factor(rep(levels, length.out = 90), levels = levels, ordered = ordered)
+  )
+  df$y <- df$x + as.numeric(df$f) + rnorm(90)
+  df
+}
+
+mixomics_reg_spec <- function() {
+  parsnip::pls(num_comp = 2) |>
+    parsnip::set_engine("mixOmics") |>
+    parsnip::set_mode("regression")
+}
+
+test_that("a factor level containing a colon is handled with parsnip", {
+  skip_if_not_installed("mixOmics")
+  skip_if_not_installed("plsmod")
+
+  df <- mixomics_factor_data(c("a:b", "c:d", "e"))
+  model <- parsnip::fit(mixomics_reg_spec(), y ~ x + x2 + f, df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$.pred
+  )
+})
+
+test_that("an ordered factor is silently wrong with parsnip", {
+  skip_if_not_installed("mixOmics")
+  skip_if_not_installed("plsmod")
+  skip(
+    "The parsnip path passes a model matrix built with `contr.poly`, whose
+     columns `f.L` and `f.Q` are read as levels of `f`. The generated formula
+     compares `f` against level names that never match and the predictions are
+     off by up to 1.34."
+  )
+  df <- mixomics_factor_data(c("p", "q", "r"), ordered = TRUE)
+  model <- parsnip::fit(mixomics_reg_spec(), y ~ x + x2 + f, df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$.pred
+  )
+})
+
+test_that("an unused factor level errors instead of predicting", {
+  skip_if_not_installed("mixOmics")
+  skip_if_not_installed("plsmod")
+  skip(
+    "An unused level expands into a constant dummy column, which `mixOmics`
+     gives an `NA` loading. `predict()` copes and returns a number, but
+     `tidypredict_fit()` fails with `missing value where TRUE/FALSE needed`
+     from the `coef == 0` test that drops zero terms."
+  )
+  df <- mixomics_factor_data(c("p", "q", "r"))
+  df$f <- factor(df$f, levels = c("p", "q", "r", "unused"))
+  model <- suppressWarnings(
+    parsnip::fit(mixomics_reg_spec(), y ~ x + x2 + f, df)
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    suppressWarnings(predict(model, df)$.pred)
+  )
+})
+
+test_that("newdata containing NA disagrees with predict()", {
+  skip_if_not_installed("mixOmics")
+  skip(
+    "`predict.mixo_pls()` fills a missing predictor in rather than propagating
+     it, so it returns 22.13 for a row whose `disp` is `NA` while the generated
+     formula returns `NA`. Every other supported model either propagates the
+     `NA` or drops the row."
+  )
+  x <- as.matrix(mtcars[c("disp", "hp", "drat")])
+  model <- mixOmics::pls(x, mtcars$mpg, ncomp = 2)
+
+  nd <- mtcars
+  nd$disp[1:2] <- NA
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), nd),
+    unname(predict(model, as.matrix(nd[c("disp", "hp", "drat")]))$predict[,, 2])
+  )
+})
+
+test_that("training data containing NA is rejected", {
+  skip_if_not_installed("mixOmics")
+
+  x <- as.matrix(mtcars[c("disp", "hp", "drat")])
+  x[1:2, 1] <- NA
+  model <- mixOmics::pls(x, mtcars$mpg, ncomp = 2)
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
 test_that("model can be saved and re-loaded", {
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("yaml")

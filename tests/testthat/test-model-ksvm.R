@@ -178,6 +178,121 @@ test_that("errors on unsupported models", {
   expect_snapshot(tidypredict_fit(noprob), error = TRUE)
 })
 
+ksvm_factor_data <- function(levels, ordered = FALSE, seed = 1) {
+  set.seed(seed)
+  df <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(levels, length.out = 90), levels = levels, ordered = ordered)
+  )
+  df$y <- df$x + as.numeric(df$f) + rnorm(90)
+  df
+}
+
+ksvm_fit <- function(formula, data, ...) {
+  set.seed(1)
+  kernlab::ksvm(formula, data = data, kernel = "vanilladot", ...)
+}
+
+test_that("unused and ordered factor levels are handled", {
+  skip_if_not_installed("kernlab")
+  # `ksvm()` builds a full-dummy model matrix itself, so an ordered predictor
+  # never reaches `contr.poly`.
+  unused <- ksvm_factor_data(c("p", "q", "r"))
+  unused$f <- factor(unused$f, levels = c("p", "q", "r", "unused"))
+  model <- ksvm_fit(y ~ x + f, unused, type = "eps-svr")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), unused),
+    as.numeric(kernlab::predict(model, unused)),
+    tolerance = 1e-10
+  )
+
+  ord <- ksvm_factor_data(c("p", "q", "r"), ordered = TRUE)
+  model <- ksvm_fit(y ~ x + f, ord, type = "eps-svr")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), ord),
+    as.numeric(kernlab::predict(model, ord)),
+    tolerance = 1e-10
+  )
+})
+
+test_that("a factor level that is not a syntactic name is silently wrong", {
+  skip_if_not_installed("kernlab")
+  skip(
+    "`ksvm()` runs its model matrix column names through `make.names()`, so a
+     level such as `c:d` becomes the column `fc.d`. The parser reads the level
+     back off that name and emits `f == \"c.d\"`, which matches no row, so the
+     dummy term drops out: predictions are off by 0.90 for a regression fit and
+     0.75 for classification probabilities. A level containing a space is wrong
+     the same way, and two levels that mangle to the same name make `ksvm()`
+     disambiguate with a `.1` suffix."
+  )
+  df <- ksvm_factor_data(c("a:b", "c:d", "e"))
+  model <- ksvm_fit(y ~ x + f, df, type = "eps-svr")
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    as.numeric(kernlab::predict(model, df)),
+    tolerance = 1e-10
+  )
+})
+
+test_that("NA in the newdata and in the training data match predict()", {
+  skip_if_not_installed("kernlab")
+
+  df <- ksvm_factor_data(c("p", "q", "r"))
+  model <- ksvm_fit(y ~ x + f, df, type = "eps-svr")
+
+  nd <- df
+  nd$x[1:3] <- NA
+  complete <- stats::complete.cases(nd)
+  te <- rlang::eval_tidy(tidypredict_fit(model), nd)
+
+  # `predict.ksvm()` drops the incomplete rows rather than returning `NA`.
+  expect_true(all(is.na(te[!complete])))
+  expect_equal(
+    te[complete],
+    as.numeric(kernlab::predict(model, nd)),
+    tolerance = 1e-10
+  )
+
+  trained_with_na <- df
+  trained_with_na$x[1:5] <- NA
+  model <- ksvm_fit(y ~ x + f, trained_with_na, type = "eps-svr")
+  kept <- trained_with_na[stats::complete.cases(trained_with_na), ]
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), kept),
+    as.numeric(kernlab::predict(model, kept)),
+    tolerance = 1e-10
+  )
+})
+
+test_that("non-default cost, epsilon and class weights are handled", {
+  skip_if_not_installed("kernlab")
+
+  df <- ksvm_factor_data(c("p", "q", "r"))
+  model <- ksvm_fit(y ~ x + f, df, type = "eps-svr", C = 10, epsilon = 0.5)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    as.numeric(kernlab::predict(model, df)),
+    tolerance = 1e-10
+  )
+
+  df$cls <- factor(ifelse(df$x + as.numeric(df$f) > 1.5, "a", "b"))
+  model <- ksvm_fit(
+    cls ~ x + f,
+    df,
+    type = "C-svc",
+    prob.model = TRUE,
+    class.weights = c(a = 1, b = 5)
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(kernlab::predict(model, df, type = "probabilities")[, "b"]),
+    tolerance = 1e-10
+  )
+})
+
 test_that("a coefficient label colliding with a variable name works (#376)", {
   skip_if_not_installed("kernlab")
 

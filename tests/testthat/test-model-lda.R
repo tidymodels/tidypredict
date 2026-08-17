@@ -176,6 +176,86 @@ test_that("an unused outcome level is handled (#302)", {
   expect_equal(unname(probs), unname(predict(model, df)$posterior))
 })
 
+lda_na_data <- function(seed = 1) {
+  set.seed(seed)
+  df <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(c("p", "q", "r"), length.out = 90))
+  )
+  df$cls <- factor(ifelse(df$x + as.numeric(df$f) > 1.5, "a", "b"))
+  df
+}
+
+test_that("newdata containing NA matches predict()", {
+  skip_if_not_installed("MASS")
+
+  df <- lda_na_data()
+  model <- MASS::lda(cls ~ x + f, data = df)
+
+  nd <- df
+  nd$x[1:3] <- NA
+  nd$f[4:5] <- NA
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, nd))
+  native <- suppressWarnings(predict(model, nd)$posterior)
+
+  expect_true(anyNA(native))
+  expect_equal(unname(probs), unname(native))
+})
+
+test_that("training data containing NA matches predict()", {
+  skip_if_not_installed("MASS")
+
+  df <- lda_na_data()
+  df$x[1:5] <- NA
+  model <- MASS::lda(cls ~ x + f, data = df)
+  complete <- df[stats::complete.cases(df), ]
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, complete))
+
+  expect_equal(unname(probs), unname(predict(model, complete)$posterior))
+})
+
+test_that("a single-column model matrix and a collinear fit are handled", {
+  skip_if_not_installed("MASS")
+
+  df <- lda_na_data()
+  single <- MASS::lda(cls ~ x, data = df)
+  expect_equal(
+    unname(sapply(tidypredict_fit(single), \(f) rlang::eval_tidy(f, df))),
+    unname(predict(single, df)$posterior)
+  )
+
+  df$x2 <- df$x
+  collinear <- suppressWarnings(MASS::lda(cls ~ x + x2, data = df))
+  expect_equal(
+    unname(sapply(tidypredict_fit(collinear), \(f) rlang::eval_tidy(f, df))),
+    unname(predict(collinear, df)$posterior)
+  )
+})
+
+test_that("a factor level containing a colon is wrongly rejected", {
+  skip_if_not_installed("MASS")
+  skip(
+    "`acceptable_contrasts()` splits the column names on `:` before matching
+     them against the levels, so a level named `c:d` is read as the level `c`
+     of an unknown variable and the fit is rejected as a non-treatment
+     contrast. Bypassing the check makes the parse agree with `predict()` to
+     2e-16, and `mda::fda()`, which has no such check, handles the same data."
+  )
+  set.seed(1)
+  df <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(c("a:b", "c:d", "e"), length.out = 90))
+  )
+  df$cls <- factor(ifelse(df$x + as.numeric(df$f) > 1.5, "a", "b"))
+
+  model <- MASS::lda(cls ~ x + f, data = df)
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+
+  expect_equal(unname(probs), unname(predict(model, df)$posterior))
+})
+
 test_that("an ordered factor is rejected (#343)", {
   skip_if_not_installed("MASS")
   # R fits an ordered factor with `contr.poly`, whose columns are named `.L`,

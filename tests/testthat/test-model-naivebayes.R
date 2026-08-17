@@ -101,6 +101,57 @@ test_that("unseen factor levels are skipped, matching predict() (#300)", {
   )
 })
 
+nb_factor_data <- function(levels, ordered = FALSE, seed = 1) {
+  set.seed(seed)
+  df <- data.frame(
+    x = rnorm(90),
+    f = factor(rep(levels, length.out = 90), levels = levels, ordered = ordered)
+  )
+  df$cls <- factor(ifelse(df$x + as.numeric(df$f) > 1.5, "a", "b"))
+  df
+}
+
+test_that("awkward factor levels are handled", {
+  skip_if_not_installed("klaR")
+  # Both engines key their conditional probabilities on the level itself
+  # rather than on a model matrix column, so contrasts never come into it.
+  colon <- nb_factor_data(c("a:b", "c:d", "e"))
+  model <- klaR::NaiveBayes(cls ~ x + f, data = colon)
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, colon))),
+    unname(predict(model, colon)$posterior)
+  )
+
+  ord <- nb_factor_data(c("p", "q", "r"), ordered = TRUE)
+  model <- klaR::NaiveBayes(cls ~ x + f, data = ord)
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, ord))),
+    unname(predict(model, ord)$posterior)
+  )
+
+  unused <- nb_factor_data(c("p", "q", "r"))
+  unused$f <- factor(unused$f, levels = c("p", "q", "r", "unused"))
+  model <- klaR::NaiveBayes(cls ~ x + f, data = unused)
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, unused))),
+    unname(predict(model, unused)$posterior)
+  )
+
+  set.seed(1)
+  collide <- data.frame(
+    g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
+    gy2 = rnorm(60)
+  )
+  collide$cls <- factor(
+    ifelse(collide$gy2 + as.numeric(collide$g) > 2, "a", "b")
+  )
+  model <- klaR::NaiveBayes(cls ~ g + gy2, data = collide)
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, collide))),
+    unname(predict(model, collide)$posterior)
+  )
+})
+
 test_that("binary outcomes are handled", {
   skip_if_not_installed("klaR")
 
@@ -315,6 +366,53 @@ test_that("naive_bayes zero-probability levels use the predict threshold", {
   expect_equal(
     unname(probs),
     unname(predict(model, df[names(model$tables)], type = "prob"))
+  )
+})
+
+test_that("naive_bayes handles awkward factor levels and NA training data", {
+  skip_if_not_installed("naivebayes")
+
+  colon <- nb_factor_data(c("a:b", "c:d", "e"))
+  model <- suppressWarnings(naivebayes::naive_bayes(cls ~ x + f, data = colon))
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, colon))),
+    unname(predict(model, colon[names(model$tables)], type = "prob"))
+  )
+
+  ord <- nb_factor_data(c("p", "q", "r"), ordered = TRUE)
+  model <- suppressWarnings(naivebayes::naive_bayes(cls ~ x + f, data = ord))
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, ord))),
+    unname(predict(model, ord[names(model$tables)], type = "prob"))
+  )
+
+  unused <- nb_factor_data(c("p", "q", "r"))
+  unused$f <- factor(unused$f, levels = c("p", "q", "r", "unused"))
+  model <- suppressWarnings(naivebayes::naive_bayes(cls ~ x + f, data = unused))
+  expect_equal(
+    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, unused))),
+    unname(predict(model, unused[names(model$tables)], type = "prob"))
+  )
+
+  # An `NA` in the training data changes the mean and standard deviation the
+  # model stores for the predictor.
+  trained_with_na <- nb_factor_data(c("p", "q", "r"))
+  trained_with_na$x[1:5] <- NA
+  model <- suppressWarnings(naivebayes::naive_bayes(
+    cls ~ x + f,
+    data = trained_with_na
+  ))
+  probs <- sapply(
+    tidypredict_fit(model),
+    \(f) rlang::eval_tidy(f, trained_with_na)
+  )
+  expect_equal(
+    unname(probs),
+    unname(suppressWarnings(predict(
+      model,
+      trained_with_na[names(model$tables)],
+      type = "prob"
+    )))
   )
 })
 
