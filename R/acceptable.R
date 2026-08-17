@@ -59,14 +59,22 @@ fun_calls <- function(f) {
 #
 # `acceptable_lm()` reads the contrasts off the model instead, which is more
 # direct. This is for the models that do not record them.
-acceptable_contrasts <- function(columns, vars, xlevels) {
+acceptable_contrasts <- function(columns, vars, xlevels, terms = NULL) {
   invalid <- character(0)
 
-  # An interaction names each of the columns it multiplies, separated by `:`,
-  # which is how `parse_label_lm()` takes them apart too.
-  items <- unlist(strsplit(columns, ":", fixed = TRUE))
+  # `terms` says which variables each term multiplies and `xlevels` says what
+  # levels they had, which is enough to decompose a column exactly. Splitting
+  # the name on `:` instead cannot tell an interaction apart from a level whose
+  # own name contains `:` (#391).
+  decomposable <- column_decomposable(terms, xlevels)
+  if (is.null(decomposable)) {
+    columns <- unlist(strsplit(columns, ":", fixed = TRUE))
+  }
 
-  for (column in setdiff(items, vars)) {
+  for (column in setdiff(columns, vars)) {
+    if (!is.null(decomposable) && decomposable(column)) {
+      next
+    }
     # The longest matching variable wins, as it does in `parse_label_lm()`,
     # so that a column of `xy` is not read as a level of `x`.
     matches <- vars[startsWith(column, vars)]
@@ -90,6 +98,31 @@ acceptable_contrasts <- function(columns, vars, xlevels) {
   }
 
   invisible()
+}
+
+# A predicate saying whether a model matrix column can be read as the expansion
+# of one of the model's terms, or `NULL` when the model records too little to
+# say.
+#
+# `match_label_fields()` is the same decomposition the parsers use, so a column
+# it accepts is one they can take apart, whatever characters the level names
+# happen to contain.
+column_decomposable <- function(terms, xlevels) {
+  if (is.null(terms)) {
+    return(NULL)
+  }
+  term_labels <- attr(terms, "term.labels")
+  classes <- attr(terms, "dataClasses")
+  if (length(term_labels) == 0 || is.null(classes)) {
+    return(NULL)
+  }
+  term_vars <- strsplit(term_labels, ":", fixed = TRUE)
+
+  function(column) {
+    any(map_lgl(term_vars, function(vars) {
+      length(match_label_fields(column, vars, xlevels, classes)) > 0
+    }))
+  }
 }
 
 # Abort when a predictor is an ordered factor.

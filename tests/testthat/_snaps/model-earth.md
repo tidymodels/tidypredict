@@ -21,14 +21,6 @@
       Error in `acceptable_contrasts()`:
       ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
 
-# a factor level containing a colon is rejected
-
-    Code
-      tidypredict_fit(earth::earth(y ~ x + z + f, data = d))
-    Condition
-      Error in `acceptable_contrasts()`:
-      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
-
 # .extract_earth_multiclass errors on non-earth model
 
     Code

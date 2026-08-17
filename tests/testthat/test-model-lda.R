@@ -234,15 +234,8 @@ test_that("a single-column model matrix and a collinear fit are handled", {
   )
 })
 
-test_that("a factor level containing a colon is wrongly rejected", {
+test_that("a factor level containing a colon matches predict() (#391)", {
   skip_if_not_installed("MASS")
-  skip(
-    "`acceptable_contrasts()` splits the column names on `:` before matching
-     them against the levels, so a level named `c:d` is read as the level `c`
-     of an unknown variable and the fit is rejected as a non-treatment
-     contrast. Bypassing the check makes the parse agree with `predict()` to
-     2e-16, and `mda::fda()`, which has no such check, handles the same data."
-  )
   set.seed(1)
   df <- data.frame(
     x = rnorm(90),
