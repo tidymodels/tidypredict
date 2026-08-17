@@ -104,6 +104,29 @@
 <li>
 <strong><code>NA</code> handling.</strong> Predict on data that actually contains <code>NA</code>, not just a structural check that a missing-value branch was generated.</li>
 </ol><div class="section level3">
+<h3 id="edge-cases-every-parser-must-cover">Edge cases every parser must cover<a class="anchor" aria-label="anchor" href="#edge-cases-every-parser-must-cover"></a></h3>
+<p>Items 10 and 11 above are the short form of a longer list. A triage of the bug-labelled issues found that almost all of them shared one root cause: each model’s tests fit a clean numeric model on clean data and compared against <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, and every bug lived somewhere else. Five sweeps across the supported model classes each turned up several independent bugs, in these five categories. Work through all five for any model you add or change.</p>
+<p>The reasons matter more than the list. A new model class will have edge cases nobody anticipated, and the way to find them is to ask the same underlying questions.</p>
+<ol style="list-style-type: decimal"><li>
+<strong>Factors and categorical splits.</strong> Test a factor predictor with contrast coding other than <code>contr.treatment</code>, since an ordered factor gets <code>contr.poly</code> and produces <code>.L</code>/<code>.Q</code> columns whose names and values a parser written against dummy variables will not reconstruct. Test a factor with an unused level, a level whose name collides with another variable in the data, and a level containing a special character such as <code>:</code>. The parser has to recover the mapping from model matrix column names back to variable and level, and every one of these breaks a naive string split.</li>
+<li>
+<strong>Missing values.</strong> Predict on newdata containing <code>NA</code> and compare against <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code>, for every model. Eight of sixteen regression models disagreed with their own <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> here. Also fit a model whose <em>training</em> data contains <code>NA</code>, which is a different case: it changes what the model stores (LightGBM’s <code>missing_type</code>) and can add surrogate splits (rpart) that the generated formula has to honor. A structural check that a missing-value branch was generated is not enough; the branch has to produce the right number.</li>
+<li>
+<strong>Threshold precision.</strong> Models that store thresholds in float32 are compared against float64 data at prediction time, so test a value exactly at a split threshold, a value at the float32 representation of that threshold, and a boundary tie. Whether the comparison is <code>&lt;</code> or <code>&lt;=</code>, and at what precision, decides which leaf a row lands in.</li>
+<li>
+<strong>Options the parser might ignore.</strong> Any model argument that changes <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> output but that the parser never reads is a silent wrong answer. Fit the model with such arguments set to non-default values and compare numerically. Past examples: LightGBM’s <code>sigmoid</code>, <code>reg_sqrt</code>, and <code>zero_as_missing</code>, catboost objectives with a link function, glmnet offsets, and mboost’s <code>mstop</code>.</li>
+<li>
+<strong>Degenerate fit shapes.</strong> Fit a stump (a root-only tree), a single-column model matrix, a rank-deficient fit with <code>NA</code> coefficients, a model on a constant outcome, and single-row or single-class training data. These produce structures the parser’s loops were never written for: an empty split table, a vector where a matrix was assumed, a level that never appears.</li>
+</ol></div>
+<div class="section level3">
+<h3 id="fixing-a-bug-reported-in-an-issue">Fixing a bug reported in an issue<a class="anchor" aria-label="anchor" href="#fixing-a-bug-reported-in-an-issue"></a></h3>
+<p>Two habits, both learned from getting them wrong:</p>
+<ul><li>
+<strong>Check the stated mechanism against the code before implementing the proposed fix.</strong> Six issues in the last triage proposed changes that would have been regressions, because they reasoned from the symptom rather than from the source. One named <code>"partykit"</code> as the stored model type when parsed models actually store <code>"party"</code>. One asserted that <code>cross_entropy</code> applies LightGBM’s <code>sigmoid</code> scaling, which it does not. One proposed returning <code>TRUE</code> from a path handler in a way that would have emitted <code>TRUE &amp; x &gt; 4</code> into the generated SQL. Read the parser and confirm the described behavior is real before changing it.</li>
+<li>
+<strong>Verify numerically, not structurally.</strong> A regression test for a bug fix has to compare against the modelling package’s own <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> on data that reproduces the bug. Assertions of the form <code>expect_false(is.null(x))</code>, or that the call runs without error, have repeatedly passed while the computed prediction was wrong. If the test would still pass with the fix reverted, it is not a test of the fix.</li>
+</ul></div>
+<div class="section level3">
 <h3 id="conventions">Conventions<a class="anchor" aria-label="anchor" href="#conventions"></a></h3>
 <ul><li>Use <code>skip_if_not_installed("pkg")</code> in every test that needs a suggested package, rather than <code>skip_on_cran()</code>.</li>
 <li>Use <code>withr::local_tempfile(fileext = ".yml")</code> for temp files, so they are cleaned up.</li>
