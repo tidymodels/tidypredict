@@ -1648,3 +1648,153 @@ test_that("tidypredict_test works with parsnip xgboost model", {
   expect_type(preds, "double")
   expect_length(preds, nrow(train_data))
 })
+
+# Booster arguments that change predict() ------------------------------------
+
+xgb_option_data <- function() {
+  as.matrix(mtcars[, c("wt", "hp", "disp")])
+}
+
+expect_xgb_option_matches <- function(params, nrounds = 5) {
+  x <- xgb_option_data()
+  set.seed(1)
+  model <- xgboost::xgb.train(
+    params = params,
+    data = xgboost::xgb.DMatrix(x, label = mtcars$mpg),
+    nrounds = nrounds,
+    verbose = 0
+  )
+  testthat::expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), as.data.frame(x)),
+    as.numeric(predict(model, x)),
+    tolerance = 1e-5
+  )
+}
+
+test_that("num_parallel_tree predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  expect_xgb_option_matches(list(
+    objective = "reg:squarederror",
+    num_parallel_tree = 3
+  ))
+})
+
+test_that("objective hyperparameters match native predict", {
+  skip_if_not_installed("xgboost")
+
+  expect_xgb_option_matches(list(
+    objective = "reg:tweedie",
+    tweedie_variance_power = 1.9
+  ))
+  expect_xgb_option_matches(list(
+    objective = "reg:pseudohubererror",
+    huber_slope = 10,
+    min_child_weight = 0
+  ))
+  expect_xgb_option_matches(list(
+    objective = "count:poisson",
+    max_delta_step = 0.1
+  ))
+  expect_xgb_option_matches(list(objective = "count:poisson", base_score = 3))
+})
+
+test_that("lossguide growth predictions match native predict", {
+  skip_if_not_installed("xgboost")
+
+  expect_xgb_option_matches(list(
+    objective = "reg:squarederror",
+    tree_method = "hist",
+    grow_policy = "lossguide",
+    max_depth = 0,
+    max_leaves = 4
+  ))
+})
+
+test_that("degenerate boosters match native predict", {
+  skip_if_not_installed("xgboost")
+
+  x <- as.matrix(mtcars[, "wt", drop = FALSE])
+  set.seed(1)
+  one_col <- xgboost::xgb.train(
+    params = list(objective = "reg:squarederror"),
+    data = xgboost::xgb.DMatrix(x, label = mtcars$mpg),
+    nrounds = 5,
+    verbose = 0
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(one_col), as.data.frame(x)),
+    as.numeric(predict(one_col, x)),
+    tolerance = 1e-5
+  )
+
+  full <- xgb_option_data()
+  set.seed(1)
+  shallow <- xgboost::xgb.train(
+    params = list(objective = "reg:squarederror", max_depth = 1),
+    data = xgboost::xgb.DMatrix(full, label = mtcars$mpg),
+    nrounds = 5,
+    verbose = 0
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(shallow), as.data.frame(full)),
+    as.numeric(predict(shallow, full)),
+    tolerance = 1e-5
+  )
+})
+
+test_that("a booster of stumps matches native predict", {
+  skip_if_not_installed("xgboost")
+  skip(
+    "Every tree collapses to a root, so the generated formula is a constant that
+     mentions no column and evaluates to a single value rather than one per row."
+  )
+
+  full <- xgb_option_data()
+  set.seed(1)
+  constant <- xgboost::xgb.train(
+    params = list(objective = "reg:squarederror"),
+    data = xgboost::xgb.DMatrix(full, label = rep(5, nrow(full))),
+    nrounds = 5,
+    verbose = 0
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(constant), as.data.frame(full)),
+    as.numeric(predict(constant, full)),
+    tolerance = 1e-5
+  )
+
+  set.seed(1)
+  one_row <- xgboost::xgb.train(
+    params = list(objective = "reg:squarederror"),
+    data = xgboost::xgb.DMatrix(full[1, , drop = FALSE], label = mtcars$mpg[1]),
+    nrounds = 3,
+    verbose = 0
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(one_row), as.data.frame(full)),
+    as.numeric(predict(one_row, full)),
+    tolerance = 1e-5
+  )
+})
+
+test_that("a booster trained on data containing NA matches native predict", {
+  skip_if_not_installed("xgboost")
+
+  x <- xgb_option_data()
+  x[1:3, "wt"] <- NA
+
+  set.seed(1)
+  model <- xgboost::xgb.train(
+    params = list(objective = "reg:squarederror"),
+    data = xgboost::xgb.DMatrix(x, label = mtcars$mpg),
+    nrounds = 5,
+    verbose = 0
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), as.data.frame(x)),
+    as.numeric(predict(model, x)),
+    tolerance = 1e-5
+  )
+})

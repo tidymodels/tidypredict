@@ -488,3 +488,181 @@ test_that("missing values route through the CART surrogates (#294)", {
     predict(model, new_df)$.pred
   )
 })
+
+test_that("awkward factor level names match predict()", {
+  skip_if_not_installed("baguette")
+
+  df <- mtcars
+  df$fac <- factor(c("a:b", "c d", "e", "a:b")[(seq_len(32) %% 4) + 1])
+  df$unused <- factor(as.character(df$gear), levels = c("3", "4", "5", "9"))
+  df$ord <- factor(df$carb, ordered = TRUE)
+
+  set.seed(100)
+  model <- baguette::bagger(
+    mpg ~ wt + fac + unused + ord,
+    data = df,
+    times = 5
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$.pred
+  )
+})
+
+test_that("awkward factor level names match predict() - classification", {
+  skip_if_not_installed("baguette")
+
+  df <- iris
+  df$g <- factor(
+    c("a:b", "c d", "e"),
+    levels = c("a:b", "c d", "e", "unused")
+  )
+
+  set.seed(100)
+  model <- baguette::bagger(Species ~ Sepal.Length + g, data = df, times = 5)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    as.character(predict(model, df)$.pred_class)
+  )
+})
+
+test_that("training data containing NA matches predict()", {
+  skip_if_not_installed("baguette")
+
+  df <- mtcars
+  df$wt[c(2, 5, 9)] <- NA_real_
+
+  set.seed(100)
+  model <- baguette::bagger(mpg ~ wt + hp + disp, data = df, times = 5)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$.pred
+  )
+})
+
+test_that("values sitting exactly on a split point match predict()", {
+  skip_if_not_installed("baguette")
+
+  model <- bagger_reg(times = 5)
+
+  splits <- unlist(lapply(model$model_df$model, function(x) {
+    x$fit$splits[, "index"]
+  }))
+  nd <- mtcars[rep(1, length(splits)), ]
+  nd$wt <- splits
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), nd),
+    predict(model, nd)$.pred
+  )
+})
+
+test_that("degenerate ensembles match predict()", {
+  skip_if_not_installed("baguette")
+
+  set.seed(100)
+  single <- baguette::bagger(mpg ~ wt, data = mtcars, times = 5)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single), mtcars),
+    predict(single, mtcars)$.pred
+  )
+
+  set.seed(100)
+  shallow <- baguette::bagger(
+    mpg ~ wt + cyl + disp,
+    data = mtcars,
+    times = 5,
+    maxdepth = 1
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(shallow), mtcars),
+    predict(shallow, mtcars)$.pred
+  )
+})
+
+test_that("an ensemble of stumps matches predict()", {
+  skip_if_not_installed("baguette")
+  skip(
+    "`cp = 1` prunes every base model back to its root, so the generated formula
+     is a constant that mentions no column and evaluates to a single value
+     rather than one per row."
+  )
+
+  set.seed(100)
+  model <- baguette::bagger(mpg ~ wt + hp, data = mtcars, times = 5, cp = 1)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    predict(model, mtcars)$.pred
+  )
+})
+
+test_that("rpart surrogate settings are respected", {
+  skip_if_not_installed("baguette")
+
+  for (surrogate in list(list(usesurrogate = 0), list(maxsurrogate = 0))) {
+    set.seed(100)
+    model <- rlang::exec(
+      baguette::bagger,
+      mpg ~ wt + cyl + disp,
+      data = mtcars,
+      times = 3,
+      !!!surrogate
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      predict(model, mtcars)$.pred
+    )
+  }
+})
+
+test_that("C5.0 tree-shaping arguments are respected", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+
+  for (arg in list(
+    list(winnow = TRUE),
+    list(CF = 0.05),
+    list(minCases = 20)
+  )) {
+    set.seed(100)
+    model <- rlang::exec(
+      baguette::bagger,
+      Species ~ .,
+      data = iris,
+      base_model = "C5.0",
+      times = 3,
+      !!!arg
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), iris),
+      as.character(predict(model, iris)$.pred_class)
+    )
+  }
+})
+
+test_that("C5.0 fuzzyThreshold is respected", {
+  skip_if_not_installed("baguette")
+  skip_if_not_installed("C50")
+  skip(
+    "C5.0 soft thresholds average the two branches near a split point, but the
+     generated formula treats every split as a hard threshold."
+  )
+
+  set.seed(100)
+  model <- baguette::bagger(
+    Species ~ .,
+    data = iris,
+    base_model = "C5.0",
+    times = 3,
+    fuzzyThreshold = TRUE
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), iris),
+    as.character(predict(model, iris)$.pred_class)
+  )
+})

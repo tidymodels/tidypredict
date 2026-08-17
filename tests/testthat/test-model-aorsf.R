@@ -134,3 +134,95 @@ test_that("a missing predictor gives NA rather than a confident value (#325)", {
     as.numeric(predict(model, new_data = nd[-(1:5), ]))
   )
 })
+
+test_that("non-default control and sampling arguments match predict()", {
+  skip_if_not_installed("aorsf")
+
+  nd <- new_data()
+
+  set.seed(1)
+  net <- aorsf::orsf(
+    mtcars,
+    mpg ~ wt + cyl + disp + hp,
+    n_tree = 10,
+    control = aorsf::orsf_control_regression(method = "net")
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(net), nd),
+    as.numeric(predict(net, new_data = nd))
+  )
+
+  set.seed(1)
+  tuned <- aorsf::orsf(
+    mtcars,
+    mpg ~ wt + cyl + disp + hp,
+    n_tree = 10,
+    n_split = 1,
+    leaf_min_obs = 10,
+    mtry = 2
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(tuned), nd),
+    as.numeric(predict(tuned, new_data = nd))
+  )
+
+  set.seed(1)
+  subsampled <- aorsf::orsf(
+    mtcars,
+    mpg ~ wt + cyl + disp,
+    n_tree = 10,
+    sample_fraction = 0.5,
+    sample_with_replacement = FALSE
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(subsampled), nd),
+    as.numeric(predict(subsampled, new_data = nd))
+  )
+})
+
+test_that("degenerate forests match predict()", {
+  skip_if_not_installed("aorsf")
+
+  nd <- new_data()
+
+  # `split_min_obs` just under the row count leaves every tree a single split.
+  set.seed(1)
+  shallow <- aorsf::orsf(
+    mtcars,
+    mpg ~ wt + cyl + disp,
+    n_tree = 10,
+    split_min_obs = 31
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(shallow), nd),
+    as.numeric(predict(shallow, new_data = nd))
+  )
+
+  set.seed(1)
+  single <- aorsf::orsf(mtcars, mpg ~ wt, n_tree = 10)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single), nd),
+    as.numeric(predict(single, new_data = nd))
+  )
+
+  set.seed(1)
+  tiny <- aorsf::orsf(
+    mtcars[1:5, ],
+    mpg ~ wt + hp,
+    n_tree = 5,
+    leaf_min_obs = 1,
+    split_min_obs = 2
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(tiny), nd),
+    as.numeric(predict(tiny, new_data = nd))
+  )
+
+  flat <- transform(mtcars, mpg = 5)
+  set.seed(1)
+  constant <- aorsf::orsf(flat, mpg ~ wt + hp, n_tree = 5)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(constant), flat),
+    as.numeric(predict(constant, new_data = flat))
+  )
+})

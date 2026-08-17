@@ -785,3 +785,141 @@ test_that("factor splits match predict() for a probability forest (#283)", {
 
   expect_equal(probs, base, ignore_attr = "dimnames")
 })
+
+test_that("awkward factor level names match predict() (#283)", {
+  skip_if_not_installed("ranger")
+
+  df <- mtcars
+  df$fac <- factor(c("a:b", "c d", "e", "a:b")[(seq_len(32) %% 4) + 1])
+  df$unused <- factor(as.character(df$gear), levels = c("3", "4", "5", "9"))
+  # `grp` is a prefix of `grphi`, which a parser matching names by prefix would
+  # confuse.
+  df$grp <- factor(ifelse(df$hp > 120, "hi", "lo"))
+  df$grphi <- factor(ifelse(df$wt > 3, "x", "lo"))
+
+  for (mode in c("ignore", "order", "partition")) {
+    set.seed(9)
+    model <- ranger::ranger(
+      mpg ~ wt + fac + unused + grp + grphi,
+      data = df,
+      num.trees = 20,
+      respect.unordered.factors = mode
+    )
+    base <- predict(model, df)$predictions
+
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+      base
+    )
+  }
+})
+
+test_that("values sitting exactly on a split value match predict()", {
+  skip_if_not_installed("ranger")
+
+  set.seed(9)
+  model <- ranger::ranger(mpg ~ wt + hp, data = mtcars, num.trees = 20)
+
+  splits <- unlist(lapply(seq_len(20), function(i) {
+    tree <- ranger::treeInfo(model, i)
+    tree$splitval[!tree$terminal & tree$splitvarName == "wt"]
+  }))
+  nd <- mtcars[rep(1, length(splits)), ]
+  nd$wt <- splits
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), nd),
+    predict(model, nd)$predictions
+  )
+})
+
+test_that("non-default split rules match predict()", {
+  skip_if_not_installed("ranger")
+
+  for (rule in c("extratrees", "maxstat")) {
+    set.seed(9)
+    model <- ranger::ranger(
+      mpg ~ wt + hp + disp,
+      data = mtcars,
+      num.trees = 20,
+      splitrule = rule
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      predict(model, mtcars)$predictions
+    )
+  }
+
+  set.seed(9)
+  shallow <- ranger::ranger(
+    mpg ~ wt + hp,
+    data = mtcars,
+    num.trees = 20,
+    max.depth = 1,
+    min.node.size = 10
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(shallow), mtcars),
+    predict(shallow, mtcars)$predictions
+  )
+})
+
+test_that("degenerate forests match predict()", {
+  skip_if_not_installed("ranger")
+
+  set.seed(9)
+  single <- ranger::ranger(mpg ~ wt, data = mtcars, num.trees = 10)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single), mtcars),
+    predict(single, mtcars)$predictions
+  )
+
+  set.seed(9)
+  shallow <- ranger::ranger(
+    mpg ~ wt + hp,
+    data = mtcars,
+    num.trees = 10,
+    max.depth = 1
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(shallow), mtcars),
+    predict(shallow, mtcars)$predictions
+  )
+})
+
+test_that("a forest of stumps matches predict()", {
+  skip_if_not_installed("ranger")
+  skip(
+    "Every tree collapses to a root, so the generated formula is a constant that
+     mentions no column and evaluates to a single value rather than one per row."
+  )
+
+  # A constant outcome makes every tree a root-only stump.
+  flat <- transform(mtcars, mpg = 5)
+  set.seed(9)
+  model <- ranger::ranger(mpg ~ wt + hp, data = flat, num.trees = 10)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), flat),
+    predict(model, flat)$predictions
+  )
+})
+
+test_that("a forest trained on data containing NA matches predict()", {
+  skip_if_not_installed("ranger")
+  skip(
+    "ranger routes NA per node when the training data is incomplete, but the
+     generated formula always sends NA left."
+  )
+
+  df <- mtcars
+  df$wt[c(2, 5)] <- NA
+  set.seed(9)
+  model <- ranger::ranger(mpg ~ wt + hp, data = df, num.trees = 10)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$predictions
+  )
+})
