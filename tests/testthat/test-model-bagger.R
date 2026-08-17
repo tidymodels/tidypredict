@@ -585,11 +585,6 @@ test_that("degenerate ensembles match predict()", {
 
 test_that("an ensemble of stumps matches predict()", {
   skip_if_not_installed("baguette")
-  skip(
-    "`cp = 1` prunes every base model back to its root, so the generated formula
-     is a constant that mentions no column and evaluates to a single value
-     rather than one per row."
-  )
 
   set.seed(100)
   model <- baguette::bagger(mpg ~ wt + hp, data = mtcars, times = 5, cp = 1)

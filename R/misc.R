@@ -104,6 +104,22 @@ expr_na_if_incomplete <- function(f, cols, missing = NA_real_) {
   expr(ifelse(!!any_missing, !!missing, !!f))
 }
 
+# Keep a constant expression the length of the data it is evaluated against.
+#
+# When every tree in a model is a stump, the generated expression mentions no
+# column at all, so `rlang::eval_tidy()` has nothing to recycle against and
+# returns a length-1 scalar instead of one prediction per row. Referencing a
+# predictor restores the length. Both branches of the `ifelse()` are the same
+# expression, so the value is untouched and missing predictors stay harmless.
+expr_recycle_over_column <- function(f, cols) {
+  cols <- cols[!is.na(cols)]
+  if (length(cols) == 0 || length(all.vars(f)) > 0) {
+    return(f)
+  }
+  col <- rlang::sym(cols[[1]])
+  expr(ifelse(is.na(!!col), !!f, !!f))
+}
+
 # Average a set of expressions, as forests do over their trees. `n` is taken
 # from the model where it is available, so that the divisor is written the same
 # way as the model reports it.

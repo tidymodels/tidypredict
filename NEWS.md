@@ -14,6 +14,8 @@
 
 - `tidypredict_fit()` now returns predictions on the response scale for CatBoost models fit with the `Poisson` or `Tweedie` objective, applying `exp()` to the raw score as the other CatBoost objectives already invert their own links. Anyone using such a model will see their predictions change from the log scale to the count or mean scale; they now match `catboost.predict(prediction_type = "Exponent")` instead of the `"RawFormulaVal"` default. (#356)
 
+- `tidypredict_fit()` now returns one prediction per row for a `ranger::ranger()`, `xgboost`, `baguette::bagger()`, or `xrf::xrf()` model in which every tree collapsed to a single leaf, or in which the lasso kept only the intercept. Such a model produced a formula that mentioned no column at all, so evaluating it returned a single value rather than one per row. The value was always correct; only its length was wrong. (#397)
+
 - `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
 
 - `tidypredict_fit()` now works on a parsed LightGBM model fit with `linear_tree = TRUE`. A leaf of a linear tree stores its coefficients separately and leaves its constant prediction empty, which the parsed path never read, so the formula failed with "`..1 (right)` must be a vector, not `NULL`". This also affected such a model saved with `tidypredict_save()` and read back with `tidypredict_load()`. (#346)

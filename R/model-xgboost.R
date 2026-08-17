@@ -266,12 +266,23 @@ build_fit_formula_xgb_nested <- function(model) {
   json_params <- get_xgb_json_params(model)
   params <- attr(model, "param") %||% model$params
 
-  assemble_xgb_formula(
-    extract_xgb_trees_nested(model),
-    weight_drop = json_params$weight_drop,
-    base_score = json_params$base_score,
-    objective = params$objective %||% json_params$objective
+  expr_recycle_over_column(
+    assemble_xgb_formula(
+      extract_xgb_trees_nested(model),
+      weight_drop = json_params$weight_drop,
+      base_score = json_params$base_score,
+      objective = params$objective %||% json_params$objective
+    ),
+    xgb_feature_names(model)
   )
+}
+
+xgb_feature_names <- function(model) {
+  if (xgb_has_new_api()) {
+    xgboost::getinfo(model, "feature_name")
+  } else {
+    model$feature_names # nocov
+  }
 }
 
 # Everything after the trees have been built is the same whether they came from
@@ -315,11 +326,14 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
     )
   })
 
-  assemble_xgb_formula(
-    trees_nested,
-    weight_drop = parsedmodel$general$weight_drop,
-    base_score = parsedmodel$general$params$base_score,
-    objective = parsedmodel$general$params$objective
+  expr_recycle_over_column(
+    assemble_xgb_formula(
+      trees_nested,
+      weight_drop = parsedmodel$general$weight_drop,
+      base_score = parsedmodel$general$params$base_score,
+      objective = parsedmodel$general$params$objective
+    ),
+    parsedmodel$general$feature_names
   )
 }
 

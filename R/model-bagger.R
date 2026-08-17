@@ -70,7 +70,10 @@ bagger_classes <- function(model) {
 
 #' @export
 tidypredict_fit.bagger <- function(model, ...) {
-  bagger_build_formula(parse_model(model))
+  expr_recycle_over_column(
+    bagger_build_formula(parse_model(model)),
+    names(model$blueprint$ptypes$predictors)
+  )
 }
 
 bagger_build_formula <- function(parsedmodel) {

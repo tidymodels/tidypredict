@@ -890,10 +890,6 @@ test_that("degenerate forests match predict()", {
 
 test_that("a forest of stumps matches predict()", {
   skip_if_not_installed("ranger")
-  skip(
-    "Every tree collapses to a root, so the generated formula is a constant that
-     mentions no column and evaluates to a single value rather than one per row."
-  )
 
   # A constant outcome makes every tree a root-only stump.
   flat <- transform(mtcars, mpg = 5)
