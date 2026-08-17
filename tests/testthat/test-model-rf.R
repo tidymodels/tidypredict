@@ -424,3 +424,101 @@ test_that("factor splits match predict() for class probabilities (#282)", {
   base <- unclass(predict(model, df, type = "prob"))[, colnames(probs)]
   expect_equal(probs, unname(base), ignore_attr = "dimnames")
 })
+
+test_that("awkward factor level names match predict() (#282)", {
+  skip_if_not_installed("randomForest")
+
+  df <- mtcars
+  df$fac <- factor(c("a:b", "c d", "e", "a:b")[(seq_len(32) %% 4) + 1])
+  df$unused <- factor(as.character(df$gear), levels = c("3", "4", "5", "9"))
+  # `grp` is a prefix of `grphi`, which a parser matching names by prefix would
+  # confuse.
+  df$grp <- factor(ifelse(df$hp > 120, "hi", "lo"))
+  df$grphi <- factor(ifelse(df$wt > 3, "x", "lo"))
+
+  set.seed(1)
+  model <- randomForest::randomForest(
+    mpg ~ wt + fac + unused + grp + grphi,
+    data = df,
+    ntree = 20
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("values sitting exactly on a split point match predict()", {
+  skip_if_not_installed("randomForest")
+
+  set.seed(1)
+  model <- randomForest::randomForest(mpg ~ wt + hp, data = mtcars, ntree = 20)
+
+  splits <- sort(unique(model$forest$xbestsplit[model$forest$xbestsplit != 0]))
+  nd <- mtcars[rep(1, length(splits)), ]
+  nd$wt <- splits
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), nd),
+    unname(predict(model, nd))
+  )
+})
+
+test_that("degenerate forests match predict()", {
+  skip_if_not_installed("randomForest")
+
+  flat <- transform(mtcars, mpg = 5)
+  set.seed(1)
+  stumps <- suppressWarnings(
+    randomForest::randomForest(mpg ~ wt + hp, data = flat, ntree = 10)
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(stumps), flat),
+    unname(predict(stumps, flat))
+  )
+
+  set.seed(1)
+  single <- randomForest::randomForest(mpg ~ wt, data = mtcars, ntree = 10)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single), mtcars),
+    unname(predict(single, mtcars))
+  )
+
+  set.seed(1)
+  capped <- randomForest::randomForest(
+    mpg ~ wt + hp,
+    data = mtcars,
+    ntree = 10,
+    maxnodes = 2
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(capped), mtcars),
+    unname(predict(capped, mtcars))
+  )
+})
+
+test_that("corr.bias = TRUE matches predict()", {
+  skip_if_not_installed("randomForest")
+  skip(
+    "`predict.randomForest()` rescales the forest average by the bias-correction
+     coefficients in `model$coefs`, which the parser never reads."
+  )
+
+  set.seed(1)
+  model <- randomForest::randomForest(
+    mpg ~ wt + hp + disp,
+    data = mtcars,
+    ntree = 20,
+    corr.bias = TRUE
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    unname(predict(model, mtcars))
+  )
+})

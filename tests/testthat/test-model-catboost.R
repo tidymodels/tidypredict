@@ -2177,3 +2177,115 @@ test_that("values on a split border match catboost's float comparison (#298)", {
     )
   )
 })
+
+# Training arguments that change catboost.predict() ---------------------------
+
+expect_catboost_option_matches <- function(
+  extra,
+  prediction_type = "RawFormulaVal"
+) {
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  params <- utils::modifyList(
+    list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    ),
+    extra
+  )
+
+  set.seed(123)
+  model <- catboost_catboost.train(
+    catboost_catboost.load_pool(
+      X,
+      label = mtcars$hp,
+      feature_names = as.list(colnames(X))
+    ),
+    params = params
+  )
+
+  testthat::expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), as.data.frame(X)),
+    as.numeric(catboost_catboost.predict(
+      model,
+      catboost_catboost.load_pool(X),
+      prediction_type = prediction_type
+    ))
+  )
+}
+
+test_that("boosting and shrinkage arguments match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  expect_catboost_option_matches(list(boost_from_average = FALSE))
+  expect_catboost_option_matches(list(boosting_type = "Ordered"))
+  expect_catboost_option_matches(list(
+    boosting_type = "Plain",
+    model_shrink_rate = 0.1,
+    model_shrink_mode = "Constant"
+  ))
+  expect_catboost_option_matches(list(
+    langevin = TRUE,
+    diffusion_temperature = 1000
+  ))
+  expect_catboost_option_matches(list(rsm = 0.5))
+})
+
+test_that("binarization arguments match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  expect_catboost_option_matches(list(border_count = 8))
+  expect_catboost_option_matches(list(nan_mode = "Forbidden"))
+  expect_catboost_option_matches(list(l2_leaf_reg = 10))
+})
+
+test_that("parameterized objectives match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  expect_catboost_option_matches(list(loss_function = "Quantile:alpha=0.9"))
+  expect_catboost_option_matches(list(loss_function = "Huber:delta=2"))
+  expect_catboost_option_matches(list(loss_function = "Expectile:alpha=0.3"))
+  expect_catboost_option_matches(
+    list(loss_function = "Tweedie:variance_power=1.9"),
+    prediction_type = "Exponent"
+  )
+  expect_catboost_option_matches(list(
+    loss_function = "MAE",
+    leaf_estimation_method = "Exact"
+  ))
+})
+
+test_that("degenerate catboost models match catboost.predict", {
+  skip_if_not_installed("catboost")
+
+  expect_catboost_option_matches(list(depth = 1L))
+  expect_catboost_option_matches(list(iterations = 1L))
+
+  X <- data.matrix(mtcars[, "mpg", drop = FALSE])
+  set.seed(123)
+  model <- catboost_catboost.train(
+    catboost_catboost.load_pool(
+      X,
+      label = mtcars$hp,
+      feature_names = as.list("mpg")
+    ),
+    params = list(
+      iterations = 10L,
+      depth = 3L,
+      learning_rate = 0.5,
+      loss_function = "RMSE",
+      logging_level = "Silent",
+      allow_writing_files = FALSE
+    )
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), as.data.frame(X)),
+    as.numeric(catboost_catboost.predict(
+      model,
+      catboost_catboost.load_pool(X)
+    ))
+  )
+})

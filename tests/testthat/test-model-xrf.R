@@ -153,6 +153,110 @@ test_that("works with non-default xgb_control, sparse, and deoverlap", {
   )
 })
 
+test_that("unused and special-character factor levels are mapped correctly", {
+  skip_if_not_installed("xrf")
+
+  df <- mtcars
+  df$cyl <- factor(df$cyl, levels = c("4", "5", "6", "8"))
+  df$grp <- factor(ifelse(df$hp > 120, "a:b", "c d"))
+  set.seed(7)
+  model <- xrf::xrf(
+    mpg ~ wt + cyl + grp,
+    df,
+    family = "gaussian",
+    xgb_control = list(nrounds = 5, max_depth = 3)
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    as.numeric(predict(model, df))
+  )
+})
+
+test_that("a variable named like another variable's dummy column is mapped correctly", {
+  skip_if_not_installed("xrf")
+  skip(
+    "The model matrix has both a `cyl4` dummy (for `cyl == \"4\"`) and a
+     variable named `cyl4`. `xrf_feature_field()` checks the variable names
+     before the level names, so the dummy is read as the raw column."
+  )
+
+  df <- mtcars
+  df$cyl <- factor(df$cyl)
+  df$cyl4 <- factor(ifelse(df$hp > 120, "8", "6"))
+  set.seed(7)
+  model <- xrf::xrf(
+    mpg ~ wt + cyl + cyl4,
+    df,
+    family = "gaussian",
+    sparse = FALSE,
+    xgb_control = list(nrounds = 5, max_depth = 3)
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    as.numeric(predict(model, df, sparse = FALSE))
+  )
+})
+
+test_that("values sitting exactly on a rule split match predict()", {
+  skip_if_not_installed("xrf")
+
+  set.seed(7)
+  model <- xrf::xrf(
+    mpg ~ wt + hp,
+    mtcars,
+    family = "gaussian",
+    xgb_control = list(nrounds = 5, max_depth = 3)
+  )
+
+  splits <- model$rules$split[model$rules$feature == "wt"]
+  expect_gt(length(splits), 0)
+
+  for (offset in c(0, -1e-12, 1e-12)) {
+    nd <- mtcars[rep(1, length(splits)), ]
+    nd$wt <- splits + offset
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), nd),
+      as.numeric(predict(model, nd))
+    )
+  }
+})
+
+test_that("rows with NA are scored as NA, and complete rows are unaffected", {
+  skip_if_not_installed("xrf")
+
+  df <- xrf_mtcars()
+  model <- xrf_reg_model()
+
+  nd <- df
+  nd$wt[1:3] <- NA_real_
+  fit <- rlang::eval_tidy(tidypredict_fit(model), nd)
+
+  # `predict.xrf()` drops the incomplete rows before assembling its output and
+  # then fails, so there is no value to match for those rows.
+  expect_error(predict(model, nd))
+  expect_equal(is.na(fit), c(rep(TRUE, 3), rep(FALSE, nrow(nd) - 3)))
+  expect_equal(fit[-(1:3)], as.numeric(predict(model, nd[-(1:3), ])))
+})
+
+test_that("an intercept-only fit matches predict()", {
+  skip_if_not_installed("xrf")
+  skip(
+    "At the largest penalty only the intercept survives, so the generated
+     formula is a constant that mentions no column and evaluates to a single
+     value rather than one per row."
+  )
+
+  model <- xrf_reg_model()
+  model$lambda <- max(model$glm$model$lambda)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), xrf_mtcars()),
+    as.numeric(predict(model, xrf_mtcars(), lambda = model$lambda))
+  )
+})
+
 test_that("uses the penalty recorded by rules::rule_fit()", {
   skip_if_not_installed("xrf")
 
