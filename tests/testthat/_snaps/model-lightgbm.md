@@ -1,3 +1,25 @@
+# a categorical split with default_left set is refused (#288)
+
+    Code
+      tidypredict:::get_lgb_tree(tree_df)
+    Condition
+      Error in `map()`:
+      i In index: 1.
+      Caused by error in `check_lgb_categorical_default_left()`:
+      ! A categorical split cannot set default_left.
+      i This is an internal error that was detected in the tidypredict package.
+        Please report it at <https://github.com/tidymodels/tidypredict/issues> with a reprex (<https://tidyverse.org/help/>) and the full backtrace.
+
+---
+
+    Code
+      tidypredict:::build_nested_lgb_tree(tree_df)
+    Condition
+      Error in `check_lgb_categorical_default_left()`:
+      ! A categorical split cannot set default_left.
+      i This is an internal error that was detected in the tidypredict package.
+        Please report it at <https://github.com/tidymodels/tidypredict/issues> with a reprex (<https://tidyverse.org/help/>) and the full backtrace.
+
 # unsupported objective throws error
 
     Code
