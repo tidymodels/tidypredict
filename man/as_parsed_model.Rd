@@ -9,6 +9,14 @@ as_parsed_model(x)
 \arguments{
 \item{x}{A parsed model object}
 }
+\value{
+The parsed model with its \code{parsed_model} and \verb{pm_*} classes set.
+}
 \description{
 Prepares parsed model object
+}
+\examples{
+pm <- parse_model(lm(mpg ~ wt, data = mtcars))
+as_parsed_model(pm)
+
 }

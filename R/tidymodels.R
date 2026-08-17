@@ -130,6 +130,13 @@ generics::tidy
 #' @param x A parsed_model object
 #' @param ...  Reserved for future use
 #'
+#' @returns A tibble with one row per term, containing the `term` name and its
+#'   `estimate`.
+#'
+#' @examples
+#' pm <- parse_model(lm(mpg ~ wt, data = mtcars))
+#' tidy(pm)
+#'
 #' @export
 tidy.pm_regression <- function(x, ...) {
   map_dfr(

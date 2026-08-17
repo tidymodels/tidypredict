@@ -29,7 +29,7 @@ This function is only needed when using raw CatBoost models (trained with
 handled automatically and this function is not required.
 }
 \examples{
-\dontrun{
+\dontshow{if (rlang::is_installed("catboost")) withAutoprint(\{ # examplesIf}
 # For raw CatBoost models with categorical features:
 pm <- parse_model(catboost_model)
 pm <- set_catboost_categories(pm, catboost_model, training_data)
@@ -37,5 +37,5 @@ tidypredict_fit(pm)
 
 # For parsnip/bonsai models, this is not needed:
 # tidypredict_fit(parsnip_model_fit)  # works automatically
-}
+\dontshow{\}) # examplesIf}
 }

@@ -3,8 +3,7 @@
 #' Compares the results of predict() and tidypredict_to_column()
 #' functions.
 #'
-#' @param model An R model or a list with a parsed model. It currently supports
-#' lm(), glm() and randomForest() models.
+#' @param model An R model or a list with a parsed model.
 #' @param df A data frame that contains all of the needed fields to run the prediction.
 #' It defaults to the "model" data frame object inside the model object.
 #' @param threshold The number that a given result difference, between predict() and
@@ -19,6 +18,10 @@
 #' predictions. Required for XGBoost, LightGBM and CatBoost models, which
 #' cannot predict from a data frame. Pass an `xgb.DMatrix` for XGBoost and a
 #' numeric matrix for LightGBM and CatBoost. It defaults to NULL.
+#'
+#' @returns A list of test results comparing `predict()` and
+#'   `tidypredict_to_column()`, including the maximum difference and whether it
+#'   stays within `threshold`.
 #'
 #' @examples
 #'

@@ -5,6 +5,9 @@
 #'
 #' @param model An R model or a list with a parsed model.
 #'
+#' @returns A Tidy Eval formula that calculates the fitted values. Models that
+#'   produce one formula per class or per outcome return a list of formulas.
+#'
 #' @examples
 #'
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)

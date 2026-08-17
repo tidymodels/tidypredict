@@ -11,6 +11,11 @@ tidypredict_interval(model, interval = 0.95)
 
 \item{interval}{The prediction interval, defaults to 0.95}
 }
+\value{
+A Tidy Eval formula that calculates the half width of the
+prediction interval. It must be added to and subtracted from the fit to
+obtain the upper and lower bounds.
+}
 \description{
 It parses a model or uses an already parsed model to return a
 Tidy Eval formula that can then be used inside a dplyr command.

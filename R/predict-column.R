@@ -12,6 +12,13 @@
 #' FALSE
 #' @param vars The name of the variables that this function will produce. Defaults to "fit", "upper", and "lower".
 #'
+#' @returns The input data frame with one new column (the fit) added, or three
+#'   new columns (fit, upper and lower bounds) when `add_interval` is `TRUE`.
+#'
+#' @examples
+#' model <- lm(mpg ~ wt, data = mtcars)
+#' tidypredict_to_column(mtcars, model)
+#'
 #' @export
 tidypredict_to_column <- function(
   df,

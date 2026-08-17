@@ -20,9 +20,9 @@ if \code{type == "set"} must be \code{"in"} on \verb{not-in}.
 \item \code{col} character.
 \item \code{val} if \code{type == "conditional"} and \code{vals} if \code{type == "set"}.
 Can be character or numeric.
-@keywords internal
 }}
 }
 \description{
 Turn a path object into a combined expression
 }
+\keyword{internal}
