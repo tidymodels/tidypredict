@@ -83,7 +83,10 @@ parse_model_xrf <- function(model, call = rlang::caller_env()) {
 # Fit model --------------------------------------
 #
 # The lasso can shrink every rule away, leaving an intercept-only formula that
-# mentions no column, so anchor the result to a predictor.
+# mentions no column, so anchor the result to a predictor. `all.vars()` on the
+# base formula gives the raw columns rather than the model matrix names, so
+# the anchor is a column of `newdata` even for a formula that transforms its
+# predictors.
 #' @export
 tidypredict_fit.xrf <- function(model) {
   expr_recycle_over_column(

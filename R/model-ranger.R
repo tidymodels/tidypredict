@@ -180,6 +180,8 @@ tidypredict_fit_ranger_nested <- function(model) {
     build_nested_ranger_tree(model, tree_no)
   })
 
+  # A forest of stumps mentions no column, so anchor it to one. These are the
+  # predictors `ranger:::predict.ranger()` itself requires in `newdata`.
   expr_recycle_over_column(
     expr_mean(tree_exprs, n_trees),
     model$forest$independent.variable.names

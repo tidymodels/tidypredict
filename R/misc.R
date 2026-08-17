@@ -108,9 +108,23 @@ expr_na_if_incomplete <- function(f, cols, missing = NA_real_) {
 #
 # When every tree in a model is a stump, the generated expression mentions no
 # column at all, so `rlang::eval_tidy()` has nothing to recycle against and
-# returns a length-1 scalar instead of one prediction per row. Referencing a
-# predictor restores the length. Both branches of the `ifelse()` are the same
-# expression, so the value is untouched and missing predictors stay harmless.
+# returns a length-1 scalar instead of one prediction per row. Mentioning a
+# column is what restores the length, so the guard only applies to an
+# expression that mentions none: for every other model this returns `f`
+# untouched, and the formula is exactly what it was before.
+#
+# `f` deliberately appears in *both* branches of the `ifelse()`, which is what
+# makes the wrapper inert: whichever way the test goes the value is the same,
+# so no prediction changes and a missing predictor is not turned into `NA` the
+# way `expr_na_if_incomplete()` does. Do not "simplify" this to a single
+# branch or to a bare `f`; dropping either branch either changes the value for
+# rows with a missing predictor or removes the column reference and brings the
+# scalar back. The constant is short, so writing it twice costs little.
+#
+# `cols[[1]]` is an arbitrary choice: any column works, since the reference is
+# only there to supply a length. It must, though, be a column that is
+# guaranteed to be present in `newdata`, so callers pass the model's own
+# predictor names rather than, say, a name scraped from a split.
 expr_recycle_over_column <- function(f, cols) {
   cols <- cols[!is.na(cols)]
   if (length(cols) == 0 || length(all.vars(f)) > 0) {

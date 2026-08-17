@@ -266,6 +266,7 @@ build_fit_formula_xgb_nested <- function(model) {
   json_params <- get_xgb_json_params(model)
   params <- attr(model, "param") %||% model$params
 
+  # A booster of stumps mentions no column, so anchor it to one.
   expr_recycle_over_column(
     assemble_xgb_formula(
       extract_xgb_trees_nested(model),
@@ -277,6 +278,10 @@ build_fit_formula_xgb_nested <- function(model) {
   )
 }
 
+# The columns the booster was trained on, which are the ones every generated
+# xgboost formula refers to and so are present in `newdata`. A booster fit on
+# an unnamed matrix has none, and `expr_recycle_over_column()` then leaves the
+# formula alone rather than inventing a column.
 xgb_feature_names <- function(model) {
   if (xgb_has_new_api()) {
     xgboost::getinfo(model, "feature_name")
@@ -326,6 +331,8 @@ build_fit_formula_xgb_from_parsed <- function(parsedmodel) {
     )
   })
 
+  # As in `build_fit_formula_xgb_nested()`, but from the names recorded when
+  # the model was parsed.
   expr_recycle_over_column(
     assemble_xgb_formula(
       trees_nested,
