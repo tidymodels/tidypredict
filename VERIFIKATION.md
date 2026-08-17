@@ -47,6 +47,11 @@ done
 **Erwartung:** Alle 9 "OK". (`tidypredict_sql`/`tidypredict_sql_interval`
 hatten schon `\value` – unverändert.)
 
+**Hinweis (Laufzeit-Test):** `acceptable_formula` gibt bei Erfolg `NULL`
+(invisibly) zurück, NICHT `TRUE`. Die `\value`-Doku lautet daher
+"`NULL` (invisibly) when the model's formula can be parsed, or an error
+when it cannot."
+
 ### Punkt 3: `man/tidypredict_test.Rd` model-Param-Enumeration
 **Soll:** Der Satz "It currently supports lm(), glm() and randomForest() models"
 ist entfernt (NAMESPACE hat 40+ Methoden).

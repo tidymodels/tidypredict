@@ -10,7 +10,7 @@ acceptable_formula(model)
 \item{model}{An R model object}
 }
 \value{
-\code{TRUE} (invisibly) when the model's formula can be parsed, or an
+\code{NULL} (invisibly) when the model's formula can be parsed, or an
 error when it cannot.
 }
 \description{

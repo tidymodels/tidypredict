@@ -7,7 +7,7 @@
 #'
 #' @param model An R model object
 #'
-#' @returns `TRUE` (invisibly) when the model's formula can be parsed, or an
+#' @returns `NULL` (invisibly) when the model's formula can be parsed, or an
 #'   error when it cannot.
 #'
 #' @examples
