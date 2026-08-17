@@ -309,6 +309,113 @@ test_that("every usesurrogate mode is followed (#294)", {
   }
 })
 
+test_that("awkward factor level names match predict()", {
+  skip_if_not_installed("rpart")
+
+  # An unused level, a level holding a `:`, and a level whose name is also a
+  # column in the data all break a parser that splits level names by hand.
+  df <- mtcars
+  df$g <- factor(
+    c("a:b", "wt", "c d")[df$cyl / 2 - 1],
+    levels = c("a:b", "wt", "c d", "unused")
+  )
+  model <- rpart::rpart(mpg ~ g + wt, data = df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("ordered factor predictors match predict()", {
+  skip_if_not_installed("rpart")
+
+  df <- transform(mtcars, gear = factor(gear, ordered = TRUE))
+  model <- rpart::rpart(mpg ~ gear + wt, data = df)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("an unused outcome level matches predict()", {
+  skip_if_not_installed("rpart")
+
+  # `Species` keeps all three levels, but only two of them occur.
+  df <- iris[iris$Species != "virginica", ]
+  model <- rpart::rpart(Species ~ Sepal.Length + Petal.Length, data = df)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df, type = "class"))
+  )
+})
+
+test_that("training data containing NA matches predict() in every mode", {
+  skip_if_not_installed("rpart")
+
+  df <- mtcars
+  df$wt[1:5] <- NA_real_
+
+  for (mode in 0:2) {
+    model <- rpart::rpart(
+      mpg ~ wt + disp + hp,
+      data = df,
+      control = rpart::rpart.control(usesurrogate = mode)
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), df),
+      unname(predict(model, df))
+    )
+  }
+})
+
+test_that("a constant outcome matches predict()", {
+  skip_if_not_installed("rpart")
+
+  df <- transform(mtcars, const = 5)
+  model <- rpart::rpart(const ~ wt + cyl, data = df)
+
+  # Neither fit can split, so each collapses to a scalar rather than a vector.
+  fit <- rlang::eval_tidy(tidypredict_fit(model), df)
+  expect_length(fit, 1)
+  expect_equal(rep(fit, nrow(df)), unname(predict(model, df)))
+})
+
+test_that("single-row training data matches predict()", {
+  skip_if_not_installed("rpart")
+
+  model <- rpart::rpart(mpg ~ wt, data = mtcars[1, ])
+
+  fit <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+  expect_length(fit, 1)
+  expect_equal(rep(fit, nrow(mtcars)), unname(predict(model, mtcars)))
+})
+
+test_that("a value at a threshold and at its float32 image matches predict()", {
+  skip_if_not_installed("rpart")
+
+  # `rpart` keeps its cut points as doubles, so a value at the float32 image of
+  # a cut has to land on the same side as `predict()` sends it.
+  model <- rpart::rpart(mpg ~ wt + disp, data = mtcars)
+  cuts <- unname(model$splits[, "index"])
+
+  for (col in c("wt", "disp")) {
+    probe <- mtcars[rep(1, length(cuts) * 2), ]
+    probe[[col]] <- c(cuts, as_f32(cuts))
+
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), probe),
+      unname(predict(model, probe))
+    )
+  }
+})
+
 test_that("a tied split has no majority to go with (#294)", {
   skip_if_not_installed("rpart")
 

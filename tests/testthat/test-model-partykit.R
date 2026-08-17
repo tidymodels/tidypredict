@@ -409,6 +409,77 @@ test_that("multiway numeric splits match predict() (#295)", {
   }
 })
 
+test_that("awkward factor level names match predict() (#295)", {
+  skip_if_not_installed("partykit")
+
+  # An unused level, a level holding a `:`, and a level whose name is also a
+  # column in the data all break a parser that splits level names by hand.
+  set.seed(1)
+  df <- mtcars
+  df$g <- factor(
+    c("a:b", "wt", "c d")[df$cyl / 2 - 1],
+    levels = c("a:b", "wt", "c d", "unused")
+  )
+  model <- partykit::ctree(mpg ~ g + wt, data = df)
+  base <- unname(predict(model, df))
+
+  expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+  expect_equal(rlang::eval_tidy(tidypredict_fit(parse_model(model)), df), base)
+})
+
+test_that("training data containing NA matches predict()", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  df <- mtcars
+  df$wt[1:5] <- NA_real_
+  model <- partykit::ctree(mpg ~ wt + disp + hp, data = df)
+
+  # `predict()` on complete rows is deterministic even though the tree was
+  # grown on data with holes in it.
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    unname(predict(model, mtcars))
+  )
+})
+
+test_that("an unused outcome level matches predict()", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  df <- iris[iris$Species != "virginica", ]
+  model <- partykit::ctree(Species ~ Sepal.Length + Petal.Length, data = df)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df, type = "response"))
+  )
+
+  exprs <- .extract_partykit_classprob(model)
+  eval_env <- rlang::new_environment(
+    data = as.list(df),
+    parent = asNamespace("dplyr")
+  )
+  probs <- lapply(exprs, rlang::eval_tidy, env = eval_env)
+
+  expect_equal(
+    unname(do.call(cbind, probs)),
+    unname(predict(model, df, type = "prob"))
+  )
+})
+
+test_that("a constant outcome and single-row data match predict()", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  df <- transform(mtcars, const = 5)
+  constant <- partykit::ctree(const ~ wt + cyl, data = df)
+  expect_equal(tidypredict_fit(constant), 5)
+
+  one_row <- partykit::ctree(mpg ~ wt, data = mtcars[1, ])
+  expect_equal(tidypredict_fit(one_row), mtcars$mpg[1])
+})
+
 test_that("a multiway model can be saved and re-loaded (#295)", {
   skip_if_not_installed("partykit")
   skip_if_not_installed("yaml")

@@ -465,6 +465,80 @@ test_that("tidypredict_test() compares against predict(), not against itself", {
   expect_true(any(result$raw_results$fit != "setosa"))
 })
 
+test_that("training data containing NA matches predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  df$wt[1:5] <- NA_real_
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df))
+  )
+})
+
+test_that("an unused outcome level matches predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  y <- factor(as.character(df$vs), levels = c("0", "1", "2"))
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], y)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df))
+  )
+})
+
+test_that("ordered factor predictors match predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  df$o <- factor(df$gear, ordered = TRUE)
+  model <- C50::C5.0(df[, c("o", "wt")], df$vs)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df))
+  )
+})
+
+test_that("a single-column model matrix matches predict()", {
+  skip_if_not_installed("C50")
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, "wt", drop = FALSE], df$vs)
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), df)),
+    as.character(predict(model, df))
+  )
+})
+
+test_that("newdata containing NA matches predict()", {
+  skip_if_not_installed("C50")
+  skip(paste(
+    "C5.0 resolves a missing split value by descending every branch and",
+    "combining the leaf class distributions weighted by branch frequency",
+    "(the `forks` entry in the model text). The generated `case_when()` sends",
+    "NA to `.default` instead, so a row missing a split variable gets the",
+    "wrong class. On `mtcars` with `cyl` blanked, `predict()` returns \"1\"",
+    "(prob 0.523) where tidypredict returns \"0\"."
+  ))
+
+  df <- mtcars
+  df$vs <- factor(df$vs)
+  model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs)
+
+  nd <- df
+  nd$cyl[6:9] <- NA_real_
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), nd)),
+    as.character(predict(model, nd))
+  )
+})
+
 test_that("values on a cut boundary match C5.0's float comparison (#287)", {
   set.seed(3)
   n <- 600
