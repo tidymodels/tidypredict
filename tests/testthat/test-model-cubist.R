@@ -355,6 +355,92 @@ test_that("the residual against predict() is relative, not absolute (#375)", {
   expect_equal(fit, reference, tolerance = 1e-6)
 })
 
+test_that("an unused level and a colliding level name match predict() (#322)", {
+  skip_if_not_installed("Cubist")
+  # A level that never occurs, and a level whose name is also a column in the
+  # data, both break a parser that recovers levels by string matching.
+  set.seed(1)
+  n <- 300
+  df <- data.frame(x = rnorm(n), z = rnorm(n))
+  df$f <- factor(
+    sample(c("x", "z", "q"), n, TRUE),
+    levels = c("x", "z", "q", "unused")
+  )
+  df$y <- 2 * df$x + df$z + 2 * as.integer(df$f) + rnorm(n)
+
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("ordered factor predictors match predict()", {
+  skip_if_not_installed("Cubist")
+  set.seed(2)
+  n <- 300
+  df <- data.frame(x = rnorm(n), z = rnorm(n))
+  df$f <- factor(
+    sample(c("lo", "mid", "hi"), n, TRUE),
+    levels = c("lo", "mid", "hi"),
+    ordered = TRUE
+  )
+  df$y <- 2 * df$x + df$z + 2 * as.integer(df$f) + rnorm(n)
+
+  model <- Cubist::cubist(df[, c("x", "z", "f")], df$y)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(predict(model, df)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("degenerate fit shapes match predict()", {
+  skip_if_not_installed("Cubist")
+
+  single_column <- Cubist::cubist(mtcars[, "wt", drop = FALSE], mtcars$mpg)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(single_column), mtcars),
+    unname(predict(single_column, mtcars)),
+    tolerance = 1e-6
+  )
+
+  # A constant outcome leaves one rule with no slopes, so the formula is a
+  # scalar rather than a vector.
+  constant <- Cubist::cubist(mtcars[, c("wt", "cyl")], rep(5, nrow(mtcars)))
+  fit <- rlang::eval_tidy(tidypredict_fit(constant), mtcars)
+  expect_length(fit, 1)
+  expect_equal(
+    rep(fit, nrow(mtcars)),
+    unname(predict(constant, mtcars)),
+    tolerance = 1e-6
+  )
+})
+
+test_that("`neighbors` is a predict-time option the formula cannot reproduce", {
+  skip_if_not_installed("Cubist")
+  # The composite of the rule model and a nearest-neighbor correction needs the
+  # training data at prediction time, so no formula can express it. The formula
+  # reproduces `neighbors = 0`, which is what `predict()` defaults to.
+  model <- Cubist::cubist(mtcars[, c("wt", "cyl", "disp")], mtcars$mpg)
+  fit <- rlang::eval_tidy(tidypredict_fit(model), mtcars)
+
+  expect_equal(
+    fit,
+    unname(predict(model, mtcars, neighbors = 0)),
+    tolerance = 1e-6
+  )
+  expect_gt(max(abs(fit - unname(predict(model, mtcars, neighbors = 5)))), 1)
+})
+
 test_that("rows exactly on a split threshold match predict() (#232)", {
   skip_if_not_installed("Cubist")
   # Cubist splits `disp` at 95.1, which is exactly the `disp` of the Lotus
