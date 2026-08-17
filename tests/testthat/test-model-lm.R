@@ -183,6 +183,103 @@ test_that("four nested prefixes and interactions between them work (#308)", {
   )
 })
 
+test_that("an unused factor level works", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    x = rnorm(60),
+    g = factor(rep(c("a", "b", "c"), length.out = 60), levels = letters[1:4])
+  )
+
+  lm_fit <- lm(y ~ x + g, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), df),
+    unname(predict(lm_fit, df))
+  )
+
+  glm_fit <- glm(y ~ x + g, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(glm_fit), df),
+    unname(predict(glm_fit, df, type = "response"))
+  )
+})
+
+test_that("an ordered factor is rejected", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    x = rnorm(60),
+    g = factor(rep(c("a", "b", "c"), length.out = 60), ordered = TRUE)
+  )
+
+  expect_snapshot(error = TRUE, tidypredict_fit(lm(y ~ x + g, data = df)))
+  expect_snapshot(error = TRUE, tidypredict_fit(glm(y ~ x + g, data = df)))
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  set.seed(1)
+  df <- data.frame(
+    y = rnorm(60),
+    x = rnorm(60),
+    g = factor(rep(c("a", "b", "c"), length.out = 60))
+  )
+  df$yb <- as.integer(df$y > 0)
+
+  na_df <- df
+  na_df$x[c(2, 5)] <- NA
+  na_df$g[c(1, 3)] <- NA
+
+  lm_fit <- lm(y ~ x + g, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), na_df),
+    unname(predict(lm_fit, na_df))
+  )
+
+  glm_fit <- glm(yb ~ x + g, data = df, family = binomial())
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(glm_fit), na_df),
+    unname(predict(glm_fit, na_df, type = "response"))
+  )
+})
+
+test_that("`NA` in the training data works", {
+  set.seed(1)
+  df <- data.frame(y = rnorm(60), x = rnorm(60), z = rnorm(60))
+  train <- df
+  train$x[1:5] <- NA
+
+  lm_fit <- lm(y ~ x + z, data = train)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(lm_fit), df),
+    unname(predict(lm_fit, df))
+  )
+})
+
+test_that("degenerate fit shapes work", {
+  set.seed(1)
+  df <- data.frame(y = rnorm(60), x = rnorm(60))
+
+  # An intercept-only fit translates to a constant, so it evaluates to length 1
+  intercept_only <- lm(y ~ 1, data = df)
+  expect_equal(
+    rep(rlang::eval_tidy(tidypredict_fit(intercept_only), df), nrow(df)),
+    unname(predict(intercept_only, df))
+  )
+
+  no_intercept <- lm(y ~ x - 1, data = df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(no_intercept), df),
+    unname(predict(no_intercept, df))
+  )
+
+  df$const <- 5
+  constant <- suppressWarnings(lm(const ~ x, data = df))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(constant), df),
+    unname(predict(constant, df))
+  )
+})
+
 test_that("logical predictors work", {
   set.seed(1)
   df <- data.frame(

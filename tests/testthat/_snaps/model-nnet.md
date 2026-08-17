@@ -5,6 +5,14 @@
     Output
       [1] "0.7 + case_when(0.1 + wt * 0.2 + hp * 0.3 < -15 ~ 0, 0.1 + wt * \n    0.2 + hp * 0.3 > 15 ~ 1, .default = 1/(1 + exp(-(0.1 + wt * \n    0.2 + hp * 0.3)))) * 0.8 + case_when(0.4 + wt * 0.5 + hp * \n    0.6 < -15 ~ 0, 0.4 + wt * 0.5 + hp * 0.6 > 15 ~ 1, .default = 1/(1 + \n    exp(-(0.4 + wt * 0.5 + hp * 0.6)))) * 0.9"
 
+# an ordered factor is rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_lm()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
 # multiple non classification outputs are rejected
 
     Code

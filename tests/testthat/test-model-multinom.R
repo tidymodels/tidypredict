@@ -72,6 +72,129 @@ test_that("interactions and weights are handled", {
   expect_equal(unname(probs), unname(predict(model, df, type = "probs")))
 })
 
+multinom_df <- function(levels_of = identity, ordered = FALSE) {
+  set.seed(1)
+  df <- data.frame(x = rnorm(200), z = rnorm(200))
+  g <- rep(c("a", "b", "c"), length.out = 200)
+  df$f <- factor(levels_of(g), ordered = ordered)
+  score <- rnorm(200) + df$x + as.numeric(factor(g))
+  df$y <- factor(ifelse(score > median(score), "hi", "lo"))
+  df$w <- rep(c(1, 3), 100)
+  df
+}
+
+test_that("awkward predictor factor levels work", {
+  skip_if_not_installed("nnet")
+
+  dfs <- list(
+    unused = transform(
+      multinom_df(),
+      f = factor(f, levels = c("a", "b", "c", "unused"))
+    ),
+    colon = multinom_df(\(g) paste0(g, ":1")),
+    # levels named after the other predictors in the data
+    colliding = multinom_df(\(g) c(a = "x", b = "z", c = "q")[g])
+  )
+
+  for (df in dfs) {
+    model <- nnet::multinom(y ~ x + z + f, data = df, trace = FALSE)
+    probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+    expect_equal(
+      unname(probs[, 2]),
+      unname(predict(model, df, type = "probs"))
+    )
+  }
+})
+
+test_that("an ordered predictor factor is rejected", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df(ordered = TRUE)
+  model <- nnet::multinom(y ~ x + f, data = df, trace = FALSE)
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
+test_that("an unused outcome level is dropped", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df()
+  df$y <- factor(df$y, levels = c("hi", "lo", "never"))
+  model <- nnet::multinom(y ~ x + z, data = df, trace = FALSE)
+
+  tf <- tidypredict_fit(model)
+  expect_named(tf, c("hi", "lo"))
+
+  probs <- sapply(tf, \(f) rlang::eval_tidy(f, df))
+  expect_equal(unname(probs[, 2]), unname(predict(model, df, type = "probs")))
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df()
+  na_df <- df
+  na_df$x[c(2, 5)] <- NA
+  na_df$f[c(1, 3)] <- NA
+
+  binary <- nnet::multinom(y ~ x + z + f, data = df, trace = FALSE)
+  probs <- sapply(tidypredict_fit(binary), \(f) rlang::eval_tidy(f, na_df))
+  expect_equal(
+    unname(probs[, 2]),
+    unname(predict(binary, na_df, type = "probs"))
+  )
+
+  na_iris <- iris
+  na_iris$Petal.Length[1:2] <- NA
+  multi <- nnet::multinom(Species ~ ., data = iris, trace = FALSE)
+  probs <- sapply(tidypredict_fit(multi), \(f) rlang::eval_tidy(f, na_iris))
+  expect_equal(
+    unname(probs),
+    unname(predict(multi, na_iris, type = "probs"))
+  )
+})
+
+test_that("`NA` in the training data works", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df()
+  train <- df
+  train$x[1:5] <- NA
+  model <- nnet::multinom(y ~ x + z, data = train, trace = FALSE)
+
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+  expect_equal(unname(probs[, 2]), unname(predict(model, df, type = "probs")))
+})
+
+test_that("weights and decay are reflected in the formula", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df()
+  models <- list(
+    nnet::multinom(y ~ x + z, data = df, weights = w, trace = FALSE),
+    nnet::multinom(y ~ x + z, data = df, decay = 0.5, trace = FALSE)
+  )
+
+  for (model in models) {
+    probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+    expect_equal(unname(probs[, 2]), unname(predict(model, df, type = "probs")))
+  }
+})
+
+test_that("an intercept-only fit works", {
+  skip_if_not_installed("nnet")
+
+  df <- multinom_df()
+  model <- nnet::multinom(y ~ 1, data = df, trace = FALSE)
+
+  # Every class probability is a constant, so each formula evaluates to length 1
+  probs <- sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))
+  expect_equal(
+    rep(unname(probs[["lo"]]), nrow(df)),
+    unname(predict(model, df, type = "probs"))
+  )
+})
+
 test_that("model can be saved and re-loaded", {
   skip_if_not_installed("nnet")
   skip_if_not_installed("yaml")

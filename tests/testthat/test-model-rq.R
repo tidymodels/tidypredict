@@ -36,19 +36,19 @@ test_that("formulas produce correct predictions", {
 test_that("works with non-default tau, method, and weights", {
   skip_if_not_installed("quantreg")
 
-  expect_type(
-    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, tau = 0.9)),
-    "language"
+  mtcars$w <- rep(c(1, 2), length.out = nrow(mtcars))
+  models <- list(
+    quantreg::rq(mpg ~ wt + cyl, data = mtcars, tau = 0.9),
+    quantreg::rq(mpg ~ wt + cyl, data = mtcars, method = "fn"),
+    quantreg::rq(mpg ~ wt + cyl, data = mtcars, weights = w)
   )
-  expect_type(
-    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, method = "fn")),
-    "language"
-  )
-  w <- rep(c(1, 2), length.out = nrow(mtcars))
-  expect_type(
-    tidypredict_fit(quantreg::rq(mpg ~ wt + cyl, data = mtcars, weights = w)),
-    "language"
-  )
+
+  for (model in models) {
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), mtcars),
+      unname(predict(model, mtcars))
+    )
+  }
 })
 
 test_that("returns one expression per quantile for multiple quantiles", {
@@ -145,5 +145,89 @@ test_that("factor predictors work", {
   expect_equal(
     rlang::eval_tidy(fit, df),
     unname(predict(model, df))
+  )
+})
+
+rq_factor_df <- function(levels = letters[1:3], ordered = FALSE) {
+  set.seed(1)
+  df <- data.frame(x = rnorm(60), z = rnorm(60))
+  g <- rep(c("a", "b", "c"), length.out = 60)
+  df$g <- factor(g, levels = levels, ordered = ordered)
+  df$y <- rnorm(60) + df$x + as.numeric(df$g)
+  df
+}
+
+test_that("an unused factor level works", {
+  skip_if_not_installed("quantreg")
+  df <- rq_factor_df(levels = letters[1:4])
+  model <- suppressWarnings(quantreg::rq(y ~ x + g, data = df))
+
+  expect_equal(
+    rlang::eval_tidy(suppressWarnings(tidypredict_fit(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("an ordered factor is rejected", {
+  skip_if_not_installed("quantreg")
+  df <- rq_factor_df(ordered = TRUE)
+  model <- suppressWarnings(quantreg::rq(y ~ x + g, data = df))
+
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
+})
+
+test_that("`NA` in newdata gives the same answer as predict()", {
+  skip_if_not_installed("quantreg")
+  df <- rq_factor_df()
+  model <- suppressWarnings(quantreg::rq(y ~ x + g, data = df))
+
+  na_df <- df
+  na_df$x[c(2, 5)] <- NA
+  na_df$g[c(1, 3)] <- NA
+
+  expect_equal(
+    rlang::eval_tidy(suppressWarnings(tidypredict_fit(model)), na_df),
+    unname(predict(model, na_df))
+  )
+})
+
+test_that("`NA` in the training data works", {
+  skip_if_not_installed("quantreg")
+  df <- rq_factor_df()
+  train <- df
+  train$x[1:5] <- NA
+  model <- suppressWarnings(quantreg::rq(y ~ x + z, data = train))
+
+  expect_equal(
+    rlang::eval_tidy(suppressWarnings(tidypredict_fit(model)), df),
+    unname(predict(model, df))
+  )
+})
+
+test_that("degenerate fit shapes work", {
+  skip_if_not_installed("quantreg")
+  df <- rq_factor_df()
+
+  # An intercept-only fit translates to a constant, so it evaluates to length 1
+  intercept_only <- suppressWarnings(quantreg::rq(y ~ 1, data = df))
+  expect_equal(
+    rep(
+      rlang::eval_tidy(suppressWarnings(tidypredict_fit(intercept_only)), df),
+      nrow(df)
+    ),
+    unname(predict(intercept_only, df))
+  )
+
+  no_intercept <- suppressWarnings(quantreg::rq(y ~ x - 1, data = df))
+  expect_equal(
+    rlang::eval_tidy(suppressWarnings(tidypredict_fit(no_intercept)), df),
+    unname(predict(no_intercept, df))
+  )
+
+  df$const <- 5
+  constant <- suppressWarnings(quantreg::rq(const ~ x, data = df))
+  expect_equal(
+    rlang::eval_tidy(suppressWarnings(tidypredict_fit(constant)), df),
+    unname(predict(constant, df))
   )
 })

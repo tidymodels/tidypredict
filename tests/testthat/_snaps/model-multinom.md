@@ -13,6 +13,14 @@
       [1] "-23.83628 + (Sepal.Length * -7.923634) + (Sepal.Width * -15.37077) + (Petal.Length * 23.65978) + (Petal.Width * 15.1353)"
       
 
+# an ordered predictor factor is rejected
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_lm()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
 # tidypredict_test errors for multinom models
 
     Code
