@@ -22,3 +22,11 @@
       ! `tidypredict_test()` does not support `sda::sda()` models.
       i Use `tidypredict_fit()` directly for multiclass predictions.
 
+# an ordered factor is rejected with parsnip (#393)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_ordered()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+

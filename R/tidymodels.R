@@ -19,6 +19,20 @@ preproc_fields <- function(labels, preproc) {
   term_fields(labels, preproc$terms, xlevels = preproc$xlevels)
 }
 
+# `sda()`, `sparsediscrim` and `mixOmics` are fit from a numeric matrix, so they
+# carry none of the contrast checks the formula models do, and none of them can
+# be handed an ordered factor directly. parsnip builds the model matrix for the
+# user, which is the one way `contr.poly` reaches these parsers: its columns are
+# named `f.L` and `f.Q`, and the level recovered from either matches no row.
+#
+# The check belongs to the parsnip dispatch rather than to `preproc_fields()`,
+# because a `sparsediscrim` formula fit supplies a `preproc` of its own, and its
+# own expansion names every column after a level whether the factor is ordered
+# or not (#393).
+acceptable_preproc <- function(model) {
+  acceptable_ordered(list(terms = model$preproc$terms))
+}
+
 #' @export
 tidypredict_fit._xgb.Booster <- function(model) {
   tidypredict_fit(model$fit)
@@ -37,6 +51,10 @@ tidypredict_fit.model_fit <- function(model) {
   # columns back onto the original factors
   if (inherits(model$fit, c("sda", sparsediscrim_classes))) {
     return(build_fit_formula_multinom(parse_model(model)))
+  }
+
+  if (inherits(model$fit, mixomics_classes)) {
+    acceptable_preproc(model)
   }
 
   # {mixOmics} models only see the model matrix, so the formula is needed to map
@@ -62,6 +80,10 @@ tidypredict_fit.model_fit <- function(model) {
 #' @export
 parse_model.model_fit <- function(model) {
   model <- glmnet_set_lambda(model)
+
+  if (inherits(model$fit, c("sda", sparsediscrim_classes, mixomics_classes))) {
+    acceptable_preproc(model)
+  }
 
   if (inherits(model$fit, "sda")) {
     return(parse_model_sda(model$fit, parsnip_vars(model), model$preproc))

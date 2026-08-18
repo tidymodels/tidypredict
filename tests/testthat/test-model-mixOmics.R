@@ -194,22 +194,14 @@ test_that("a factor level containing a colon is handled with parsnip", {
   )
 })
 
-test_that("an ordered factor is silently wrong with parsnip", {
+test_that("an ordered factor is rejected with parsnip (#393)", {
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
-  skip(
-    "The parsnip path passes a model matrix built with `contr.poly`, whose
-     columns `f.L` and `f.Q` are read as levels of `f`. The generated formula
-     compares `f` against level names that never match and the predictions are
-     off by up to 1.34."
-  )
+
   df <- mixomics_factor_data(c("p", "q", "r"), ordered = TRUE)
   model <- parsnip::fit(mixomics_reg_spec(), y ~ x + x2 + f, df)
 
-  expect_equal(
-    rlang::eval_tidy(tidypredict_fit(model), df),
-    predict(model, df)$.pred
-  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
 test_that("an unused factor level errors instead of predicting", {

@@ -10,6 +10,8 @@
 
 - `acceptable_formula()` no longer rejects a `MASS::lda()`, `MASS::qda()` or `earth::earth()` fit whose factor has a level containing a colon. The contrast check split the model matrix column names on `:` to find interactions, so such a level looked like one and the fit was refused as using an unsupported contrast; the check now decomposes each column against the model's own term structure. (#391)
 
+- `parse_model()` and `tidypredict_fit()` now reject an ordered predictor in a parsnip fit whose engine is `sda`, `sparsediscrim` or `mixOmics`, with the same "the treatment contrast is the only one supported" error that `MASS::lda()`, `MASS::qda()` and `mda::fda()` already gave. parsnip builds the model matrix with `contr.poly`, whose `.L` and `.Q` columns were read as level names, so the predictions were silently wrong by as much as 1.34. (#393)
+
 - `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
