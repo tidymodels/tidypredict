@@ -13,6 +13,15 @@
       [1] "-258.6928 + (Sepal.Length * 25.36695) + (Sepal.Width * 26.29996) + (Petal.Length * 30.59223) + (Petal.Width * 49.36166)"
       
 
+# a colliding model matrix column is rejected (#398)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model_sparsediscrim()`:
+      x Two predictors expanded into the same model matrix column "gy2".
+      i `sparsediscrim::predict()` cannot tell them apart either. Rename the predictor or the factor level it collides with.
+
 # an ordered factor is rejected with parsnip (#393)
 
     Code

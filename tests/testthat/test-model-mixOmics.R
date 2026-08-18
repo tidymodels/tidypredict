@@ -204,15 +204,10 @@ test_that("an ordered factor is rejected with parsnip (#393)", {
   expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
-test_that("an unused factor level errors instead of predicting", {
+test_that("an unused factor level matches predict() (#398)", {
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
-  skip(
-    "An unused level expands into a constant dummy column, which `mixOmics`
-     gives an `NA` loading. `predict()` copes and returns a number, but
-     `tidypredict_fit()` fails with `missing value where TRUE/FALSE needed`
-     from the `coef == 0` test that drops zero terms."
-  )
+
   df <- mixomics_factor_data(c("p", "q", "r"))
   df$f <- factor(df$f, levels = c("p", "q", "r", "unused"))
   model <- suppressWarnings(
@@ -225,14 +220,9 @@ test_that("an unused factor level errors instead of predicting", {
   )
 })
 
-test_that("newdata containing NA disagrees with predict()", {
+test_that("newdata containing NA matches predict() (#398)", {
   skip_if_not_installed("mixOmics")
-  skip(
-    "`predict.mixo_pls()` fills a missing predictor in rather than propagating
-     it, so it returns 22.13 for a row whose `disp` is `NA` while the generated
-     formula returns `NA`. Every other supported model either propagates the
-     `NA` or drops the row."
-  )
+
   x <- as.matrix(mtcars[c("disp", "hp", "drat")])
   model <- mixOmics::pls(x, mtcars$mpg, ncomp = 2)
 

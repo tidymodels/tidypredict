@@ -698,5 +698,12 @@ lm_constructor <- function(x) {
       ))
     }
   }
+
+  # A model whose `predict()` fills a missing predictor in rather than
+  # propagating it records what it fills in with, so that the formula agrees
+  # (#398). Every other model leaves this unset and is untouched.
+  if (!is.null(f) && !is.null(x$na_val)) {
+    f <- expr(ifelse(is.na(!!as.name(x$col)), !!x$na_val, !!f))
+  }
   f
 }

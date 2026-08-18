@@ -183,16 +183,9 @@ test_that("newdata containing NA matches predict()", {
   expect_equal(unname(probs), unname(native))
 })
 
-test_that("a coefficient label colliding with a variable name is wrong (#376)", {
+test_that("a colliding model matrix column is rejected (#398)", {
   skip_if_not_installed("sparsediscrim")
-  skip(
-    "The formula method expands every level into a column named `g` plus the
-     level, so a level named `y2` produces the column `gy2`, which collides
-     with the predictor `gy2` and gives `col_names` a duplicate. The generated
-     formula reuses the wrong coefficient and the probabilities are off by up
-     to 0.84. The same fit was corrected for `lda`, `qda`, `fda`, `sda` and
-     `ksvm` in #376."
-  )
+
   set.seed(1)
   df <- data.frame(
     g = factor(rep(c("x1", "y2", "z3"), length.out = 60)),
@@ -202,10 +195,9 @@ test_that("a coefficient label colliding with a variable name is wrong (#376)", 
 
   model <- sparsediscrim::lda_diag(cls ~ g + gy2, df)
 
-  expect_equal(
-    unname(sparsediscrim_probs(model, df)),
-    unname(as.matrix(predict(model, df, type = "prob")))
-  )
+  # `predict()` selects the duplicated `gy2` column twice and never sees the
+  # predictor, so it disagrees with the fit it came from.
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
 test_that("an ordered factor is rejected with parsnip (#393)", {
