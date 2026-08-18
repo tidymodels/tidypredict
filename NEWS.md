@@ -14,6 +14,8 @@
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
 
+- `tidypredict_fit()` now works on a LightGBM model whose trees are bare leaves, which is what LightGBM emits when it cannot make a single split, such as with a constant outcome, a single training row, or a lone factor predictor whose splits the categorical guards reject. `lightgbm::lgb.model.dt.tree()` reports no rows at all for such a tree, so the model parsed to no trees and failed with "Model has no trees."; the leaf values are now read from the model's JSON dump. A multiclass model in which only some trees are bare leaves silently assigned trees to the wrong classes, and now matches `predict()`. (#401)
+
 - `parse_model()` now aborts on a `kernlab::ksvm()` model with a factor level that is not a syntactic name, such as `c:d`. `ksvm()` only keeps the `make.names()` form of its model matrix column names, so the level was read back as `c.d` and the formula compared against a value that matches no row, silently dropping that dummy term from the prediction. (#390)
 
 - `tidypredict_fit()` now returns predictions on the response scale for CatBoost models fit with the `Poisson` or `Tweedie` objective, applying `exp()` to the raw score as the other CatBoost objectives already invert their own links. Anyone using such a model will see their predictions change from the log scale to the count or mean scale; they now match `catboost.predict(prediction_type = "Exponent")` instead of the `"RawFormulaVal"` default. (#356)
