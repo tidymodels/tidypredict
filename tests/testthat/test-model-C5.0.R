@@ -568,6 +568,35 @@ test_that("NA in a factor predictor matches predict() (#387)", {
   )
 })
 
+test_that("class probabilities with NA in newdata match predict() (#417)", {
+  skip_if_not_installed("C50")
+  set.seed(51)
+  n <- 400
+  df <- data.frame(
+    v1 = rnorm(n),
+    v2 = rnorm(n),
+    f1 = factor(sample(letters[1:4], n, TRUE))
+  )
+  lp <- df$v1 - 2 * df$v2 + 0.7 * as.integer(df$f1) + rnorm(n)
+  df$g <- factor(c("A", "B", "C")[cut(lp, 3, labels = FALSE)])
+  model <- C50::C5.0(g ~ ., data = df)
+
+  nd <- df
+  for (col in c("v1", "v2", "f1")) {
+    nd[[col]][sample(n, 60)] <- NA
+  }
+  expected <- predict(model, nd, type = "prob")
+
+  tree_info <- c50_classprob_tree_info(model)
+  for (cl in colnames(expected)) {
+    expect_equal(
+      rlang::eval_tidy(classprob_tree_expr(tree_info[[cl]]), nd),
+      unname(expected[, cl]),
+      tolerance = 1e-6
+    )
+  }
+})
+
 test_that("values on a cut boundary match C5.0's float comparison (#287)", {
   set.seed(3)
   n <- 600
