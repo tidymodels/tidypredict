@@ -270,22 +270,29 @@ ksvm_matrix_fit <- function(cols, ...) {
   )
 }
 
-test_that("a matrix column that is not a syntactic name errors (#418)", {
+test_that("matrix columns containing a dot match predict() (#418)", {
   skip_if_not_installed("kernlab")
 
-  fit <- ksvm_matrix_fit(c("a:b", "cd"))
-  expect_snapshot(error = TRUE, tidypredict_fit(fit$model))
+  # `make.names()` leaves a syntactic name such as `Sepal.Length` alone, so a
+  # dot in a matrix column name is not evidence that anything was mangled.
+  x <- as.matrix(iris[1:100, c(1, 3, 4)])
+  set.seed(1)
+  model <- kernlab::ksvm(x, iris[1:100, 2], kernel = "vanilladot")
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), as.data.frame(x)),
+    as.numeric(kernlab::predict(model, x)),
+    tolerance = 1e-10
+  )
 
-  fit <- ksvm_matrix_fit(c("a b", "cd"))
-  expect_error(tidypredict_fit(fit$model), "Unable to recover the predictor")
-
-  # Two columns that mangle to the same name, which `ksvm()` then disambiguates
-  # with a `.1` suffix.
-  fit <- ksvm_matrix_fit(c("a.b", "a:b"))
-  expect_error(tidypredict_fit(fit$model), "Unable to recover the predictor")
+  fit <- ksvm_matrix_fit(c("a.b", "a.b.1"))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(fit$model), fit$df),
+    as.numeric(kernlab::predict(fit$model, as.matrix(fit$df))),
+    tolerance = 1e-10
+  )
 })
 
-test_that("syntactic matrix columns still match predict() (#418)", {
+test_that("syntactic matrix columns match predict() (#418)", {
   skip_if_not_installed("kernlab")
 
   fit <- ksvm_matrix_fit(c("a_b", "cd"))

@@ -35,13 +35,3 @@
       i `kernlab::ksvm()` only keeps the `make.names()` form of the model matrix column names, so a level containing "." cannot be told apart from a level such as "a:b" that mangles to the same name.
       i Rename the factor levels to syntactic names before fitting.
 
-# a matrix column that is not a syntactic name errors (#418)
-
-    Code
-      tidypredict_fit(fit$model)
-    Condition
-      Error in `parse_model()`:
-      x Unable to recover the predictor name behind "a.b".
-      i `kernlab::ksvm()` only keeps the `make.names()` form of the model matrix column names, so a column containing "." cannot be told apart from a column such as "a:b" that mangles to the same name.
-      i Rename the columns to syntactic names before fitting, or use the formula interface.
-

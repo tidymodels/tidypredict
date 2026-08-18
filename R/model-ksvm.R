@@ -57,9 +57,6 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
   }
   weights <- as.numeric(crossprod(sv, cf))
   names(weights) <- ksvm_feature_names(sv, terms_obj, call = call)
-  if (is.null(terms_obj)) {
-    ksvm_check_columns(names(weights), call = call)
-  }
   bias <- as.numeric(kernlab::b(model))
 
   # kernlab scales predictors before fitting. Undo the scaling so the weights
@@ -193,34 +190,20 @@ ksvm_check_levels <- function(fields, call = rlang::caller_env()) {
 }
 
 # The same `data.frame(y, x)` mangling hits the column names of a model fitted
-# through the matrix interface. There the fitted object carries no `terms`
-# object to compare against, and no other slot keeps the original names:
-# `xmatrix` and `scaling$x.scale` both record the `make.names` form, `lev` is
-# the response, and `kcall` does not store the data. A column that reads back
-# containing a `.` therefore cannot be told apart from the names that mangle to
-# it, so the formula written out would reference a column the data does not
-# have. `make.names()` is the identity on syntactic names, so models whose
-# columns were already syntactic are untouched.
-ksvm_check_columns <- function(features, call = rlang::caller_env()) {
-  bad <- unique(features[grepl(".", features, fixed = TRUE)])
-  if (length(bad) == 0) {
-    return(invisible())
-  }
-
-  cli::cli_abort(
-    c(
-      x = "Unable to recover the predictor name{?s} behind {.val {bad}}.",
-      i = "{.fun kernlab::ksvm} only keeps the {.fun make.names} form of the
-      model matrix column names, so a column containing {.val .} cannot be told
-      apart from a column such as {.val {gsub('.', ':', bad[[1]], fixed = TRUE)}}
-      that mangles to the same name.",
-      i = "Rename the columns to syntactic names before fitting, or use the
-      formula interface."
-    ),
-    call = call
-  )
-}
-
+# through the matrix interface, where there is no `terms` object to compare
+# against. That case is deliberately not checked for, and the check must not be
+# added back: it cannot be done without rejecting correct models.
+#
+# `make.names(unique = TRUE)` is the identity on names that are already
+# syntactic and distinct, and every name it produces is itself syntactic and
+# distinct. Its image is therefore contained in its fixed points, so every
+# mangled name we could read back is also a name a user could legitimately have
+# passed in unchanged. `a:b, a.b` mangles to `a.b.1, a.b`, which is exactly what
+# the untouched columns `a.b.1, a.b` produce; `a, a` mangles to `a, a.1`, which
+# is what the untouched `a, a.1` produce. Even a `make.unique` suffix is not
+# evidence, and neither is a `.`: `Sepal.Length` is a fixed point and such a
+# model is correct today. Nothing in the names distinguishes the broken case
+# from the working one, so any check here is a false abort on working code.
 ksvm_feature_names <- function(sv, terms_obj, call = rlang::caller_env()) {
   features <- colnames(sv)
   if (!is.null(features)) {
