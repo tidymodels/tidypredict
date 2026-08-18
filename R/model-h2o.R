@@ -196,7 +196,11 @@ tidypredict_test.H2OMultinomialModel <- function(
     cbind,
     map(formulas, \(f) rlang::eval_tidy(f, df))
   )
-  base_matrix <- as.matrix(preds[, domain, drop = FALSE])
+  # H2O does not always name the probability columns after the domain levels;
+  # a level that is not a syntactic name gets a "p" prefix. The columns follow
+  # the "predict" column in domain order, so select them positionally.
+  prob_cols <- setdiff(names(preds), "predict")
+  base_matrix <- as.matrix(preds[, prob_cols, drop = FALSE])
 
   test_results_multiclass(base_matrix, te_matrix, threshold, domain)
 }
