@@ -62,6 +62,7 @@ parse_model_mixomics <- function(
   labels <- rownames(coefs)
   outcomes <- colnames(coefs)
   fields <- preproc_fields(labels, preproc)
+  center <- attr(coefs, "center")
 
   if (inherits(model, "DA")) {
     # `predict()` returns one linear predictor per class, which {plsmod} turns
@@ -69,7 +70,8 @@ parse_model_mixomics <- function(
     class_terms <- lapply(
       outcomes,
       function(outcome) {
-        build_terms(coefs[, outcome], labels, vars, fields = fields)
+        terms <- build_terms(coefs[, outcome], labels, vars, fields = fields)
+        mixomics_impute(terms, center)
       }
     )
 
@@ -94,7 +96,8 @@ parse_model_mixomics <- function(
       pm$general$type <- "regression"
       pm$general$is_glm <- 0
       pm$general$ncomp <- model$ncomp
-      pm$terms <- build_terms(coefs[, outcome], labels, vars, fields = fields)
+      terms <- build_terms(coefs[, outcome], labels, vars, fields = fields)
+      pm$terms <- mixomics_impute(terms, center)
       as_parsed_model(pm)
     }
   )
@@ -104,6 +107,28 @@ parse_model_mixomics <- function(
   }
 
   set_names(pms, outcomes)
+}
+
+# Record, on every term that reads a single column, the value `predict()` fills
+# that column in with when it is missing.
+#
+# `predict.mixo_pls()` centers and scales `newdata` and then replaces every
+# missing value with zero, which puts the predictor back at its training mean
+# rather than propagating the `NA` (#398). A term built from more than one
+# column is an interaction, where the mean of the product is not the product of
+# the means, so it is left alone.
+mixomics_impute <- function(terms, center) {
+  map(terms, function(term) {
+    if (term$is_intercept == 1 || length(term$fields) != 1) {
+      return(term)
+    }
+    val <- center[[term$label]]
+    if (is.null(val) || is.na(val)) {
+      return(term)
+    }
+    term$fields[[1]]$na_val <- val
+    term
+  })
 }
 
 # Reproduces the coefficients that `predict.mixo_pls()` applies to `newdata`,
@@ -132,12 +157,23 @@ mixomics_coefs <- function(model, call = rlang::caller_env()) {
   center_y <- attr(y, "scaled:center") %||% rep(0, ncol(y))
   scale_y <- attr(y, "scaled:scale") %||% rep(1, ncol(y))
 
+  # A predictor that never varied, which is what an unused factor level expands
+  # into, has a scale of zero and so a coefficient of `Inf` or `NaN`. `predict()`
+  # rescales it to `NaN` too and then zeroes it along with any other missing
+  # value, so the column contributes nothing (#398).
+  constant <- scale_x == 0
+  scale_x[constant] <- 1
+
   coefs <- sweep(b_hat / scale_x, 2, scale_y, "*")
+  coefs[constant, ] <- 0
   intercept <- center_y - colSums(coefs * center_x)
 
   coefs <- rbind(intercept, coefs)
   rownames(coefs) <- c("(Intercept)", colnames(x))
   colnames(coefs) <- colnames(y)
+  # `predict()` scales `newdata` and then replaces every missing value with
+  # zero, which is the same as filling the predictor in at its training mean.
+  attr(coefs, "center") <- set_names(as.numeric(center_x), colnames(x))
   coefs
 }
 
