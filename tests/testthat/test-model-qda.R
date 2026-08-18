@@ -198,15 +198,8 @@ test_that("training data containing NA matches predict()", {
   expect_equal(unname(probs), unname(predict(model, complete)$posterior))
 })
 
-test_that("a factor level containing a colon is wrongly rejected", {
+test_that("a factor level containing a colon matches predict() (#391)", {
   skip_if_not_installed("MASS")
-  skip(
-    "`acceptable_contrasts()` splits the column names on `:` before matching
-     them against the levels, so a level named `c:d` is read as the level `c`
-     of an unknown variable and the fit is rejected as a non-treatment
-     contrast. Bypassing the check makes the parse agree with `predict()` to
-     3e-16."
-  )
   set.seed(1)
   d <- data.frame(
     x = rnorm(90),

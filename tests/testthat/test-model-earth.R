@@ -322,17 +322,15 @@ test_that("a factor level colliding with a variable name works", {
   )
 })
 
-test_that("a factor level containing a colon is rejected", {
+test_that("a factor level containing a colon matches predict() (#391)", {
   skip_if_not_installed("earth")
-  # `earth` names the model matrix column `fb:1`, which `acceptable_lm()` reads
-  # as an interaction term and so reports as an unsupported contrast. `predict()`
-  # handles the fit fine, so this rejection is a false negative.
   d <- earth_factor_data(ordered = FALSE)
   d$f <- factor(paste0(as.character(d$f), ":1"))
+  model <- earth::earth(y ~ x + z + f, data = d)
 
-  expect_snapshot(
-    tidypredict_fit(earth::earth(y ~ x + z + f, data = d)),
-    error = TRUE
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), d),
+    as.numeric(predict(model, d))
   )
 })
 
