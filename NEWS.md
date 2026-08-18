@@ -30,6 +30,8 @@
 
 - `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
 
+- `tidypredict_fit()` now follows the per-node missing value direction a `ranger::ranger()` model learns when its training data contains `NA`. Since ranger 0.17.0 the default `na.action = "na.learn"` picks a side for missing values at each node it saw one at and saves it for prediction, but the generated formula always sent them left, so rows with `NA` could be predicted at the wrong leaf. (#394)
+
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 
 - `tidypredict_interval()` now reports a parsed model of a type it does not support with the same message it gives for a fitted model, rather than "Model type not supported.", and reports a list that is not a parsed model rather than failing with "argument is of length zero". (#313)

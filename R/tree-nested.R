@@ -155,14 +155,15 @@ build_nested_node <- function(node_id, tree_info, missing = "default") {
   }
 
   # `ranger` compares as `value > splitval`, which is false for a missing
-  # value, so the row takes the left branch. A split that instead indexes a
-  # bitmask by level position records the level a missing value collapses to,
-  # and follows that level rather than a fixed side.
+  # value, so the row takes the left branch, unless the node learned a
+  # direction for missing values and it points right. A split that instead
+  # indexes a bitmask by level position records the level a missing value
+  # collapses to, and follows that level rather than a fixed side.
   if (missing == "left") {
     primary <- split_info$primary
     missing_level <- primary$missing_level
-    goes_left <- is.null(missing_level) ||
-      missing_level %in% unlist(primary$vals)
+    goes_left <- !isTRUE(primary$missing_right) &&
+      (is.null(missing_level) || missing_level %in% unlist(primary$vals))
     if (goes_left) {
       condition <- expr(!!build_nested_split_missing(primary) | !!condition)
     }

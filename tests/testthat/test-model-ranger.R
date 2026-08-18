@@ -904,15 +904,48 @@ test_that("a forest of stumps matches predict()", {
 
 test_that("a forest trained on data containing NA matches predict()", {
   skip_if_not_installed("ranger")
-  skip(
-    "ranger routes NA per node when the training data is incomplete, but the
-     generated formula always sends NA left."
-  )
 
   df <- mtcars
   df$wt[c(2, 5)] <- NA
   set.seed(9)
   model <- ranger::ranger(mpg ~ wt + hp, data = df, num.trees = 10)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    predict(model, df)$predictions
+  )
+
+  df2 <- mtcars
+  df2$wt[c(1, 3, 9)] <- NA
+  df2$hp[c(4, 7)] <- NA
+  df2$disp[c(2, 20)] <- NA
+  for (depth in c(2, 4, 10)) {
+    set.seed(3)
+    model <- ranger::ranger(
+      mpg ~ wt + hp + disp + drat,
+      data = df2,
+      num.trees = 25,
+      max.depth = depth
+    )
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(model), df2),
+      predict(model, df2)$predictions
+    )
+    expect_equal(
+      tidypredict_to_column(df2, parse_model(model))$fit,
+      predict(model, df2)$predictions
+    )
+  }
+})
+
+test_that("a forest trained on NA with factor predictors matches predict()", {
+  skip_if_not_installed("ranger")
+
+  df <- iris
+  df$Sepal.Width[c(1, 50, 100)] <- NA
+  df$Petal.Length[c(5, 60)] <- NA
+  set.seed(4)
+  model <- ranger::ranger(Sepal.Length ~ ., data = df, num.trees = 30)
 
   expect_equal(
     rlang::eval_tidy(tidypredict_fit(model), df),
