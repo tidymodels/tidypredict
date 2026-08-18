@@ -18,11 +18,15 @@
 
 - `parse_model()` now aborts on a `kernlab::ksvm()` model with a factor level that is not a syntactic name, such as `c:d`. `ksvm()` only keeps the `make.names()` form of its model matrix column names, so the level was read back as `c.d` and the formula compared against a value that matches no row, silently dropping that dummy term from the prediction. (#390)
 
+- `parse_model()` now aborts on a `baguette::bagger()` ensemble of C5.0 models fitted with `fuzzyThreshold = TRUE`. Fuzzy thresholds send a case near a split point partly down both branches, which a hard `<=` comparison cannot express, and baguette runs its base fits through `butcher()`, which empties the `control` element the existing check read; the option is now detected from the tree itself. (#395)
+
 - `parse_model()` now maps the dummy columns of an `xrf::xrf()` model against the model matrix the fit was built from. A dummy column whose name matched a separate predictor, such as a `cyl4` dummy of a factor `cyl` alongside a column literally named `cyl4`, was read as that predictor, so the formula multiplied a factor by a coefficient and every prediction came back as `NA`. (#396)
 
 - `tidypredict_fit()` now returns predictions on the response scale for CatBoost models fit with the `Poisson` or `Tweedie` objective, applying `exp()` to the raw score as the other CatBoost objectives already invert their own links. Anyone using such a model will see their predictions change from the log scale to the count or mean scale; they now match `catboost.predict(prediction_type = "Exponent")` instead of the `"RawFormulaVal"` default. (#356)
 
 - `tidypredict_fit()` now returns one prediction per row for a `ranger::ranger()`, `xgboost`, `baguette::bagger()`, or `xrf::xrf()` model in which every tree collapsed to a single leaf, or in which the lasso kept only the intercept. Such a model produced a formula that mentioned no column at all, so evaluating it returned a single value rather than one per row. The value was always correct; only its length was wrong. (#397)
+
+- `tidypredict_fit()` now applies the bias correction of a `randomForest::randomForest()` model fitted with `corr.bias = TRUE`. `predict()` rescales the forest average by the two coefficients stored in `model$coefs`, which the parser never read, so the predictions were off by as much as 0.21 for a model of `mpg` on `mtcars`. (#395)
 
 - `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
 

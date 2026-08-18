@@ -73,3 +73,19 @@
       Error in `parse_model()`:
       ! tidypredict does not support C5.0 models fitted with a cost matrix (`costs`).
 
+# C5.0 fuzzyThreshold aborts
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `parse_model()`:
+      ! tidypredict does not support C5.0 models with fuzzy thresholds (`fuzzyThreshold = TRUE`).
+
+---
+
+    Code
+      parse_model(model)
+    Condition
+      Error in `parse_model()`:
+      ! tidypredict does not support C5.0 models with fuzzy thresholds (`fuzzyThreshold = TRUE`).
+

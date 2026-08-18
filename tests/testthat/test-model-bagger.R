@@ -639,13 +639,9 @@ test_that("C5.0 tree-shaping arguments are respected", {
   }
 })
 
-test_that("C5.0 fuzzyThreshold is respected", {
+test_that("C5.0 fuzzyThreshold aborts", {
   skip_if_not_installed("baguette")
   skip_if_not_installed("C50")
-  skip(
-    "C5.0 soft thresholds average the two branches near a split point, but the
-     generated formula treats every split as a hard threshold."
-  )
 
   set.seed(100)
   model <- baguette::bagger(
@@ -656,8 +652,6 @@ test_that("C5.0 fuzzyThreshold is respected", {
     fuzzyThreshold = TRUE
   )
 
-  expect_equal(
-    rlang::eval_tidy(tidypredict_fit(model), iris),
-    as.character(predict(model, iris)$.pred_class)
-  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
+  expect_snapshot(parse_model(model), error = TRUE)
 })
