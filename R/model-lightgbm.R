@@ -178,6 +178,7 @@ get_lgb_trees <- function(model, linear_info = list()) {
   trees_df <- lightgbm::lgb.model.dt.tree(model)
   trees_df <- as.data.frame(trees_df)
   trees_df <- add_lgb_missing_type(trees_df, model)
+  trees_df <- add_lgb_stump_trees(trees_df, model)
 
   # Check for unsupported decision types
   decision_types <- unique(trees_df$decision_type[
@@ -234,6 +235,41 @@ add_lgb_missing_type <- function(trees_df, model) {
   trees_df$missing_type <- unname(
     lookup[paste(trees_df$tree_index, trees_df$split_index)]
   )
+  trees_df
+}
+
+# Add back the trees that `lgb.model.dt.tree()` drops.
+#
+# When LightGBM cannot make a split it emits a tree that is a bare leaf, and
+# `lgb.model.dt.tree()` reports no rows at all for such a tree. The leaf value
+# is still in the JSON dump, so each dropped tree is rebuilt here as the single
+# leaf row the rest of the parser expects. If no split is ever possible
+# LightGBM halts after one iteration and every tree is a stump, leaving
+# `trees_df` empty.
+add_lgb_stump_trees <- function(trees_df, model) {
+  dump <- jsonlite::fromJSON(model$dump_model(), simplifyVector = FALSE)
+
+  stumps <- Filter(
+    \(tree) is.null(tree$tree_structure$split_index),
+    dump$tree_info
+  )
+  if (length(stumps) == 0) {
+    return(trees_df)
+  }
+
+  rows <- map(stumps, function(tree) {
+    row <- trees_df[NA_integer_, , drop = FALSE]
+    row$tree_index <- as.integer(tree$tree_index)
+    row$depth <- 0L
+    row$leaf_index <- 0L
+    row$leaf_value <- as.numeric(tree$tree_structure$leaf_value)
+    row$leaf_count <- as.integer(tree$tree_structure$leaf_count)
+    row
+  })
+
+  trees_df <- do.call(rbind, c(list(trees_df), rows))
+  trees_df <- trees_df[order(trees_df$tree_index), , drop = FALSE]
+  rownames(trees_df) <- NULL
   trees_df
 }
 
@@ -650,16 +686,25 @@ assemble_lgb_formula <- function(parsedmodel, build_trees) {
 
   trees <- build_trees()
 
+  # A model of stumps mentions no column, so anchor it to one. The feature
+  # names recorded at parse time are the columns `newdata` has to supply.
+  recycle <- function(f) {
+    expr_recycle_over_column(f, parsedmodel$general$feature_names)
+  }
+
   if (objective %in% lgb_multiclass_objectives) {
     num_class <- parsedmodel$general$num_class
     if (is.null(num_class) || num_class < 2) {
       cli::cli_abort("Multiclass model must have num_class >= 2.")
     }
-    return(apply_lgb_multiclass_transformation(
-      trees,
-      num_class,
-      objective,
-      parsedmodel$general$params$sigmoid %||% 1
+    return(map(
+      apply_lgb_multiclass_transformation(
+        trees,
+        num_class,
+        objective,
+        parsedmodel$general$params$sigmoid %||% 1
+      ),
+      recycle
     ))
   }
 
@@ -671,7 +716,7 @@ assemble_lgb_formula <- function(parsedmodel, build_trees) {
     f <- expr_division(f, n_trees)
   }
 
-  apply_lgb_objective(f, objective, parsedmodel$general$params)
+  recycle(apply_lgb_objective(f, objective, parsedmodel$general$params))
 }
 
 # Build condition for lightgbm nested generation from path element
@@ -711,6 +756,7 @@ extract_lgb_trees_nested <- function(
   trees_df <- lightgbm::lgb.model.dt.tree(model)
   trees_df <- as.data.frame(trees_df)
   trees_df <- add_lgb_missing_type(trees_df, model)
+  trees_df <- add_lgb_stump_trees(trees_df, model)
 
   # Extract linear tree info (only if not provided)
   if (is.null(feature_names)) {

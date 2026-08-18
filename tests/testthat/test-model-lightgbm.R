@@ -320,27 +320,117 @@ test_that("deeper tree paths are traced correctly", {
   expect_equal(tree_result[[3]]$path[[2]]$missing, TRUE) # went right, default_left FALSE
 })
 
-test_that("single leaf tree (stump) has empty path", {
-  # Edge case: tree with only a root leaf (no splits)
-  tree_df <- data.frame(
-    tree_index = 0L,
-    split_index = NA_integer_,
-    split_feature = NA_character_,
-    node_parent = NA_integer_,
-    leaf_index = 0L,
-    leaf_parent = NA_integer_,
-    threshold = NA_real_,
-    decision_type = NA_character_,
-    default_left = NA_character_,
-    leaf_value = 42.0,
-    stringsAsFactors = FALSE
+# LightGBM halts after one iteration when it cannot make a split, and
+# `lgb.model.dt.tree()` reports no rows at all for the resulting bare-leaf
+# trees, so these models have to be rebuilt from the JSON dump.
+make_lgb_stump_model <- function(label, params = list()) {
+  set.seed(123)
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+  params <- utils::modifyList(
+    list(
+      num_leaves = 4L,
+      learning_rate = 0.3,
+      objective = "regression",
+      min_data_in_leaf = 1L
+    ),
+    params
+  )
+  dtrain <- lightgbm::lgb.Dataset(X, label = label, params = params)
+  lightgbm::lgb.train(
+    params = params,
+    data = dtrain,
+    nrounds = 3L,
+    verbose = -1L
+  )
+}
+
+test_that("a model of stumps matches predict()", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_stump_model(rep(5, nrow(mtcars)))
+
+  expect_equal(nrow(lightgbm::lgb.model.dt.tree(model)), 0)
+  expect_length(parse_model(model)$trees, 1)
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    predict(model, data.matrix(mtcars[, c("mpg", "cyl", "disp")])),
+    ignore_attr = TRUE
+  )
+})
+
+test_that("a parsed model of stumps matches predict()", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_stump_model(rep(5, nrow(mtcars)))
+  pm <- as_parsed_model(yaml::yaml.load(yaml::as.yaml(parse_model(model))))
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(pm), mtcars),
+    predict(model, data.matrix(mtcars[, c("mpg", "cyl", "disp")])),
+    ignore_attr = TRUE
+  )
+})
+
+test_that("a single training row matches predict()", {
+  skip_if_not_installed("lightgbm")
+  X <- data.matrix(mtcars[1, c("mpg", "cyl", "disp")])
+  params <- list(
+    num_leaves = 4L,
+    learning_rate = 0.3,
+    objective = "regression",
+    min_data_in_leaf = 1L
+  )
+  model <- lightgbm::lgb.train(
+    params = params,
+    data = lightgbm::lgb.Dataset(X, label = 3, params = params),
+    nrounds = 3L,
+    verbose = -1L
   )
 
-  tree_result <- tidypredict:::get_lgb_tree(tree_df)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), mtcars[1, ]),
+    predict(model, X),
+    ignore_attr = TRUE
+  )
+})
 
-  expect_length(tree_result, 1)
-  expect_equal(tree_result[[1]]$prediction, 42.0)
-  expect_length(tree_result[[1]]$path, 0) # No conditions for root leaf
+test_that("a multiclass model with stump trees matches predict()", {
+  skip_if_not_installed("lightgbm")
+  # No row has the third class, so its trees are stumps while the others split.
+  model <- make_lgb_stump_model(
+    rep(c(0, 1), each = nrow(mtcars) / 2),
+    list(objective = "multiclass", num_class = 3L)
+  )
+  X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
+
+  expect_lt(
+    length(unique(lightgbm::lgb.model.dt.tree(model)$tree_index)),
+    3 * model$current_iter()
+  )
+
+  fit <- tidypredict_fit(model)
+  got <- vapply(fit, \(e) rlang::eval_tidy(e, mtcars), double(nrow(mtcars)))
+  expect_equal(unname(got), predict(model, X), ignore_attr = TRUE)
+})
+
+test_that("a bonsai fit on a lone factor matches predict()", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("bonsai")
+  set.seed(4)
+  data <- data.frame(x = factor(rep(letters[1:4], each = 5)), y = rnorm(20))
+  fit <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::boost_tree(trees = 5, tree_depth = 3, min_n = 1),
+      "lightgbm"
+    ) |>
+      parsnip::set_mode("regression"),
+    y ~ x,
+    data = data
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(fit), data),
+    predict(fit, data)$.pred
+  )
 })
 
 test_that("mixed default_left values in same tree are handled correctly", {
