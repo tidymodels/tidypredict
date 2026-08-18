@@ -163,9 +163,26 @@ formula. The decision tree becomes a nested
 <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 6.00000023841858 ~ case_when(cyl &lt;= 4.00000023841858 ~ </span></span>
-<span><span class="co">#&gt;     "1", .default = case_when(wt &lt;= 2.87500011920929 ~ "0", .default = "1")), </span></span>
-<span><span class="co">#&gt;     .default = "0")</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(is.na(wt) | is.na(cyl) ~ case_when(case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.5625, cyl &lt;= 6.00000023841858 ~ 1, .default = 0) * (case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.611111111111111, cyl &lt;= 4.00000023841858 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0.0909090909090909 + (1 - case_when(is.na(cyl) ~ 0.611111111111111, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 4.00000023841858 ~ 1, .default = 0)) * (case_when(is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     0.428571428571429, wt &lt;= 2.87500011920929 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     1 + (1 - case_when(is.na(wt) ~ 0.428571428571429, wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;     1, .default = 0)) * 0)) + (1 - case_when(is.na(cyl) ~ 0.5625, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 6.00000023841858 ~ 1, .default = 0)) * 1 &gt;= case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.5625, cyl &lt;= 6.00000023841858 ~ 1, .default = 0) * (case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.611111111111111, cyl &lt;= 4.00000023841858 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0.909090909090909 + (1 - case_when(is.na(cyl) ~ 0.611111111111111, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 4.00000023841858 ~ 1, .default = 0)) * (case_when(is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     0.428571428571429, wt &lt;= 2.87500011920929 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0 + (1 - case_when(is.na(wt) ~ 0.428571428571429, wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;     1, .default = 0)) * 1)) + (1 - case_when(is.na(cyl) ~ 0.5625, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 6.00000023841858 ~ 1, .default = 0)) * 0 ~ "0", .default = "1"), </span></span>
+<span><span class="co">#&gt;     .default = case_when(cyl &lt;= 6.00000023841858 ~ case_when(cyl &lt;= </span></span>
+<span><span class="co">#&gt;         4.00000023841858 ~ "1", .default = case_when(wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;         "0", .default = "1")), .default = "0"))</span></span></code></pre></div>
 <p>From there, the Tidy Eval formula can be used anywhere where it can
 be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
@@ -190,7 +207,14 @@ multi-way splits become nested <code><a href="https://dplyr.tidyverse.org/refere
 <span></span>
 <span><span class="va">model_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C5.0</a></span><span class="op">(</span><span class="va">mtcars3</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"wt"</span>, <span class="st">"gear"</span>, <span class="st">"mpg"</span><span class="op">)</span><span class="op">]</span>, <span class="va">mtcars3</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(mpg &lt;= 21.0000009536743 ~ "0", .default = "1")</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(is.na(mpg) ~ case_when(case_when(is.na(mpg) ~ 0.625, </span></span>
+<span><span class="co">#&gt;     mpg &lt;= 21.0000009536743 ~ 1, .default = 0) * 0.85 + (1 - </span></span>
+<span><span class="co">#&gt;     case_when(is.na(mpg) ~ 0.625, mpg &lt;= 21.0000009536743 ~ 1, </span></span>
+<span><span class="co">#&gt;         .default = 0)) * 0.0833333333333333 &gt;= case_when(is.na(mpg) ~ </span></span>
+<span><span class="co">#&gt;     0.625, mpg &lt;= 21.0000009536743 ~ 1, .default = 0) * 0.15 + </span></span>
+<span><span class="co">#&gt;     (1 - case_when(is.na(mpg) ~ 0.625, mpg &lt;= 21.0000009536743 ~ </span></span>
+<span><span class="co">#&gt;         1, .default = 0)) * 0.916666666666667 ~ "0", .default = "1"), </span></span>
+<span><span class="co">#&gt;     .default = case_when(mpg &lt;= 21.0000009536743 ~ "0", .default = "1"))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -207,9 +231,26 @@ objects fitted via the <code>parsnip</code> package, both as a
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">vs</span> <span class="op">~</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">mpg</span>, data <span class="op">=</span> <span class="va">mtcars2</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 6.00000023841858 ~ case_when(cyl &lt;= 4.00000023841858 ~ </span></span>
-<span><span class="co">#&gt;     "1", .default = case_when(wt &lt;= 2.87500011920929 ~ "0", .default = "1")), </span></span>
-<span><span class="co">#&gt;     .default = "0")</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(is.na(wt) | is.na(cyl) ~ case_when(case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.5625, cyl &lt;= 6.00000023841858 ~ 1, .default = 0) * (case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.611111111111111, cyl &lt;= 4.00000023841858 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0.0909090909090909 + (1 - case_when(is.na(cyl) ~ 0.611111111111111, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 4.00000023841858 ~ 1, .default = 0)) * (case_when(is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     0.428571428571429, wt &lt;= 2.87500011920929 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     1 + (1 - case_when(is.na(wt) ~ 0.428571428571429, wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;     1, .default = 0)) * 0)) + (1 - case_when(is.na(cyl) ~ 0.5625, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 6.00000023841858 ~ 1, .default = 0)) * 1 &gt;= case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.5625, cyl &lt;= 6.00000023841858 ~ 1, .default = 0) * (case_when(is.na(cyl) ~ </span></span>
+<span><span class="co">#&gt;     0.611111111111111, cyl &lt;= 4.00000023841858 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0.909090909090909 + (1 - case_when(is.na(cyl) ~ 0.611111111111111, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 4.00000023841858 ~ 1, .default = 0)) * (case_when(is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;     0.428571428571429, wt &lt;= 2.87500011920929 ~ 1, .default = 0) * </span></span>
+<span><span class="co">#&gt;     0 + (1 - case_when(is.na(wt) ~ 0.428571428571429, wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;     1, .default = 0)) * 1)) + (1 - case_when(is.na(cyl) ~ 0.5625, </span></span>
+<span><span class="co">#&gt;     cyl &lt;= 6.00000023841858 ~ 1, .default = 0)) * 0 ~ "0", .default = "1"), </span></span>
+<span><span class="co">#&gt;     .default = case_when(cyl &lt;= 6.00000023841858 ~ case_when(cyl &lt;= </span></span>
+<span><span class="co">#&gt;         4.00000023841858 ~ "1", .default = case_when(wt &lt;= 2.87500011920929 ~ </span></span>
+<span><span class="co">#&gt;         "0", .default = "1")), .default = "0"))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="boosted-models">Boosted models<a class="anchor" aria-label="anchor" href="#boosted-models"></a>

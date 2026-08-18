@@ -107,7 +107,7 @@ worked example. In brief:
 
 - Regression: [`lm()`](https://rdrr.io/r/stats/lm.html),
   [`glm()`](https://rdrr.io/r/stats/glm.html),
-  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html),
+  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html),
   [`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html),
   [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html),
   [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html),
