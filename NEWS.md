@@ -8,17 +8,25 @@
 
 - `acceptable_formula()` now checks the contrast of every factor predictor. A model that used the treatment contrast for one field and something else for another was accepted and then silently mis-parsed; such a model now aborts with the usual "the treatment contrast is the only one supported" error, which also names the offending field rather than the contrast. (#291)
 
+- `acceptable_formula()` no longer rejects a `MASS::lda()`, `MASS::qda()` or `earth::earth()` fit whose factor has a level containing a colon. The contrast check split the model matrix column names on `:` to find interactions, so such a level looked like one and the fit was refused as using an unsupported contrast; the check now decomposes each column against the model's own term structure. (#391)
+
 - `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
 
 - `tidypredict_fit()` now works on a LightGBM model whose trees are bare leaves, which is what LightGBM emits when it cannot make a single split, such as with a constant outcome, a single training row, or a lone factor predictor whose splits the categorical guards reject. `lightgbm::lgb.model.dt.tree()` reports no rows at all for such a tree, so the model parsed to no trees and failed with "Model has no trees."; the leaf values are now read from the model's JSON dump. A multiclass model in which only some trees are bare leaves silently assigned trees to the wrong classes, and now matches `predict()`. (#401)
 
+- `parse_model()` now aborts on a `kernlab::ksvm()` model with a factor level that is not a syntactic name, such as `c:d`. `ksvm()` only keeps the `make.names()` form of its model matrix column names, so the level was read back as `c.d` and the formula compared against a value that matches no row, silently dropping that dummy term from the prediction. (#390)
+
 - `tidypredict_fit()` now returns predictions on the response scale for CatBoost models fit with the `Poisson` or `Tweedie` objective, applying `exp()` to the raw score as the other CatBoost objectives already invert their own links. Anyone using such a model will see their predictions change from the log scale to the count or mean scale; they now match `catboost.predict(prediction_type = "Exponent")` instead of the `"RawFormulaVal"` default. (#356)
+
+- `tidypredict_fit()` now returns one prediction per row for a `ranger::ranger()`, `xgboost`, `baguette::bagger()`, or `xrf::xrf()` model in which every tree collapsed to a single leaf, or in which the lasso kept only the intercept. Such a model produced a formula that mentioned no column at all, so evaluating it returned a single value rather than one per row. The value was always correct; only its length was wrong. (#397)
 
 - `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
 
 - `tidypredict_fit()` now works on a parsed LightGBM model fit with `linear_tree = TRUE`. A leaf of a linear tree stores its coefficients separately and leaves its constant prediction empty, which the parsed path never read, so the formula failed with "`..1 (right)` must be a vector, not `NULL`". This also affected such a model saved with `tidypredict_save()` and read back with `tidypredict_load()`. (#346)
+
+- `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
 
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 

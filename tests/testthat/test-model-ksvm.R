@@ -215,23 +215,45 @@ test_that("unused and ordered factor levels are handled", {
   )
 })
 
-test_that("a factor level that is not a syntactic name is silently wrong", {
+test_that("a factor level that is not a syntactic name errors (#390)", {
   skip_if_not_installed("kernlab")
-  skip(
-    "`ksvm()` runs its model matrix column names through `make.names()`, so a
-     level such as `c:d` becomes the column `fc.d`. The parser reads the level
-     back off that name and emits `f == \"c.d\"`, which matches no row, so the
-     dummy term drops out: predictions are off by 0.90 for a regression fit and
-     0.75 for classification probabilities. A level containing a space is wrong
-     the same way, and two levels that mangle to the same name make `ksvm()`
-     disambiguate with a `.1` suffix."
-  )
+
   df <- ksvm_factor_data(c("a:b", "c:d", "e"))
   model <- ksvm_fit(y ~ x + f, df, type = "eps-svr")
+  expect_snapshot(error = TRUE, tidypredict_fit(model))
 
+  spaced <- ksvm_factor_data(c("a b", "c d", "e"))
+  model <- ksvm_fit(y ~ x + f, spaced, type = "eps-svr")
+  expect_error(tidypredict_fit(model), "Unable to recover the factor level")
+
+  # Two levels that mangle to the same name, which `ksvm()` then disambiguates
+  # with a `.1` suffix.
+  clash <- ksvm_factor_data(c("a.b", "a:b", "e"))
+  model <- ksvm_fit(y ~ x + f, clash, type = "eps-svr")
+  expect_error(tidypredict_fit(model), "Unable to recover the factor level")
+
+  cls <- ksvm_factor_data(c("a:b", "c:d", "e"))
+  cls$cls <- factor(ifelse(cls$y > stats::median(cls$y), "a", "b"))
+  model <- ksvm_fit(cls ~ x + f, cls, type = "C-svc", prob.model = TRUE)
+  expect_error(tidypredict_fit(model), "Unable to recover the factor level")
+})
+
+test_that("syntactic factor levels still match predict() (#390)", {
+  skip_if_not_installed("kernlab")
+
+  df <- ksvm_factor_data(c("a_b", "cd", "e"))
+  model <- ksvm_fit(y ~ x + f, df, type = "eps-svr")
   expect_equal(
     rlang::eval_tidy(tidypredict_fit(model), df),
     as.numeric(kernlab::predict(model, df)),
+    tolerance = 1e-10
+  )
+
+  df$cls <- factor(ifelse(df$y > stats::median(df$y), "a", "b"))
+  model <- ksvm_fit(cls ~ x + f, df, type = "C-svc", prob.model = TRUE)
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    unname(kernlab::predict(model, df, type = "probabilities")[, "b"]),
     tolerance = 1e-10
   )
 })

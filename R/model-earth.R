@@ -34,7 +34,8 @@ acceptable_formula.earth <- function(model) {
   acceptable_contrasts(
     columns = colnames(model$modvars),
     vars = rownames(model$modvars),
-    xlevels = model$xlevels
+    xlevels = model$xlevels,
+    terms = model$terms
   )
 
   acceptable_lm(model)

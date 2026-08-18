@@ -133,18 +133,23 @@ parse_c50_trees <- function(model) {
     pos <<- pos + 1L
     type <- attrs$type
 
+    freq <- if (!is.null(attrs$freq)) {
+      as.numeric(strsplit(attrs$freq, ",")[[1]])
+    } else {
+      NULL
+    }
+    # `T->Cases` in the C sources. C5.0 omits `freq` when the node holds no
+    # training cases, which is how the unused missing-value branch is written.
+    cases <- if (is.null(freq)) 0 else sum(freq)
+
     if (type == "0") {
-      freq <- if (!is.null(attrs$freq)) {
-        as.numeric(strsplit(attrs$freq, ",")[[1]])
-      } else {
-        NULL
-      }
       # Filled in by `c50_set_leaf_predictions()`, which needs the root.
       return(list(
         kind = "leaf",
         prediction = attrs$class,
         confidence = NA_real_,
-        freq = freq
+        freq = freq,
+        cases = cases
       ))
     }
 
@@ -162,7 +167,9 @@ parse_c50_trees <- function(model) {
         col = attrs$att,
         val = f32_split_boundary(as.numeric(attrs$cut), "upper"),
         left = kids[[2]],
-        right = kids[[3]]
+        right = kids[[3]],
+        freq = freq,
+        cases = cases
       )
     } else if (type == "1") {
       # Discrete split with one fork per level of the attribute. The first fork
@@ -187,7 +194,9 @@ parse_c50_trees <- function(model) {
         kind = "cat",
         col = attrs$att,
         groups = as.list(groups),
-        kids = kids[-1]
+        kids = kids[-1],
+        freq = freq,
+        cases = cases
       )
     } else if (type == "3") {
       # Categorical split. Each fork holds a group of factor levels (`elts`).
@@ -195,7 +204,14 @@ parse_c50_trees <- function(model) {
         vals <- strsplit(g, ",")[[1]]
         gsub('^"|"$', "", vals)
       })
-      list(kind = "cat", col = attrs$att, groups = groups, kids = kids)
+      list(
+        kind = "cat",
+        col = attrs$att,
+        groups = groups,
+        kids = kids,
+        freq = freq,
+        cases = cases
+      )
     } else {
       cli::cli_abort("Unsupported C5.0 node type {.val {type}}.")
     }
@@ -225,7 +241,7 @@ parse_c50_tree <- function(model) {
 # Flatten the nested tree into the binary `tree_info` structure consumed by
 # the nested case_when generator. Multiway categorical splits are expanded
 # into a chain of binary `%in%` splits.
-c50_tree_info <- function(node) {
+c50_tree_info <- function(node, classes = NULL, default = NULL) {
   acc <- new.env(parent = emptyenv())
   acc$rows <- list()
   acc$counter <- -1L
@@ -237,6 +253,20 @@ c50_tree_info <- function(node) {
 
   add_row <- function(row) {
     acc$rows[[length(acc$rows) + 1L]] <- row
+  }
+
+  # The class distribution of a set of sibling nodes, `Nil` when none of them
+  # records one.
+  sum_freq <- function(nodes) {
+    freqs <- Filter(Negate(is.null), lapply(nodes, function(x) x$freq))
+    if (length(freqs) == 0) {
+      return(NULL)
+    }
+    Reduce(`+`, freqs)
+  }
+
+  sum_cases <- function(nodes) {
+    sum(vapply(nodes, function(x) x$cases %||% 0, numeric(1)))
   }
 
   emit_cat <- function(col, groups, kids) {
@@ -255,6 +285,9 @@ c50_tree_info <- function(node) {
       terminal = FALSE,
       prediction = NA_character_,
       confidence = NA_real_,
+      freq = sum_freq(kids),
+      cases_left = kids[[1]]$cases %||% 0,
+      cases_right = sum_cases(kids[-1]),
       split = list(
         primary = list(
           col = col,
@@ -299,6 +332,9 @@ c50_tree_info <- function(node) {
       terminal = FALSE,
       prediction = NA_character_,
       confidence = NA_real_,
+      freq = node$freq,
+      cases_left = node$left$cases %||% 0,
+      cases_right = node$right$cases %||% 0,
       split = list(
         primary = list(
           col = node$col,
@@ -323,11 +359,130 @@ c50_tree_info <- function(node) {
     terminal = map_lgl(rows, ~ .x$terminal),
     prediction = map_chr(rows, ~ .x$prediction),
     confidence = map_dbl(rows, ~ .x$confidence),
-    leaf_freq = map(rows, ~ .x$freq),
+    leaf_freq = map(rows, ~ if (isTRUE(.x$terminal)) .x$freq else NULL),
+    # The class distribution recorded on every node, and the training case
+    # counts of its two branches. Needed to reproduce the weighted descent
+    # C5.0 uses when a split value is missing.
+    node_freq = map(rows, ~ .x$freq),
+    cases_left = map_dbl(rows, ~ .x$cases_left %||% NA_real_),
+    cases_right = map_dbl(rows, ~ .x$cases_right %||% NA_real_),
     node_splits = map(rows, ~ .x$split),
+    # The outcome levels and the class C5.0 falls back on, which the weighted
+    # descent needs to break ties the way `SelectClassGen()` does.
+    classes = classes,
+    default_class = default,
     majority_left = rep(NA, n),
     use_surrogates = FALSE
   )
+}
+
+# Missing values ---------------------------------
+#
+# `FindLeafGen()` in C5.0's `classify.c` does not send a case with a missing
+# split value down one branch. It calls `PredictFollowAllBranches()`, which
+# descends *every* branch of the node carrying a fraction of the case,
+# `Fraction * Branch[v]->Cases / T->Cases`, and each leaf reached adds
+# `Fraction * ClassDist[c] / Cases` to `ClassSum[c]`. `SelectClassGen()` then
+# returns the class with the largest `ClassSum`, starting from the tree's own
+# default class and replacing only on a strict `>`, so the default wins ties.
+#
+# `ClassSum[c]` is therefore the value of this recursion, which is what
+# `c50_na_score()` writes out as an expression:
+#
+#   leaf   ->  ClassDist[c] / Cases
+#   split  ->  missing: (wl * left + wr * right) / (wl + wr)
+#             otherwise: left or right, as the comparison decides
+#
+# A branch with no training cases is skipped by `PredictFollowAllBranches()`,
+# and a leaf with no cases reached directly scores against its parent instead
+# (the `T = PT` line in `FindLeafGen()`), which `parent_freq` carries down.
+
+# The share of a node's class distribution belonging to `class_index`, or `NULL`
+# when the node holds no cases at all.
+c50_leaf_share <- function(freq, class_index) {
+  if (is.null(freq) || sum(freq) == 0) {
+    return(NULL)
+  }
+  freq[[class_index]] / sum(freq)
+}
+
+c50_na_score <- function(node_id, tree_info, class_index, parent_freq = NULL) {
+  idx <- which(tree_info$nodeID == node_id)
+
+  if (tree_info$terminal[idx]) {
+    share <- c50_leaf_share(tree_info$leaf_freq[[idx]], class_index)
+    if (is.null(share)) {
+      share <- c50_leaf_share(parent_freq, class_index) %||% 0
+    }
+    return(share)
+  }
+
+  freq <- tree_info$node_freq[[idx]]
+  left <- c50_na_score(
+    tree_info$leftChild[idx],
+    tree_info,
+    class_index,
+    parent_freq = freq
+  )
+  right <- c50_na_score(
+    tree_info$rightChild[idx],
+    tree_info,
+    class_index,
+    parent_freq = freq
+  )
+
+  wl <- tree_info$cases_left[[idx]]
+  wr <- tree_info$cases_right[[idx]]
+  total <- wl + wr
+  missing_weight <- if (is.na(total) || total == 0) 0 else wl / total
+
+  # Written as `w * left + (1 - w) * right` rather than as one `case_when()`
+  # with the two subtrees under both the missing arm and the comparison arm.
+  # The latter states each subtree twice, which doubles the expression at every
+  # level of the tree.
+  primary <- tree_info$node_splits[[idx]]$primary
+  weight <- expr(case_when(
+    !!build_nested_split_missing(primary) ~ !!missing_weight,
+    !!build_nested_split_condition(primary) ~ 1,
+    .default = 0
+  ))
+
+  reduce_addition(list(
+    expr_multiplication(weight, left),
+    expr_multiplication(expr(1 - !!weight), right)
+  ))
+}
+
+# Wrap the ordinary nested `case_when()` so that only rows actually missing a
+# split value pay for the weighted descent. Rows with no missing split value
+# reach exactly one leaf under either route, so the guard changes nothing for
+# them and keeps the expression small.
+c50_with_na_descent <- function(fit, tree_info) {
+  classes <- tree_info$classes
+  default <- tree_info$default_class
+  cols <- unique(tree_info$splitvarName[!is.na(tree_info$splitvarName)])
+  # A stump has nothing to descend, and a parsed model saved before this was
+  # recorded cannot be given the weighted branch.
+  if (
+    length(cols) == 0 ||
+      is.null(tree_info$node_freq) ||
+      is.null(classes) ||
+      is.null(default)
+  ) {
+    return(fit)
+  }
+
+  ordered <- c(default, setdiff(classes, default))
+  scores <- lapply(
+    ordered,
+    function(class) c50_na_score(0L, tree_info, match(class, classes))
+  )
+
+  any_missing <- reduce_or(map(cols, \(col) expr(is.na(!!rlang::sym(col)))))
+  expr(case_when(
+    !!any_missing ~ !!build_argmax_case_when(scores, ordered),
+    .default = !!fit
+  ))
 }
 
 c50_check_supported <- function(model, call = rlang::caller_env()) {
@@ -582,7 +737,15 @@ tidypredict_fit.C5.0 <- function(model, ...) {
   }
   trees <- parse_c50_trees(model)
   if (length(trees) == 1) {
-    return(generate_nested_case_when_tree(c50_tree_info(trees[[1]])))
+    tree_info <- c50_tree_info(
+      trees[[1]],
+      model$levels,
+      c50_default_class(model)
+    )
+    return(c50_with_na_descent(
+      generate_nested_case_when_tree(tree_info),
+      tree_info
+    ))
   }
   tree_info_list <- lapply(trees, c50_tree_info)
   c50_boosted_case_when(tree_info_list, model$levels, c50_default_class(model))
@@ -630,7 +793,11 @@ parse_model.C5.0 <- function(model) {
   }
   trees <- parse_c50_trees(model)
   if (length(trees) == 1) {
-    pm$tree_info <- c50_tree_info(trees[[1]])
+    pm$tree_info <- c50_tree_info(
+      trees[[1]],
+      model$levels,
+      c50_default_class(model)
+    )
   } else {
     pm$tree_info_list <- lapply(trees, c50_tree_info)
     pm$classes <- model$levels
@@ -664,5 +831,5 @@ build_tree_formula.pm_tree_C5.0 <- function(model) {
       model$default
     ))
   }
-  build_tree_formula_single(model)
+  c50_with_na_descent(build_tree_formula_single(model), model$tree_info)
 }

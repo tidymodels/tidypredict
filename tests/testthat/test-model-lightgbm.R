@@ -2789,3 +2789,501 @@ test_that("parsed linear tree model can be fitted (#346)", {
   loaded_preds <- dplyr::mutate(test_df, pred = !!loaded_formula)$pred
   expect_equal(unname(loaded_preds), unname(native_preds), tolerance = 1e-10)
 })
+
+# Edge-case battery -----------------------------------------------
+
+battery_lgb <- function(
+  X,
+  y,
+  params = list(),
+  nrounds = 5L,
+  categorical_feature = NULL
+) {
+  params <- utils::modifyList(
+    list(
+      objective = "regression",
+      num_leaves = 8L,
+      learning_rate = 0.3,
+      min_data_in_leaf = 1L
+    ),
+    params
+  )
+  dtrain <- lightgbm::lgb.Dataset(
+    X,
+    label = y,
+    params = params,
+    categorical_feature = categorical_feature
+  )
+  lightgbm::lgb.train(
+    params = params,
+    data = dtrain,
+    nrounds = nrounds,
+    verbose = -1L
+  )
+}
+
+expect_lgb_agrees <- function(model, newX, formula = NULL) {
+  formula <- formula %||% tidypredict_fit(model)
+  preds <- dplyr::mutate(as.data.frame(newX), pred = !!formula)$pred
+  expect_equal(unname(preds), unname(predict(model, newX)), tolerance = 1e-10)
+}
+
+expect_lgb_agrees_multi <- function(model, newX, formulas = NULL) {
+  formulas <- formulas %||% tidypredict_fit(model)
+  df <- as.data.frame(newX)
+  preds <- do.call(
+    cbind,
+    lapply(formulas, function(f) dplyr::mutate(df, pred = !!f)$pred)
+  )
+  expect_equal(unname(preds), unname(predict(model, newX)), tolerance = 1e-10)
+}
+
+battery_data <- function(seed = 42, n = 300) {
+  set.seed(seed)
+  x1 <- rnorm(n)
+  x2 <- stats::runif(n, -1, 1)
+  list(X = cbind(x1 = x1, x2 = x2), y = 2 * x1 + x2^2 + rnorm(n, sd = 0.2))
+}
+
+# Factors and categorical splits ----------------------------------
+
+battery_bonsai_fit <- function(train, formula) {
+  spec <- parsnip::boost_tree(trees = 10, tree_depth = 4, min_n = 1) |>
+    parsnip::set_engine(
+      "lightgbm",
+      min_data_per_group = 1L,
+      cat_smooth = 0,
+      cat_l2 = 0
+    ) |>
+    parsnip::set_mode("regression")
+  parsnip::fit(spec, formula, data = train)
+}
+
+# `bonsai` hands a factor to LightGBM as its zero-based integer codes, so the
+# generated formula reads those codes rather than the labels.
+battery_encode <- function(data) {
+  for (nm in names(data)) {
+    if (is.factor(data[[nm]])) {
+      data[[nm]] <- as.integer(data[[nm]]) - 1L
+    }
+  }
+  data
+}
+
+expect_bonsai_agrees <- function(fit, newdata) {
+  formula <- tidypredict_fit(fit$fit)
+  preds <- dplyr::mutate(battery_encode(newdata), pred = !!formula)$pred
+  expect_equal(
+    unname(preds),
+    unname(predict(fit, newdata)$.pred),
+    tolerance = 1e-10
+  )
+}
+
+battery_factor_data <- function(levels, seed = 1, n = 400) {
+  set.seed(seed)
+  f <- factor(sample(levels, n, replace = TRUE), levels = levels)
+  data.frame(f = f, y = as.numeric(f) * 3 + rnorm(n, sd = 0.2))
+}
+
+test_that("a factor with non-syntactic levels and a colon still matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("a", "b c", "b", "b:c"))
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), train)
+})
+
+test_that("a factor with levels that prefix each other still matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("a", "aa", "aaa"), seed = 2)
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), train)
+})
+
+test_that("an unused factor level does not shift the category codes", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("a", "b", "c", "d"), seed = 3)
+  train$f <- factor(train$f, levels = c(levels(train$f), "unused"))
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), train)
+})
+
+test_that("an ordered factor matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("lo", "mid", "hi"), seed = 4)
+  train$f <- factor(train$f, levels = levels(train$f), ordered = TRUE)
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), train)
+})
+
+test_that("a factor level named like another variable's dummy matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  set.seed(5)
+  n <- 400
+  train <- data.frame(
+    f = factor(sample(c("x", "z"), n, replace = TRUE)),
+    fx = rnorm(n)
+  )
+  train$y <- as.numeric(train$f) * 3 + train$fx
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f + fx), train)
+})
+
+test_that("a factor with NA in the training data matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("a", "b", "c", "d"), seed = 6)
+  train$f[sample(nrow(train), 40)] <- NA
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), train)
+})
+
+test_that("a factor with NA only in newdata matches", {
+  skip_if_not_installed("lightgbm")
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("bonsai")
+
+  train <- battery_factor_data(c("a", "b", "c", "d"), seed = 7)
+  newdata <- train
+  newdata$f[c(1, 5, 9)] <- NA
+  expect_bonsai_agrees(battery_bonsai_fit(train, y ~ f), newdata)
+})
+
+test_that("a categorical_feature with ten levels and NA matches", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(11)
+  n <- 400
+  codes <- sample(0:9, n, replace = TRUE)
+  codes[sample(n, 40)] <- NA
+  X <- cbind(cat_feat = as.numeric(codes), x1 = rnorm(n))
+  y <- ifelse(is.na(codes), 0, codes) * 3 + rnorm(n, sd = 0.2)
+  model <- battery_lgb(
+    X,
+    y,
+    params = list(min_data_per_group = 1L, cat_smooth = 0, cat_l2 = 0),
+    categorical_feature = "cat_feat"
+  )
+
+  expect_lgb_agrees(model, X)
+})
+
+test_that("a lone categorical predictor matches", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(12)
+  n <- 300
+  X <- cbind(cat_feat = as.numeric(sample(0:3, n, replace = TRUE)))
+  y <- X[, 1] * 3 + rnorm(n, sd = 0.2)
+  model <- battery_lgb(
+    X,
+    y,
+    params = list(min_data_per_group = 1L, cat_smooth = 0, cat_l2 = 0),
+    categorical_feature = "cat_feat"
+  )
+
+  expect_lgb_agrees(model, X)
+})
+
+# Missing values --------------------------------------------------
+
+test_that("NA in the training data matches for missing_type NaN", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data()
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+  model <- battery_lgb(X, d$y)
+
+  expect_true(any(
+    as.data.frame(lightgbm::lgb.model.dt.tree(model))$default_left == "TRUE"
+  ))
+  expect_lgb_agrees(model, X)
+})
+
+test_that("NA only in newdata matches for missing_type None", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 43)
+  model <- battery_lgb(d$X, d$y)
+  newX <- d$X
+  newX[c(1, 3, 7), 1] <- NA
+  newX[c(2, 4), 2] <- NA
+
+  expect_lgb_agrees(model, newX)
+})
+
+test_that("use_missing = FALSE matches with NA in the training data", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 44)
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+  model <- battery_lgb(X, d$y, params = list(use_missing = FALSE))
+
+  expect_lgb_agrees(model, X)
+})
+
+test_that("zero_as_missing routes zeros and NA the same way as predict", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 45)
+  X <- d$X
+  X[sample(nrow(X), 60), 1] <- 0
+  model <- battery_lgb(X, d$y, params = list(zero_as_missing = TRUE))
+  newX <- cbind(x1 = c(0, 1e-40, -1e-40, 1e-30, -1e-30, NA, 0.5), x2 = 0)
+
+  expect_lgb_agrees(model, X)
+  expect_lgb_agrees(model, newX)
+})
+
+test_that("zero_as_missing with NA in the training data matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 46)
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+  model <- battery_lgb(X, d$y, params = list(zero_as_missing = TRUE))
+
+  expect_lgb_agrees(model, X)
+})
+
+test_that("multiclass with NA in the training data matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 47)
+  X <- d$X
+  X[sample(nrow(X), 50), 1] <- NA
+  label <- as.integer(cut(d$y, 3)) - 1L
+  model <- battery_lgb(
+    X,
+    label,
+    params = list(objective = "multiclass", num_class = 3L)
+  )
+
+  expect_lgb_agrees_multi(model, X)
+})
+
+# Threshold precision ---------------------------------------------
+
+test_that("values on and around every split threshold match", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 48)
+  model <- battery_lgb(d$X, d$y)
+  trees <- as.data.frame(lightgbm::lgb.model.dt.tree(model))
+  thresholds <- trees$threshold[
+    !is.na(trees$threshold) & trees$split_feature == "x1"
+  ]
+  expect_gt(length(thresholds), 0)
+
+  values <- sort(unique(c(
+    thresholds,
+    as_f32(thresholds),
+    f32_split_boundary(thresholds, "lower"),
+    f32_split_boundary(thresholds, "upper"),
+    thresholds * (1 + .Machine$double.eps),
+    thresholds * (1 - .Machine$double.eps)
+  )))
+
+  expect_lgb_agrees(model, cbind(x1 = values, x2 = 0))
+})
+
+# Fit options -----------------------------------------------------
+
+test_that("every identity objective matches with reg_sqrt set", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 49)
+  objectives <- c(
+    "regression",
+    "regression_l1",
+    "fair",
+    "quantile",
+    "mape",
+    "huber"
+  )
+  for (objective in objectives) {
+    model <- battery_lgb(
+      d$X,
+      d$y,
+      params = list(objective = objective, reg_sqrt = TRUE)
+    )
+    expect_lgb_agrees(model, d$X)
+  }
+})
+
+test_that("num_leaves from a two-leaf tree upward matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 50)
+  for (num_leaves in c(2L, 3L, 31L, 63L)) {
+    model <- battery_lgb(d$X, d$y, params = list(num_leaves = num_leaves))
+    expect_lgb_agrees(model, d$X)
+  }
+})
+
+test_that("linear_tree matches with and without NA in the training data", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 51)
+  expect_lgb_agrees(
+    battery_lgb(d$X, d$y, params = list(linear_tree = TRUE)),
+    d$X
+  )
+
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+  expect_lgb_agrees(battery_lgb(X, d$y, params = list(linear_tree = TRUE)), X)
+})
+
+test_that("linear_tree with a categorical split matches", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(52)
+  n <- 400
+  codes <- sample(0:5, n, replace = TRUE)
+  X <- cbind(cat_feat = as.numeric(codes), x1 = rnorm(n))
+  y <- codes * 3 + X[, 2] + rnorm(n, sd = 0.2)
+  model <- battery_lgb(
+    X,
+    y,
+    params = list(
+      linear_tree = TRUE,
+      min_data_per_group = 1L,
+      cat_smooth = 0,
+      cat_l2 = 0
+    ),
+    categorical_feature = "cat_feat"
+  )
+
+  expect_lgb_agrees(model, X)
+})
+
+test_that("dart boosting matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 53)
+  model <- battery_lgb(d$X, d$y, params = list(boosting = "dart"))
+
+  expect_lgb_agrees(model, d$X)
+})
+
+test_that("multiclassova with a non-default sigmoid matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 54)
+  label <- as.integer(cut(d$y, 3)) - 1L
+  model <- battery_lgb(
+    d$X,
+    label,
+    params = list(objective = "multiclassova", num_class = 3L, sigmoid = 2.5)
+  )
+
+  expect_lgb_agrees_multi(model, d$X)
+})
+
+# Degenerate fit shapes -------------------------------------------
+
+test_that("a single tree matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 55)
+  model <- battery_lgb(d$X, d$y, nrounds = 1L)
+
+  expect_length(parse_model(model)$trees, 1)
+  expect_lgb_agrees(model, d$X)
+})
+
+test_that("a single predictor matches", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 56)
+  X <- d$X[, "x1", drop = FALSE]
+  model <- battery_lgb(X, d$y)
+
+  expect_equal(parse_model(model)$general$nfeatures, 1)
+  expect_lgb_agrees(model, X)
+})
+
+# Save and load round trips ---------------------------------------
+
+expect_lgb_roundtrips <- function(model, newX) {
+  path <- withr::local_tempfile(fileext = ".yml")
+  tidypredict_save(parse_model(model), path)
+  expect_lgb_agrees(model, newX, tidypredict_fit(tidypredict_load(path)))
+}
+
+test_that("a model trained with NA round trips through YAML", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 57)
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+
+  expect_lgb_roundtrips(battery_lgb(X, d$y), X)
+})
+
+test_that("a zero_as_missing model round trips through YAML", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 58)
+
+  expect_lgb_roundtrips(
+    battery_lgb(d$X, d$y, params = list(zero_as_missing = TRUE)),
+    d$X
+  )
+})
+
+test_that("a linear tree trained with NA round trips through YAML", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 59)
+  X <- d$X
+  X[sample(nrow(X), 40), 1] <- NA
+
+  expect_lgb_roundtrips(
+    battery_lgb(X, d$y, params = list(linear_tree = TRUE)),
+    X
+  )
+})
+
+test_that("a categorical model round trips through YAML", {
+  skip_if_not_installed("lightgbm")
+
+  set.seed(60)
+  n <- 300
+  codes <- sample(0:3, n, replace = TRUE)
+  X <- cbind(cat_feat = as.numeric(codes), x1 = rnorm(n))
+  y <- codes * 3 + X[, 2] + rnorm(n, sd = 0.2)
+  model <- battery_lgb(
+    X,
+    y,
+    params = list(min_data_per_group = 1L, cat_smooth = 0, cat_l2 = 0),
+    categorical_feature = "cat_feat"
+  )
+
+  expect_lgb_roundtrips(model, X)
+})
+
+test_that("a poisson model round trips through YAML", {
+  skip_if_not_installed("lightgbm")
+
+  d <- battery_data(seed = 61)
+
+  expect_lgb_roundtrips(
+    battery_lgb(d$X, abs(d$y) + 1, params = list(objective = "poisson")),
+    d$X
+  )
+})

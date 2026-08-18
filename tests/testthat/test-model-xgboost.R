@@ -1745,10 +1745,6 @@ test_that("degenerate boosters match native predict", {
 
 test_that("a booster of stumps matches native predict", {
   skip_if_not_installed("xgboost")
-  skip(
-    "Every tree collapses to a root, so the generated formula is a constant that
-     mentions no column and evaluates to a single value rather than one per row."
-  )
 
   full <- xgb_option_data()
   set.seed(1)

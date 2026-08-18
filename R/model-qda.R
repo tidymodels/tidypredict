@@ -82,7 +82,8 @@ acceptable_formula.qda <- function(model) {
   acceptable_contrasts(
     columns = colnames(model$means),
     vars = names(attr(model$terms, "dataClasses")),
-    xlevels = model$xlevels
+    xlevels = model$xlevels,
+    terms = model$terms
   )
 
   acceptable_lm(model)
