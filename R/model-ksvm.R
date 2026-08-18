@@ -189,6 +189,21 @@ ksvm_check_levels <- function(fields, call = rlang::caller_env()) {
   )
 }
 
+# The same `data.frame(y, x)` mangling hits the column names of a model fitted
+# through the matrix interface, where there is no `terms` object to compare
+# against. That case is deliberately not checked for, and the check must not be
+# added back: it cannot be done without rejecting correct models.
+#
+# `make.names(unique = TRUE)` is the identity on names that are already
+# syntactic and distinct, and every name it produces is itself syntactic and
+# distinct. Its image is therefore contained in its fixed points, so every
+# mangled name we could read back is also a name a user could legitimately have
+# passed in unchanged. `a:b, a.b` mangles to `a.b.1, a.b`, which is exactly what
+# the untouched columns `a.b.1, a.b` produce; `a, a` mangles to `a, a.1`, which
+# is what the untouched `a, a.1` produce. Even a `make.unique` suffix is not
+# evidence, and neither is a `.`: `Sepal.Length` is a fixed point and such a
+# model is correct today. Nothing in the names distinguishes the broken case
+# from the working one, so any check here is a false abort on working code.
 ksvm_feature_names <- function(sv, terms_obj, call = rlang::caller_env()) {
   features <- colnames(sv)
   if (!is.null(features)) {

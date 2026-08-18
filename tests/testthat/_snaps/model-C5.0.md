@@ -37,7 +37,7 @@
     Code
       rlang::expr_text(tf)
     Output
-      [1] "case_when(dplyr::if_else(cyl > 6.00000023841858, 0.9375, 0) + \n    dplyr::if_else(wt <= 2.87500011920929 & cyl > 4.00000023841858, \n        0.8, 0) >= dplyr::if_else(wt > 2.87500011920929 & cyl <= \n    6.00000023841858, 0.875, 0) + dplyr::if_else(cyl <= 4.00000023841858, \n    0.8461538, 0) ~ \"0\", .default = \"1\")"
+      [1] "case_when(dplyr::if_else(!is.na(cyl) & cyl > 6.00000023841858, \n    0.9375, 0) + dplyr::if_else(!is.na(wt) & !is.na(cyl) & wt <= \n    2.87500011920929 & cyl > 4.00000023841858, 0.8, 0) >= dplyr::if_else(!is.na(wt) & \n    !is.na(cyl) & wt > 2.87500011920929 & cyl <= 6.00000023841858, \n    0.875, 0) + dplyr::if_else(!is.na(cyl) & cyl <= 4.00000023841858, \n    0.8461538, 0) ~ \"0\", .default = \"1\")"
 
 # boosted rule-based models are not supported
 

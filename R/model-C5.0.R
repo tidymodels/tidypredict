@@ -896,6 +896,27 @@ parse_c50_rules <- function(model) {
   list(rules = rules, classes = model$levels, default = default)
 }
 
+# Missing values
+#
+# `Matches()` in C5.0's `classify.c` fires a rule only when every condition
+# `Satisfies()` it, and `Satisfies()` compares `FindOutcome()` against the
+# condition's own `TestValue`. `FindOutcome()` returns -1 when the tested
+# attribute is unknown, and no `TestValue` is -1, so a rule that tests a
+# missing attribute never fires. (The rule-tree route, `MarkActive()`, reaches
+# the same place: it only descends `Branch[v]` for `v > 0`.) There is no
+# weighted descent here as there is for a tree: a skipped rule simply
+# contributes nothing to `ClassSum`, and `PredictRuleClassify()` returns the
+# rule set's own default class when no rule fires at all, which the argmax
+# cascade below already does because every vote is then 0.
+#
+# So the correct behaviour is exactly the vote sum with a missing-value
+# condition treated as false. R makes `NA <= cut` and `f == "a"` return `NA`
+# rather than `FALSE`, which poisoned the sum and made the whole cascade fall
+# through, so every column a rule tests is guarded with `!is.na()`.
+c50_rule_cols <- function(rule) {
+  unique(vapply(rule$conditions, function(x) x$col, character(1)))
+}
+
 c50_condition_expr <- function(cond) {
   col <- sym(cond$col)
   switch(
@@ -916,7 +937,10 @@ c50_class_vote_rules <- function(rules_obj, class) {
     return(0)
   }
   terms <- lapply(matching, function(r) {
-    conds <- lapply(r$conditions, c50_condition_expr)
+    conds <- c(
+      lapply(c50_rule_cols(r), \(col) expr(!is.na(!!sym(col)))),
+      lapply(r$conditions, c50_condition_expr)
+    )
     condition <- combine_path_conditions(conds)
     expr(dplyr::if_else(!!condition, !!r$confidence, 0))
   })
