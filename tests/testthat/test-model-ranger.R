@@ -714,13 +714,45 @@ test_that("ordered factor splits match predict() (#283)", {
 test_that("a partition split lists the levels going right (#283)", {
   skip_if_not_installed("ranger")
 
-  # "1,3" names the levels going right, so the left set is the complement
-  split <- ranger_split_info("f", "1,3", c("a", "b", "c", "d"), FALSE)
+  # Bits 0 and 2 name the levels going right, so the left set is the complement
+  split <- ranger_split_info("f", 1 + 4, c("a", "b", "c", "d"), FALSE)
 
   expect_true(split$is_categorical)
   expect_equal(unlist(split$vals), c("b", "d"))
   # A missing value is routed as though it were the first level
   expect_equal(split$missing_level, "a")
+})
+
+test_that("a partition split on more than 31 levels matches predict() (#414)", {
+  skip_if_not_installed("ranger")
+
+  # `treeInfo()` cannot render a split on more than 31 levels
+  for (nlev in c(32, 50)) {
+    set.seed(1)
+    lvls <- paste0("L", seq_len(nlev))
+    df <- data.frame(
+      f = factor(sample(lvls, 400, TRUE), levels = lvls),
+      z = rnorm(400)
+    )
+    df$y <- as.numeric(df$f) + df$z
+
+    set.seed(9)
+    model <- ranger::ranger(
+      y ~ .,
+      data = df,
+      num.trees = 5,
+      max.depth = 3,
+      splitrule = "extratrees",
+      respect.unordered.factors = "partition"
+    )
+    base <- predict(model, df)$predictions
+
+    expect_equal(rlang::eval_tidy(tidypredict_fit(model), df), base)
+    expect_equal(
+      rlang::eval_tidy(tidypredict_fit(parse_model(model)), df),
+      base
+    )
+  }
 })
 
 test_that("an ordered split names a position in the stored levels (#283)", {

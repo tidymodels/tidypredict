@@ -76,6 +76,35 @@ ranger_predictor_levels <- function(model) {
   list(levels = levels, is_ordered = is_ordered)
 }
 
+# `treeInfo()` warns when it cannot render a split on more than 31 levels and
+# blanks the value out. The split values are read from the forest instead, so
+# the warning is about a column that is never used.
+ranger_tree_info <- function(model, tree_no) {
+  withCallingHandlers(
+    ranger::treeInfo(model, tree_no),
+    warning = function(w) {
+      if (grepl("Unordered splitting levels", conditionMessage(w))) {
+        rlang::cnd_muffle(w)
+      }
+    }
+  )
+}
+
+# Split values are read from the forest rather than from `treeInfo()`, which
+# renders them for display: an unordered split value is turned into a
+# comma-separated string of level indices, and above 31 levels `treeInfo()`
+# warns and drops it altogether.
+ranger_split_values <- function(model, tree_no) {
+  model$forest$split.values[[tree_no]]
+}
+
+# Is bit `k - 1` of a bit-packed split value set? `ranger` allows up to 53
+# levels, so the mask is read with arithmetic rather than with `bitwAnd()`,
+# which is limited to 32 bits.
+ranger_bit_set <- function(value, k) {
+  (floor(value) %/% 2^(k - 1)) %% 2 == 1
+}
+
 # `ranger` writes a split on a factor predictor in one of two forms, neither of
 # which is a threshold on the column itself.
 #
@@ -84,10 +113,12 @@ ranger_predictor_levels <- function(model) {
 # naming a position in the stored level sequence: everything up to that
 # position goes left.
 #
-# An unordered predictor, which is `"partition"`, gets a comma-separated list
-# of level indices that go *right*. Left is the complement. Reading the list as
-# the left set instead is wrong but plausible, and produces a small enough
-# error to look like a rounding problem.
+# An unordered predictor, which is `"partition"`, gets the set of level indices
+# that go *right* packed into the bits of a single value: bit `k - 1` is set
+# when level `k` goes right. Left is the complement. See `Tree::predict()` in
+# `src/Tree.cpp`, the branch taken when `isOrderedVariable()` is `FALSE`.
+# Reading the value as a threshold instead is wrong but plausible, and produces
+# a small enough error to look like a rounding problem.
 ranger_split_info <- function(
   col,
   split_val,
@@ -107,8 +138,7 @@ ranger_split_info <- function(
   if (isTRUE(is_ordered)) {
     left <- levels[seq_len(floor(as.numeric(split_val)))]
   } else {
-    right_idx <- as.integer(strsplit(as.character(split_val), ",")[[1]])
-    left <- levels[-right_idx]
+    left <- levels[!ranger_bit_set(as.numeric(split_val), seq_along(levels))]
     return(list(
       col = col,
       vals = as.list(left),
@@ -174,9 +204,10 @@ ranger_split_condition <- function(split) {
 
 # Convert ranger treeInfo to standard tree_info format
 ranger_tree_info_full <- function(model, tree_no) {
-  tree <- ranger::treeInfo(model, tree_no)
+  tree <- ranger_tree_info(model, tree_no)
   info <- ranger_predictor_levels(model)
   missing_right <- ranger_missing_right(model, tree_no)
+  splitval <- ranger_split_values(model, tree_no)
 
   # Build node_splits list
   node_splits <- vector("list", nrow(tree))
@@ -187,7 +218,7 @@ ranger_tree_info_full <- function(model, tree_no) {
       node_splits[[i]] <- list(
         primary = ranger_split_info(
           var_name,
-          tree$splitval[i],
+          splitval[i],
           info$levels[[var_name]],
           info$is_ordered[[var_name]],
           missing_right = isTRUE(missing_right[i])
@@ -237,13 +268,13 @@ tidypredict_fit_ranger_nested <- function(model) {
 # Regression trees use `prediction`; probability forests have one `pred.<class>`
 # column per class.
 build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
-  tree <- ranger::treeInfo(model, tree_no)
+  tree <- ranger_tree_info(model, tree_no)
 
   # Pre-extract columns as vectors for fast indexing (avoids slow df[i,] access)
   leftChild <- tree$leftChild
   rightChild <- tree$rightChild
   splitvarName <- as.character(tree$splitvarName)
-  splitval <- tree$splitval
+  splitval <- ranger_split_values(model, tree_no)
   terminal <- tree$terminal
   prediction <- tree[[leaf_col]]
   info <- ranger_predictor_levels(model)
@@ -472,7 +503,7 @@ tidypredict_test.ranger <- function(
   }
 
   # Get class levels from treeInfo
-  tree <- ranger::treeInfo(model, 1)
+  tree <- ranger_tree_info(model, 1)
   pred_cols <- grep("^pred\\.", names(tree), value = TRUE)
 
   if (length(pred_cols) == 0) {
@@ -516,7 +547,7 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
   }
 
   # Check if this is a classification model
-  first_tree <- ranger::treeInfo(model, 1)
+  first_tree <- ranger_tree_info(model, 1)
   first_pred <- first_tree$prediction[first_tree$terminal][1]
   if (is.character(first_pred) || is.factor(first_pred)) {
     cli::cli_abort(
