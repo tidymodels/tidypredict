@@ -173,8 +173,10 @@ were not selected a coefficient of zero.</p>
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 24.2937361352851 + (cyl * -0.889931447343478) + (disp * -0.0130565637350741) + </span></span>
-<span><span class="co">#&gt;     (hp * -0.0228109587521556) + (drat * 2.1303277985918)</span></span></code></pre></div>
+<span><span class="co">#&gt; 24.2937361352851 + (ifelse(is.na(cyl), 6.1875, cyl) * -0.889931447343478) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(disp), 230.721875, disp) * -0.0130565637350741) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(hp), 146.6875, hp) * -0.0228109587521556) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(drat), 3.5965625, drat) * 2.1303277985918)</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -223,17 +225,26 @@ expression per class:</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "setosa"     "versicolor" "virginica"</span></span>
 <span><span class="va">fit</span><span class="op">[[</span><span class="st">"setosa"</span><span class="op">]</span><span class="op">]</span></span>
-<span><span class="co">#&gt; 1/(1 + exp(1.96606184899222 + (Sepal.Length * -0.0303959537594359) + </span></span>
-<span><span class="co">#&gt;     (Sepal.Width * -0.492023767406961) + (Petal.Length * 0.0179469395936271) + </span></span>
-<span><span class="co">#&gt;     (Petal.Width * -0.0152407670638333) - (0.391460011724112 + </span></span>
-<span><span class="co">#&gt;     (Sepal.Length * -0.118750531861652) + (Sepal.Width * 0.378311039737146) + </span></span>
-<span><span class="co">#&gt;     (Petal.Length * -0.084556881358667) + (Petal.Width * -0.16933234787912))) + </span></span>
-<span><span class="co">#&gt;     exp(-1.35752186071634 + (Sepal.Length * 0.149146485621088) + </span></span>
-<span><span class="co">#&gt;         (Sepal.Width * 0.113712727669814) + (Petal.Length * 0.06660994176504) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * 0.184573114942953) - (0.391460011724112 + </span></span>
-<span><span class="co">#&gt;         (Sepal.Length * -0.118750531861652) + (Sepal.Width * </span></span>
-<span><span class="co">#&gt;         0.378311039737146) + (Petal.Length * -0.084556881358667) + </span></span>
-<span><span class="co">#&gt;         (Petal.Width * -0.16933234787912))))</span></span></code></pre></div>
+<span><span class="co">#&gt; 1/(1 + exp(1.96606184899222 + (ifelse(is.na(Sepal.Length), 5.84333333333333, </span></span>
+<span><span class="co">#&gt;     Sepal.Length) * -0.0303959537594359) + (ifelse(is.na(Sepal.Width), </span></span>
+<span><span class="co">#&gt;     3.05733333333333, Sepal.Width) * -0.492023767406961) + (ifelse(is.na(Petal.Length), </span></span>
+<span><span class="co">#&gt;     3.758, Petal.Length) * 0.0179469395936271) + (ifelse(is.na(Petal.Width), </span></span>
+<span><span class="co">#&gt;     1.19933333333333, Petal.Width) * -0.0152407670638333) - (0.391460011724113 + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(Sepal.Length), 5.84333333333333, Sepal.Length) * </span></span>
+<span><span class="co">#&gt;         -0.118750531861652) + (ifelse(is.na(Sepal.Width), 3.05733333333333, </span></span>
+<span><span class="co">#&gt;     Sepal.Width) * 0.378311039737146) + (ifelse(is.na(Petal.Length), </span></span>
+<span><span class="co">#&gt;     3.758, Petal.Length) * -0.084556881358667) + (ifelse(is.na(Petal.Width), </span></span>
+<span><span class="co">#&gt;     1.19933333333333, Petal.Width) * -0.16933234787912))) + exp(-1.35752186071634 + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(Sepal.Length), 5.84333333333333, Sepal.Length) * </span></span>
+<span><span class="co">#&gt;         0.149146485621088) + (ifelse(is.na(Sepal.Width), 3.05733333333333, </span></span>
+<span><span class="co">#&gt;     Sepal.Width) * 0.113712727669814) + (ifelse(is.na(Petal.Length), </span></span>
+<span><span class="co">#&gt;     3.758, Petal.Length) * 0.06660994176504) + (ifelse(is.na(Petal.Width), </span></span>
+<span><span class="co">#&gt;     1.19933333333333, Petal.Width) * 0.184573114942953) - (0.391460011724113 + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(Sepal.Length), 5.84333333333333, Sepal.Length) * </span></span>
+<span><span class="co">#&gt;         -0.118750531861652) + (ifelse(is.na(Sepal.Width), 3.05733333333333, </span></span>
+<span><span class="co">#&gt;     Sepal.Width) * 0.378311039737146) + (ifelse(is.na(Petal.Length), </span></span>
+<span><span class="co">#&gt;     3.758, Petal.Length) * -0.084556881358667) + (ifelse(is.na(Petal.Width), </span></span>
+<span><span class="co">#&gt;     1.19933333333333, Petal.Width) * -0.16933234787912))))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -251,8 +262,9 @@ expression per class:</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">drat</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">p_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 18.9698741155116 + (disp * -0.0183282632913477) + (hp * -0.0323705835435153) + </span></span>
-<span><span class="co">#&gt;     (drat * 2.80763705068415)</span></span></code></pre></div>
+<span><span class="co">#&gt; 18.9698741155116 + (ifelse(is.na(disp), 230.721875, disp) * -0.0183282632913477) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(hp), 146.6875, hp) * -0.0323705835435153) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(drat), 3.5965625, drat) * 2.80763705068415)</span></span></code></pre></div>
 <p><code>mixOmics</code> models are fit from a numeric matrix, so a
 model fit directly can only refer to the matrix columns it was given.
 Categorical predictors therefore work through the <code>parsnip</code>
@@ -267,9 +279,11 @@ written in terms of the original factors:</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">disp</span> <span class="op">+</span> <span class="va">hp</span> <span class="op">+</span> <span class="va">gear</span>, data <span class="op">=</span> <span class="va">cars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">c_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 28.3990491890354 + (disp * -0.0212765260717577) + (hp * -0.0321040699674561) + </span></span>
-<span><span class="co">#&gt;     (ifelse(gear == "4", 1, 0) * 1.89118556186025) + (ifelse(gear == </span></span>
-<span><span class="co">#&gt;     "5", 1, 0) * 3.84388465523581)</span></span></code></pre></div>
+<span><span class="co">#&gt; 28.3990491890354 + (ifelse(is.na(disp), 230.721875, disp) * -0.0212765260717577) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(hp), 146.6875, hp) * -0.0321040699674561) + </span></span>
+<span><span class="co">#&gt;     (ifelse(is.na(gear), 0.375, ifelse(gear == "4", 1, 0)) * </span></span>
+<span><span class="co">#&gt;         1.89118556186025) + (ifelse(is.na(gear), 0.15625, ifelse(gear == </span></span>
+<span><span class="co">#&gt;     "5", 1, 0)) * 3.84388465523581)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>

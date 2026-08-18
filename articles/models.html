@@ -152,7 +152,7 @@ route, not that it is known to fail.</p>
 </tr>
 <tr class="odd">
 <td>Regularized regression</td>
-<td><code><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet::glmnet()</a></code></td>
+<td><code><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet::glmnet()</a></code></td>
 <td>
 <code><a href="https://parsnip.tidymodels.org/reference/linear_reg.html" class="external-link">linear_reg()</a></code>, <code><a href="https://parsnip.tidymodels.org/reference/logistic_reg.html" class="external-link">logistic_reg()</a></code>,
 <code><a href="https://parsnip.tidymodels.org/reference/multinom_reg.html" class="external-link">multinom_reg()</a></code> with <code>engine = "glmnet"</code>
@@ -443,6 +443,31 @@ or <code>"klaR"</code>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level2">
+<h2 id="support-vector-machines-and-non-syntactic-names">Support vector machines and non-syntactic names<a class="anchor" aria-label="anchor" href="#support-vector-machines-and-non-syntactic-names"></a>
+</h2>
+<p><code><a href="https://rdrr.io/pkg/kernlab/man/ksvm.html" class="external-link">kernlab::ksvm()</a></code> collects its model matrix with
+<code>data.frame(y, x)</code>, whose default <code>check.names</code>
+runs the column names through <code>make.names(unique = TRUE)</code>. A
+predictor named <code>a:b</code> is therefore stored as
+<code>a.b</code>, and two predictors that mangle to the same name are
+told apart with a <code>.1</code> suffix. The original names are not
+recorded anywhere on the fitted object.</p>
+<p>On the formula interface there is a <code>terms</code> object to
+compare the stored names against, so <code><a href="../reference/parse_model.html">parse_model()</a></code> detects
+the ambiguity and aborts. On the matrix interface,
+<code>ksvm(x, y)</code>, there is no <code>terms</code> object, and the
+mangling cannot be detected at all: every name <code><a href="https://rdrr.io/r/base/make.names.html" class="external-link">make.names()</a></code>
+can produce is also a name it leaves alone, so a stored <code>a.b</code>
+is indistinguishable from a model that genuinely had a column named
+<code>a.b</code> and is correct. <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>
+therefore takes the stored names at face value, and a matrix model
+fitted with a non-syntactic column name yields a formula that refers to
+a column your data does not have.</p>
+<p>Give the matrix columns syntactic names before fitting, or use the
+formula interface, which will tell you when it cannot recover a
+name.</p>
 </div>
 <div class="section level2">
 <h2 id="intervals">Intervals<a class="anchor" aria-label="anchor" href="#intervals"></a>

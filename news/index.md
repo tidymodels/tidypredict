@@ -38,6 +38,20 @@
   never underflows.
   ([\#300](https://github.com/tidymodels/tidypredict/issues/300))
 
+- The models article now documents a limit on
+  [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) models
+  fitted through the matrix interface, `ksvm(x, y)`. `ksvm()` mangles
+  its model matrix column names with
+  [`make.names()`](https://rdrr.io/r/base/make.names.html) and keeps no
+  record of the originals, and unlike the formula interface there is no
+  `terms` object to detect this against, so a non-syntactic column name
+  such as `a:b` yields a formula referring to a column the data does not
+  have. This cannot be caught automatically, because every name
+  [`make.names()`](https://rdrr.io/r/base/make.names.html) produces is
+  also a name it leaves alone, so `a.b` from a mangled `a:b` is
+  indistinguishable from a correct model with a column genuinely named
+  `a.b`. ([\#418](https://github.com/tidymodels/tidypredict/issues/418))
+
 - [`acceptable_formula()`](https://tidypredict.tidymodels.org/reference/acceptable_formula.md)
   now checks the contrast of every factor predictor. A model that used
   the treatment contrast for one field and something else for another
@@ -57,6 +71,50 @@
   contrast; the check now decomposes each column against the model’s own
   term structure.
   ([\#391](https://github.com/tidymodels/tidypredict/issues/391))
+
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  and
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reject an ordered predictor in a parsnip fit whose engine is
+  `sda`, `sparsediscrim` or `mixOmics`, with the same “the treatment
+  contrast is the only one supported” error that
+  [`MASS::lda()`](https://rdrr.io/pkg/MASS/man/lda.html),
+  [`MASS::qda()`](https://rdrr.io/pkg/MASS/man/qda.html) and
+  [`mda::fda()`](https://rdrr.io/pkg/mda/man/fda.html) already gave.
+  parsnip builds the model matrix with `contr.poly`, whose `.L` and `.Q`
+  columns were read as level names, so the predictions were silently
+  wrong by as much as 1.34.
+  ([\#393](https://github.com/tidymodels/tidypredict/issues/393))
+
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  and
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now reject a `sparsediscrim` fit whose model matrix has two columns
+  with the same name, which happens when a factor level and another
+  predictor expand into the same name, such as level `y2` of `g` against
+  a predictor `gy2`. `sparsediscrim::predict()` selects those columns
+  back out by name and so silently uses one of them twice, disagreeing
+  with the fit it came from by as much as 0.84, and errors outright on a
+  parsnip fit; there is no answer that matches both.
+  ([\#398](https://github.com/tidymodels/tidypredict/issues/398))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now handles a `mixOmics` predictor that never varied, which is what an
+  unused factor level expands into. Such a column has a scale of zero
+  and so a coefficient of `NaN`, which made the fit fail with “missing
+  value where TRUE/FALSE needed”;
+  [`predict()`](https://rdrr.io/r/stats/predict.html) drops the column,
+  and the generated formula now does too.
+  ([\#398](https://github.com/tidymodels/tidypredict/issues/398))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now fills a missing `mixOmics` predictor in at its training mean, as
+  `predict.mixo_pls()` does, rather than returning `NA` for the row.
+  Each predictor is now wrapped in an `ifelse(is.na(x), mean, x)`, so
+  the generated formula is longer than before but agrees with
+  [`predict()`](https://rdrr.io/r/stats/predict.html) on data with
+  missing values.
+  ([\#398](https://github.com/tidymodels/tidypredict/issues/398))
 
 - [`acceptable_formula()`](https://tidypredict.tidymodels.org/reference/acceptable_formula.md)
   and
@@ -96,6 +154,26 @@
   dropping that dummy term from the prediction.
   ([\#390](https://github.com/tidymodels/tidypredict/issues/390))
 
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now aborts on a
+  [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
+  ensemble of C5.0 models fitted with `fuzzyThreshold = TRUE`. Fuzzy
+  thresholds send a case near a split point partly down both branches,
+  which a hard `<=` comparison cannot express, and baguette runs its
+  base fits through `butcher()`, which empties the `control` element the
+  existing check read; the option is now detected from the tree itself.
+  ([\#395](https://github.com/tidymodels/tidypredict/issues/395))
+
+- [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+  now maps the dummy columns of an
+  [`xrf::xrf()`](https://rdrr.io/pkg/xrf/man/xrf.html) model against the
+  model matrix the fit was built from. A dummy column whose name matched
+  a separate predictor, such as a `cyl4` dummy of a factor `cyl`
+  alongside a column literally named `cyl4`, was read as that predictor,
+  so the formula multiplied a factor by a coefficient and every
+  prediction came back as `NA`.
+  ([\#396](https://github.com/tidymodels/tidypredict/issues/396))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now returns predictions on the response scale for CatBoost models fit
   with the `Poisson` or `Tweedie` objective, applying
@@ -118,6 +196,16 @@
   column at all, so evaluating it returned a single value rather than
   one per row. The value was always correct; only its length was wrong.
   ([\#397](https://github.com/tidymodels/tidypredict/issues/397))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now applies the bias correction of a
+  [`randomForest::randomForest()`](https://rdrr.io/pkg/randomForest/man/randomForest.html)
+  model fitted with `corr.bias = TRUE`.
+  [`predict()`](https://rdrr.io/r/stats/predict.html) rescales the
+  forest average by the two coefficients stored in `model$coefs`, which
+  the parser never read, so the predictions were off by as much as 0.21
+  for a model of `mpg` on `mtcars`.
+  ([\#395](https://github.com/tidymodels/tidypredict/issues/395))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now sends a split threshold that is not finite, or that overflows the
@@ -148,6 +236,66 @@
   routed the missing value to the `.default` branch, so the row could
   come back as a different class.
   ([\#387](https://github.com/tidymodels/tidypredict/issues/387))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now matches [`predict()`](https://rdrr.io/r/stats/predict.html) for a
+  boosted
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  model (`trials > 1`) when new data is missing a split value. Each
+  trial picks its class by the same weighted descent a single tree uses
+  and votes with the confidence of that class, both of which the
+  generated formula worked out as if the row had reached one leaf. The
+  weighted form is only reached by rows that are actually missing a
+  split value, but it is stated once per class per trial, so the formula
+  for a boosted model grows quadratically in the number of outcome
+  levels.
+  ([\#416](https://github.com/tidymodels/tidypredict/issues/416))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now matches [`predict()`](https://rdrr.io/r/stats/predict.html) for a
+  rule-based
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  model, the engine behind parsnip’s
+  [`C5_rules()`](https://parsnip.tidymodels.org/reference/C5_rules.html),
+  when new data is missing a value a rule tests. Such a rule does not
+  fire in C5.0, but R returns `NA` rather than `FALSE` for a comparison
+  against a missing value, which spread through the vote sum and dropped
+  the row to the last class: 65 rows in 400 came back wrong in the
+  original report.
+  ([\#415](https://github.com/tidymodels/tidypredict/issues/415))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now matches `predict(type = "prob")` for the class probabilities of a
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  model when new data is missing a split value, which a
+  [`baguette::bagger()`](https://baguette.tidymodels.org/reference/bagger.html)
+  ensemble of C5.0 models averages to pick its class. Only the predicted
+  class was made aware of C5.0’s weighted descent; the probabilities
+  still routed a missing value to the `.default` branch, and were wrong
+  by as much as 0.75 on the rows affected.
+  ([\#417](https://github.com/tidymodels/tidypredict/issues/417))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now follows the per-node missing value direction a
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  model learns when its training data contains `NA`. Since ranger 0.17.0
+  the default `na.action = "na.learn"` picks a side for missing values
+  at each node it saw one at and saves it for prediction, but the
+  generated formula always sent them left, so rows with `NA` could be
+  predicted at the wrong leaf.
+  ([\#394](https://github.com/tidymodels/tidypredict/issues/394))
+
+- [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  now matches [`predict()`](https://rdrr.io/r/stats/predict.html) for a
+  [`ranger::ranger()`](http://imbs-hl.github.io/ranger/reference/ranger.md)
+  model fitted with `respect.unordered.factors = "partition"` on a
+  factor with more than 31 levels. Such a split is stored as a bit mask
+  naming the levels that go right, and the levels were read from
+  [`ranger::treeInfo()`](http://imbs-hl.github.io/ranger/reference/treeInfo.md),
+  which can only render a mask of up to 31 levels and silently blanks a
+  wider one out; the mask is now decoded from the value stored on the
+  forest, which `ranger` allows up to 53 levels.
+  ([\#414](https://github.com/tidymodels/tidypredict/issues/414))
 
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   now rejects an `interval` that is not a single number strictly between
@@ -898,7 +1046,7 @@
   ([\#232](https://github.com/tidymodels/tidypredict/issues/232))
 
 - Added support for multinomial
-  [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html)
+  [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html)
   models (`family = "multinomial"`), including
   [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html)
   parsnip models fitted with the `"glmnet"` engine.
@@ -1237,9 +1385,9 @@ CRAN release: 2026-02-27
   [\#206](https://github.com/tidymodels/tidypredict/issues/206),
   [\#207](https://github.com/tidymodels/tidypredict/issues/207))
 
-- [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models now
-  support `Gamma` family and Cox proportional hazards (`family = "cox"`)
-  models.
+- [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  now support `Gamma` family and Cox proportional hazards
+  (`family = "cox"`) models.
   ([\#200](https://github.com/tidymodels/tidypredict/issues/200),
   [\#201](https://github.com/tidymodels/tidypredict/issues/201))
 
@@ -1304,9 +1452,9 @@ CRAN release: 2026-02-27
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now works with
-  [`glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) models that
-  use family function syntax (e.g., `family = gaussian()`) instead of
-  string syntax (e.g., `family = "gaussian"`).
+  [`glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) models
+  that use family function syntax (e.g., `family = gaussian()`) instead
+  of string syntax (e.g., `family = "gaussian"`).
   ([\#197](https://github.com/tidymodels/tidypredict/issues/197))
 
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)

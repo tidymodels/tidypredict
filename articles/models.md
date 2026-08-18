@@ -17,7 +17,7 @@ route, not that it is known to fail.
 |----|----|----|----|
 | Linear regression | [`stats::lm()`](https://rdrr.io/r/stats/lm.html) | `linear_reg(engine = "lm")` | [article](https://tidypredict.tidymodels.org/articles/lm.md) |
 | Generalized linear regression | [`stats::glm()`](https://rdrr.io/r/stats/glm.html) | `linear_reg(engine = "glm")`, `logistic_reg(engine = "glm")` | [article](https://tidypredict.tidymodels.org/articles/glm.md) |
-| Regularized regression | [`glmnet::glmnet()`](https://rdrr.io/pkg/glmnet/man/glmnet.html) | [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html), [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html), [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html) with `engine = "glmnet"` | [article](https://tidypredict.tidymodels.org/articles/glmnet.md) |
+| Regularized regression | [`glmnet::glmnet()`](https://glmnet.stanford.edu/reference/glmnet.html) | [`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html), [`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html), [`multinom_reg()`](https://parsnip.tidymodels.org/reference/multinom_reg.html) with `engine = "glmnet"` | [article](https://tidypredict.tidymodels.org/articles/glmnet.md) |
 | Regularized linear models | [`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html) | `logistic_reg(engine = "LiblineaR")`, `svm_linear(engine = "LiblineaR")` |  |
 | Quantile regression | [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html), `quantreg::rqs()` | `linear_reg(engine = "quantreg")` |  |
 | Multinomial regression | [`nnet::multinom()`](https://rdrr.io/pkg/nnet/man/multinom.html) | `multinom_reg(engine = "nnet")` | [article](https://tidypredict.tidymodels.org/articles/multinom.md) |
@@ -65,6 +65,32 @@ route, not that it is known to fail.
 | RuleFit | [`xrf::xrf()`](https://rdrr.io/pkg/xrf/man/xrf.html) | `rule_fit(engine = "xrf")` |  |
 | H2O gradient boosting | [`h2o::h2o.gbm()`](https://rdrr.io/pkg/h2o/man/h2o.gbm.html) | `boost_tree(engine = "h2o_gbm")`, via agua | [article](https://tidypredict.tidymodels.org/articles/h2o.md) |
 | H2O RuleFit | [`h2o::h2o.rulefit()`](https://rdrr.io/pkg/h2o/man/h2o.rulefit.html) | `rule_fit(engine = "h2o")`, via agua | [article](https://tidypredict.tidymodels.org/articles/h2o.md) |
+
+## Support vector machines and non-syntactic names
+
+[`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html) collects
+its model matrix with `data.frame(y, x)`, whose default `check.names`
+runs the column names through `make.names(unique = TRUE)`. A predictor
+named `a:b` is therefore stored as `a.b`, and two predictors that mangle
+to the same name are told apart with a `.1` suffix. The original names
+are not recorded anywhere on the fitted object.
+
+On the formula interface there is a `terms` object to compare the stored
+names against, so
+[`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
+detects the ambiguity and aborts. On the matrix interface, `ksvm(x, y)`,
+there is no `terms` object, and the mangling cannot be detected at all:
+every name [`make.names()`](https://rdrr.io/r/base/make.names.html) can
+produce is also a name it leaves alone, so a stored `a.b` is
+indistinguishable from a model that genuinely had a column named `a.b`
+and is correct.
+[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+therefore takes the stored names at face value, and a matrix model
+fitted with a non-syntactic column name yields a formula that refers to
+a column your data does not have.
+
+Give the matrix columns syntactic names before fitting, or use the
+formula interface, which will tell you when it cannot recover a name.
 
 ## Intervals
 
