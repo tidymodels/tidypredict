@@ -230,25 +230,15 @@ test_that("newdata containing NA matches predict() with parsnip", {
   expect_equal(unname(probs), unname(native), tolerance = sda_tolerance)
 })
 
-test_that("an ordered factor is silently wrong with parsnip", {
+test_that("an ordered factor is rejected with parsnip (#393)", {
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
-  skip(
-    "`parse_model_sda()` has no contrast check, so the `contr.poly` columns
-     `f.L` and `f.Q` that an ordered predictor expands into are read as levels
-     of `f`. The generated formula compares `f` against level names that never
-     match and the probabilities are off by up to 0.79. `MASS::lda()` and
-     `mda::fda()` reject the same fit."
-  )
+
   df <- sda_factor_data(c("p", "q", "r"), ordered = TRUE)
   spec <- parsnip::discrim_linear(engine = "sda")
   model <- parsnip::fit(spec, cls ~ x + f, df)
 
-  expect_equal(
-    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))),
-    unname(as.matrix(predict(model, df, type = "prob"))),
-    tolerance = sda_tolerance
-  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
 test_that("a coefficient label colliding with a variable name works (#376)", {

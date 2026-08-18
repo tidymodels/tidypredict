@@ -13,6 +13,14 @@
       [1] "-258.6928 + (Sepal.Length * 25.36695) + (Sepal.Width * 26.29996) + (Petal.Length * 30.59223) + (Petal.Width * 49.36166)"
       
 
+# an ordered factor is rejected with parsnip (#393)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_ordered()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
 # inline formula functions are rejected
 
     Code

@@ -208,24 +208,15 @@ test_that("a coefficient label colliding with a variable name is wrong (#376)", 
   )
 })
 
-test_that("an ordered factor is silently wrong with parsnip", {
+test_that("an ordered factor is rejected with parsnip (#393)", {
   skip_if_not_installed("sparsediscrim")
   skip_if_not_installed("discrim")
-  skip(
-    "The parsnip path passes a model matrix built with `contr.poly`, whose
-     columns `f.L` and `f.Q` are read as levels of `f`. The generated formula
-     compares `f` against level names that never match and the probabilities
-     are off by up to 0.49. The formula method, which names its own columns
-     after the levels, is unaffected."
-  )
+
   df <- sparsediscrim_factor_data(c("p", "q", "r"), ordered = TRUE)
   spec <- parsnip::discrim_linear(engine = "sparsediscrim")
   model <- parsnip::fit(spec, cls ~ x + f, df)
 
-  expect_equal(
-    unname(sapply(tidypredict_fit(model), \(f) rlang::eval_tidy(f, df))),
-    unname(as.matrix(predict(model, df, type = "prob")))
-  )
+  expect_snapshot(tidypredict_fit(model), error = TRUE)
 })
 
 test_that("estimated priors are handled", {
