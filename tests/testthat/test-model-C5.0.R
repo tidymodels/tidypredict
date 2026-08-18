@@ -187,6 +187,38 @@ test_that("a boosted vote tie goes to the default class (#287)", {
   expect_equal(rlang::eval_tidy(fit, data.frame(x = 1)), "c")
 })
 
+test_that("boosted models with NA in newdata match predict() (#416)", {
+  skip_if_not_installed("C50")
+  set.seed(11)
+  n <- 400
+  df <- data.frame(
+    v1 = rnorm(n),
+    v2 = rnorm(n),
+    f1 = factor(sample(letters[1:4], n, TRUE))
+  )
+  lp <- df$v1 - 2 * df$v2 + 0.7 * as.integer(df$f1) + rnorm(n)
+  df$g <- factor(c("A", "B", "C")[cut(lp, 3, labels = FALSE)])
+
+  nd <- df
+  for (col in c("v1", "v2", "f1")) {
+    nd[[col]][sample(n, 60)] <- NA
+  }
+
+  for (trials in c(3L, 5L)) {
+    model <- C50::C5.0(g ~ ., data = df, trials = trials)
+    expected <- as.character(predict(model, nd))
+
+    expect_equal(
+      as.character(rlang::eval_tidy(tidypredict_fit(model), nd)),
+      expected
+    )
+    expect_equal(
+      as.character(rlang::eval_tidy(tidypredict_fit(parse_model(model)), nd)),
+      expected
+    )
+  }
+})
+
 test_that("boosted models round-trip through parse_model()", {
   skip_if_not_installed("C50")
   model <- C50::C5.0(iris[, 1:4], iris$Species, trials = 5)

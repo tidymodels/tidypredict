@@ -225,11 +225,15 @@ parse_c50_trees <- function(model) {
   })
 
   lapply(seq_len(n_trees), function(i) {
-    c50_set_leaf_predictions(
+    tree <- c50_set_leaf_predictions(
       trees[[i]],
       c50_node_prior(roots[[i]], levels),
       levels
     )
+    # `Pruned[t]->Leaf` in the C sources: the class `SelectClassGen()` starts
+    # from, and so gives any tie to, when this trial classifies a case.
+    tree$root_class <- roots[[i]]$class
+    tree
   })
 }
 
@@ -706,6 +710,111 @@ c50_boosted_case_when <- function(tree_info_list, classes, default = NULL) {
   build_argmax_case_when(votes, ordered)
 }
 
+# Boosting under a missing split value
+#
+# `PredictBoostClassify()` in C5.0's `classify.c` runs each trial in turn:
+#
+#   Best = PredictTreeClassify(Case, Pruned[t])
+#   Vote[Best] += Confidence
+#
+# and finally takes `SelectClassGen()` over `Vote[c] / Total`. Dividing by
+# `Total` is a positive constant and cannot move the argmax, so it is dropped.
+#
+# `PredictTreeClassify()` picks `Best` as the argmax of the *raw* accumulated
+# `ClassSum[c]`, starting from that trial's own root class, and only then
+# rewrites `ClassSum[c]` as `(W * ClassSum[c] + prior[c]) / (W + 1)` and takes
+# `Confidence = ClassSum[Best]`. With no missing split value the case reaches a
+# single leaf, so `Best` is that leaf's recorded class and `Confidence` is the
+# leaf confidence the ordinary expression already votes with. A missing split
+# value makes both the argmax and the confidence depend on the weighted descent,
+# which is what this rebuilds.
+
+# Whether each score is the first of `scores` to attain the maximum, which is
+# what `SelectClassGen()` returns when its default class is put first: it starts
+# from the default and replaces only on a strict `>`.
+c50_argmax_indicators <- function(scores) {
+  n <- length(scores)
+  lapply(seq_len(n), function(j) {
+    conds <- c(
+      lapply(seq_len(j - 1L), \(i) expr(!!scores[[j]] > !!scores[[i]])),
+      lapply(seq_len(n - j) + j, \(i) expr(!!scores[[j]] >= !!scores[[i]]))
+    )
+    combine_path_conditions(conds)
+  })
+}
+
+# One trial's confidence-weighted vote for every class, named by class.
+c50_trial_na_votes <- function(tree_info, classes) {
+  root <- which(tree_info$nodeID == 0L)
+  root_freq <- tree_info$node_freq[[root]]
+  priors <- root_freq / sum(root_freq)
+
+  ordered <- c(
+    tree_info$default_class,
+    setdiff(classes, tree_info$default_class)
+  )
+  index <- match(ordered, classes)
+
+  scores <- lapply(index, function(i) c50_na_score(0L, tree_info, i))
+  n <- c50_na_cases(0L, tree_info)
+  wins <- c50_argmax_indicators(scores)
+
+  votes <- lapply(seq_along(ordered), function(j) {
+    confidence <- expr(
+      (!!expr_multiplication(n, scores[[j]]) + !!priors[[index[[j]]]]) /
+        (!!n + 1)
+    )
+    expr(dplyr::if_else(!!wins[[j]], !!confidence, 0))
+  })
+  names(votes) <- ordered
+  votes
+}
+
+# Whether a trial carries everything the weighted descent needs. A model parsed
+# before these fields were recorded, or one whose trials are all stumps, keeps
+# the expression it had.
+c50_boosted_na_ready <- function(tree_info_list) {
+  all(vapply(
+    tree_info_list,
+    function(x) {
+      root <- which(x$nodeID == 0L)
+      !is.null(x$node_freq) &&
+        !is.null(x$default_class) &&
+        length(root) == 1 &&
+        !is.null(x$node_freq[[root]])
+    },
+    logical(1)
+  ))
+}
+
+c50_boosted_with_na_descent <- function(fit, tree_info_list, classes, default) {
+  cols <- unique(unlist(lapply(
+    tree_info_list,
+    function(x) x$splitvarName[!is.na(x$splitvarName)]
+  )))
+  if (
+    length(cols) == 0 ||
+      is.null(classes) ||
+      is.null(default) ||
+      !c50_boosted_na_ready(tree_info_list)
+  ) {
+    return(fit)
+  }
+
+  trial_votes <- lapply(tree_info_list, c50_trial_na_votes, classes = classes)
+
+  ordered <- c(default, setdiff(classes, default))
+  votes <- lapply(ordered, function(class) {
+    reduce_addition(lapply(trial_votes, function(x) x[[class]]))
+  })
+
+  any_missing <- reduce_or(map(cols, \(col) expr(is.na(!!rlang::sym(col)))))
+  expr(case_when(
+    !!any_missing ~ !!build_argmax_case_when(votes, ordered),
+    .default = !!fit
+  ))
+}
+
 # Rules -----------------------------------------
 
 # A rule-based C5.0 model (`rules = TRUE`, the engine behind parsnip's
@@ -878,8 +987,22 @@ tidypredict_fit.C5.0 <- function(model, ...) {
       tree_info
     ))
   }
-  tree_info_list <- lapply(trees, c50_tree_info)
-  c50_boosted_case_when(tree_info_list, model$levels, c50_default_class(model))
+  tree_info_list <- c50_boosted_tree_info(trees, model$levels)
+  classes <- model$levels
+  default <- c50_default_class(model)
+  c50_boosted_with_na_descent(
+    c50_boosted_case_when(tree_info_list, classes, default),
+    tree_info_list,
+    classes,
+    default
+  )
+}
+
+# One `tree_info` per trial, each carrying the outcome levels and its own root
+# class, which the weighted descent needs to break ties as `SelectClassGen()`
+# does within that trial.
+c50_boosted_tree_info <- function(trees, classes) {
+  lapply(trees, function(tree) c50_tree_info(tree, classes, tree$root_class))
 }
 
 # Test ---------------------------------------------
@@ -930,7 +1053,7 @@ parse_model.C5.0 <- function(model) {
       c50_default_class(model)
     )
   } else {
-    pm$tree_info_list <- lapply(trees, c50_tree_info)
+    pm$tree_info_list <- c50_boosted_tree_info(trees, model$levels)
     pm$classes <- model$levels
     pm$default <- c50_default_class(model)
   }
@@ -956,7 +1079,12 @@ build_tree_formula.pm_tree_C5.0 <- function(model) {
     return(c50_rules_case_when(model$rules_info))
   }
   if (!is.null(model$tree_info_list)) {
-    return(c50_boosted_case_when(
+    return(c50_boosted_with_na_descent(
+      c50_boosted_case_when(
+        model$tree_info_list,
+        model$classes,
+        model$default
+      ),
       model$tree_info_list,
       model$classes,
       model$default
