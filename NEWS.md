@@ -10,6 +10,14 @@
 
 - `acceptable_formula()` no longer rejects a `MASS::lda()`, `MASS::qda()` or `earth::earth()` fit whose factor has a level containing a colon. The contrast check split the model matrix column names on `:` to find interactions, so such a level looked like one and the fit was refused as using an unsupported contrast; the check now decomposes each column against the model's own term structure. (#391)
 
+- `parse_model()` and `tidypredict_fit()` now reject a `sparsediscrim` fit whose model matrix has two columns with the same name, which happens when a factor level and another predictor expand into the same name, such as level `y2` of `g` against a predictor `gy2`. `sparsediscrim::predict()` selects those columns back out by name and so silently uses one of them twice, disagreeing with the fit it came from by as much as 0.84, and errors outright on a parsnip fit; there is no answer that matches both. (#398)
+
+- `tidypredict_fit()` now handles a `mixOmics` predictor that never varied, which is what an unused factor level expands into. Such a column has a scale of zero and so a coefficient of `NaN`, which made the fit fail with "missing value where TRUE/FALSE needed"; `predict()` drops the column, and the generated formula now does too. (#398)
+
+- `tidypredict_fit()` now fills a missing `mixOmics` predictor in at its training mean, as `predict.mixo_pls()` does, rather than returning `NA` for the row. Each predictor is now wrapped in an `ifelse(is.na(x), mean, x)`, so the generated formula is longer than before but agrees with `predict()` on data with missing values. (#398)
+
+- `parse_model()` and `tidypredict_fit()` now reject an ordered predictor in a parsnip fit whose engine is `sda`, `sparsediscrim` or `mixOmics`, with the same "the treatment contrast is the only one supported" error that `MASS::lda()`, `MASS::qda()` and `mda::fda()` already gave. parsnip builds the model matrix with `contr.poly`, whose `.L` and `.Q` columns were read as level names, so the predictions were silently wrong by as much as 1.34. (#393)
+
 - `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
