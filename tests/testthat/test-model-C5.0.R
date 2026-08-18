@@ -515,17 +515,8 @@ test_that("a single-column model matrix matches predict()", {
   )
 })
 
-test_that("newdata containing NA matches predict()", {
+test_that("newdata containing NA matches predict() (#387)", {
   skip_if_not_installed("C50")
-  skip(paste(
-    "C5.0 resolves a missing split value by descending every branch and",
-    "combining the leaf class distributions weighted by branch frequency",
-    "(the `forks` entry in the model text). The generated `case_when()` sends",
-    "NA to `.default` instead, so a row missing a split variable gets the",
-    "wrong class. On `mtcars` with `cyl` blanked, `predict()` returns \"1\"",
-    "(prob 0.523) where tidypredict returns \"0\"."
-  ))
-
   df <- mtcars
   df$vs <- factor(df$vs)
   model <- C50::C5.0(df[, c("wt", "cyl", "mpg")], df$vs)
@@ -536,6 +527,44 @@ test_that("newdata containing NA matches predict()", {
   expect_equal(
     as.character(rlang::eval_tidy(tidypredict_fit(model), nd)),
     as.character(predict(model, nd))
+  )
+})
+
+test_that("NA in a factor predictor matches predict() (#387)", {
+  skip_if_not_installed("C50")
+  set.seed(24)
+  n <- 400
+  df <- data.frame(
+    v1 = rnorm(n),
+    v2 = rnorm(n),
+    f1 = factor(sample(letters[1:4], n, TRUE)),
+    f2 = factor(sample(c("p", "q", "r", "s", "t"), n, TRUE))
+  )
+  lp <- df$v1 -
+    2 * df$v2 +
+    0.7 * as.integer(df$f1) +
+    0.4 * as.integer(df$f2) +
+    rnorm(n)
+  df$g <- factor(c("A", "B", "C")[cut(lp, 3, labels = FALSE)])
+  model <- C50::C5.0(
+    g ~ .,
+    data = df,
+    control = C50::C5.0Control(subset = TRUE)
+  )
+
+  nd <- df
+  for (col in c("v1", "v2", "f1", "f2")) {
+    nd[[col]][sample(n, 60)] <- NA
+  }
+  expected <- as.character(predict(model, nd))
+
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(model), nd)),
+    expected
+  )
+  expect_equal(
+    as.character(rlang::eval_tidy(tidypredict_fit(parse_model(model)), nd)),
+    expected
   )
 })
 

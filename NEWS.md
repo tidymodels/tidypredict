@@ -22,6 +22,8 @@
 
 - `tidypredict_fit()` now works on a parsed LightGBM model fit with `linear_tree = TRUE`. A leaf of a linear tree stores its coefficients separately and leaves its constant prediction empty, which the parsed path never read, so the formula failed with "`..1 (right)` must be a vector, not `NULL`". This also affected such a model saved with `tidypredict_save()` and read back with `tidypredict_load()`. (#346)
 
+- `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
+
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 
 - `tidypredict_interval()` now reports a parsed model of a type it does not support with the same message it gives for a fitted model, rather than "Model type not supported.", and reports a list that is not a parsed model rather than failing with "argument is of length zero". (#313)
