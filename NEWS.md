@@ -44,6 +44,8 @@
 
 - `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
 
+- `tidypredict_fit()` now matches `predict()` for a rule-based `C50::C5.0()` model, the engine behind parsnip's `C5_rules()`, when new data is missing a value a rule tests. Such a rule does not fire in C5.0, but R returns `NA` rather than `FALSE` for a comparison against a missing value, which spread through the vote sum and dropped the row to the last class: 65 rows in 400 came back wrong in the original report. (#415)
+
 - `tidypredict_fit()` now matches `predict(type = "prob")` for the class probabilities of a `C50::C5.0()` model when new data is missing a split value, which a `baguette::bagger()` ensemble of C5.0 models averages to pick its class. Only the predicted class was made aware of C5.0's weighted descent; the probabilities still routed a missing value to the `.default` branch, and were wrong by as much as 0.75 on the rows affected. (#417)
 
 - `tidypredict_fit()` now follows the per-node missing value direction a `ranger::ranger()` model learns when its training data contains `NA`. Since ranger 0.17.0 the default `na.action = "na.learn"` picks a side for missing values at each node it saw one at and saves it for prediction, but the generated formula always sent them left, so rows with `NA` could be predicted at the wrong leaf. (#394)
