@@ -44,6 +44,8 @@
 
 - `tidypredict_fit()` now follows the per-node missing value direction a `ranger::ranger()` model learns when its training data contains `NA`. Since ranger 0.17.0 the default `na.action = "na.learn"` picks a side for missing values at each node it saw one at and saves it for prediction, but the generated formula always sent them left, so rows with `NA` could be predicted at the wrong leaf. (#394)
 
+- `tidypredict_fit()` now matches `predict()` for a `ranger::ranger()` model fitted with `respect.unordered.factors = "partition"` on a factor with more than 31 levels. Such a split is stored as a bit mask naming the levels that go right, and the levels were read from `ranger::treeInfo()`, which can only render a mask of up to 31 levels and silently blanks a wider one out; the mask is now decoded from the value stored on the forest, which `ranger` allows up to 53 levels. (#414)
+
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 
 - `tidypredict_interval()` now reports a parsed model of a type it does not support with the same message it gives for a fitted model, rather than "Model type not supported.", and reports a list that is not a parsed model rather than failing with "argument is of length zero". (#313)
