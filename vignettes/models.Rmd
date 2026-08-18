@@ -66,6 +66,14 @@ tidypredict dispatches on the class of the fitted model, so a model is supported
 | H2O gradient boosting | `h2o::h2o.gbm()` | `boost_tree(engine = "h2o_gbm")`, via agua | [article](h2o.html) |
 | H2O RuleFit | `h2o::h2o.rulefit()` | `rule_fit(engine = "h2o")`, via agua | [article](h2o.html) |
 
+## Support vector machines and non-syntactic names
+
+`kernlab::ksvm()` collects its model matrix with `data.frame(y, x)`, whose default `check.names` runs the column names through `make.names(unique = TRUE)`. A predictor named `a:b` is therefore stored as `a.b`, and two predictors that mangle to the same name are told apart with a `.1` suffix. The original names are not recorded anywhere on the fitted object.
+
+On the formula interface there is a `terms` object to compare the stored names against, so `parse_model()` detects the ambiguity and aborts. On the matrix interface, `ksvm(x, y)`, there is no `terms` object, and the mangling cannot be detected at all: every name `make.names()` can produce is also a name it leaves alone, so a stored `a.b` is indistinguishable from a model that genuinely had a column named `a.b` and is correct. `tidypredict_fit()` therefore takes the stored names at face value, and a matrix model fitted with a non-syntactic column name yields a formula that refers to a column your data does not have.
+
+Give the matrix columns syntactic names before fitting, or use the formula interface, which will tell you when it cannot recover a name.
+
 ## Intervals
 
 `tidypredict_interval()` and `tidypredict_sql_interval()` are narrower than `tidypredict_fit()`: they only support `lm()` and `glm()` models.

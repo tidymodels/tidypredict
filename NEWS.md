@@ -6,6 +6,8 @@
 
 - The naive Bayes article now documents the one case where `tidypredict_fit()` does not reproduce `predict()` for `klaR::NaiveBayes()` and `naivebayes::naive_bayes()` models: both replace a normal density that underflowed to zero with their `threshold` argument, which takes a value roughly 38 standard deviations from the class mean, and the log scale used throughout never underflows. (#300)
 
+- The models article now documents a limit on `kernlab::ksvm()` models fitted through the matrix interface, `ksvm(x, y)`. `ksvm()` mangles its model matrix column names with `make.names()` and keeps no record of the originals, and unlike the formula interface there is no `terms` object to detect this against, so a non-syntactic column name such as `a:b` yields a formula referring to a column the data does not have. This cannot be caught automatically, because every name `make.names()` produces is also a name it leaves alone, so `a.b` from a mangled `a:b` is indistinguishable from a correct model with a column genuinely named `a.b`. (#418)
+
 - `acceptable_formula()` now checks the contrast of every factor predictor. A model that used the treatment contrast for one field and something else for another was accepted and then silently mis-parsed; such a model now aborts with the usual "the treatment contrast is the only one supported" error, which also names the offending field rather than the contrast. (#291)
 
 - `acceptable_formula()` no longer rejects a `MASS::lda()`, `MASS::qda()` or `earth::earth()` fit whose factor has a level containing a colon. The contrast check split the model matrix column names on `:` to find interactions, so such a level looked like one and the fit was refused as using an unsupported contrast; the check now decomposes each column against the model's own term structure. (#391)
@@ -43,6 +45,8 @@
 - `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
 
 - `tidypredict_fit()` now matches `predict()` for a rule-based `C50::C5.0()` model, the engine behind parsnip's `C5_rules()`, when new data is missing a value a rule tests. Such a rule does not fire in C5.0, but R returns `NA` rather than `FALSE` for a comparison against a missing value, which spread through the vote sum and dropped the row to the last class: 65 rows in 400 came back wrong in the original report. (#415)
+
+- `tidypredict_fit()` now matches `predict(type = "prob")` for the class probabilities of a `C50::C5.0()` model when new data is missing a split value, which a `baguette::bagger()` ensemble of C5.0 models averages to pick its class. Only the predicted class was made aware of C5.0's weighted descent; the probabilities still routed a missing value to the `.default` branch, and were wrong by as much as 0.75 on the rows affected. (#417)
 
 - `tidypredict_fit()` now follows the per-node missing value direction a `ranger::ranger()` model learns when its training data contains `NA`. Since ranger 0.17.0 the default `na.action = "na.learn"` picks a side for missing values at each node it saw one at and saves it for prediction, but the generated formula always sent them left, so rows with `NA` could be predicted at the wrong leaf. (#394)
 

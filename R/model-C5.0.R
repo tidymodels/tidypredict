@@ -406,6 +406,23 @@ c50_leaf_share <- function(freq, class_index) {
   freq[[class_index]] / sum(freq)
 }
 
+# The share of the case that goes down the left branch: the branch's share of
+# the node's training cases when the split value is missing, and the ordinary
+# 1/0 of the comparison otherwise.
+c50_na_weight <- function(idx, tree_info) {
+  wl <- tree_info$cases_left[[idx]]
+  wr <- tree_info$cases_right[[idx]]
+  total <- wl + wr
+  missing_weight <- if (is.na(total) || total == 0) 0 else wl / total
+
+  primary <- tree_info$node_splits[[idx]]$primary
+  expr(case_when(
+    !!build_nested_split_missing(primary) ~ !!missing_weight,
+    !!build_nested_split_condition(primary) ~ 1,
+    .default = 0
+  ))
+}
+
 c50_na_score <- function(node_id, tree_info, class_index, parent_freq = NULL) {
   idx <- which(tree_info$nodeID == node_id)
 
@@ -431,26 +448,100 @@ c50_na_score <- function(node_id, tree_info, class_index, parent_freq = NULL) {
     parent_freq = freq
   )
 
-  wl <- tree_info$cases_left[[idx]]
-  wr <- tree_info$cases_right[[idx]]
-  total <- wl + wr
-  missing_weight <- if (is.na(total) || total == 0) 0 else wl / total
-
   # Written as `w * left + (1 - w) * right` rather than as one `case_when()`
   # with the two subtrees under both the missing arm and the comparison arm.
   # The latter states each subtree twice, which doubles the expression at every
   # level of the tree.
-  primary <- tree_info$node_splits[[idx]]$primary
-  weight <- expr(case_when(
-    !!build_nested_split_missing(primary) ~ !!missing_weight,
-    !!build_nested_split_condition(primary) ~ 1,
-    .default = 0
-  ))
+  weight <- c50_na_weight(idx, tree_info)
 
   reduce_addition(list(
     expr_multiplication(weight, left),
     expr_multiplication(expr(1 - !!weight), right)
   ))
+}
+
+# `ClassSum[0]` in `FindLeafGen()`: the same weighted descent as
+# `c50_na_score()`, but each leaf reached contributes `Fraction * Cases` rather
+# than a class share. A leaf with no cases of its own is again scored against
+# its parent, matching the `T = PT` line.
+c50_na_cases <- function(node_id, tree_info, parent_cases = NULL) {
+  idx <- which(tree_info$nodeID == node_id)
+
+  if (tree_info$terminal[idx]) {
+    freq <- tree_info$leaf_freq[[idx]]
+    cases <- if (is.null(freq)) 0 else sum(freq)
+    if (cases == 0) {
+      cases <- parent_cases %||% 0
+    }
+    return(cases)
+  }
+
+  freq <- tree_info$node_freq[[idx]]
+  cases <- if (is.null(freq)) NULL else sum(freq)
+  left <- c50_na_cases(
+    tree_info$leftChild[idx],
+    tree_info,
+    parent_cases = cases
+  )
+  right <- c50_na_cases(
+    tree_info$rightChild[idx],
+    tree_info,
+    parent_cases = cases
+  )
+
+  weight <- c50_na_weight(idx, tree_info)
+
+  reduce_addition(list(
+    expr_multiplication(weight, left),
+    expr_multiplication(expr(1 - !!weight), right)
+  ))
+}
+
+# Class probabilities under a missing split value.
+#
+# `PredictTreeClassify()` in `classify.c` accumulates the weighted class shares
+# in `ClassSum[c]` and the weighted leaf count in `ClassSum[0]`, then reports
+#
+#   ClassSum[c] <- (ClassSum[0] * ClassSum[c] + Prior[c]) / (ClassSum[0] + 1)
+#
+# with `Prior[c]` the class proportion at the root of the tree. With no missing
+# value the case reaches a single leaf, so `ClassSum[0]` is that leaf's case
+# count and the formula collapses to the `(freq + prior) / (n + 1)` the ordinary
+# nested `case_when()` already returns. Only rows actually missing a split value
+# need the weighted form, so they are the only ones routed to it.
+c50_classprob_with_na_descent <- function(fit, tree_info) {
+  class_index <- tree_info$prob_class_index
+  prior <- tree_info$prob_prior
+  cols <- unique(tree_info$splitvarName[!is.na(tree_info$splitvarName)])
+  # A stump has nothing to descend, and a parsed model saved before this was
+  # recorded cannot be given the weighted branch.
+  if (
+    length(cols) == 0 ||
+      is.null(tree_info$node_freq) ||
+      is.null(class_index) ||
+      is.null(prior)
+  ) {
+    return(fit)
+  }
+
+  n <- c50_na_cases(0L, tree_info)
+  share <- c50_na_score(0L, tree_info, class_index)
+  prob <- expr((!!expr_multiplication(n, share) + !!prior) / (!!n + 1))
+
+  any_missing <- reduce_or(map(cols, \(col) expr(is.na(!!rlang::sym(col)))))
+  expr(case_when(
+    !!any_missing ~ !!prob,
+    .default = !!fit
+  ))
+}
+
+# The expression for one class-probability tree, weighted descent included when
+# the tree carries what that needs (C5.0) and plain otherwise (rpart).
+classprob_tree_expr <- function(tree_info) {
+  c50_classprob_with_na_descent(
+    generate_nested_case_when_tree(tree_info),
+    tree_info
+  )
 }
 
 # Wrap the ordinary nested `case_when()` so that only rows actually missing a
@@ -572,7 +663,12 @@ c50_classprob_tree_info <- function(model, call = rlang::caller_env()) {
   })
 
   res <- map(seq_along(classes), function(i) {
-    tree_info_with_predictions(tree_info, map_dbl(probs, ~ .x[[i]]))
+    ti <- tree_info_with_predictions(tree_info, map_dbl(probs, ~ .x[[i]]))
+    # Which class this tree scores, and that class's prior, so the weighted
+    # descent used for a missing split value can rebuild the probability.
+    ti$prob_class_index <- i
+    ti$prob_prior <- priors[[i]]
+    ti
   })
   names(res) <- classes
   res
