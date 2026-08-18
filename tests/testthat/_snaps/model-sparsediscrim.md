@@ -22,6 +22,14 @@
       x Two predictors expanded into the same model matrix column "gy2".
       i `sparsediscrim::predict()` cannot tell them apart either. Rename the predictor or the factor level it collides with.
 
+# an ordered factor is rejected with parsnip (#393)
+
+    Code
+      tidypredict_fit(model)
+    Condition
+      Error in `acceptable_ordered()`:
+      ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
+
 # inline formula functions are rejected
 
     Code
