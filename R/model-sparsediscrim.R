@@ -45,6 +45,8 @@ parse_model_sparsediscrim <- function(
   # precision matrix. The quadratic `x' P x` term is identical for every class,
   # so it cancels in the softmax and what is left is one linear predictor per
   # class.
+  sparsediscrim_col_names(model)
+
   precision <- sparsediscrim_precision(model)
   labels <- c("(Intercept)", model$col_names)
   fields <- preproc_fields(labels, preproc)
@@ -66,6 +68,36 @@ parse_model_sparsediscrim <- function(
     sparsediscrim_method(model),
     model$groups,
     unname(class_terms)
+  )
+}
+
+# Abort when two columns of the model matrix ended up with the same name.
+#
+# The formula method expands a factor into one column per level, named after
+# the variable and the level, so a level `y2` of `g` gives the column `gy2`,
+# which is also what a predictor literally named `gy2` gives. `lda_diag()` fits
+# on both columns but `predict()` selects them back out of the new data by name
+# with `x[, col_names]`, which returns whichever column comes first for both, so
+# the fit and `predict()` no longer agree with each other.
+#
+# There is no answer that matches both, and the parsnip path is worse still: the
+# model matrix is made unique to `gy2.1`, a name no new data has, and
+# `predict()` fails outright. Refusing is the only honest option (#398).
+sparsediscrim_col_names <- function(model, call = rlang::caller_env()) {
+  cols <- model$col_names
+  duplicated <- unique(cols[duplicated(cols)])
+  if (length(duplicated) == 0) {
+    return(invisible())
+  }
+
+  cli::cli_abort(
+    c(
+      x = "Two predictors expanded into the same model matrix column
+      {.val {duplicated}}.",
+      i = "{.fn sparsediscrim::predict} cannot tell them apart either.
+      Rename the predictor or the factor level it collides with."
+    ),
+    call = call
   )
 }
 
