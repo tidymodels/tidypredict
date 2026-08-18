@@ -96,7 +96,7 @@ bagger_build_formula <- function(parsedmodel) {
 
 # Average the per-tree expressions of a single quantity
 bagger_mean_tree <- function(tree_info_list) {
-  expr_mean(map(tree_info_list, generate_nested_case_when_tree))
+  expr_mean(map(tree_info_list, classprob_tree_expr))
 }
 
 # Return the class with the largest probability, with ties going to the class
@@ -177,7 +177,7 @@ tidypredict_test.bagger <- function(
   res <- map(
     seq_along(classes),
     function(i) {
-      map(tree_info_list, function(x) generate_nested_case_when_tree(x[[i]]))
+      map(tree_info_list, function(x) classprob_tree_expr(x[[i]]))
     }
   )
   names(res) <- classes
