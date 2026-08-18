@@ -504,10 +504,6 @@ test_that("degenerate forests match predict()", {
 
 test_that("corr.bias = TRUE matches predict()", {
   skip_if_not_installed("randomForest")
-  skip(
-    "`predict.randomForest()` rescales the forest average by the bias-correction
-     coefficients in `model$coefs`, which the parser never reads."
-  )
 
   set.seed(1)
   model <- randomForest::randomForest(
@@ -519,6 +515,10 @@ test_that("corr.bias = TRUE matches predict()", {
 
   expect_equal(
     rlang::eval_tidy(tidypredict_fit(model), mtcars),
+    unname(predict(model, mtcars))
+  )
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(parse_model(model)), mtcars),
     unname(predict(model, mtcars))
   )
 })
