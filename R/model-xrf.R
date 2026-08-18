@@ -29,6 +29,7 @@ parse_model_xrf <- function(model, call = rlang::caller_env()) {
   vars <- all.vars(stats::delete.response(stats::terms(model$base_formula)))
   xlev <- model$glm$xlev %||% list()
   rules <- model$rules
+  feature_map <- xrf_feature_map(model)
 
   terms <- list()
   for (label in names(coefs)) {
@@ -41,12 +42,19 @@ parse_model_xrf <- function(model, call = rlang::caller_env()) {
     } else if (label %in% rules$rule_id) {
       fields <- xrf_rule_fields(
         rules[rules$rule_id == label, ],
+        feature_map,
         xlev,
         vars,
         call = call
       )
     } else {
-      fields <- list(xrf_feature_field(label, xlev, vars, call = call))
+      fields <- list(xrf_feature_field(
+        label,
+        feature_map,
+        xlev,
+        vars,
+        call = call
+      ))
     }
     terms[[length(terms) + 1]] <- list(
       label = label,
@@ -95,10 +103,85 @@ tidypredict_fit.xrf <- function(model) {
   )
 }
 
+# The names `xrf` gave the columns of its model matrix, paired with the column
+# each one came from. Reading the mapping off a rebuilt model matrix settles
+# cases that a name alone cannot, such as a `cyl4` dummy of a factor `cyl`
+# sitting next to a separate column literally named `cyl4`.
+#
+# `NULL` when the model matrix cannot be rebuilt, in which case the names are
+# all there is to go on.
+xrf_feature_map <- function(model) {
+  terms <- model$glm$formula
+  xlev <- model$glm$xlev %||% list()
+  labels <- attr(terms, "term.labels")
+  if (is.null(terms) || length(labels) == 0 || length(xlev) == 0) {
+    return(NULL)
+  }
+
+  n <- max(2, lengths(xlev))
+  frame <- map(labels, function(var) {
+    if (is.null(xlev[[var]])) {
+      return(as.numeric(seq_len(n)))
+    }
+    factor(rep_len(xlev[[var]], n), levels = xlev[[var]])
+  })
+  names(frame) <- labels
+  attr(frame, "row.names") <- seq_len(n)
+  class(frame) <- "data.frame"
+
+  mm <- tryCatch(
+    stats::model.matrix(stats::delete.response(terms), frame),
+    error = function(cnd) NULL
+  )
+  if (is.null(mm)) {
+    return(NULL)
+  }
+
+  assign <- attr(mm, "assign")
+  keep <- assign != 0
+  cols <- colnames(mm)[keep]
+  sources <- labels[assign[keep]]
+
+  out <- map2(cols, sources, function(col, var) {
+    if (is.null(xlev[[var]])) {
+      return(list(type = "ordinary", col = var))
+    }
+    level <- substr(col, nchar(var) + 1, nchar(col))
+    list(type = "conditional", col = var, val = level, op = "equal")
+  })
+  names(out) <- cols
+  # Two columns of the model matrix sharing a name leaves the coefficients of
+  # the fit genuinely ambiguous.
+  out[cols %in% cols[duplicated(cols)]] <- list(NULL)
+  out
+}
+
 # `xrf` fits the lasso on the columns of a model matrix, so a coefficient name
 # is either a numeric column, a dummy column of a factor (or character) column,
 # or the name of a rule.
-xrf_feature_field <- function(feature, xlev, vars, call = rlang::caller_env()) {
+xrf_feature_field <- function(
+  feature,
+  feature_map,
+  xlev,
+  vars,
+  call = rlang::caller_env()
+) {
+  if (feature %in% names(feature_map)) {
+    field <- feature_map[[feature]]
+    if (is.null(field)) {
+      cli::cli_abort(
+        c(
+          "Unable to tell which column the model term {.val {feature}}
+          refers to.",
+          i = "More than one column of the model matrix is named
+          {.val {feature}}."
+        ),
+        call = call
+      )
+    }
+    return(field)
+  }
+
   if (feature %in% vars) {
     return(list(type = "ordinary", col = feature))
   }
@@ -127,11 +210,23 @@ xrf_feature_field <- function(feature, xlev, vars, call = rlang::caller_env()) {
 
 # A rule is the intersection of its splits, which `build_linear_predictor()`
 # turns into a product of indicators.
-xrf_rule_fields <- function(rule, xlev, vars, call = rlang::caller_env()) {
+xrf_rule_fields <- function(
+  rule,
+  feature_map,
+  xlev,
+  vars,
+  call = rlang::caller_env()
+) {
   map(
     seq_len(nrow(rule)),
     function(i) {
-      field <- xrf_feature_field(rule$feature[[i]], xlev, vars, call = call)
+      field <- xrf_feature_field(
+        rule$feature[[i]],
+        feature_map,
+        xlev,
+        vars,
+        call = call
+      )
       split <- rule$split[[i]]
       less_than <- rule$less_than[[i]]
 

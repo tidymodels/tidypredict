@@ -175,12 +175,6 @@ test_that("unused and special-character factor levels are mapped correctly", {
 
 test_that("a variable named like another variable's dummy column is mapped correctly", {
   skip_if_not_installed("xrf")
-  skip(
-    "The model matrix has both a `cyl4` dummy (for `cyl == \"4\"`) and a
-     variable named `cyl4`. `xrf_feature_field()` checks the variable names
-     before the level names, so the dummy is read as the raw column."
-  )
-
   df <- mtcars
   df$cyl <- factor(df$cyl)
   df$cyl4 <- factor(ifelse(df$hp > 120, "8", "6"))

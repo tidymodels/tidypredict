@@ -486,7 +486,7 @@ c50_with_na_descent <- function(fit, tree_info) {
 }
 
 c50_check_supported <- function(model, call = rlang::caller_env()) {
-  if (isTRUE(model$control$fuzzyThreshold)) {
+  if (isTRUE(model$control$fuzzyThreshold) || c50_has_soft_threshold(model)) {
     # Fuzzy thresholds route cases near a split point partly down both branches,
     # which cannot be expressed as a hard `<= cut` comparison.
     cli::cli_abort(
@@ -503,6 +503,17 @@ c50_check_supported <- function(model, call = rlang::caller_env()) {
     )
   }
   invisible(model)
+}
+
+# Whether the tree was built with fuzzy thresholds.
+#
+# `model$control` is the direct record, but {baguette} runs its base fits
+# through `butcher()`, which empties it. A soft threshold is also visible in
+# the tree text itself: C5.0 writes the `low` and `high` bounds it interpolates
+# between alongside the `cut` of every continuous split, and writes neither for
+# a hard threshold.
+c50_has_soft_threshold <- function(model) {
+  is.character(model$tree) && any(grepl("\" low=\"", model$tree, fixed = TRUE))
 }
 
 c50_tree_info_full <- function(model) {

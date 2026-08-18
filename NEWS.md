@@ -12,6 +12,12 @@
 
 - `parse_model()` and `tidypredict_fit()` now reject an ordered predictor in a parsnip fit whose engine is `sda`, `sparsediscrim` or `mixOmics`, with the same "the treatment contrast is the only one supported" error that `MASS::lda()`, `MASS::qda()` and `mda::fda()` already gave. parsnip builds the model matrix with `contr.poly`, whose `.L` and `.Q` columns were read as level names, so the predictions were silently wrong by as much as 1.34. (#393)
 
+- `parse_model()` and `tidypredict_fit()` now reject a `sparsediscrim` fit whose model matrix has two columns with the same name, which happens when a factor level and another predictor expand into the same name, such as level `y2` of `g` against a predictor `gy2`. `sparsediscrim::predict()` selects those columns back out by name and so silently uses one of them twice, disagreeing with the fit it came from by as much as 0.84, and errors outright on a parsnip fit; there is no answer that matches both. (#398)
+
+- `tidypredict_fit()` now handles a `mixOmics` predictor that never varied, which is what an unused factor level expands into. Such a column has a scale of zero and so a coefficient of `NaN`, which made the fit fail with "missing value where TRUE/FALSE needed"; `predict()` drops the column, and the generated formula now does too. (#398)
+
+- `tidypredict_fit()` now fills a missing `mixOmics` predictor in at its training mean, as `predict.mixo_pls()` does, rather than returning `NA` for the row. Each predictor is now wrapped in an `ifelse(is.na(x), mean, x)`, so the generated formula is longer than before but agrees with `predict()` on data with missing values. (#398)
+
 - `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)
@@ -20,15 +26,23 @@
 
 - `parse_model()` now aborts on a `kernlab::ksvm()` model with a factor level that is not a syntactic name, such as `c:d`. `ksvm()` only keeps the `make.names()` form of its model matrix column names, so the level was read back as `c.d` and the formula compared against a value that matches no row, silently dropping that dummy term from the prediction. (#390)
 
+- `parse_model()` now aborts on a `baguette::bagger()` ensemble of C5.0 models fitted with `fuzzyThreshold = TRUE`. Fuzzy thresholds send a case near a split point partly down both branches, which a hard `<=` comparison cannot express, and baguette runs its base fits through `butcher()`, which empties the `control` element the existing check read; the option is now detected from the tree itself. (#395)
+
+- `parse_model()` now maps the dummy columns of an `xrf::xrf()` model against the model matrix the fit was built from. A dummy column whose name matched a separate predictor, such as a `cyl4` dummy of a factor `cyl` alongside a column literally named `cyl4`, was read as that predictor, so the formula multiplied a factor by a coefficient and every prediction came back as `NA`. (#396)
+
 - `tidypredict_fit()` now returns predictions on the response scale for CatBoost models fit with the `Poisson` or `Tweedie` objective, applying `exp()` to the raw score as the other CatBoost objectives already invert their own links. Anyone using such a model will see their predictions change from the log scale to the count or mean scale; they now match `catboost.predict(prediction_type = "Exponent")` instead of the `"RawFormulaVal"` default. (#356)
 
 - `tidypredict_fit()` now returns one prediction per row for a `ranger::ranger()`, `xgboost`, `baguette::bagger()`, or `xrf::xrf()` model in which every tree collapsed to a single leaf, or in which the lasso kept only the intercept. Such a model produced a formula that mentioned no column at all, so evaluating it returned a single value rather than one per row. The value was always correct; only its length was wrong. (#397)
+
+- `tidypredict_fit()` now applies the bias correction of a `randomForest::randomForest()` model fitted with `corr.bias = TRUE`. `predict()` rescales the forest average by the two coefficients stored in `model$coefs`, which the parser never read, so the predictions were off by as much as 0.21 for a model of `mpg` on `mtcars`. (#395)
 
 - `tidypredict_fit()` now sends a split threshold that is not finite, or that overflows the 32-bit float range, down the branch the model does. Such a threshold was moved to a boundary of `NaN`, which makes every comparison `FALSE`, so the model silently mispredicted. (#313)
 
 - `tidypredict_fit()` now works on a parsed LightGBM model fit with `linear_tree = TRUE`. A leaf of a linear tree stores its coefficients separately and leaves its constant prediction empty, which the parsed path never read, so the formula failed with "`..1 (right)` must be a vector, not `NULL`". This also affected such a model saved with `tidypredict_save()` and read back with `tidypredict_load()`. (#346)
 
 - `tidypredict_fit()` now matches `predict()` for a single-tree `C50::C5.0()` model when new data is missing a split value. C5.0 does not send such a row down one branch: it descends every branch of the node, weighting each by the training cases it holds, and returns the class with the largest combined leaf distribution. The generated formula instead routed the missing value to the `.default` branch, so the row could come back as a different class. (#387)
+
+- `tidypredict_fit()` now follows the per-node missing value direction a `ranger::ranger()` model learns when its training data contains `NA`. Since ranger 0.17.0 the default `na.action = "na.learn"` picks a side for missing values at each node it saw one at and saves it for prediction, but the generated formula always sent them left, so rows with `NA` could be predicted at the wrong leaf. (#394)
 
 - `tidypredict_interval()` now rejects an `interval` that is not a single number strictly between 0 and 1. An `interval` of 1.5 gave a formula beginning with `NaN`, so every prediction bound came back missing. (#313)
 
