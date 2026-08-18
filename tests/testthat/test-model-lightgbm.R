@@ -396,6 +396,7 @@ test_that("a single training row matches predict()", {
 test_that("a multiclass model with stump trees matches predict()", {
   skip_if_not_installed("lightgbm")
   # No row has the third class, so its trees are stumps while the others split.
+  # The dropped trees must be restored or the classes shift positionally (#419).
   model <- make_lgb_stump_model(
     rep(c(0, 1), each = nrow(mtcars) / 2),
     list(objective = "multiclass", num_class = 3L)

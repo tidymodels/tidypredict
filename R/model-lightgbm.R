@@ -246,6 +246,16 @@ add_lgb_missing_type <- function(trees_df, model) {
 # leaf row the rest of the parser expects. If no split is ever possible
 # LightGBM halts after one iteration and every tree is a stump, leaving
 # `trees_df` empty.
+#
+# Restoring the trees is also what keeps a multiclass model correct, which is a
+# separate concern from the empty-`trees_df` one and is easy to lose sight of.
+# A multiclass fit assigns trees to classes positionally, so a dropped tree
+# shifts every class after the gap. That needs only one absent class, which is
+# ordinary in imbalanced or filtered data, and it is silent: the probabilities
+# still sum to 1. Restoring the trees closes the gap and the positional
+# assignment is right again. Anyone reworking this must keep that property:
+# if the dropped trees are no longer restored, the class assignment has to be
+# made `tree_index`-aware instead, or the defect returns unnoticed. (#419)
 add_lgb_stump_trees <- function(trees_df, model) {
   dump <- jsonlite::fromJSON(model$dump_model(), simplifyVector = FALSE)
 
