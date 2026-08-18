@@ -258,6 +258,44 @@ test_that("syntactic factor levels still match predict() (#390)", {
   )
 })
 
+ksvm_matrix_fit <- function(cols, ...) {
+  set.seed(1)
+  x <- matrix(rnorm(30 * length(cols)), ncol = length(cols))
+  colnames(x) <- cols
+  y <- as.numeric(x %*% seq_along(cols)) + rnorm(30)
+  list(
+    model = kernlab::ksvm(x, y, kernel = "vanilladot", type = "eps-svr", ...),
+    df = as.data.frame(x, check.names = FALSE),
+    y = y
+  )
+}
+
+test_that("a matrix column that is not a syntactic name errors (#418)", {
+  skip_if_not_installed("kernlab")
+
+  fit <- ksvm_matrix_fit(c("a:b", "cd"))
+  expect_snapshot(error = TRUE, tidypredict_fit(fit$model))
+
+  fit <- ksvm_matrix_fit(c("a b", "cd"))
+  expect_error(tidypredict_fit(fit$model), "Unable to recover the predictor")
+
+  # Two columns that mangle to the same name, which `ksvm()` then disambiguates
+  # with a `.1` suffix.
+  fit <- ksvm_matrix_fit(c("a.b", "a:b"))
+  expect_error(tidypredict_fit(fit$model), "Unable to recover the predictor")
+})
+
+test_that("syntactic matrix columns still match predict() (#418)", {
+  skip_if_not_installed("kernlab")
+
+  fit <- ksvm_matrix_fit(c("a_b", "cd"))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(fit$model), fit$df),
+    as.numeric(kernlab::predict(fit$model, as.matrix(fit$df))),
+    tolerance = 1e-10
+  )
+})
+
 test_that("NA in the newdata and in the training data match predict()", {
   skip_if_not_installed("kernlab")
 

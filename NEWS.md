@@ -26,6 +26,8 @@
 
 - `parse_model()` now aborts on a `kernlab::ksvm()` model with a factor level that is not a syntactic name, such as `c:d`. `ksvm()` only keeps the `make.names()` form of its model matrix column names, so the level was read back as `c.d` and the formula compared against a value that matches no row, silently dropping that dummy term from the prediction. (#390)
 
+- `parse_model()` now aborts on a `kernlab::ksvm()` model fitted through the matrix interface with a column name that is not a syntactic name, such as `a:b`. `ksvm()` builds its model matrix with `data.frame()`, whose `check.names` mangles the name to `a.b`, and the matrix interface records no `terms` object to recover the original from, so the generated formula referenced a column the data does not have. Matrix models whose column names were already syntactic are unaffected. (#418)
+
 - `parse_model()` now aborts on a `baguette::bagger()` ensemble of C5.0 models fitted with `fuzzyThreshold = TRUE`. Fuzzy thresholds send a case near a split point partly down both branches, which a hard `<=` comparison cannot express, and baguette runs its base fits through `butcher()`, which empties the `control` element the existing check read; the option is now detected from the tree itself. (#395)
 
 - `parse_model()` now maps the dummy columns of an `xrf::xrf()` model against the model matrix the fit was built from. A dummy column whose name matched a separate predictor, such as a `cyl4` dummy of a factor `cyl` alongside a column literally named `cyl4`, was read as that predictor, so the formula multiplied a factor by a coefficient and every prediction came back as `NA`. (#396)
