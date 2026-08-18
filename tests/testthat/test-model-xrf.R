@@ -242,11 +242,6 @@ test_that("rows with NA are scored as NA, and complete rows are unaffected", {
 
 test_that("an intercept-only fit matches predict()", {
   skip_if_not_installed("xrf")
-  skip(
-    "At the largest penalty only the intercept survives, so the generated
-     formula is a constant that mentions no column and evaluates to a single
-     value rather than one per row."
-  )
 
   model <- xrf_reg_model()
   model$lambda <- max(model$glm$model$lambda)
