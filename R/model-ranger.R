@@ -88,9 +88,20 @@ ranger_predictor_levels <- function(model) {
 # of level indices that go *right*. Left is the complement. Reading the list as
 # the left set instead is wrong but plausible, and produces a small enough
 # error to look like a rounding problem.
-ranger_split_info <- function(col, split_val, levels, is_ordered) {
+ranger_split_info <- function(
+  col,
+  split_val,
+  levels,
+  is_ordered,
+  missing_right = FALSE
+) {
   if (is.null(levels)) {
-    return(list(col = col, val = as.numeric(split_val), is_categorical = FALSE))
+    return(list(
+      col = col,
+      val = as.numeric(split_val),
+      is_categorical = FALSE,
+      missing_right = missing_right
+    ))
   }
 
   if (isTRUE(is_ordered)) {
@@ -106,12 +117,38 @@ ranger_split_info <- function(col, split_val, levels, is_ordered) {
     ))
   }
 
-  list(col = col, vals = as.list(left), is_categorical = TRUE)
+  list(
+    col = col,
+    vals = as.list(left),
+    is_categorical = TRUE,
+    missing_right = missing_right
+  )
 }
 
-# `ranger` compares an ordered or numeric split as `value > splitval`, and a
-# missing value fails that test, so it takes the same branch as a value at or
-# below the split point.
+# With `na.action = "na.learn"`, the default since `ranger` 0.17.0, a forest
+# trained on data containing `NA` learns a direction for missing values at each
+# node it saw one at, and stores it as a third child vector alongside the left
+# and right ones. `Tree::predict()` consults it for an ordered or numeric split
+# only: a positive entry is the node ID to descend to, and a zero means the node
+# learned nothing and the row goes left.
+#
+# An unordered split takes the other branch of `Tree::predict()` entirely and
+# never looks at the default direction, so it keeps the level-collapsing
+# behaviour described above.
+ranger_missing_right <- function(model, tree_no) {
+  kids <- model$forest$child.nodeIDs[[tree_no]]
+  if (length(kids) < 3) {
+    return(NULL)
+  }
+  default_child <- kids[[3]]
+  right_child <- kids[[2]]
+  default_child > 0 & default_child == right_child
+}
+
+# A node that learned a direction for missing values sends them there; see
+# `ranger_missing_right()`. Otherwise `ranger` compares an ordered or numeric
+# split as `value > splitval`, and a missing value fails that test, so it takes
+# the same branch as a value at or below the split point.
 #
 # An unordered split instead indexes a bitmask by the level's position.
 # `ranger` derives that position from the raw value, and a missing value
@@ -128,6 +165,10 @@ ranger_split_condition <- function(split) {
     return(condition)
   }
 
+  if (isTRUE(split$missing_right)) {
+    return(condition)
+  }
+
   expr(!!build_nested_split_missing(split) | !!condition)
 }
 
@@ -135,6 +176,7 @@ ranger_split_condition <- function(split) {
 ranger_tree_info_full <- function(model, tree_no) {
   tree <- ranger::treeInfo(model, tree_no)
   info <- ranger_predictor_levels(model)
+  missing_right <- ranger_missing_right(model, tree_no)
 
   # Build node_splits list
   node_splits <- vector("list", nrow(tree))
@@ -147,7 +189,8 @@ ranger_tree_info_full <- function(model, tree_no) {
           var_name,
           tree$splitval[i],
           info$levels[[var_name]],
-          info$is_ordered[[var_name]]
+          info$is_ordered[[var_name]],
+          missing_right = isTRUE(missing_right[i])
         )
       )
     }
@@ -204,6 +247,7 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
   terminal <- tree$terminal
   prediction <- tree[[leaf_col]]
   info <- ranger_predictor_levels(model)
+  missing_right <- ranger_missing_right(model, tree_no)
 
   build_node <- function(node_id) {
     # node_id is 0-indexed, convert to 1-indexed for vector access
@@ -225,7 +269,8 @@ build_nested_ranger_tree <- function(model, tree_no, leaf_col = "prediction") {
       split_var,
       split_val,
       info$levels[[split_var]],
-      info$is_ordered[[split_var]]
+      info$is_ordered[[split_var]],
+      missing_right = isTRUE(missing_right[idx])
     )
     condition <- ranger_split_condition(split)
 
