@@ -133,6 +133,8 @@
 
 - `tidypredict_sql()` and `tidypredict_sql_interval()` now check that dbplyr is installed before using it, and are no longer marked as internal in the documentation index. (#314)
 
+- `tidypredict_test()` now works for multiclass `h2o` models whose class labels are not syntactic names, such as the levels `"3"`, `"4"` and `"5"`. It looked the model's predictions up by level name, but `h2o.predict()` prefixes such a column with `p`, so the lookup failed with "undefined columns selected". `tidypredict_fit()` was unaffected. (#360)
+
 - `tidypredict_fit()` now supports splits with more than two branches for `partykit` models, such as those from `ctree_control(multiway = TRUE)` or a `partysplit()` with several breaks. Every branch after the second was previously dropped, silently for a factor split and with a warning for a numeric one. (#295)
 
 - `tidypredict_fit()` now honours `partysplit(right = FALSE)` for `partykit` models, where the left branch is `x < break` rather than `x <= break`. A value falling exactly on the break took the wrong branch. (#295)

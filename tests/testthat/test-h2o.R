@@ -55,6 +55,24 @@ test_that("works with H2O GBM multiclass classification models", {
   expect_false(tidypredict_test(model$fit, df = iris)$alert)
 })
 
+test_that("works with H2O GBM multiclass models with non-syntactic levels", {
+  skip_if_no_h2o()
+
+  df <- mtcars
+  df$gear <- factor(df$gear)
+  model <- parsnip::fit(
+    parsnip::set_engine(
+      parsnip::boost_tree(mode = "classification", trees = 10),
+      "h2o_gbm"
+    ),
+    gear ~ mpg + wt + hp,
+    data = df
+  )
+
+  expect_named(tidypredict_fit(model$fit), levels(df$gear))
+  expect_false(tidypredict_test(model$fit, df = df)$alert)
+})
+
 test_that("works with H2O GBM models with categorical predictors", {
   skip_if_no_h2o()
 
