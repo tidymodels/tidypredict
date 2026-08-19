@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("randomForest")
   set.seed(1234)
 
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
@@ -20,6 +21,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("randomForest")
   set.seed(1234)
 
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
@@ -32,6 +34,7 @@ test_that("model can be saved and re-loaded", {
 })
 
 test_that("formulas produce correct predictions", {
+  skip_if_not_installed("randomForest")
   set.seed(1234)
 
   # regression
@@ -44,6 +47,7 @@ test_that("formulas produce correct predictions", {
 })
 
 test_that("split operator uses <= for left child (#192)", {
+  skip_if_not_installed("randomForest")
   set.seed(42)
   df <- data.frame(x = c(1, 2, 3, 4), y = c(10, 20, 100, 200))
   suppressWarnings(
@@ -66,6 +70,7 @@ test_that("split operator uses <= for left child (#192)", {
 })
 
 test_that("produced case_when uses .default", {
+  skip_if_not_installed("randomForest")
   set.seed(1234)
 
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
@@ -77,6 +82,7 @@ test_that("produced case_when uses .default", {
 })
 
 test_that("classification models error with clear message (#193)", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ Sepal.Length + Sepal.Width,
@@ -88,6 +94,7 @@ test_that("classification models error with clear message (#193)", {
 })
 
 test_that("parse_model errors on classification model", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ Sepal.Length + Sepal.Width,
@@ -127,6 +134,7 @@ test_that("v2 parsed classification model errors", {
 # Tests for .extract_rf_classprob()
 
 test_that(".extract_rf_classprob returns correct structure", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ Sepal.Length + Sepal.Width,
@@ -150,6 +158,7 @@ test_that(".extract_rf_classprob errors on non-randomForest model", {
 })
 
 test_that(".extract_rf_classprob errors on regression model", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
 
@@ -157,6 +166,7 @@ test_that(".extract_rf_classprob errors on regression model", {
 })
 
 test_that(".extract_rf_classprob works with binary classification", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   mtcars$vs <- factor(mtcars$vs)
   model <- randomForest::randomForest(
@@ -173,6 +183,7 @@ test_that(".extract_rf_classprob works with binary classification", {
 })
 
 test_that(".extract_rf_classprob produces correct vote counts", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ .,
@@ -202,6 +213,7 @@ test_that(".extract_rf_classprob produces correct vote counts", {
 })
 
 test_that(".extract_rf_classprob works with single tree", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ .,
@@ -220,6 +232,7 @@ test_that(".extract_rf_classprob works with single tree", {
 # Tests for .extract_rf_trees() (regression)
 
 test_that(".extract_rf_trees returns correct structure", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     mpg ~ cyl + disp + hp,
@@ -241,6 +254,7 @@ test_that(".extract_rf_trees errors on non-randomForest model", {
 })
 
 test_that(".extract_rf_trees errors on classification model", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     Species ~ Sepal.Length + Sepal.Width,
@@ -252,6 +266,7 @@ test_that(".extract_rf_trees errors on classification model", {
 })
 
 test_that(".extract_rf_trees produces correct predictions when averaged", {
+  skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
     mpg ~ cyl + disp + hp,

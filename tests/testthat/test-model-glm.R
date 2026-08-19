@@ -20,6 +20,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
 
   model$coefficients <- round(model$coefficients, 7)

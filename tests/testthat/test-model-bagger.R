@@ -128,6 +128,7 @@ test_that("tidypredict_test.bagger max_rows and alert work", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("baguette")
 
   model <- bagger_reg()
@@ -143,6 +144,7 @@ test_that("model can be saved and re-loaded", {
 })
 
 test_that("Classification model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("baguette")
 
   model <- bagger_cls()
@@ -367,6 +369,7 @@ test_that("C5.0 control arguments are respected", {
 })
 
 test_that("C5.0 model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("baguette")
   skip_if_not_installed("C50")
 

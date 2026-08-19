@@ -18,6 +18,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
@@ -234,6 +235,7 @@ test_that("rejects a model fit with an offset (#296)", {
 })
 
 test_that("glmnet are handeld neatly with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("glmnet")
   spec <- parsnip::linear_reg(engine = "glmnet", penalty = 1)
 
@@ -319,6 +321,7 @@ test_that("multinomial family is supported (#198)", {
 })
 
 test_that("multinomial model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
@@ -385,6 +388,7 @@ test_that("tidypredict_test errors for multinomial models", {
 })
 
 test_that("multinomial is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("glmnet")
   spec <- parsnip::multinom_reg(engine = "glmnet", penalty = 0.05)
   model <- parsnip::fit(spec, Species ~ ., iris)
@@ -401,6 +405,7 @@ test_that("multinomial is handled with parsnip", {
 })
 
 test_that("multinomial SQL translation works", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),

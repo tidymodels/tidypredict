@@ -1039,6 +1039,7 @@ test_that("empty trees throws error", {
 # SQL generation tests ----------------------------------------------------
 
 test_that("tidypredict_sql returns SQL class", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("catboost")
   model <- make_catboost_model()
 
@@ -1560,6 +1561,7 @@ test_that("categorical features without mapping throws error", {
 })
 
 test_that("categorical features SQL generation works", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("catboost")
 
   set.seed(42)

@@ -18,6 +18,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
   model$coefficients <- round(model$coefficients, 7)

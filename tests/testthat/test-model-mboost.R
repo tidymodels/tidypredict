@@ -227,6 +227,7 @@ test_that("blackboost honours an mstop reduced after fitting (#306)", {
 })
 
 test_that("blackboost supports SQL", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("mboost")
 
   set.seed(1)

@@ -124,6 +124,7 @@ test_that("works without predictor scaling", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("kernlab")
 
   set.seed(1)

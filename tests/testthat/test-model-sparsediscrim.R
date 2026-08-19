@@ -201,6 +201,7 @@ test_that("a colliding model matrix column is rejected (#398)", {
 })
 
 test_that("an ordered factor is rejected with parsnip (#393)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sparsediscrim")
   skip_if_not_installed("discrim")
 
@@ -299,6 +300,7 @@ test_that("SQL translation works", {
 })
 
 test_that("sparsediscrim is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sparsediscrim")
   skip_if_not_installed("discrim")
 
@@ -317,6 +319,7 @@ test_that("sparsediscrim is handled with parsnip", {
 })
 
 test_that("all regularization methods are handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sparsediscrim")
   skip_if_not_installed("discrim")
 
@@ -335,6 +338,7 @@ test_that("all regularization methods are handled with parsnip", {
 })
 
 test_that("categorical predictors are handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sparsediscrim")
   skip_if_not_installed("discrim")
 

@@ -23,6 +23,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("Cubist")
 
   model <- Cubist::cubist(
@@ -72,6 +73,7 @@ test_that("formulas produce correct predictions", {
 })
 
 test_that("intercept is done correctly (#58)", {
+  skip_if_not_installed("modeldata")
   skip_if_not_installed("Cubist")
 
   biomass_tr <- modeldata::biomass %>%

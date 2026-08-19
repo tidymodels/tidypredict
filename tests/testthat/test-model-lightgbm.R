@@ -269,6 +269,7 @@ test_that("default_left FALSE assigns missing to right child path", {
 })
 
 test_that("deeper tree paths are traced correctly", {
+  skip_if_not_installed("lightgbm")
   # Tree structure:
   #           split_0 (x1 <= 10)
   #          /                 \
@@ -359,6 +360,7 @@ test_that("a model of stumps matches predict()", {
 })
 
 test_that("a parsed model of stumps matches predict()", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("lightgbm")
   model <- make_lgb_stump_model(rep(5, nrow(mtcars)))
   pm <- as_parsed_model(yaml::yaml.load(yaml::as.yaml(parse_model(model))))
@@ -414,6 +416,7 @@ test_that("a multiclass model with stump trees matches predict()", {
 })
 
 test_that("a bonsai fit on a lone factor matches predict()", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("lightgbm")
   skip_if_not_installed("bonsai")
   set.seed(4)
@@ -478,6 +481,7 @@ test_that("mixed default_left values in same tree are handled correctly", {
 })
 
 test_that("a categorical split with default_left set is refused (#288)", {
+  skip_if_not_installed("lightgbm")
   tree_df <- data.frame(
     tree_index = c(0L, 0L, 0L),
     split_index = c(0L, NA, NA),
@@ -2741,6 +2745,7 @@ test_that("linear tree handles NA values correctly when trained with NAs (#186)"
 })
 
 test_that("parsed linear tree model can be fitted (#346)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("lightgbm")
 
   set.seed(1)
