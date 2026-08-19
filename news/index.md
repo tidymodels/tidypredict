@@ -711,6 +711,16 @@
   marked as internal in the documentation index.
   ([\#314](https://github.com/tidymodels/tidypredict/issues/314))
 
+- [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
+  now works for multiclass `h2o` models whose class labels are not
+  syntactic names, such as the levels `"3"`, `"4"` and `"5"`. It looked
+  the model’s predictions up by level name, but `h2o.predict()` prefixes
+  such a column with `p`, so the lookup failed with “undefined columns
+  selected”.
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  was unaffected.
+  ([\#360](https://github.com/tidymodels/tidypredict/issues/360))
+
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   now supports splits with more than two branches for `partykit` models,
   such as those from `ctree_control(multiway = TRUE)` or a
