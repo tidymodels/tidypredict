@@ -1,10 +1,8 @@
-^CRAN-RELEASE$
 ^codecov\.yml$
 ^.*\.Rproj$
 ^\.Rproj\.user$
-README.Rmd
-model.csv
-travis.yml
+^README\.Rmd$
+^model\.csv$
 ^docs$
 ^_pkgdown\.yml$
 ^public$

@@ -43,6 +43,7 @@ Two habits, both learned from getting them wrong:
 - Use `withr::local_tempfile(fileext = ".yml")` for temp files, so they are cleaned up.
 - No `library()` calls. Namespace everything.
 - Prefer a direct assertion for correctness and reserve snapshots for printed output and error messages.
+- `catboost` is not on CRAN, so it is deliberately absent from `Suggests`. Tests and `vignettes/catboost.Rmd` that need it are guarded by `skip_if_not_installed("catboost")`. To run them locally, install it from the upstream releases: see <https://catboost.ai/docs/en/installation/r-installation-binary-installation>.
 
 ### Comparing against the fitted model, not against tidypredict
 

@@ -60,7 +60,7 @@ test_that("formulas produce correct predictions", {
   splits <- map2(splits$variable, splits$value, function(x, y) {
     str2lang(paste("abs(", x, "-", y, ") > 0.0001"))
   })
-  non_split_data <- mtcars %>%
+  non_split_data <- mtcars |>
     dplyr::filter(!!!splits)
 
   expect_false(
@@ -76,13 +76,13 @@ test_that("intercept is done correctly (#58)", {
   skip_if_not_installed("modeldata")
   skip_if_not_installed("Cubist")
 
-  biomass_tr <- modeldata::biomass %>%
-    dplyr::filter(dataset == "Training") %>%
+  biomass_tr <- modeldata::biomass |>
+    dplyr::filter(dataset == "Training") |>
     dplyr::select(-dataset, -sample)
 
   set.seed(1)
   mod <- Cubist::cubist(
-    x = biomass_tr %>% dplyr::select(-HHV),
+    x = biomass_tr |> dplyr::select(-HHV),
     y = biomass_tr$HHV
   )
 

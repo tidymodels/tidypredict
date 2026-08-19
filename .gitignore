@@ -9,6 +9,5 @@ content
 vignettes-backup
 /themes/
 /layouts/
-pkgdown
 docs
 catboost_info/
