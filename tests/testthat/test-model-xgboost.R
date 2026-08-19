@@ -450,9 +450,13 @@ test_that("reg:pseudohubererror predictions match native predict", {
 test_that("reg:absoluteerror predictions match native predict", {
   skip_if_not_installed("xgboost")
 
-  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  # Snap to a 1/64 grid so every value is exactly representable in float32.
+  # xgboost stores split thresholds as float32, so a value that is not
+  # float32-exact can land on the other side of a threshold here than it does
+  # in predict(). Which splits are chosen varies by xgboost version, so an
+  # arbitrary offset is not enough to stay clear of the boundaries.
   mtcars_adj <- mtcars
-  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+  mtcars_adj[, -9] <- round(mtcars_adj[, -9] * 64) / 64
 
   xgb_data <- xgboost::xgb.DMatrix(
     as.matrix(mtcars_adj[, -9]),
@@ -542,28 +546,32 @@ test_that("DART booster with rate_drop = 0 predictions match native predict", {
 test_that("DART booster with rate_drop > 0 predictions match native predict", {
   skip_if_not_installed("xgboost")
 
-  # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
+  # Snap to a 1/64 grid so every value is exactly representable in float32; see
+  # the reg:absoluteerror test above.
   mtcars_adj <- mtcars
-  mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
+  mtcars_adj[, -9] <- round(mtcars_adj[, -9] * 64) / 64
 
   xgb_data <- xgboost::xgb.DMatrix(
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$am
   )
 
-  model <- xgboost::xgb.train(
+  # `one_drop` forces a tree to be dropped every round, so the dropout weights
+  # are actually exercised. `rate_drop` alone leaves that to the RNG.
+  model <- suppressWarnings(xgboost::xgb.train(
     params = list(
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
       booster = "dart",
       rate_drop = 0.3,
+      one_drop = 1,
       seed = 123
     ),
     data = xgb_data,
     nrounds = 4L,
     verbose = 0
-  )
+  ))
 
   result <- tidypredict_test(
     model,
@@ -584,26 +592,30 @@ test_that("DART booster weight_drop is extracted correctly", {
     label = mtcars$am
   )
 
-  model <- xgboost::xgb.train(
+  # `one_drop` forces a tree to be dropped every round. `rate_drop` alone is
+  # not enough: whether any tree is actually dropped depends on the RNG, and
+  # xgboost 3.4 drops nothing here, which would leave `weight_drop` all ones.
+  model <- suppressWarnings(xgboost::xgb.train(
     params = list(
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
       booster = "dart",
       rate_drop = 0.3,
+      one_drop = 1,
       seed = 123
     ),
     data = xgb_data,
     nrounds = 4L,
     verbose = 0
-  )
+  ))
 
   pm <- parse_model(model)
 
   expect_equal(pm$general$booster_name, "dart")
   expect_type(pm$general$weight_drop, "double")
   expect_length(pm$general$weight_drop, 4)
-  # At least one weight should be different from 1 when rate_drop > 0
+  # At least one weight should be different from 1 when trees are dropped
   expect_false(all(pm$general$weight_drop == 1))
 })
 
