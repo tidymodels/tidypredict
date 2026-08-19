@@ -17,10 +17,13 @@ test_that("returns the right output", {
   )
 })
 
-test_that("model can be saved and re-loaded", {
+test_that("a parsed model round trips through YAML", {
   skip_if_not_installed("yaml")
   skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
+
+  # Both sides derive from the same rounded object, so this asserts that the
+  # YAML round trip is lossless, not that either side matches `predict()`.
   model$coefficients <- round(model$coefficients, 7)
 
   pm <- parse_model(model)

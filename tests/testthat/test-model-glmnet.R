@@ -61,21 +61,34 @@ test_that("formulas produce correct predictions", {
   )
 })
 
+expect_glmnet_matches_predict <- function(model, x) {
+  actual <- rlang::eval_tidy(tidypredict_fit(model), as.data.frame(x))
+  # A penalty that zeroes every coefficient leaves a constant formula
+  if (length(actual) == 1) {
+    actual <- rep(actual, nrow(x))
+  }
+  testthat::expect_equal(
+    actual,
+    unname(drop(predict(model, x, type = "response"))),
+    tolerance = 1e-12
+  )
+}
+
 test_that("family function syntax works (#197)", {
   skip_if_not_installed("glmnet")
   x <- as.matrix(mtcars[, -1])
 
   # gaussian()
   model <- glmnet::glmnet(x, mtcars$mpg, family = gaussian(), lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 
   # binomial()
   model <- glmnet::glmnet(x, mtcars$am, family = binomial(), lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 
   # poisson()
   model <- glmnet::glmnet(x, mtcars$carb, family = poisson(), lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 })
 
 test_that("family string syntax works (#197)", {
@@ -84,15 +97,15 @@ test_that("family string syntax works (#197)", {
 
   # "gaussian"
   model <- glmnet::glmnet(x, mtcars$mpg, family = "gaussian", lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 
   # "binomial"
   model <- glmnet::glmnet(x, mtcars$am, family = "binomial", lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 
   # "poisson"
   model <- glmnet::glmnet(x, mtcars$carb, family = "poisson", lambda = 0.5)
-  expect_no_error(tidypredict_fit(model))
+  expect_glmnet_matches_predict(model, x)
 })
 
 test_that("fitting options the parser never reads still agree with predict()", {
