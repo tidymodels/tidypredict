@@ -378,6 +378,21 @@ test_that("a constant outcome and a single predictor match predict", {
   )
 })
 
+test_that("constant predictors match predict (#363)", {
+  skip_if_not_installed("dbarts")
+
+  set.seed(204)
+  df <- bart_data()
+  df$xconst <- 1
+  df$fconst <- factor(rep("z", nrow(df)))
+
+  model <- bart_fit(df, cols = c("xconst", "x1", "fconst", "f3", "x2"))
+  expect_equal(
+    rlang::eval_tidy(tidypredict_fit(model), df),
+    colMeans(predict(model, df))
+  )
+})
+
 # Tests for .extract_bart_trees() and .extract_bart_scaling() ------------------
 
 test_that(".extract_bart_trees() returns the trees of every draw", {
