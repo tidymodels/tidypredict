@@ -534,6 +534,7 @@ test_that("naive_bayes SQL translation works", {
 })
 
 test_that("naive_bayes is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("naivebayes")
   skip_if_not_installed("discrim")
 
@@ -556,6 +557,7 @@ test_that("naive_bayes is handled with parsnip", {
 })
 
 test_that("NaiveBayes is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("klaR")
   skip_if_not_installed("discrim")
 

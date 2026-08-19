@@ -33,7 +33,7 @@ knitr::opts_chunk$set(
 `dbarts::bart()` fits a Bayesian additive regression trees (BART) model. Each
 draw of the posterior sampler holds a full ensemble of trees, and the fitted
 value is the average, over every draw, of the summed leaf values of that draw's
-trees. `tidypredict_fit()` returns one nested `case_when()` per tree of per
+trees. `tidypredict_fit()` returns one nested `case_when()` per tree per
 draw, so the size of the returned expression grows with both the number of trees
 and the number of posterior samples that were kept. Small values of `ntree` and
 `ndpost` keep the formula manageable.

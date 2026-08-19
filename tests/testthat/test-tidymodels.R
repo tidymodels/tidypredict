@@ -1,4 +1,6 @@
 test_that("works with parsnip model specification", {
+  skip_if_not_installed("earth")
+  skip_if_not_installed("parsnip")
   etitanic_fac <- dplyr::mutate(earth::etitanic, survived = as.factor(survived))
 
   # Classification
@@ -31,6 +33,8 @@ test_that("works with parsnip model specification", {
 })
 
 test_that("works with decision_tree() and the C5.0 engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("C50")
   df <- mtcars
   df$vs <- as.factor(df$vs)
@@ -50,6 +54,8 @@ test_that("works with decision_tree() and the C5.0 engine", {
 })
 
 test_that("works with C5_rules() and the C5.0 engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("C50")
   skip_if_not_installed("rules")
   loadNamespace("rules")
@@ -69,6 +75,8 @@ test_that("works with C5_rules() and the C5.0 engine", {
 })
 
 test_that("works with boost_tree() and the C5.0 engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("C50")
 
   model <- parsnip::fit(
@@ -86,6 +94,8 @@ test_that("works with boost_tree() and the C5.0 engine", {
 })
 
 test_that("works with boost_tree() and the h2o_gbm engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_no_h2o()
 
   reg <- parsnip::fit(
@@ -115,6 +125,8 @@ test_that("works with boost_tree() and the h2o_gbm engine", {
 })
 
 test_that("works with rule_fit() and the h2o engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_no_h2o()
 
   reg <- parsnip::fit(
@@ -138,6 +150,7 @@ test_that("works with rule_fit() and the h2o engine", {
 })
 
 test_that("works with linear_reg() and the glm engine", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::fit(
     parsnip::set_engine(parsnip::linear_reg(), "glm"),
     mpg ~ wt + cyl,
@@ -150,6 +163,8 @@ test_that("works with linear_reg() and the glm engine", {
 })
 
 test_that("works with logistic_reg() and the LiblineaR engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("LiblineaR")
 
   df <- mtcars
@@ -183,6 +198,8 @@ test_that("works with logistic_reg() and the LiblineaR engine", {
 })
 
 test_that("works with svm_linear() and the LiblineaR engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("LiblineaR")
 
   reg <- parsnip::fit(
@@ -217,6 +234,8 @@ test_that("works with svm_linear() and the LiblineaR engine", {
 })
 
 test_that("works with svm_linear() and the kernlab engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("kernlab")
 
   reg <- parsnip::fit(
@@ -251,6 +270,8 @@ test_that("works with svm_linear() and the kernlab engine", {
 })
 
 test_that("works with decision_tree() and the rpart engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("rpart")
 
   # Regression
@@ -284,6 +305,8 @@ test_that("works with decision_tree() and the rpart engine", {
 })
 
 test_that("works with rand_forest() and the partykit engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("bonsai")
   skip_if_not_installed("partykit")
 
@@ -314,6 +337,8 @@ test_that("works with rand_forest() and the partykit engine", {
 })
 
 test_that("works with rand_forest() and the aorsf engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("bonsai")
   skip_if_not_installed("aorsf")
 
@@ -350,6 +375,7 @@ test_that("works with rand_forest() and the aorsf engine", {
 })
 
 test_that("works with linear_reg() and the quantreg engine", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("quantreg")
 
   model <- parsnip::fit(
@@ -368,6 +394,8 @@ test_that("works with linear_reg() and the quantreg engine", {
 })
 
 test_that("works with rule_fit() and the xrf engine", {
+  skip_if_not_installed("parsnip")
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("rules")
   skip_if_not_installed("xrf")
   # {rules} must be attached for parsnip's xrf prediction to resolve.
@@ -418,6 +446,7 @@ test_that("works with rule_fit() and the xrf engine", {
 })
 
 test_that("mlp is handled with parsnip", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("nnet")
   skip_if_not_installed("parsnip")
 
@@ -454,6 +483,7 @@ test_that("mlp is handled with parsnip", {
 })
 
 test_that("bart is handled with parsnip", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("dbarts")
   skip_if_not_installed("parsnip")
 
@@ -505,6 +535,7 @@ test_that("bart is handled with parsnip", {
 })
 
 test_that("bag_tree is handled with parsnip", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("baguette")
   skip_if_not_installed("parsnip")
 
@@ -544,6 +575,7 @@ test_that("bag_tree is handled with parsnip", {
 })
 
 test_that("bag_tree is handled with parsnip and the C5.0 engine", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("baguette")
   skip_if_not_installed("parsnip")
   skip_if_not_installed("C50")

@@ -69,7 +69,7 @@ mtcars %>%
   glimpse()
     ```
 
-- Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the matrix data set.
+- Confirm that `tidypredict` results match the model's `predict()` results. The `xg_df` argument expects the matrix data set.
     ```{r}
 tidypredict_test(model, xg_df = X)
     ```

@@ -273,6 +273,7 @@ test_that("SQL translation works", {
 })
 
 test_that("fda is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mda")
   skip_if_not_installed("discrim")
 

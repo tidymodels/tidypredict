@@ -65,7 +65,7 @@ iris %>%
 - Confirm that the results match the model's `predict()` results
     ```{r}
 probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
-posterior <- sda::predict.sda(model, as.matrix(iris[1:4]), verbose = FALSE)
+posterior <- predict(model, as.matrix(iris[1:4]), verbose = FALSE)
 all.equal(unname(probs), unname(posterior$posterior))
     ```
 

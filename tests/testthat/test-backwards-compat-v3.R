@@ -6,7 +6,7 @@
 # The expected values are stored, so these tests do not need the modelling
 # packages installed.
 
-expect_v3_fixture <- function(name, tolerance = 1e-6) {
+expect_v3_fixture <- function(name, tolerance = 1e-12) {
   fixture <- readRDS(test_path("backwards-compat", paste0(name, ".rds")))
   pm <- as_parsed_model(fixture$pm)
 
@@ -38,7 +38,9 @@ test_that("v3 C5.0 parsed models still predict correctly", {
 })
 
 test_that("v3 xgboost parsed models still predict correctly", {
-  expect_v3_fixture("v3-xgb-regression")
+  # `xgboost` stores its leaf values as float32, so the fixture's expected
+  # values only carry about seven significant digits.
+  expect_v3_fixture("v3-xgb-regression", tolerance = 1e-7)
 })
 
 test_that("v3 tree fixtures carry no dispatch class of their own", {

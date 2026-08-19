@@ -130,6 +130,7 @@ test_that("SQL translation works", {
 })
 
 test_that("sda is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 
@@ -148,6 +149,7 @@ test_that("sda is handled with parsnip", {
 })
 
 test_that("categorical predictors are handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 
@@ -188,6 +190,7 @@ test_that("a single predictor is handled", {
 })
 
 test_that("special-character and unused factor levels work with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 
@@ -213,6 +216,7 @@ test_that("special-character and unused factor levels work with parsnip", {
 })
 
 test_that("newdata containing NA matches predict() with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 
@@ -231,6 +235,7 @@ test_that("newdata containing NA matches predict() with parsnip", {
 })
 
 test_that("an ordered factor is rejected with parsnip (#393)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 
@@ -242,6 +247,7 @@ test_that("an ordered factor is rejected with parsnip (#393)", {
 })
 
 test_that("a coefficient label colliding with a variable name works (#376)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("sda")
   skip_if_not_installed("discrim")
 

@@ -1,4 +1,5 @@
 test_that("returns the right output", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
 
   tf <- tidypredict_fit(model)
@@ -13,12 +14,14 @@ test_that("returns the right output", {
 })
 
 test_that("regression predictions match native predict", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
 
   expect_false(tidypredict_test(model, mtcars)$alert)
 })
 
 test_that("classification returns one probability per class", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(iris[-5], iris$Species)
 
   tf <- tidypredict_fit(model)
@@ -31,13 +34,14 @@ test_that("classification returns one probability per class", {
   expect_equal(pm$classes, levels(iris$Species))
 
   probs <- vapply(tf, as.numeric, numeric(1))
-  native <- parsnip:::predict.nullmodel(model, iris, type = "prob")
+  native <- predict(model, iris, type = "prob")
 
   expect_equal(unname(probs), unname(unlist(native[1, ])))
   expect_equal(sum(probs), 1)
 })
 
 test_that("unbalanced and binary outcomes are handled", {
+  skip_if_not_installed("parsnip")
   df <- transform(mtcars, am = factor(am))
   model <- parsnip::nullmodel(df[-9], df$am)
 
@@ -45,12 +49,13 @@ test_that("unbalanced and binary outcomes are handled", {
   expect_named(tf, c("0", "1"))
 
   probs <- vapply(tf, as.numeric, numeric(1))
-  native <- parsnip:::predict.nullmodel(model, df, type = "prob")
+  native <- predict(model, df, type = "prob")
 
   expect_equal(unname(probs), unname(unlist(native[1, ])))
 })
 
 test_that("categorical predictors are ignored", {
+  skip_if_not_installed("parsnip")
   df <- transform(mtcars, cyl = factor(cyl))
   model <- parsnip::nullmodel(df[c("cyl", "wt")], df$mpg)
 
@@ -58,6 +63,7 @@ test_that("categorical predictors are ignored", {
 })
 
 test_that("an unused outcome level gets a probability of zero", {
+  skip_if_not_installed("parsnip")
   y <- factor(c(rep("a", 10), rep("b", 5)), levels = c("a", "b", "unused"))
   model <- parsnip::nullmodel(data.frame(x = seq_along(y)), y)
 
@@ -65,17 +71,18 @@ test_that("an unused outcome level gets a probability of zero", {
   expect_named(tf, c("a", "b", "unused"))
 
   probs <- vapply(tf, as.numeric, numeric(1))
-  native <- parsnip:::predict.nullmodel(model, data.frame(x = 1), type = "prob")
+  native <- predict(model, data.frame(x = 1), type = "prob")
 
   expect_equal(unname(probs), unname(unlist(native[1, ])))
 })
 
 test_that("NA in the outcome and in the newdata are handled", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(data.frame(x = 1:5), c(1, 2, NA, 4, 5))
 
   expect_equal(
     tidypredict_fit(model),
-    parsnip:::predict.nullmodel(model, data.frame(x = 1))
+    predict(model, data.frame(x = 1))
   )
 
   # The predictors are ignored, so a missing one cannot change the prediction.
@@ -85,20 +92,22 @@ test_that("NA in the outcome and in the newdata are handled", {
 
   expect_equal(
     rep(rlang::eval_tidy(tidypredict_fit(model), nd), nrow(nd)),
-    parsnip:::predict.nullmodel(model, nd)
+    predict(model, nd)
   )
 })
 
 test_that("single-row training data is handled", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(data.frame(x = 1), 5)
 
   expect_equal(
     tidypredict_fit(model),
-    parsnip:::predict.nullmodel(model, data.frame(x = 1))
+    predict(model, data.frame(x = 1))
   )
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("yaml")
 
   model <- parsnip::nullmodel(iris[-5], iris$Species)
@@ -121,12 +130,14 @@ test_that("model can be saved and re-loaded", {
 })
 
 test_that("tidypredict_test errors for classification nullmodel", {
+  skip_if_not_installed("parsnip")
   model <- parsnip::nullmodel(iris[-5], iris$Species)
 
   expect_snapshot(error = TRUE, tidypredict_test(model, iris))
 })
 
 test_that("SQL translation works", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("dbplyr")
 
   model <- parsnip::nullmodel(mtcars[-1], mtcars$mpg)
@@ -141,6 +152,7 @@ test_that("SQL translation works", {
 })
 
 test_that("null_model is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   spec <- parsnip::null_model(mode = "regression")
   model <- parsnip::fit(spec, mpg ~ ., mtcars)
 

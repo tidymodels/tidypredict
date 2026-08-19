@@ -23,9 +23,11 @@ save_fixture <- function(name, model, newdata, expected) {
   )
 }
 
-set.seed(123)
+# Each fit gets its own seed, so adding or reordering a fixture below does not
+# silently change the ones that follow it.
 
 # rpart, a single regression tree
+set.seed(123)
 library(rpart)
 model <- rpart(mpg ~ wt + cyl, data = mtcars)
 save_fixture(
@@ -36,6 +38,7 @@ save_fixture(
 )
 
 # partykit, a single conditional inference tree
+set.seed(124)
 library(partykit)
 model <- ctree(mpg ~ wt + cyl, data = mtcars)
 save_fixture(
@@ -46,6 +49,7 @@ save_fixture(
 )
 
 # randomForest, a forest whose trees are averaged
+set.seed(125)
 library(randomForest)
 model <- randomForest(mpg ~ wt + cyl, data = mtcars, ntree = 5)
 save_fixture(
@@ -56,6 +60,7 @@ save_fixture(
 )
 
 # C5.0, a classification tree
+set.seed(126)
 library(C50)
 iris_x <- iris[, 1:4]
 model <- C5.0(iris_x, iris$Species)
@@ -67,6 +72,7 @@ save_fixture(
 )
 
 # xgboost, a gradient boosted ensemble
+set.seed(127)
 library(xgboost)
 xgb_data <- xgb.DMatrix(
   as.matrix(mtcars[, c("wt", "cyl", "disp")]),

@@ -19,9 +19,12 @@ test_that("returns the right output", {
   )
 })
 
-test_that("model can be saved and re-loaded", {
+test_that("a parsed model round trips through YAML", {
+  skip_if_not_installed("yaml")
   model <- glm(am ~ wt + cyl, data = mtcars, family = "gaussian")
 
+  # Both sides derive from the same rounded object, so this asserts that the
+  # YAML round trip is lossless, not that either side matches `predict()`.
   model$coefficients <- round(model$coefficients, 7)
 
   pm <- parse_model(model)
@@ -83,6 +86,34 @@ test_that("formulas produce correct predictions", {
       mtcars
     )$alert
   )
+})
+
+test_that("every family matches predict() directly", {
+  # `tidypredict_test()` compares against `predict()` too, but only reports a
+  # verdict. These assert the numbers.
+  df <- transform(mtcars, cyl = paste0("cyl", cyl))
+
+  rhs <- c("wt + cyl + disp", "wt * cyl + disp", "wt:cyl + disp")
+  # `am` is 0/1, so the families needing a strictly positive response use `mpg`
+  cases <- c(
+    am = "gaussian",
+    am = "binomial",
+    mpg = "poisson",
+    mpg = "Gamma",
+    mpg = "inverse.gaussian"
+  )
+
+  for (r in rhs) {
+    for (i in seq_along(cases)) {
+      f <- stats::as.formula(paste(names(cases)[i], "~", r))
+      model <- suppressWarnings(glm(f, data = df, family = cases[[i]]))
+      expect_equal(
+        rlang::eval_tidy(tidypredict_fit(model), df),
+        unname(predict(model, df, type = "response")),
+        tolerance = 1e-12
+      )
+    }
+  }
 })
 
 test_that("tidypredict works when variable names are subset of other variables", {

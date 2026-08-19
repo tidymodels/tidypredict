@@ -38,6 +38,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("xrf")
 
   model <- xrf_reg_model()
@@ -247,6 +248,7 @@ test_that("an intercept-only fit matches predict()", {
 })
 
 test_that("uses the penalty recorded by rules::rule_fit()", {
+  skip_if_not_installed("rules")
   skip_if_not_installed("xrf")
 
   df <- xrf_mtcars()

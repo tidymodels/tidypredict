@@ -1,0 +1,111 @@
+---
+title: "Model-based boosting, using mboost"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Model-based boosting, using mboost}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (rlang::is_installed("mboost")) {
+  library(tidypredict)
+  library(mboost)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+set.seed(1)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✗  |
+
+## How it works
+
+`mboost::blackboost()` boosts regression trees. Each boosting iteration
+contributes one tree, shrunk by the learning rate `nu`, and the contributions
+are added to the model's offset.
+
+```{r}
+library(mboost)
+library(dplyr)
+library(tidypredict)
+
+model <- blackboost(
+  mpg ~ wt + cyl,
+  data = mtcars,
+  control = boost_control(mstop = 10)
+)
+```
+
+## Under the hood
+
+The parser walks the `partykit` tree behind every boosting iteration and turns
+it into one nested `dplyr::case_when()` statement. The learning rate and the
+offset are folded into the result.
+
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+The parsed model is transformed into a `dplyr`, a.k.a. Tidy Eval, formula.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere it can be evaluated.
+`tidypredict` provides three paths:
+
+- Use directly inside `dplyr`, `mutate(mtcars, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
+
+```{r}
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+```
+
+## How it performs
+
+```{r}
+tidypredict_test(model, df = mtcars)
+```
+
+## Categorical predictors
+
+`blackboost()` handles factors natively, and the generated formula uses `%in%`
+for the resulting splits.
+
+```{r}
+df <- transform(mtcars, cyl = factor(cyl))
+
+model_cat <- blackboost(
+  mpg ~ wt + cyl,
+  data = df,
+  control = boost_control(mstop = 10)
+)
+
+tidypredict_test(model_cat, df = df)
+```
+
+## Limitations
+
+- Only the `Gaussian()` family is supported. Other families apply a response
+  function that cannot be expressed as a single formula.
+- Prediction intervals are not supported.
+- There is no `parsnip` engine for `blackboost()`.

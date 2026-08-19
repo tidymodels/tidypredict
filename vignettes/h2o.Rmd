@@ -39,9 +39,12 @@ set.seed(100)
 
 | Function                                                      |Works|
 |---------------------------------------------------------------|-----|
-|`tidypredict_fit()`, `tidypredict_sql()`                       |
-|`tidypredict_test()`                                           |
-|`parsnip`                                                      |
+|`tidypredict_fit()`, `tidypredict_sql()`                       |  ✔  |
+|`parse_model()`                                                |  ✗  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
 
 ## How it works
 
@@ -72,11 +75,11 @@ connection is required.
 tidypredict_fit(model)
 ```
 
-From there, the Tidy Eval formula can be used anywhere it can be operated.
+From there, the Tidy Eval formula can be used anywhere it can be evaluated.
 `tidypredict` provides these paths:
 
 - Use directly inside `dplyr`, `mutate(mtcars, !! tidypredict_fit(model))`
-- Use `tidypredict_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 ```{r}
 tidypredict_sql(model, dbplyr::simulate_dbi())

@@ -20,6 +20,7 @@ test_that("returns the right output", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   model <- lm(am ~ wt + cyl, data = mtcars)
 
   model$coefficients <- round(model$coefficients, 7)
@@ -114,6 +115,7 @@ test_that("longest variable name wins with three nested prefixes (#290)", {
 })
 
 test_that("factor levels containing a colon work (#308)", {
+  skip_if_not_installed("quantreg")
   set.seed(1)
   df <- data.frame(
     y = rnorm(60),
@@ -133,6 +135,7 @@ test_that("factor levels containing a colon work (#308)", {
 })
 
 test_that("a coefficient label colliding with a variable name works (#308)", {
+  skip_if_not_installed("quantreg")
   set.seed(1)
   df <- data.frame(
     y = rnorm(60),

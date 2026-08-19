@@ -287,6 +287,7 @@ test_that("errors on unsupported configurations", {
 })
 
 test_that("SQL translation works", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("C50")
   df <- mtcars
   df$vs <- factor(df$vs)
@@ -316,6 +317,7 @@ test_that("predictions round-trip through a SQLite database", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("C50")
   df <- mtcars
   df$vs <- factor(df$vs)
@@ -433,6 +435,7 @@ test_that("rule-based models round-trip through parse_model()", {
 })
 
 test_that("rule-based models can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("C50")
   model <- C50::C5.0(iris[, 1:4], iris$Species, rules = TRUE)
 
@@ -664,6 +667,7 @@ test_that("class probabilities with NA in newdata match predict() (#417)", {
 })
 
 test_that("values on a cut boundary match C5.0's float comparison (#287)", {
+  skip_if_not_installed("C50")
   set.seed(3)
   n <- 600
   df <- as.data.frame(matrix(rnorm(n * 4), ncol = 4))

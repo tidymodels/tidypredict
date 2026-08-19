@@ -61,6 +61,7 @@ test_that("tidypredict_test agrees with predict()", {
 })
 
 test_that("model can be saved and re-loaded", {
+  skip_if_not_installed("yaml")
   skip_if_not_installed("LiblineaR")
 
   df <- mtcars
@@ -177,6 +178,7 @@ test_that("errors on unsupported and multiclass models", {
 })
 
 test_that("SQL translation works", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("LiblineaR")
 
   df <- mtcars
