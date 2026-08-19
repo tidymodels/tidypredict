@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-It parses a fitted 'R' model object, and returns a formula in 'Tidy Eval' code that calculates the predictions. It works with several databases back-ends because it leverages 'dplyr' and 'dbplyr' for the final 'SQL' translation of the algorithm. It currently supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(), earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(), cubist(), ctree(), cforest(), fda(), ksvm(), lda(), qda(), sda(), lda_diag(), pls(), nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(), bagger(), and xrf() models.
+It parses a fitted 'R' model object, and returns a formula in 'Tidy Eval' code that calculates the predictions. It works with several databases back-ends because it leverages 'dplyr' and 'dbplyr' for the final 'SQL' translation of the algorithm. Dozens of model classes are supported; see the "Supported models" article at \url{https://tidypredict.tidymodels.org/articles/models.html} for the current list.
 }
 \seealso{
 Useful links:
@@ -20,13 +20,18 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Emil Hvitfeldt \email{emil.hvitfeldt@posit.co}
+\strong{Maintainer}: Emil Hvitfeldt \email{emil.hvitfeldt@posit.co} (\href{https://orcid.org/0000-0002-0679-1945}{ORCID})
 
 Authors:
 \itemize{
-  \item Emil Hvitfeldt \email{emil.hvitfeldt@posit.co}
+  \item Emil Hvitfeldt \email{emil.hvitfeldt@posit.co} (\href{https://orcid.org/0000-0002-0679-1945}{ORCID})
   \item Edgar Ruiz \email{edgar@posit.co}
-  \item Max Kuhn \email{max@posit.co}
+  \item Max Kuhn \email{max@posit.co} (\href{https://orcid.org/0000-0003-2402-136X}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Posit Software, PBC (\href{https://ror.org/03wc8by49}{ROR}) [copyright holder, funder]
 }
 
 }

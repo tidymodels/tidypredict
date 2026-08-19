@@ -16,7 +16,6 @@
 #' @importFrom knitr knit_print
 #' @importFrom dplyr mutate
 #' @importFrom dplyr case_when
-#' @importFrom dplyr %>%
 #' @importFrom stats binomial
 #' @importFrom stats setNames
 #' @keywords internal
