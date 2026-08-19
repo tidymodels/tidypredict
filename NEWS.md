@@ -20,6 +20,8 @@
 
 - `tidypredict_fit()` now fills a missing `mixOmics` predictor in at its training mean, as `predict.mixo_pls()` does, rather than returning `NA` for the row. Each predictor is now wrapped in an `ifelse(is.na(x), mean, x)`, so the generated formula is longer than before but agrees with `predict()` on data with missing values. (#398)
 
+- `tidypredict_fit()` now works on a `dbarts::bart()` model fit with a constant predictor. `dbarts` drops such a predictor from the model matrix and never splits on it, which broke the mapping from the stored predictors back onto the columns of the data and aborted with "Unable to map the predictors of the `dbarts::bart()` model onto the columns of the data."; the dropped predictor is now skipped and the generated formula matches `predict()`. (#363)
+
 - `acceptable_formula()` and `parse_model()` now report a model class they do not support, rather than failing with R's "no applicable method" error. (#313)
 
 - `as_parsed_model()` now rejects an object that is not a parsed model. A list without a `general$type` element was given a class of `pm_` that no method matches, so the failure surfaced much later and said nothing about the real problem. (#313)

@@ -149,14 +149,19 @@ bart_column_map <- function(model) {
 
   res <- list()
   for (var in names(drop)) {
+    # A predictor that is constant in the training data is dropped by `bart()`,
+    # so it has no column in the model matrix and is never split on
+    if (isTRUE(drop[[var]])) {
+      next
+    }
+
     if (isFALSE(drop[[var]])) {
       res <- c(res, list(list(col = var)))
       next
     }
 
     prefix <- paste0(var, ".")
-    levels <- cols[seq(length(res) + 1, length(cols))]
-    levels <- levels[startsWith(levels, prefix)]
+    levels <- cols[seq_along(cols) > length(res) & startsWith(cols, prefix)]
     res <- c(
       res,
       map(levels, function(level) {
