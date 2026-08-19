@@ -7,6 +7,9 @@
 #'
 #' @param model An R model object
 #'
+#' @returns `NULL` (invisibly) when the model's formula can be parsed, or an
+#'   error when it cannot.
+#'
 #' @examples
 #'
 #' model <- lm(mpg ~ wt, mtcars)

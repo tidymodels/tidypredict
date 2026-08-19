@@ -36,7 +36,7 @@ conditions are at the same level.
 \item \strong{Version 2}: Improved coefficient storage for linear models (lm, earth).
 Tree models still use flat \code{case_when()}.
 \item \strong{Version 3}: Current format. Tree models (rpart, ranger, randomForest,
-xgboost, lightgbm, catboost, partykit, cubist) use nested \code{case_when()}
+xgboost, lightgbm, catboost, partykit) use nested \code{case_when()}
 expressions that mirror the tree structure. This produces more efficient
 SQL and R code because conditions are evaluated hierarchically rather than
 checking all leaf paths.
@@ -58,7 +58,14 @@ cubist)
 \item \code{pm_xgb}: XGBoost gradient boosting models
 \item \code{pm_lgb}: LightGBM gradient boosting models
 \item \code{pm_catboost}: CatBoost gradient boosting models
+\item \code{pm_bart}: BART models
+\item \code{pm_naive_bayes}: Naive Bayes models
+\item \code{pm_nnet}: Neural network models
+\item \code{pm_multiclass_regression}: Multiclass regression models
+\item \code{pm_nullmodel_classification}: Null model classification
 }
+
+This list is not exhaustive; new model types are added as support grows.
 }
 
 \examples{

@@ -118,7 +118,7 @@ generate_tree_nodes <- function(tree, mode) {
 #'   used then `is_intercept == 1`.
 #' - `is_intercept`integer, takes values `0` and `1`.`
 #'
-#'  @keywords internal
+#' @keywords internal
 generate_tree_node <- function(node, calc_mode = "") {
   path <- node$path
   prediction <- node$prediction
@@ -204,7 +204,7 @@ clamp_prediction <- function(pl, limits) {
 #' - `col` character.
 #' - `val` if `type == "conditional"` and `vals` if `type == "set"`.
 #'   Can be character or numeric.
-#'  @keywords internal
+#' @keywords internal
 path_formulas <- function(path) {
   if (length(path) == 0) {
     return(TRUE)
@@ -238,7 +238,7 @@ path_formulas <- function(path) {
 #' - `col` character.
 #' - `val` if `type == "conditional"` and `vals` if `type == "set"`.
 #'   Can be character or numeric.
-#'  @keywords internal
+#' @keywords internal
 path_formula <- function(x) {
   type <- x$type
 

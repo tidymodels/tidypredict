@@ -9,6 +9,10 @@ acceptable_formula(model)
 \arguments{
 \item{model}{An R model object}
 }
+\value{
+\code{NULL} (invisibly) when the model's formula can be parsed, or an
+error when it cannot.
+}
 \description{
 Uses an S3 method to check that a given formula can be parsed based on its class.
 It currently scans for contrasts that are not supported and in-line functions.

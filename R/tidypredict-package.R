@@ -23,7 +23,7 @@
 #' @importFrom generics tidy
 #'
 "_PACKAGE"
-NULL
+
 utils::globalVariables(
   c(
     ".",

@@ -11,6 +11,15 @@
 
 \item{...}{Reserved for future use}
 }
+\value{
+A tibble with one row per term, containing the \code{term} name and its
+\code{estimate}.
+}
 \description{
 Tidy the parsed model results
+}
+\examples{
+pm <- parse_model(lm(mpg ~ wt, data = mtcars))
+tidy(pm)
+
 }

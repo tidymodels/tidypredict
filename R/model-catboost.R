@@ -165,8 +165,7 @@ parse_model.catboost.Model <- function(model) {
 #'   training.
 #' @return The parsed model with category mappings added
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf rlang::is_installed("catboost")
 #' # For raw CatBoost models with categorical features:
 #' pm <- parse_model(catboost_model)
 #' pm <- set_catboost_categories(pm, catboost_model, training_data)
@@ -174,7 +173,6 @@ parse_model.catboost.Model <- function(model) {
 #'
 #' # For parsnip/bonsai models, this is not needed:
 #' # tidypredict_fit(parsnip_model_fit)  # works automatically
-#' }
 #' @export
 set_catboost_categories <- function(parsed_model, model, data) {
   if (!inherits(parsed_model, "pm_catboost")) {

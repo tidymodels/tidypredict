@@ -2,6 +2,12 @@
 #'
 #' @param x A parsed model object
 #'
+#' @returns The parsed model with its `parsed_model` and `pm_*` classes set.
+#'
+#' @examples
+#' pm <- parse_model(lm(mpg ~ wt, data = mtcars))
+#' as_parsed_model(pm)
+#'
 #' @export
 as_parsed_model <- function(x) {
   UseMethod("as_parsed_model")

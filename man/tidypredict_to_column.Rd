@@ -25,8 +25,17 @@ FALSE}
 
 \item{vars}{The name of the variables that this function will produce. Defaults to "fit", "upper", and "lower".}
 }
+\value{
+The input data frame with one new column (the fit) added, or three
+new columns (fit, upper and lower bounds) when \code{add_interval} is \code{TRUE}.
+}
 \description{
 Adds a new column with the results from tidypredict_fit() to a piped command set.
 If add_interval is set to TRUE, it will add two additional columns- one
 for the lower and another for the upper prediction interval bounds.
+}
+\examples{
+model <- lm(mpg ~ wt, data = mtcars)
+tidypredict_to_column(mtcars, model)
+
 }

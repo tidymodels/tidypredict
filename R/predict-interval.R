@@ -9,6 +9,10 @@
 #' @param model An R model or a list with a parsed model
 #' @param interval The prediction interval, defaults to 0.95
 #'
+#' @returns A Tidy Eval formula that calculates the half width of the
+#'   prediction interval. It must be added to and subtracted from the fit to
+#'   obtain the upper and lower bounds.
+#'
 #' @examples
 #'
 #' model <- lm(mpg ~ wt + cyl * disp, offset = am, data = mtcars)

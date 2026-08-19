@@ -40,10 +40,9 @@ If it is a list it will have the following 4 named elements \code{col}, \code{va
 \item \code{op} character, known values are \code{"none"} and \code{"multiply"}. \code{"none"} is
 used then \code{is_intercept == 1}.
 \item \code{is_intercept}integer, takes values \code{0} and \code{1}.`
-}
-
-@keywords internal}
+}}
 }
 \description{
 Construct a single node of a tree
 }
+\keyword{internal}

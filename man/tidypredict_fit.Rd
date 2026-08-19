@@ -9,6 +9,10 @@ tidypredict_fit(model)
 \arguments{
 \item{model}{An R model or a list with a parsed model.}
 }
+\value{
+A Tidy Eval formula that calculates the fitted values. Models that
+produce one formula per class or per outcome return a list of formulas.
+}
 \description{
 It parses a model or uses an already parsed model to return a
 Tidy Eval formula that can then be used inside a dplyr command.
