@@ -2,26 +2,27 @@ Package: tidypredict
 Title: Run Predictions Inside the Database
 Version: 1.1.0.9000
 Authors@R: c(
-    person("Emil", "Hvitfeldt", , "emil.hvitfeldt@posit.co", role = c("aut", "cre")),
+    person("Emil", "Hvitfeldt", , "emil.hvitfeldt@posit.co", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0002-0679-1945")),
     person("Edgar", "Ruiz", , "edgar@posit.co", role = "aut"),
-    person("Max", "Kuhn", , "max@posit.co", role = "aut")
+    person("Max", "Kuhn", , "max@posit.co", role = "aut",
+           comment = c(ORCID = "0000-0003-2402-136X")),
+    person("Posit Software, PBC", role = c("cph", "fnd"),
+           comment = c(ROR = "03wc8by49"))
   )
 Description: It parses a fitted 'R' model object, and returns a formula in
     'Tidy Eval' code that calculates the predictions.  It works with
     several databases back-ends because it leverages 'dplyr' and 'dbplyr'
-    for the final 'SQL' translation of the algorithm. It currently
-    supports lm(), glm(), randomForest(), ranger(), rpart(), C5.0(),
-    earth(), xgb.Booster.complete(), lgb.Booster(), catboost.Model(),
-    cubist(), ctree(), cforest(), fda(), ksvm(), lda(), qda(), sda(),
-    lda_diag(),
-    pls(), nullmodel(), NaiveBayes(), naive_bayes(), nnet(), bart(),
-    bagger(), and xrf() models.
+    for the final 'SQL' translation of the algorithm.  Dozens of model
+    classes are supported; see the "Supported models" article at
+    <https://tidypredict.tidymodels.org/articles/models.html> for the
+    current list.
 License: MIT + file LICENSE
 URL: https://tidypredict.tidymodels.org,
     https://github.com/tidymodels/tidypredict
 BugReports: https://github.com/tidymodels/tidypredict/issues
 Depends:
-    R (>= 3.6)
+    R (>= 4.1)
 Imports:
     cli,
     dplyr (>= 0.7),
@@ -53,10 +54,9 @@ Suggests:
     LiblineaR,
     lightgbm,
     MASS,
-    mda,
     mboost,
+    mda,
     mixOmics,
-    methods,
     mlbench,
     modeldata,
     naivebayes,
@@ -68,12 +68,12 @@ Suggests:
     quantreg,
     randomForest,
     ranger (>= 0.14.1),
+    rmarkdown,
     rpart (>= 4.1.0),
+    RSQLite,
     rules,
     sda,
     sparsediscrim,
-    rmarkdown,
-    RSQLite,
     survival,
     testthat (>= 3.2.0),
     withr,
@@ -83,7 +83,8 @@ Suggests:
 VignetteBuilder: 
     knitr
 Config/Needs/website: tidyverse/tidytemplate
+Config/roxygen2/version: 8.0.0
 Config/testthat/edition: 3
+Config/usethis/last-upkeep: 2026-08-19
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.0.0
