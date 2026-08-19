@@ -54,7 +54,7 @@ etitanic %>%
   glimpse()
     ```
 
-- Confirm that `tidypredict` results match to the model's `predict()` results
+- Confirm that `tidypredict` results match the model's `predict()` results
     ```{r}
 tidypredict_test(model, etitanic)
     ```
@@ -71,7 +71,7 @@ model <- earth(survived ~ .,
 tidypredict_fit(model)
 ```
 
-The spec sets the `is_glm` entry to 1, as well as the `family` and `link` entries. 
+The spec sets the `is_glm` entry to 1, as well as the `family` and `link` entries.
 ```{r}
 str(parse_model(model), 2)
 ```

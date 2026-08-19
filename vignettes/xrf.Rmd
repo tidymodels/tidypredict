@@ -1,0 +1,142 @@
+---
+title: "RuleFit, using xrf"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{RuleFit, using xrf}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (rlang::is_installed("xrf")) {
+  library(tidypredict)
+  library(xrf)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+set.seed(7)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+## How it works
+
+A RuleFit model is a regularized linear model over two kinds of terms: rules
+extracted from a boosted tree ensemble, and the original predictors entered
+linearly. Both kinds translate cleanly, so the whole model becomes a single
+formula.
+
+```{r}
+library(xrf)
+library(dplyr)
+library(tidypredict)
+
+df <- mtcars
+df$cyl <- factor(df$cyl)
+
+model <- xrf(
+  mpg ~ wt + hp + cyl,
+  df,
+  family = "gaussian",
+  xgb_control = list(nrounds = 5, max_depth = 3)
+)
+```
+
+## Under the hood
+
+The parser reads the fitted `glmnet` coefficients and the rules they belong to.
+Each rule becomes a `dplyr::if_else()` indicator multiplied by its coefficient,
+and the linear terms are added on top.
+
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+The parsed model is transformed into a `dplyr`, a.k.a. Tidy Eval, formula.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere it can be evaluated.
+`tidypredict` provides three paths:
+
+- Use directly inside `dplyr`, `mutate(df, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
+
+```{r}
+df %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+```
+
+## How it performs
+
+```{r}
+tidypredict_test(model, df)
+```
+
+## Classification
+
+Binary classification models, `family = "binomial"`, are supported and return
+the probability of the second outcome level through the logistic link.
+
+```{r}
+df_bin <- mtcars
+df_bin$vs <- factor(df_bin$vs)
+
+model_bin <- xrf(
+  vs ~ wt + mpg,
+  df_bin,
+  family = "binomial",
+  xgb_control = list(nrounds = 5, max_depth = 3)
+)
+
+tidypredict_test(model_bin, df_bin)
+```
+
+## parsnip
+
+`tidypredict` also supports `xrf` model objects fitted via the `parsnip`
+package, using `rule_fit()` from the `rules` package with the `"xrf"` engine.
+
+```{r, eval = eval_code && rlang::is_installed(c("parsnip", "rules"))}
+library(parsnip)
+library(rules)
+
+parsnip_model <- rule_fit(
+  mode = "regression",
+  trees = 5,
+  tree_depth = 3,
+  penalty = 0.1
+) |>
+  set_engine("xrf") |>
+  fit(mpg ~ wt + hp + cyl, data = df)
+
+tidypredict_test(parsnip_model, df)
+```
+
+## Limitations
+
+- Multinomial models are not supported; only `family = "gaussian"` and
+  `family = "binomial"` are.
+- Prediction intervals are not supported.
+- Functions and interactions written inside the model formula are not supported.
+  Prepare those columns with `dplyr` before fitting.
+- The underlying trees come from XGBoost, which stores split thresholds as
+  32-bit floats. See the [float precision](float-precision.html) article.

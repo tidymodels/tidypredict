@@ -1,0 +1,139 @@
+---
+title: "Support vector machines, using kernlab"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Support vector machines, using kernlab}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+if (rlang::is_installed("kernlab")) {
+  library(tidypredict)
+  library(kernlab)
+  library(dplyr)
+  eval_code <- TRUE
+} else {
+  eval_code <- FALSE
+}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = eval_code
+)
+set.seed(100)
+```
+
+| Function                                                      |Works|
+|---------------------------------------------------------------|-----|
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
+
+## How it works
+
+Only linear (`vanilladot`) kernels are supported. With a linear kernel the
+decision function collapses to a weighted sum of the predictors, which is
+exactly the shape `tidypredict` can write out.
+
+```{r}
+library(kernlab)
+library(dplyr)
+library(tidypredict)
+
+model <- ksvm(
+  mpg ~ wt + hp + disp,
+  data = mtcars,
+  kernel = "vanilladot",
+  type = "eps-svr"
+)
+```
+
+## Under the hood
+
+The parser multiplies the support vectors by their coefficients to recover one
+weight per predictor, undoes the scaling `ksvm()` applied while fitting, and
+adds the bias term.
+
+```{r}
+pm <- parse_model(model)
+str(pm, 2)
+```
+
+The parsed model is transformed into a `dplyr`, a.k.a. Tidy Eval, formula.
+
+```{r}
+tidypredict_fit(model)
+```
+
+From there, the Tidy Eval formula can be used anywhere it can be evaluated.
+`tidypredict` provides three paths:
+
+- Use directly inside `dplyr`, `mutate(mtcars, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
+
+```{r}
+mtcars %>%
+  tidypredict_to_column(model) %>%
+  glimpse()
+```
+
+```{r}
+tidypredict_sql(model, dbplyr::simulate_mssql())
+```
+
+## How it performs
+
+```{r}
+tidypredict_test(model, mtcars)
+```
+
+## Classification
+
+Binary classification models are supported, and return the probability of the
+second outcome level. `ksvm()` turns its decision values into probabilities with
+a fitted sigmoid, so the model has to be fitted with `prob.model = TRUE` for
+that sigmoid to exist.
+
+```{r}
+df <- mtcars
+df$vs <- factor(df$vs)
+
+model_class <- ksvm(
+  vs ~ wt + mpg,
+  data = df,
+  kernel = "vanilladot",
+  type = "C-svc",
+  prob.model = TRUE
+)
+
+tidypredict_fit(model_class)
+```
+
+## parsnip
+
+`tidypredict` also supports `ksvm` model objects fitted via the `parsnip`
+package, using `svm_linear()` with the `"kernlab"` engine.
+
+```{r}
+library(parsnip)
+
+parsnip_model <- svm_linear(mode = "regression") |>
+  set_engine("kernlab") |>
+  fit(mpg ~ wt + hp, data = mtcars)
+
+tidypredict_fit(parsnip_model)
+```
+
+## Limitations
+
+- Only the linear `vanilladot` kernel is supported. Non-linear kernels cannot be
+  written as a single formula over the columns.
+- Only binary classification is supported, and it requires `prob.model = TRUE`.
+- Prediction intervals are not supported.
+- Non-syntactic column names are risky on the matrix interface, `ksvm(x, y)`,
+  because `ksvm()` mangles them with `make.names()` and keeps no record of the
+  originals. See the [supported models](models.html) article for details.

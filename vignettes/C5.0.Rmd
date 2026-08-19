@@ -21,10 +21,11 @@ set.seed(100)
 
 | Function                                                      |Works|
 |---------------------------------------------------------------|-----|
-|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |
-|`tidypredict_to_column()`                                      |
-|`tidypredict_test()`                                           |
-|`parsnip`                                                      |
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
 
 ## How it works
 
@@ -45,18 +46,18 @@ model <- C5.0(mtcars2[, c("wt", "cyl", "mpg")], mtcars2$vs)
 
 C5.0 stores its fitted tree as text in the `tree` element of the model object. `tidypredict` parses that text directly, so the model can be translated even when it was fitted through the x/y interface (as `parsnip` does).
 
-The tree is transformed into a `dplyr`, a.k.a Tidy Eval, formula. The decision tree becomes a nested `dplyr::case_when()` statement.
+The tree is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. The decision tree becomes a nested `dplyr::case_when()` statement.
 
 ```{r}
 tidypredict_fit(model)
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be evaluated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`,
   `mutate(mtcars2, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
-- Use `tidypredict_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 ## Categorical predictors
 

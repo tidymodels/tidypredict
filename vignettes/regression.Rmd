@@ -14,6 +14,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+This article documents the version 2 parsed model spec for regression models. Version 3 is the current format, and tidypredict still reads version 2 models for backwards compatibility. See [tree internals](tree-internals.html) for what changed.
+
 ```{r, echo = FALSE}
 spec_frame <- read.csv("regression.csv")
 knitr::kable(spec_frame, row.names = FALSE)

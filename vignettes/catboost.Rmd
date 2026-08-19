@@ -1,5 +1,5 @@
 ---
-title: "catboost models"
+title: "CatBoost models"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{CatBoost models}
@@ -8,8 +8,9 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-if (FALSE) {
+if (rlang::is_installed("catboost")) {
   library(tidypredict)
+  library(catboost)
   library(dplyr)
   eval_code <- TRUE
 } else {
@@ -24,16 +25,17 @@ knitr::opts_chunk$set(
 
 | Function                                                      |Works|
 |---------------------------------------------------------------|-----|
-|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |
-|`tidypredict_to_column()`                                      |
-|`tidypredict_test()`                                           |
-|`tidypredict_interval()`, `tidypredict_sql_interval()`         |
-|`parsnip`                                                      |
+|`tidypredict_fit()`, `tidypredict_sql()`, `parse_model()`      |  ✔  |
+|`tidypredict_to_column()`                                      |  ✔  |
+|`tidypredict_test()`                                           |  ✔  |
+|`tidypredict_interval()`, `tidypredict_sql_interval()`         |  ✗  |
+|`parsnip`                                                      |  ✔  |
 
 ## `tidypredict_` functions
 
-```r
+```{r}
 library(catboost)
+
 # Prepare data
 X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y <- mtcars$hp
@@ -58,22 +60,25 @@ model <- catboost.train(
 ```
 
 - Create the R formula
-    ```r
-tidypredict_fit(model)
+
+    ```{r}
+    tidypredict_fit(model)
     ```
 
 - Add the prediction to the original table
-    ```r
-library(dplyr)
 
-mtcars %>%
-  tidypredict_to_column(model) %>%
-  glimpse()
+    ```{r}
+    library(dplyr)
+
+    mtcars %>%
+      tidypredict_to_column(model) %>%
+      glimpse()
     ```
 
-- Confirm that `tidypredict` results match to the model's `predict()` results. The `xg_df` argument expects the matrix data set.
-    ```r
-tidypredict_test(model, xg_df = X)
+- Confirm that `tidypredict` results match the model's `predict()` results. The `xg_df` argument expects the matrix data set.
+
+    ```{r}
+    tidypredict_test(model, xg_df = X)
     ```
 
 ## Supported objectives
@@ -115,7 +120,7 @@ Equivalent to `prediction_type = "Probability"`.
 
 ## Binary classification example
 
-```r
+```{r}
 X_bin <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
 y_bin <- mtcars$am
 
@@ -142,7 +147,7 @@ tidypredict_test(model_bin, xg_df = X_bin)
 
 ## Multiclass classification example
 
-```r
+```{r}
 X_multi <- data.matrix(iris[, 1:4])
 y_multi <- as.integer(iris$Species) - 1L
 
@@ -171,7 +176,7 @@ names(formulas)
 
 Test multiclass predictions:
 
-```r
+```{r}
 tidypredict_test(model_multi, xg_df = X_multi)
 ```
 
@@ -179,11 +184,11 @@ tidypredict_test(model_multi, xg_df = X_multi)
 
 CatBoost models can use categorical features with one-hot encoding.
 
-### With parsnip/bonsai (recommended)
+### With parsnip and bonsai (recommended)
 
-When using parsnip/bonsai, categorical features are handled automatically:
+When using parsnip and bonsai, categorical features are handled automatically:
 
-```r
+```{r, eval = eval_code && rlang::is_installed(c("parsnip", "bonsai"))}
 library(parsnip)
 library(bonsai)
 
@@ -207,7 +212,13 @@ tidypredict_fit(model_fit)
 
 For raw CatBoost models, you need to manually establish the hash-to-category mapping:
 
-```r
+```{r}
+df_cat <- data.frame(
+  num_feat = mtcars$mpg,
+  cat_feat = factor(ifelse(mtcars$am == 1, "manual", "auto")),
+  target = mtcars$hp
+)
+
 pool_cat <- catboost.load_pool(
   df_cat[, c("num_feat", "cat_feat")],
   label = df_cat$target
@@ -237,13 +248,14 @@ tidypredict_fit(pm_cat)
 ## Parse model spec
 
 Here is an example of the model spec:
-```r
+
+```{r}
 pm <- parse_model(model)
 str(pm, 2)
 ```
 
-```r
-str(pm$trees[1])
+```{r}
+str(pm$trees[1], 2)
 ```
 
 ## Limitations
