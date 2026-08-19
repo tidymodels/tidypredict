@@ -27,6 +27,7 @@ test_that("aorsf regression predictions match", {
 })
 
 test_that("aorsf supports SQL", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("aorsf")
 
   set.seed(1)
@@ -36,6 +37,7 @@ test_that("aorsf supports SQL", {
 })
 
 test_that("aorsf predictions round-trip through SQLite", {
+  skip_if_not_installed("DBI")
   skip_if_not_installed("aorsf")
   skip_if_not_installed("RSQLite")
 

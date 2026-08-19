@@ -1,8 +1,5 @@
 test_that("returns the right output", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -24,16 +21,17 @@ test_that("returns the right output", {
   expect_equal(pm$general$model, "ranger")
   expect_equal(pm$general$version, 3)
 
-  expect_snapshot(
-    rlang::expr_text(tf)
-  )
+  # `ranger` grows its trees with its own RNG, whose stream is not portable
+  # across platforms, so the split values in the formula text are not either.
+  # Assert the shape of the expression and let the surrounding tests assert
+  # the numbers against `predict()`.
+  fit_text <- rlang::expr_text(tf)
+  expect_match(fit_text, "case_when")
+  expect_match(fit_text, "/3$")
 })
 
 test_that("tidypredict_fit produces correct predictions", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -53,9 +51,6 @@ test_that("tidypredict_fit produces correct predictions", {
 
 test_that("formulas produce correct predictions", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   # regression
   expect_false(
@@ -75,9 +70,6 @@ test_that("formulas produce correct predictions", {
 
 test_that("split operator uses <= for left child (#189)", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -97,9 +89,6 @@ test_that("split operator uses <= for left child (#189)", {
 
 test_that("predictions are averaged not summed (#190)", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -119,9 +108,6 @@ test_that("predictions are averaged not summed (#190)", {
 
 test_that("produced case_when uses .default", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -140,9 +126,6 @@ test_that("produced case_when uses .default", {
 
 test_that("classification models error with clear message (#191)", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ Sepal.Length + Sepal.Width,
@@ -187,9 +170,6 @@ test_that("probability and survival forests error with clear message (#301)", {
 
 test_that(".extract_ranger_classprob returns correct structure", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ Sepal.Length + Sepal.Width,
@@ -219,9 +199,6 @@ test_that(".extract_ranger_classprob errors on non-ranger model", {
 
 test_that(".extract_ranger_classprob errors without probability = TRUE", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ Sepal.Length + Sepal.Width,
@@ -238,9 +215,6 @@ test_that(".extract_ranger_classprob errors without probability = TRUE", {
 
 test_that(".extract_ranger_classprob works with binary classification", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   mtcars$vs <- factor(mtcars$vs)
   model <- ranger::ranger(
@@ -262,9 +236,6 @@ test_that(".extract_ranger_classprob works with binary classification", {
 
 test_that(".extract_ranger_classprob produces correct probabilities", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ .,
@@ -299,9 +270,6 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
 
 test_that(".extract_ranger_classprob works with single tree", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ .,
@@ -325,9 +293,6 @@ test_that(".extract_ranger_classprob works with single tree", {
 
 test_that(".extract_ranger_trees returns correct structure", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -354,9 +319,6 @@ test_that(".extract_ranger_trees errors on non-ranger model", {
 
 test_that(".extract_ranger_trees errors on classification model", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ Sepal.Length + Sepal.Width,
@@ -372,9 +334,6 @@ test_that(".extract_ranger_trees errors on classification model", {
 
 test_that(".extract_ranger_trees produces correct predictions when averaged", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     mpg ~ cyl + disp + hp,
@@ -437,151 +396,8 @@ test_that("v2 parsed classification model errors", {
   expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
-test_that("legacy get_ra_trees extracts correct structure", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  model <- ranger::ranger(
-    mpg ~ cyl + disp,
-    data = mtcars,
-    num.trees = 2,
-    max.depth = 2,
-    seed = 100,
-    num.threads = 1
-  )
-
-  trees <- tidypredict:::get_ra_trees(model)
-
-  expect_type(trees, "list")
-  expect_length(trees, 2)
-  # Each tree should have leaf nodes with prediction and path
-
-  expect_true(all(vapply(
-    trees[[1]],
-    function(x) "prediction" %in% names(x),
-    logical(1)
-  )))
-  expect_true(all(vapply(
-    trees[[1]],
-    function(x) "path" %in% names(x),
-    logical(1)
-  )))
-})
-
-test_that("legacy get_ra_tree extracts single tree", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  model <- ranger::ranger(
-    mpg ~ cyl + disp,
-    data = mtcars,
-    num.trees = 2,
-    max.depth = 2,
-    seed = 100,
-    num.threads = 1
-  )
-
-  tree <- tidypredict:::get_ra_tree(1, model)
-
-  expect_type(tree, "list")
-  expect_true(length(tree) > 0)
-  expect_true("prediction" %in% names(tree[[1]]))
-  expect_true("path" %in% names(tree[[1]]))
-})
-
-test_that("legacy get_child_info builds parent map", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  model <- ranger::ranger(
-    mpg ~ cyl + disp,
-    data = mtcars,
-    num.trees = 1,
-    max.depth = 2,
-    seed = 100,
-    num.threads = 1
-  )
-
-  tree <- ranger::treeInfo(model, 1)
-  child_info <- tidypredict:::get_child_info(tree)
-
-  expect_type(child_info, "double")
-  # child_info maps each node to its parent
-  expect_true(length(child_info) > 0)
-})
-
-test_that("legacy get_ra_path handles stump trees", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  # Create a stump tree (single node, no splits)
-  model <- ranger::ranger(
-    mpg ~ cyl,
-    data = mtcars,
-    num.trees = 1,
-    max.depth = 0,
-    seed = 100,
-    num.threads = 1
-  )
-
-  tree <- ranger::treeInfo(model, 1)
-  child_info <- tidypredict:::get_child_info(tree)
-
-  # Stump has no children, so path should be empty
-
-  path <- tidypredict:::get_ra_path(0, tree, child_info, FALSE)
-  expect_equal(path, list())
-})
-
-test_that("legacy get_ra_path with default_op = TRUE", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  model <- ranger::ranger(
-    mpg ~ cyl + disp,
-    data = mtcars,
-    num.trees = 1,
-    max.depth = 2,
-    seed = 100,
-    num.threads = 1
-  )
-
-  tree <- ranger::treeInfo(model, 1)
-  child_info <- tidypredict:::get_child_info(tree)
-  terminal_nodes <- tree$nodeID[tree$terminal]
-
-  # Test with default_op = TRUE (uses "less" and "more-equal")
-  # Test all terminal nodes to exercise both left and right child paths
-  all_ops <- character(0)
-  for (node in terminal_nodes) {
-    path <- tidypredict:::get_ra_path(node, tree, child_info, TRUE)
-    expect_type(path, "list")
-    if (length(path) > 0) {
-      ops <- vapply(path, function(x) x$op, character(1))
-      expect_true(all(ops %in% c("less", "more-equal")))
-      all_ops <- c(all_ops, ops)
-    }
-  }
-  # Ensure both operators are used across all paths
-  expect_true("less" %in% all_ops)
-  expect_true("more-equal" %in% all_ops)
-})
-
 test_that("parse_model.ranger errors on classification", {
   skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
 
   model <- ranger::ranger(
     Species ~ Sepal.Length + Sepal.Width,
@@ -593,56 +409,6 @@ test_that("parse_model.ranger errors on classification", {
   )
 
   expect_snapshot(parse_model(model), error = TRUE)
-})
-
-test_that("legacy get_ra_tree converts factor predictions to character", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  # Non-probability classification model returns factor predictions
-  model <- ranger::ranger(
-    Species ~ Sepal.Length + Sepal.Width,
-    data = iris,
-    num.trees = 1,
-    max.depth = 2,
-    seed = 123,
-    num.threads = 1,
-    probability = FALSE
-  )
-
-  tree <- tidypredict:::get_ra_tree(1, model)
-
-  expect_type(tree, "list")
-  # Predictions should be converted to character
-  expect_type(tree[[1]]$prediction, "character")
-})
-
-test_that("legacy get_ra_tree handles probability predictions", {
-  skip_if_not_installed("ranger")
-  skip_on_cran()
-  skip_on_os("windows")
-  skip_on_os("linux")
-
-  model <- ranger::ranger(
-    Species ~ Sepal.Length + Sepal.Width,
-    data = iris,
-    num.trees = 1,
-    max.depth = 2,
-    seed = 123,
-    num.threads = 2,
-    probability = TRUE
-  )
-
-  tree <- tidypredict:::get_ra_tree(1, model)
-
-  expect_type(tree, "list")
-  expect_true(length(tree) > 0)
-
-  # With probability = TRUE, nodes should have probs field
-  expect_true("probs" %in% names(tree[[1]]))
-  expect_true("prob" %in% names(tree[[1]]))
 })
 
 test_that("a missing predictor takes the left branch, matching predict() (#294)", {

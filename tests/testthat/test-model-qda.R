@@ -257,6 +257,7 @@ test_that("SQL translation works", {
 })
 
 test_that("qda is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("MASS")
   skip_if_not_installed("discrim")
 

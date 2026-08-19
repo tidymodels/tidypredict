@@ -1,4 +1,5 @@
 test_that("Correct SQL query is returned", {
+  skip_if_not_installed("dbplyr")
   expect_s3_class(
     tidypredict_sql(lm(mpg ~ wt, data = mtcars), dbplyr::simulate_dbi()),
     "sql"
@@ -13,6 +14,7 @@ test_that("Correct SQL query is returned", {
 })
 
 test_that("tidypredict_sql() translates the fitted formula", {
+  skip_if_not_installed("dbplyr")
   model <- lm(mpg ~ wt + cyl, data = mtcars)
   sql <- as.character(tidypredict_sql(model, dbplyr::simulate_dbi()))
 
@@ -21,6 +23,7 @@ test_that("tidypredict_sql() translates the fitted formula", {
 })
 
 test_that("tidypredict_sql() accepts a parsed model", {
+  skip_if_not_installed("dbplyr")
   model <- lm(mpg ~ wt, data = mtcars)
 
   expect_equal(
@@ -30,6 +33,7 @@ test_that("tidypredict_sql() accepts a parsed model", {
 })
 
 test_that("tidypredict_sql() returns one query per formula for multiclass", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("MASS")
   model <- MASS::lda(Species ~ ., data = iris)
 
@@ -41,6 +45,7 @@ test_that("tidypredict_sql() returns one query per formula for multiclass", {
 })
 
 test_that("tidypredict_sql() translates case_when for tree models", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ wt, data = mtcars)
 
@@ -50,6 +55,7 @@ test_that("tidypredict_sql() translates case_when for tree models", {
 })
 
 test_that("tidypredict_sql_interval() widens with `interval`", {
+  skip_if_not_installed("dbplyr")
   model <- lm(mpg ~ wt, data = mtcars)
   con <- dbplyr::simulate_dbi()
 
@@ -60,6 +66,7 @@ test_that("tidypredict_sql_interval() widens with `interval`", {
 })
 
 test_that("tidypredict_sql() returns one query for intercept-only models (#313)", {
+  skip_if_not_installed("dbplyr")
   sql <- tidypredict_sql(lm(mpg ~ 1, data = mtcars), dbplyr::simulate_dbi())
 
   expect_s3_class(sql, "sql")
@@ -67,6 +74,7 @@ test_that("tidypredict_sql() returns one query for intercept-only models (#313)"
 })
 
 test_that("tidypredict_sql_interval() validates `interval` (#313)", {
+  skip_if_not_installed("dbplyr")
   model <- lm(mpg ~ wt, data = mtcars)
 
   expect_snapshot(
@@ -76,6 +84,7 @@ test_that("tidypredict_sql_interval() validates `interval` (#313)", {
 })
 
 test_that("tidypredict_sql_interval() errors for unsupported models", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ wt, data = mtcars)
 

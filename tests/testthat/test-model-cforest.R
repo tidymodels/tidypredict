@@ -53,6 +53,7 @@ test_that("cforest works with categorical predictors", {
 })
 
 test_that("cforest supports SQL", {
+  skip_if_not_installed("dbplyr")
   skip_if_not_installed("partykit")
 
   set.seed(1)

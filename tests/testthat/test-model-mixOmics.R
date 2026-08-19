@@ -151,6 +151,7 @@ test_that("splsda models are handled", {
 })
 
 test_that("binary outcomes are handled", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
 
   df <- transform(mtcars, am = factor(am))
@@ -182,6 +183,7 @@ mixomics_reg_spec <- function() {
 }
 
 test_that("a factor level containing a colon is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
 
@@ -195,6 +197,7 @@ test_that("a factor level containing a colon is handled with parsnip", {
 })
 
 test_that("an ordered factor is rejected with parsnip (#393)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
 
@@ -205,6 +208,7 @@ test_that("an ordered factor is rejected with parsnip (#393)", {
 })
 
 test_that("an unused factor level matches predict() (#398)", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
 
@@ -287,6 +291,7 @@ test_that("SQL translation works", {
 })
 
 test_that("mixOmics is handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
 
@@ -315,6 +320,7 @@ test_that("mixOmics is handled with parsnip", {
 })
 
 test_that("categorical predictors are handled with parsnip", {
+  skip_if_not_installed("parsnip")
   skip_if_not_installed("mixOmics")
   skip_if_not_installed("plsmod")
 
