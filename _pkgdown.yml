@@ -38,6 +38,7 @@ articles:
   - naivebayes
   - mixOmics
   - nnet
+  - ksvm
   - ranger
   - rf
   - partykit
@@ -52,6 +53,8 @@ articles:
   - lightgbm
   - catboost
   - h2o
+  - mboost
+  - xrf
   - nullmodel
 
 - title: How it works
@@ -80,6 +83,10 @@ navbar:
       href: articles/glm.html
     - text: Regularized Regression - glmnet()
       href: articles/glmnet.html
+    - text: Regularized Regression - LiblineaR()
+      href: articles/glm.html#liblinear
+    - text: Quantile Regression - rq()
+      href: articles/lm.html#quantile-regression
     - text: Multinomial Regression - multinom()
       href: articles/multinom.html
     - text: Flexible Discriminant Analysis - fda()
@@ -98,6 +105,8 @@ navbar:
       href: articles/mixOmics.html
     - text: Neural Network - nnet()
       href: articles/nnet.html
+    - text: Support Vector Machine - kernlab - ksvm()
+      href: articles/ksvm.html
     - text: Random Forest - Ranger - ranger()
       href: articles/ranger.html
     - text: Random Forest - randomForest()
@@ -126,6 +135,10 @@ navbar:
       href: articles/catboost.html
     - text: H2O GBM - H2OModel
       href: articles/h2o.html
+    - text: Model-based Boosting - mboost - blackboost()
+      href: articles/mboost.html
+    - text: RuleFit - xrf - xrf()
+      href: articles/xrf.html
     - text: Null Model - nullmodel()
       href: articles/nullmodel.html
   - text: Articles
