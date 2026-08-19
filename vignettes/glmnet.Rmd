@@ -53,7 +53,7 @@ mtcars %>%
   glimpse()
     ```
 
-- Confirm that `tidypredict` results match to the model's `predict()` results.
+- Confirm that `tidypredict` results match the model's `predict()` results.
     ```{r}
 tidypredict_test(model, mtcars[, -1])
     ```
@@ -81,7 +81,10 @@ pm <- parse_model(model)
 str(pm, 2)
 ```
 
+A `glmnet` model has no trees; each entry of `pm$terms` describes one
+coefficient:
+
 ```{r}
-str(pm$trees[1])
+str(pm$terms[1], 3)
 ```
 

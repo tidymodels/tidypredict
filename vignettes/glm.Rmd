@@ -20,11 +20,11 @@ library(tidypredict)
 ## Highlights & Limitations
 
 - Defaults to 0-to-1 predictions for `binomial` family models. That is akin to running `predict(model, type = "response")`
-- Only *treatment* contrast (`contr.treatment`) are supported.
+- Only *treatment* contrasts (`contr.treatment`) are supported.
 - `offset` is supported
 - Categorical variables are supported
-- In-line functions in the formulas are **not supported**:  
-     - OK - `wt ~ mpg + am` 
+- In-line functions in the formulas are **not supported**:
+     - OK - `wt ~ mpg + am`
      - OK - `mutate(mtcars, newam = paste0(am))` and then `wt ~ mpg + newam`
      - Not OK - `wt ~ mpg + as.factor(am)`
      - Not OK - `wt ~ mpg + as.character(am)`
@@ -44,16 +44,16 @@ df <- mtcars %>%
 model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 ```
 
-It returns a SQL query that contains the coefficients (`model$coefficients`) operated against the correct variable or categorical variable value.  In most cases the resulting SQL is one short `CASE WHEN` statement per coefficient.  It appends the `offset` field or value, if one is provided.
+It returns a SQL query that contains the coefficients (`model`) evaluated against the correct variable or categorical variable value.  In most cases the resulting SQL is one short `CASE WHEN` statement per coefficient.  It appends the `offset` field or value, if one is provided.
 
-For `binomial` models, the [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_function) equation is applied. This means that the target SQL database type will need to support the exponent function. 
+For `binomial` models, the [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_function) equation is applied. This means that the target SQL database type will need to support the exponent function.
 
 ```{r}
 library(tidypredict)
 tidypredict_sql(model, dbplyr::simulate_mssql())
 ```
 
-Alternatively, use `tidypredict_to_column()` if the results are the be used or previewed in `dplyr`.
+Alternatively, use `tidypredict_to_column()` if the results are to be used or previewed in `dplyr`.
 
 ```{r}
 df %>%
@@ -99,24 +99,22 @@ pm <- parse_model(model)
 str(pm, 2)
 ```
 
-The output from `parse_model()` is transformed into a `dplyr`, a.k.a Tidy Eval, formula.  All categorical variables are operated using `if_else()`.
+The output from `parse_model()` is transformed into a `dplyr`, a.k.a. Tidy Eval, formula.  All categorical variables are evaluated using `if_else()`.
 ```{r}
 tidypredict_fit(model)
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be evaluated. `tidypredict` provides three paths:
 
   - Use directly inside `dplyr`,  `mutate(df, !! tidypredict_fit(model))`
-  - Use `tidypredict_to_column(model)` to a piped command set
-  - Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+  - Use `tidypredict_to_column(model)` to add it to a piped command set
+  - Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
-The same applies to the prediction interval functions.
-
+Prediction intervals are not available for `glm` models, so `tidypredict_interval()` and `tidypredict_sql_interval()` have no `glm` counterpart.
 
 ## How it performs
 
-
-Testing the `tidypredict` results is easy.  The `tidypredict_test()` function automatically uses the `lm` model object's data frame, to compare `tidypredict_fit()`, and `tidypredict_interval()` to the results given by `predict()`
+Testing the `tidypredict` results is easy.  The `tidypredict_test()` function automatically uses the `glm` model object's data frame to compare `tidypredict_fit()` to the results given by `predict()`
 
 ```{r}
 tidypredict_test(model)
