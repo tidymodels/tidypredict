@@ -94,12 +94,12 @@ tidypredict_fit(model)
 #>             27.12, .default = 28.44))))/5L)
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be
-operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`,
   `mutate(mtcars, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
+- Use `tidypredict_to_column(model)` to add it to a piped command set
 - Use `tidypredict_sql(model)` to retrieve the SQL statement
 
 ## A note on split boundaries

@@ -16,10 +16,12 @@
 <url><loc>https://tidypredict.tidymodels.org/articles/glmnet.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/h2o.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/index.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/ksvm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/lda.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/lightgbm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/lm.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/mars.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/mboost.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/mixOmics.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/models.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/multinom.html</loc></url>
@@ -40,6 +42,7 @@
 <url><loc>https://tidypredict.tidymodels.org/articles/tree-internals.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/articles/xgboost.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/articles/xrf.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/authors.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/index.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/news/index.html</loc></url>

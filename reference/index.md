@@ -6,14 +6,8 @@
   : Checks that the formula can be parsed
 - [`as_parsed_model()`](https://tidypredict.tidymodels.org/reference/as_parsed_model.md)
   : Prepares parsed model object
-- [`generate_tree_node()`](https://tidypredict.tidymodels.org/reference/generate_tree_node.md)
-  : Construct a single node of a tree
 - [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
   : Converts an R model object into a parsed model
-- [`path_formula()`](https://tidypredict.tidymodels.org/reference/path_formula.md)
-  : Turn a path object into an expression
-- [`path_formulas()`](https://tidypredict.tidymodels.org/reference/path_formulas.md)
-  : Turn a path object into a combined expression
 - [`set_catboost_categories()`](https://tidypredict.tidymodels.org/reference/set_catboost_categories.md)
   : Set categorical feature mappings for CatBoost model
 - [`tidy(`*`<pm_regression>`*`)`](https://tidypredict.tidymodels.org/reference/tidy.pm_regression.md)

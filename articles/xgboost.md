@@ -122,7 +122,7 @@ model <- xgboost::xgb.train(
   #> $ fit  <dbl> 0.98574329, 0.98574329, 0.92725081, 0.01079918, 0.046325…
   ```
 
-- Confirm that `tidypredict` results match to the model’s
+- Confirm that `tidypredict` results match the model’s
   [`predict()`](https://rdrr.io/r/stats/predict.html) results. The
   `xg_df` argument expects the `xgb.DMatrix` data set.
 

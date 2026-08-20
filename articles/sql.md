@@ -33,8 +33,8 @@ A new database is created using `RSQLite`.
 
 library(DBI)
 
-con <- dbConnect(RSQLite::SQLite(), path = ":memory:")
-db_fligths <- copy_to(con, flights_table)
+con <- dbConnect(RSQLite::SQLite(), dbname = ":memory:")
+db_flights <- copy_to(con, flights_table)
 ```
 
 ## Model preparation
@@ -44,7 +44,7 @@ already selects the needed variables.
 
 ``` r
 
-df <- db_fligths %>%
+df <- db_flights %>%
   select(dep_delay, hour, distance) %>%
   head(1000) %>%
   collect()
@@ -88,7 +88,7 @@ if (tidypredict_test(model)$alert) stop("Threshold exceeded!")
 
 ## Scenario 1 - Update scores
 
-In this scenario, The table that supplies the term values is also the
+In this scenario, the table that supplies the term values is also the
 recipient of the new score. This is done by updating a specific field in
 the table. For this example, the field is called `current_score`. The
 following SQL UPDATE statement should work in most databases:
@@ -121,12 +121,12 @@ Here is a sample of the newly populated field:
 
 ``` r
 
-db_fligths %>%
+db_flights %>%
   select(current_score) %>%
   head(10)
 #> Warning: Closing open result set, pending rows
 #> # A query:  ?? x 1
-#> # Database: sqlite 3.53.3 []
+#> # Database: sqlite 3.53.3 [:memory:]
 #>    current_score
 #>            <dbl>
 #>  1       -0.969 
@@ -141,13 +141,13 @@ db_fligths %>%
 #> 10        2.47
 ```
 
-## Scenario 2- Append new scores
+## Scenario 2 - Append new scores
 
 There may be the need to retain not only the new score, but when it was
 determined and its history. This is usually possible because the source
 of record possesses a unique key identifier per entity, such as
-transaction ID or customer ID. In the example, `flights_id` is the
-unique identifier.
+transaction ID or customer ID. In the example, `flight_id` is the unique
+identifier.
 
 In this example, the new scores will be stored in a new table called
 `daily_scores`. The following code is part of the example preparation,
@@ -167,10 +167,10 @@ dbWriteTable(
 )
 ```
 
-The plan is to use a SQL statement that most vendors support, is called
+The plan is to use a SQL statement that most vendors support, called
 INSERT INTO SELECT. The idea is to use `dplyr` laziness to prepare the
 data transformation and predictions, but it’s not going to be executed
-until is parsed into SQL and sent as part of a another statement. The
+until it is parsed into SQL and sent as part of another statement. The
 INSERT INTO SELECT statement allows for the results of a query to be
 saved in a table, and without leaving the database.
 
@@ -178,11 +178,11 @@ In this example, predictions are going to be executed for just the
 records in the month of December. The data is filtered, and then
 [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
 is used to create the new fit field. The results are then transformed to
-match to the structure of the new `daily_scores` table.
+match the structure of the new `daily_scores` table.
 
 ``` r
 
-new_predictions <- db_fligths %>%
+new_predictions <- db_flights %>%
   filter(month == 12) %>%
   tidypredict_to_column(model, vars = "score") %>%
   select(
@@ -229,8 +229,8 @@ dbSendQuery(con, insert_scores)
 
 A simple table join can be used to confirm that the new update worked.
 For real life scenarios, a more sophisticated query should be performed
-in order to only get the latest score. For this example, we simple
-filter on the same date we inserted
+in order to only get the latest score. For this example, we simply
+filter on the same date we inserted.
 
 ``` r
 
@@ -240,7 +240,7 @@ tbl(con, "daily_scores") %>%
   select(dep_delay, hour, distance, score, date)
 #> Warning: Closing open result set, pending rows
 #> # A query:  ?? x 5
-#> # Database: sqlite 3.53.3 []
+#> # Database: sqlite 3.53.3 [:memory:]
 #>    dep_delay  hour distance   score date      
 #>        <dbl> <dbl>    <dbl>   <dbl> <chr>     
 #>  1        14    23     1617 23.3    01/01/2018

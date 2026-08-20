@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
+    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
     <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
     <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
     <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
@@ -49,6 +51,7 @@
     <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
     <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
     <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
     <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
@@ -63,6 +66,8 @@
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
     <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
+    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
+    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
     <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
@@ -183,8 +188,8 @@
 <span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.17473<span style="color: #949494;">, </span>21.51315<span style="color: #949494;">, </span>24.86796<span style="color: #949494;">, </span>20.63104<span style="color: #949494;">, </span>17.64676<span style="color: #949494;">, </span>20.045…</span></span></code></pre></div>
 </li>
 <li>
-<p>Confirm that <code>tidypredict</code> results match to the
-model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results.</p>
+<p>Confirm that <code>tidypredict</code> results match the model’s
+<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidypredict test results</span></span>
@@ -231,9 +236,17 @@ model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
 <span><span class="co">#&gt;   ..$ :List of 4</span></span>
 <span><span class="co">#&gt;   ..$ :List of 4</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
+<p>A <code>glmnet</code> model has no trees; each entry of
+<code>pm$terms</code> describes one coefficient:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  NULL</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
+<span><span class="co">#&gt; List of 1</span></span>
+<span><span class="co">#&gt;  $ :List of 4</span></span>
+<span><span class="co">#&gt;   ..$ label       : chr "(Intercept)"</span></span>
+<span><span class="co">#&gt;   ..$ coef        : num 35.3</span></span>
+<span><span class="co">#&gt;   ..$ is_intercept: int 1</span></span>
+<span><span class="co">#&gt;   ..$ fields      :List of 1</span></span>
+<span><span class="co">#&gt;   .. ..$ :List of 2</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -244,7 +257,7 @@ model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-l
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

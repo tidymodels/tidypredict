@@ -16,7 +16,7 @@ draw’s trees.
 [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
 returns one nested
 [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
-per tree of per draw, so the size of the returned expression grows with
+per tree per draw, so the size of the returned expression grows with
 both the number of trees and the number of posterior samples that were
 kept. Small values of `ntree` and `ndpost` keep the formula manageable.
 

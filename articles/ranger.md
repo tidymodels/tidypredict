@@ -52,7 +52,7 @@ treeInfo(model) %>%
 
 The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-is transformed into a `dplyr`, a.k.a Tidy Eval, formula. Each decision
+is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. Each decision
 tree becomes one
 [`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
 statement, which are then combined.
@@ -76,12 +76,13 @@ tidypredict_fit(model)
 #>     192.5 ~ 18.65, .default = 12.8625)))/5
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be
-operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. `tidypredict` provides three paths:
 
-- Use directly inside `dplyr`, `mutate(iris, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
-- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+- Use directly inside `dplyr`,
+  `mutate(mtcars, !! tidypredict_fit(model))`
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 ## parsnip
 

@@ -18,6 +18,11 @@ acceptable_formula(model)
 
   An R model object
 
+## Value
+
+`NULL` (invisibly) when the model's formula can be parsed, or an error
+when it cannot.
+
 ## Examples
 
 ``` r

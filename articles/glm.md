@@ -4,7 +4,7 @@
 
 - Defaults to 0-to-1 predictions for `binomial` family models. That is
   akin to running `predict(model, type = "response")`
-- Only *treatment* contrast (`contr.treatment`) are supported.
+- Only *treatment* contrasts (`contr.treatment`) are supported.
 - `offset` is supported
 - Categorical variables are supported
 - In-line functions in the formulas are **not supported**:
@@ -34,11 +34,10 @@ df <- mtcars %>%
 model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 ```
 
-It returns a SQL query that contains the coefficients
-(`model$coefficients`) operated against the correct variable or
-categorical variable value. In most cases the resulting SQL is one short
-`CASE WHEN` statement per coefficient. It appends the `offset` field or
-value, if one is provided.
+It returns a SQL query that contains the coefficients (`model`)
+evaluated against the correct variable or categorical variable value. In
+most cases the resulting SQL is one short `CASE WHEN` statement per
+coefficient. It appends the `offset` field or value, if one is provided.
 
 For `binomial` models, the
 [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_function) equation is
@@ -54,7 +53,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 Alternatively, use
 [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
-if the results are the be used or previewed in `dplyr`.
+if the results are to be used or previewed in `dplyr`.
 
 ``` r
 
@@ -162,8 +161,8 @@ str(pm, 2)
 
 The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-is transformed into a `dplyr`, a.k.a Tidy Eval, formula. All categorical
-variables are operated using
+is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. All
+categorical variables are evaluated using
 [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html).
 
 ``` r
@@ -174,24 +173,26 @@ tidypredict_fit(model)
 #>     1, 0) * 5.37942092366097))))
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be
-operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`, `mutate(df, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
-- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
-The same applies to the prediction interval functions.
+Prediction intervals are not available for `glm` models, so
+[`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+and
+[`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
+have no `glm` counterpart.
 
 ## How it performs
 
 Testing the `tidypredict` results is easy. The
 [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
-function automatically uses the `lm` model object’s data frame, to
+function automatically uses the `glm` model object’s data frame to
 compare
-[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md),
-and
-[`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
+[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
 to the results given by
 [`predict()`](https://rdrr.io/r/stats/predict.html)
 

@@ -15,6 +15,11 @@ tidypredict_fit(model)
 
   An R model or a list with a parsed model.
 
+## Value
+
+A Tidy Eval formula that calculates the fitted values. Models that
+produce one formula per class or per outcome return a list of formulas.
+
 ## Examples
 
 ``` r

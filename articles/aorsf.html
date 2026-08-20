@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
+    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
     <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
     <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
     <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
@@ -49,6 +51,7 @@
     <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
     <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
     <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
     <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
@@ -63,6 +66,8 @@
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
     <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
+    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
+    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
     <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
@@ -222,14 +227,14 @@ averaged.</p>
 <span><span class="co">#&gt;             hp &lt;= 45.9662492476846 ~ 21.76, .default = case_when(-0.0558201660441367 * </span></span>
 <span><span class="co">#&gt;             hp + -3.63079789140073 * drat &lt;= -19.5356435084838 ~ </span></span>
 <span><span class="co">#&gt;             27.12, .default = 28.44))))/5L)</span></span></code></pre></div>
-<p>From there, the Tidy Eval formula can be used anywhere where it can
-be operated. <code>tidypredict</code> provides three paths:</p>
+<p>From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>,
 <code>mutate(mtcars, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code>tidypredict_to_column(model)</code> to a piped command
-set</li>
+<li>Use <code>tidypredict_to_column(model)</code> to add it to a piped
+command set</li>
 <li>Use <code>tidypredict_sql(model)</code> to retrieve the SQL
 statement</li>
 </ul>
@@ -320,7 +325,7 @@ objects fitted via the <code>parsnip</code> package (using the
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

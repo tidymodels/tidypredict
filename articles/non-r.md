@@ -1,6 +1,6 @@
 # Non-R Models
 
-A model that is trained in any language are able to integrate with
+A model that is trained in any language can integrate with
 `tidypredict`, and thus with `broom`. The requirement is that the model
 in that language is exported using the parse model spec. The easiest
 file format would be YAML.

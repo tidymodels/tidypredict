@@ -19,6 +19,12 @@ tidypredict_interval(model, interval = 0.95)
 
   The prediction interval, defaults to 0.95
 
+## Value
+
+A Tidy Eval formula that calculates the half width of the prediction
+interval. It must be added to and subtracted from the fit to obtain the
+upper and lower bounds.
+
 ## Details
 
 The result still has to be added to and subtracted from the fit to

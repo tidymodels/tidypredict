@@ -2,11 +2,11 @@
 
 | Function | Works |
 |----|----|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) |  |
-| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) |  |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) |  |
-| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) |  |
-| `parsnip` |  |
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md), [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✔ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✔ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✔ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## How it works
 
@@ -42,7 +42,7 @@ model$frame |>
 
 The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-is transformed into a `dplyr`, a.k.a Tidy Eval, formula. The decision
+is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. The decision
 tree becomes a
 [`dplyr::case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
 statement.
@@ -60,13 +60,13 @@ tidypredict_fit(model)
 #>     .default = 13.4142857142857))
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be
-operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`,
   `mutate(mtcars, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
-- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 ## Classification
 

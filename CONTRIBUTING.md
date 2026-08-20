@@ -136,6 +136,33 @@ Two habits, both learned from getting them wrong:
   everything.
 - Prefer a direct assertion for correctness and reserve snapshots for
   printed output and error messages.
+- `catboost` is not on CRAN, so it is deliberately absent from
+  `Suggests`. Tests and `vignettes/catboost.Rmd` that need it are
+  guarded by `skip_if_not_installed("catboost")`. To run them locally,
+  install it from the upstream releases: see
+  <https://catboost.ai/docs/en/installation/r-installation-binary-installation>.
+
+### Local setup for h2o and catboost
+
+Two backends need more than an
+[`install.packages()`](https://rdrr.io/r/utils/install.packages.html)
+before their tests will run, so a fresh checkout will report skips for
+them. This is expected, and neither is required to contribute.
+
+**h2o** needs a Java runtime as well as the `h2o` and `agua` packages.
+`skip_if_no_h2o()` in `tests/testthat/helper-h2o.R` skips when Java is
+missing, when either package is missing, when a cluster cannot be
+started, or when the running cluster’s version does not match the
+installed `h2o` R package. That last case matters if you already have a
+long-lived cluster on `localhost:54321` from an older `h2o`: shut it
+down with `h2o::h2o.shutdown(prompt = FALSE)` and let the helper start a
+fresh one. The helper starts the cluster at most once per run and shuts
+it down at the end of the suite.
+
+**catboost** is not on CRAN and has to be installed from its GitHub
+release, for example with
+`install.packages(<release URL>, repos = NULL, type = "source")`. Its
+tests skip cleanly when it is absent.
 
 ### Comparing against the fitted model, not against tidypredict
 

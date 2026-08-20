@@ -77,7 +77,7 @@ model <- sda::sda(as.matrix(iris[1:4]), iris$Species, verbose = FALSE)
   ``` r
 
   probs <- sapply(fit, \(f) rlang::eval_tidy(f, iris))
-  posterior <- sda::predict.sda(model, as.matrix(iris[1:4]), verbose = FALSE)
+  posterior <- predict(model, as.matrix(iris[1:4]), verbose = FALSE)
   all.equal(unname(probs), unname(posterior$posterior))
   #> [1] "Mean relative difference: 4.24967e-08"
   ```

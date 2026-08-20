@@ -34,6 +34,8 @@ for the full list.
 - [mixOmics PLS
   models](https://tidypredict.tidymodels.org/articles/mixOmics.md):
 - [nnet models](https://tidypredict.tidymodels.org/articles/nnet.md):
+- [Support vector machines, using
+  kernlab](https://tidypredict.tidymodels.org/articles/ksvm.md):
 - [Random Forest, using
   Ranger](https://tidypredict.tidymodels.org/articles/ranger.md):
 - [Random Forest](https://tidypredict.tidymodels.org/articles/rf.md):
@@ -56,10 +58,14 @@ for the full list.
   models](https://tidypredict.tidymodels.org/articles/xgboost.md):
 - [LightGBM
   models](https://tidypredict.tidymodels.org/articles/lightgbm.md):
-- [catboost
+- [CatBoost
   models](https://tidypredict.tidymodels.org/articles/catboost.md):
 - [Gradient boosting, using
   H2O](https://tidypredict.tidymodels.org/articles/h2o.md):
+- [Model-based boosting, using
+  mboost](https://tidypredict.tidymodels.org/articles/mboost.md):
+- [RuleFit, using
+  xrf](https://tidypredict.tidymodels.org/articles/xrf.md):
 - [nullmodel
   models](https://tidypredict.tidymodels.org/articles/nullmodel.md):
 

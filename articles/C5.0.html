@@ -40,6 +40,8 @@
     <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
+    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
     <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
     <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
     <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
@@ -49,6 +51,7 @@
     <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
     <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
     <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
     <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
@@ -63,6 +66,8 @@
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
     <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
+    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
+    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
     <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
@@ -120,19 +125,26 @@
 <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>,
 <code><a href="../reference/parse_model.html">parse_model()</a></code>
 </td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
+<td>
+<code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>,
+<code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
+</td>
+<td>✗</td>
+</tr>
+<tr class="odd">
 <td><code>parsnip</code></td>
-<td></td>
+<td>✔</td>
 </tr>
 </tbody>
 </table>
@@ -158,7 +170,7 @@
 of the model object. <code>tidypredict</code> parses that text directly,
 so the model can be translated even when it was fitted through the x/y
 interface (as <code>parsnip</code> does).</p>
-<p>The tree is transformed into a <code>dplyr</code>, a.k.a Tidy Eval,
+<p>The tree is transformed into a <code>dplyr</code>, a.k.a. Tidy Eval,
 formula. The decision tree becomes a nested
 <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -183,15 +195,15 @@ formula. The decision tree becomes a nested
 <span><span class="co">#&gt;     .default = case_when(cyl &lt;= 6.00000023841858 ~ case_when(cyl &lt;= </span></span>
 <span><span class="co">#&gt;         4.00000023841858 ~ "1", .default = case_when(wt &lt;= 2.87500011920929 ~ </span></span>
 <span><span class="co">#&gt;         "0", .default = "1")), .default = "0"))</span></span></code></pre></div>
-<p>From there, the Tidy Eval formula can be used anywhere where it can
-be operated. <code>tidypredict</code> provides three paths:</p>
+<p>From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>,
 <code>mutate(mtcars2, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code>tidypredict_to_column(model)</code> to a piped command
-set</li>
-<li>Use <code>tidypredict_sql(model)</code> to retrieve the SQL
+<li>Use <code>tidypredict_to_column(model)</code> to add it to a piped
+command set</li>
+<li>Use <code>tidypredict_sql(model, con)</code> to retrieve the SQL
 statement</li>
 </ul>
 </div>
@@ -3007,7 +3019,7 @@ models (<code>rules = TRUE</code> with <code>trials &gt; 1</code>).</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

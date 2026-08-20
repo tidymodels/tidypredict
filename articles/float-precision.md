@@ -16,8 +16,12 @@ the data point to go left in one system and right in another.
 ## Which models are affected?
 
 XGBoost and Cubist store everything as 32-bit floats, making them most
-susceptible to this issue. LightGBM and CatBoost use 64-bit doubles for
-leaf values, which reduces (but does not eliminate) the risk.
+susceptible to this issue. LightGBM and CatBoost store leaf values as
+64-bit doubles, so the values a prediction is built from carry full
+precision. Their split thresholds are still 32-bit floats, though, so
+the boundary problem described here applies to them as well: only the
+size of the discrepancy is reduced, not the chance of taking the wrong
+branch.
 
 ## Example
 
@@ -117,6 +121,7 @@ Considerations:
     fraction of predictions may differ at exact boundaries. Decide if
     this is acceptable for your use case.
 
-2.  Use native predictions when possible: For applications where perfect
-    agreement is critical, consider using the native model’s predict
-    function rather than SQL translation.
+2.  Use native predictions when possible: When you are not pushing
+    predictions to a database, and perfect agreement is critical,
+    consider using the native model’s predict function rather than SQL
+    translation.

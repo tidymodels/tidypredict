@@ -60,7 +60,7 @@ model <- earth(age ~ sibsp + parch, data = etitanic, degree = 3)
   #> $ fit      <dbl> 31.99903, 22.29190, 22.29190, 22.29190, 22.29190, 31…
   ```
 
-- Confirm that `tidypredict` results match to the model’s
+- Confirm that `tidypredict` results match the model’s
   [`predict()`](https://rdrr.io/r/stats/predict.html) results
 
   ``` r

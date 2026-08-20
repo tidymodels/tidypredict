@@ -22,6 +22,8 @@
     <li><a class="dropdown-item" href="articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="articles/glmnet.html">Regularized Regression - glmnet()</a></li>
+    <li><a class="dropdown-item" href="articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
+    <li><a class="dropdown-item" href="articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
     <li><a class="dropdown-item" href="articles/multinom.html">Multinomial Regression - multinom()</a></li>
     <li><a class="dropdown-item" href="articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
     <li><a class="dropdown-item" href="articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
@@ -31,6 +33,7 @@
     <li><a class="dropdown-item" href="articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
     <li><a class="dropdown-item" href="articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
     <li><a class="dropdown-item" href="articles/nnet.html">Neural Network - nnet()</a></li>
+    <li><a class="dropdown-item" href="articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="articles/rf.html">Random Forest - randomForest()</a></li>
     <li><a class="dropdown-item" href="articles/partykit.html">Random Forest - partykit - cforest()</a></li>
@@ -45,6 +48,8 @@
     <li><a class="dropdown-item" href="articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="articles/catboost.html">CatBoost - catboost.Model()</a></li>
     <li><a class="dropdown-item" href="articles/h2o.html">H2O GBM - H2OModel</a></li>
+    <li><a class="dropdown-item" href="articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
+    <li><a class="dropdown-item" href="articles/xrf.html">RuleFit - xrf - xrf()</a></li>
     <li><a class="dropdown-item" href="articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul></li>
 <li class="nav-item dropdown">
@@ -132,7 +137,15 @@
 <li>Use <code>withr::local_tempfile(fileext = ".yml")</code> for temp files, so they are cleaned up.</li>
 <li>No <code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code> calls. Namespace everything.</li>
 <li>Prefer a direct assertion for correctness and reserve snapshots for printed output and error messages.</li>
+<li>
+<code>catboost</code> is not on CRAN, so it is deliberately absent from <code>Suggests</code>. Tests and <code>vignettes/catboost.Rmd</code> that need it are guarded by <code>skip_if_not_installed("catboost")</code>. To run them locally, install it from the upstream releases: see <a href="https://catboost.ai/docs/en/installation/r-installation-binary-installation" class="external-link uri">https://catboost.ai/docs/en/installation/r-installation-binary-installation</a>.</li>
 </ul></div>
+<div class="section level3">
+<h3 id="local-setup-for-h2o-and-catboost">Local setup for h2o and catboost<a class="anchor" aria-label="anchor" href="#local-setup-for-h2o-and-catboost"></a></h3>
+<p>Two backends need more than an <code><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages()</a></code> before their tests will run, so a fresh checkout will report skips for them. This is expected, and neither is required to contribute.</p>
+<p><strong>h2o</strong> needs a Java runtime as well as the <code>h2o</code> and <code>agua</code> packages. <code>skip_if_no_h2o()</code> in <code>tests/testthat/helper-h2o.R</code> skips when Java is missing, when either package is missing, when a cluster cannot be started, or when the running cluster’s version does not match the installed <code>h2o</code> R package. That last case matters if you already have a long-lived cluster on <code>localhost:54321</code> from an older <code>h2o</code>: shut it down with <code>h2o::h2o.shutdown(prompt = FALSE)</code> and let the helper start a fresh one. The helper starts the cluster at most once per run and shuts it down at the end of the suite.</p>
+<p><strong>catboost</strong> is not on CRAN and has to be installed from its GitHub release, for example with <code>install.packages(&lt;release URL&gt;, repos = NULL, type = "source")</code>. Its tests skip cleanly when it is absent.</p>
+</div>
 <div class="section level3">
 <h3 id="comparing-against-the-fitted-model-not-against-tidypredict">Comparing against the fitted model, not against tidypredict<a class="anchor" aria-label="anchor" href="#comparing-against-the-fitted-model-not-against-tidypredict"></a></h3>
 <p>The single most common way a test here has been wrong is comparing two tidypredict outputs to each other. <code>tidypredict_fit(pm)</code> against <code>tidypredict_fit(pm_loaded)</code>, or a parsed model against a fitted one, is a real assertion but a weak one: it cannot catch a parser that is consistently wrong. Every model needs at least one test whose right-hand side comes from the modelling package itself.</p>
@@ -147,7 +160,7 @@
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

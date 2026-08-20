@@ -2,9 +2,12 @@
 
 | Function | Works |
 |----|----|
-| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) |  |
-| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) |  |
-| `parsnip` |  |
+| [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md), [`tidypredict_sql()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql.md) | ✔ |
+| [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md) | ✗ |
+| [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md) | ✔ |
+| [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md) | ✔ |
+| [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md), [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md) | ✗ |
+| `parsnip` | ✔ |
 
 ## How it works
 
@@ -235,11 +238,11 @@ tidypredict_fit(model)
 ```
 
 From there, the Tidy Eval formula can be used anywhere it can be
-operated. `tidypredict` provides these paths:
+evaluated. `tidypredict` provides these paths:
 
 - Use directly inside `dplyr`,
   `mutate(mtcars, !! tidypredict_fit(model))`
-- Use `tidypredict_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 ``` r
 
@@ -970,11 +973,11 @@ model_rules <- rule_fit(mode = "regression") |>
   fit(mpg ~ wt + hp + disp, data = mtcars)
 
 tidypredict_fit(model_rules)
-#> 33.6849250683786 + (-2.98365666456686 * wt + case_when(wt < 2.25968027114868 ~ 
-#>     1.2692577001715, .default = 0) + case_when(disp < 101.545547485352 ~ 
-#>     0.0549192265976455, .default = 0) + case_when(disp < 97.7222671508789 & 
-#>     hp < 118 ~ 0.0549192265956506, .default = 0) + -0.0243188365426768 * 
-#>     hp + -0.00296051728171462 * disp)
+#> 33.6849250683785 + (-2.98365666456687 * wt + case_when(wt < 2.25968027114868 ~ 
+#>     1.26925770017162, .default = 0) + case_when(disp < 101.545547485352 ~ 
+#>     0.0549192265975957, .default = 0) + case_when(disp < 97.7222671508789 & 
+#>     hp < 118 ~ 0.0549192265959384, .default = 0) + -0.0243188365426766 * 
+#>     hp + -0.00296051728171416 * disp)
 ```
 
 ## Limitations

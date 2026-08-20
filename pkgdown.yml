@@ -13,10 +13,12 @@ articles:
   glm: glm.html
   glmnet: glmnet.html
   h2o: h2o.html
+  ksvm: ksvm.html
   lda: lda.html
   lightgbm: lightgbm.html
   lm: lm.html
   mars: mars.html
+  mboost: mboost.html
   mixOmics: mixOmics.html
   models: models.html
   multinom: multinom.html
@@ -37,7 +39,8 @@ articles:
   tree-internals: tree-internals.html
   tree: tree.html
   xgboost: xgboost.html
-last_built: 2026-08-19T19:28Z
+  xrf: xrf.html
+last_built: 2026-08-20T01:43Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

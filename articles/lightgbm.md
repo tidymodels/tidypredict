@@ -99,7 +99,7 @@ model <- lgb.train(
   #> $ fit  <dbl> 107.75256, 107.75256, 95.22895, 107.75256, 186.49246, 11…
   ```
 
-- Confirm that `tidypredict` results match to the model’s
+- Confirm that `tidypredict` results match the model’s
   [`predict()`](https://rdrr.io/r/stats/predict.html) results. The
   `xg_df` argument expects the matrix data set.
 

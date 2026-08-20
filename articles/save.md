@@ -4,11 +4,10 @@
 model to extract the needed components to produce the prediction. And
 second, it uses the object with the parsed information to produce the R
 formula. Thanks to this two step process, `tidypredict` does not need to
-parse the model every time. `tidypredict`’s functions also accept R
-objects that contained already models that have been parsed already.
-Additionally, because the parsed model object is made up of a list made
-up of basic variables, it is possible to save it in a file. Currently,
-the best file format is YAML.
+parse the model every time. `tidypredict`’s functions also accept models
+that have already been parsed. Additionally, because the parsed model
+object is a list of basic variables, it is possible to save it in a
+file. Currently, the best file format is YAML.
 
 For this article, we will use the following model:
 
