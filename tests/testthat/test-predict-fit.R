@@ -128,4 +128,10 @@ test_that("unsupported models are signalled with a distinguishing class", {
     parse_model(structure(list(), class = "made_up_model")),
     class = "tidypredict_unsupported_model"
   )
+
+  # The parsed-model branch of the same helper.
+  expect_error(
+    parse_model(as_parsed_model(list(general = list(type = "made_up")))),
+    class = "tidypredict_unsupported_model"
+  )
 })
