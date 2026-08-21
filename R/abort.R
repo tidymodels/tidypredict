@@ -35,15 +35,23 @@ abort_test_unsupported <- function(
 
 # Raised for a model class, or a parsed model type, that no method knows how to
 # handle.
+#
+# Carries the `tidypredict_unsupported_model` class so callers can tell "no
+# method exists for this model at all" apart from the many other "not
+# supported" errors, which report a specific unsupported *configuration* of an
+# otherwise supported model. orbital needs that distinction to decide whether
+# to fall back or to report the model as unsupported.
 abort_model_unsupported <- function(model, call = rlang::caller_env()) {
   if (inherits(model, "parsed_model")) {
     cli::cli_abort(
       "Parsed models of type {.val {model$general$type}} are not supported.",
+      class = "tidypredict_unsupported_model",
       call = call
     )
   }
   cli::cli_abort(
     "Models of class {.cls {class(model)[[1]]}} are not supported.",
+    class = "tidypredict_unsupported_model",
     call = call
   )
 }

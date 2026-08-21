@@ -114,3 +114,18 @@ test_that("tidypredict_fit() errors for a parsed model type with no builder", {
   pm <- as_parsed_model(list(general = list(type = "made_up")))
   expect_snapshot(error = TRUE, tidypredict_fit(pm))
 })
+
+test_that("unsupported models are signalled with a distinguishing class", {
+  # Callers such as orbital need to tell "no method exists for this model"
+  # apart from "this model is supported but this configuration is not", which
+  # share the "are not supported" wording.
+  expect_error(
+    tidypredict_fit(structure(list(), class = "made_up_model")),
+    class = "tidypredict_unsupported_model"
+  )
+
+  expect_error(
+    parse_model(structure(list(), class = "made_up_model")),
+    class = "tidypredict_unsupported_model"
+  )
+})
