@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- The error raised when no method knows how to handle a model at all now carries the condition class `tidypredict_unsupported_model`. Many other errors also say "are not supported", but they report an unsupported *configuration* of a model that is otherwise handled, so the wording alone could not distinguish the two. Packages that wrap `tidypredict_fit()`, such as orbital, need that distinction to decide whether to fall back or to report the model as unsupported. (#432)
+
 - New articles for `kernlab::ksvm()`, `mboost::blackboost()` and `xrf::xrf()`, and the model list menu now links to the `LiblineaR` and `quantreg` sections directly. (#317)
 
 - The lm, glm, ranger, randomForest and rpart articles recommended `tidypredict_to_sql()`, which does not exist. They now point at `tidypredict_sql()`. (#317)

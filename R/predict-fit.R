@@ -42,9 +42,9 @@ tidypredict_fit.default <- function(model) {
   ))
 
   if (!has_parser) {
-    cli::cli_abort(
-      "Models of class {.cls {class(model)[[1]]}} are not supported."
-    )
+    # `current_env()` keeps the reported call on this frame, which is what the
+    # inlined `cli_abort()` here used to do.
+    abort_model_unsupported(model, call = rlang::current_env())
   }
 
   tidypredict_fit(parse_model(model))
