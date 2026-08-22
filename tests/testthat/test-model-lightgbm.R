@@ -10,6 +10,7 @@ make_lgb_model <- function() {
   )
   lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -122,6 +123,7 @@ test_that("model without explicit colnames still works", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -405,6 +407,7 @@ test_that("model with missing values produces valid parse", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -477,6 +480,7 @@ test_that("regression predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression",
@@ -508,6 +512,7 @@ test_that("binary classification predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "binary",
@@ -535,6 +540,7 @@ test_that("poisson predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "poisson",
@@ -566,6 +572,7 @@ test_that("regression_l1 predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression_l1",
@@ -597,6 +604,7 @@ test_that("regression_l2 predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression_l2",
@@ -628,6 +636,7 @@ test_that("mape predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "mape",
@@ -659,6 +668,7 @@ test_that("huber predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "huber",
@@ -690,6 +700,7 @@ test_that("fair predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "fair",
@@ -721,6 +732,7 @@ test_that("quantile predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "quantile",
@@ -753,6 +765,7 @@ test_that("gamma predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "gamma",
@@ -784,6 +797,7 @@ test_that("tweedie predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "tweedie",
@@ -816,6 +830,7 @@ test_that("cross_entropy predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "cross_entropy",
@@ -847,6 +862,7 @@ test_that("RF boosting predictions match native predict (#185)", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       boosting = "rf",
       num_leaves = 4L,
       objective = "regression",
@@ -883,6 +899,7 @@ test_that("predictions with missing values match", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -978,6 +995,7 @@ test_that("SQL predictions match for binary classification with SQLite", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y)
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "binary",
@@ -1018,6 +1036,7 @@ test_that("parse_model extracts num_class for multiclass", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1048,6 +1067,7 @@ test_that("tidypredict_fit returns list for multiclass", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1080,6 +1100,7 @@ test_that("multiclass predictions match native predictions", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.3,
       objective = "multiclass",
@@ -1117,6 +1138,7 @@ test_that("multiclass probabilities sum to 1", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1153,6 +1175,7 @@ test_that("multiclassova predictions match native predictions", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.3,
       objective = "multiclassova",
@@ -1193,6 +1216,7 @@ test_that("multiclass SQL generation returns list of SQL", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1464,6 +1488,7 @@ test_that("parse_model handles categorical splits", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1504,6 +1529,7 @@ test_that("categorical predictions match native predictions", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1541,6 +1567,7 @@ test_that("mixed numerical + categorical predictions match", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1583,6 +1610,7 @@ test_that("categorical with missing values predictions match", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1627,6 +1655,7 @@ test_that("categorical SQL generation works", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1694,6 +1723,7 @@ test_that("categorical path contains both in and not-in operators", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1733,6 +1763,7 @@ test_that("categorical with many categories works", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1767,6 +1798,7 @@ test_that("parsed model can be saved and loaded via YAML", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1805,6 +1837,7 @@ test_that("parsed multiclass model can be saved and loaded via YAML", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1850,6 +1883,7 @@ test_that("tidypredict_test works for regression model", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1877,6 +1911,7 @@ test_that("tidypredict_test works for binary classification model", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y)
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "binary",
@@ -1904,6 +1939,7 @@ test_that("tidypredict_test errors for multiclass model", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1932,6 +1968,7 @@ test_that("tidypredict_test errors when matrix not provided", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1959,6 +1996,7 @@ test_that("tidypredict_test respects max_rows parameter", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1988,6 +2026,7 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2179,6 +2218,7 @@ test_that("linear tree regression predictions match native predict (#186)", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2209,6 +2249,7 @@ test_that("linear tree binary classification predictions match (#186)", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "binary",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2239,6 +2280,7 @@ test_that("linear tree multiclass predictions match (#186)", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "multiclass",
       num_class = 3L,
       linear_tree = TRUE,
@@ -2277,6 +2319,7 @@ test_that("linear tree with RF boosting predictions match (#186)", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       boosting = "rf",
       objective = "regression",
       linear_tree = TRUE,
@@ -2310,6 +2353,7 @@ test_that("linear tree parsed model has correct structure", {
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2363,6 +2407,7 @@ test_that("linear tree handles NA values correctly when trained with NAs (#186)"
   dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,

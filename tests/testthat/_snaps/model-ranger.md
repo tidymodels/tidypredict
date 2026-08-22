@@ -9,7 +9,7 @@
 
     Code
       tidypredict_test(ranger::ranger(mpg ~ ., data = mtcars, num.trees = 3,
-      max.depth = 2, seed = 100, num.threads = 2), mtcars)
+      max.depth = 2, seed = 100, num.threads = 1), mtcars)
     Output
       tidypredict test results
       Difference threshold: 1e-12

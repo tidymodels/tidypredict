@@ -14,6 +14,7 @@ make_xgb_model <- function(
 
   xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = max_depth,
       objective = objective,
       base_score = 0.5
@@ -157,6 +158,7 @@ test_that("deeper tree paths are traced correctly", {
   )
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 4L,
       objective = "reg:squarederror"
     ),
@@ -183,6 +185,7 @@ test_that("model without explicit feature names still works", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror"
     ),
@@ -291,6 +294,7 @@ test_that("count:poisson predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "count:poisson",
       base_score = 0.5
@@ -325,6 +329,7 @@ test_that("reg:tweedie predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:tweedie",
       base_score = 0.5
@@ -359,6 +364,7 @@ test_that("reg:squaredlogerror predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squaredlogerror",
       base_score = 0.5
@@ -393,6 +399,7 @@ test_that("reg:gamma predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:gamma",
       base_score = 0.5
@@ -427,6 +434,7 @@ test_that("reg:pseudohubererror predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:pseudohubererror",
       base_score = 0.5
@@ -465,6 +473,7 @@ test_that("reg:absoluteerror predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:absoluteerror",
       base_score = 0.5
@@ -499,6 +508,7 @@ test_that("binary:hinge predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "binary:hinge",
       base_score = 0.5
@@ -526,6 +536,7 @@ test_that("DART booster with rate_drop = 0 predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
@@ -560,6 +571,7 @@ test_that("DART booster with rate_drop > 0 predictions match native predict", {
   # are actually exercised. `rate_drop` alone leaves that to the RNG.
   model <- suppressWarnings(xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
@@ -597,6 +609,7 @@ test_that("DART booster weight_drop is extracted correctly", {
   # xgboost 3.4 drops nothing here, which would leave `weight_drop` all ones.
   model <- suppressWarnings(xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
@@ -629,6 +642,7 @@ test_that("gbtree booster has no weight_drop", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
@@ -682,6 +696,7 @@ test_that("model with custom base_score works correctly", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:logistic",
       base_score = mean(mtcars$am)
@@ -711,6 +726,7 @@ test_that("base_score of 0 is not included in formula", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 1L,
       objective = "reg:squarederror",
       base_score = 0
@@ -739,6 +755,7 @@ test_that("base_score of 0.5 is included in formula", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 1L,
       objective = "reg:squarederror",
       base_score = 0.5
@@ -765,6 +782,7 @@ test_that("predictions with missing values work", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror"
     ),
@@ -815,6 +833,7 @@ test_that("stump trees (no splits) predictions match native predict", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       gamma = 100,
       objective = "reg:squarederror",
@@ -1092,6 +1111,7 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", 
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       max_depth = 2L,
       objective = "reg:squarederror",
       base_score = 0.5,
@@ -1131,6 +1151,7 @@ test_that("gblinear booster is detected by get_xgb_json_params", {
 
   model <- xgboost::xgb.train(
     params = list(
+      nthread = 1,
       booster = "gblinear",
       objective = "reg:squarederror"
     ),

@@ -8,7 +8,12 @@ test_that("tidypredict_fit.pm_tree works for v3 party", {
 
 test_that("tidypredict_fit.pm_tree works for v3 ranger", {
   skip_if_not_installed("ranger")
-  model <- ranger::ranger(mpg ~ wt + cyl, data = mtcars, num.trees = 2)
+  model <- ranger::ranger(
+    mpg ~ wt + cyl,
+    data = mtcars,
+    num.trees = 2,
+    num.threads = 1
+  )
   pm <- parse_model(model)
   fit <- tidypredict_fit(pm)
   expect_type(fit, "language")

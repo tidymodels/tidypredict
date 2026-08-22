@@ -9,7 +9,7 @@ test_that("returns the right output", {
     num.trees = 3,
     max.depth = 2,
     seed = 100,
-    num.threads = 2
+    num.threads = 1
   )
 
   tf <- tidypredict_fit(model)
@@ -39,7 +39,7 @@ test_that("tidypredict_fit produces correct predictions", {
     num.trees = 3,
     max.depth = 2,
     seed = 100,
-    num.threads = 2
+    num.threads = 1
   )
 
   fit_expr <- tidypredict_fit(model)
@@ -63,7 +63,7 @@ test_that("formulas produces correct predictions", {
         num.trees = 3,
         max.depth = 2,
         seed = 100,
-        num.threads = 2
+        num.threads = 1
       ),
       mtcars
     )
@@ -81,7 +81,7 @@ test_that("split operator uses <= for left child (#189)", {
     num.trees = 2,
     max.depth = 3,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   native <- predict(model, mtcars)$predictions
@@ -102,7 +102,7 @@ test_that("predictions are averaged not summed (#190)", {
     num.trees = 5,
     max.depth = 3,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   native <- predict(model, mtcars)$predictions
@@ -123,7 +123,7 @@ test_that("produced case_when uses .default", {
     num.trees = 3,
     max.depth = 2,
     seed = 100,
-    num.threads = 2
+    num.threads = 1
   )
 
   fit <- tidypredict_fit(model)
@@ -143,7 +143,7 @@ test_that("classification models error with clear message (#191)", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   expect_snapshot(tidypredict_fit(model), error = TRUE)
@@ -162,7 +162,7 @@ test_that(".extract_ranger_classprob returns correct structure", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = TRUE
   )
 
@@ -192,7 +192,7 @@ test_that(".extract_ranger_classprob errors without probability = TRUE", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = FALSE
   )
 
@@ -211,7 +211,7 @@ test_that(".extract_ranger_classprob works with binary classification", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = TRUE
   )
 
@@ -233,7 +233,7 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
     num.trees = 5,
     max.depth = 3,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = TRUE
   )
 
@@ -269,7 +269,7 @@ test_that(".extract_ranger_classprob works with single tree", {
     num.trees = 1,
     max.depth = 3,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = TRUE
   )
 
@@ -294,7 +294,7 @@ test_that(".extract_ranger_trees returns correct structure", {
     num.trees = 5,
     max.depth = 2,
     seed = 100,
-    num.threads = 2
+    num.threads = 1
   )
 
   result <- .extract_ranger_trees(model)
@@ -321,7 +321,7 @@ test_that(".extract_ranger_trees errors on classification model", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   expect_snapshot(error = TRUE, .extract_ranger_trees(model))
@@ -338,7 +338,7 @@ test_that(".extract_ranger_trees produces correct predictions when averaged", {
     num.trees = 5,
     max.depth = 3,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   trees <- .extract_ranger_trees(model)
@@ -536,7 +536,7 @@ test_that("parse_model.ranger errors on classification", {
     num.trees = 3,
     max.depth = 2,
     seed = 123,
-    num.threads = 2
+    num.threads = 1
   )
 
   expect_snapshot(parse_model(model), error = TRUE)
@@ -576,7 +576,7 @@ test_that("legacy get_ra_tree handles probability predictions", {
     num.trees = 1,
     max.depth = 2,
     seed = 123,
-    num.threads = 2,
+    num.threads = 1,
     probability = TRUE
   )
 
