@@ -2,6 +2,15 @@
 
 ## tidypredict (development version)
 
+- Fixed [`cforest()`](https://rdrr.io/pkg/partykit/man/cforest.html)
+  models failing with “‘language’ object cannot be coerced to type
+  ‘symbol’” under partykit 1.3-0. That release added a shim to
+  partykit’s methods that identifies the caller with
+  [`as.name()`](https://rdrr.io/r/base/name.html), which errors when the
+  generic is reached as
+  [`partykit::gettree()`](https://rdrr.io/pkg/partykit/man/cforest.html).
+  ([\#434](https://github.com/tidymodels/tidypredict/issues/434))
+
 - The error raised when no method knows how to handle a model at all now
   carries the condition class `tidypredict_unsupported_model`. Many
   other errors also say “are not supported”, but they report an
