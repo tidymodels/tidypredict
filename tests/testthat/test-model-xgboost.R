@@ -8,6 +8,7 @@ make_xgb_model <- function(
   objective = "reg:squarederror"
 ) {
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
@@ -27,10 +28,7 @@ make_xgb_model <- function(
 
 # Helper to get the standard xgb.DMatrix for testing
 make_xgb_data <- function() {
-  xgboost::xgb.DMatrix(
-    as.matrix(mtcars[, -9]),
-    label = mtcars$am
-  )
+  xgboost::xgb.DMatrix(nthread = 1L, as.matrix(mtcars[, -9]), label = mtcars$am)
 }
 
 # Parser tests ---------------------------------------------------------------
@@ -152,6 +150,7 @@ test_that("deeper tree paths are traced correctly", {
   y <- X[, 1] + X[, 2] * 2 + X[, 3] * 3 + rnorm(n, sd = 0.1)
 
   dtrain <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     X,
     label = y,
     feature_names = c("a", "b", "c")
@@ -181,7 +180,7 @@ test_that("model without explicit feature names still works", {
   X <- data.matrix(mtcars[, c("mpg", "cyl")])
   y <- mtcars$hp
 
-  dtrain <- xgboost::xgb.DMatrix(X, label = y)
+  dtrain <- xgboost::xgb.DMatrix(nthread = 1L, X, label = y)
 
   model <- xgboost::xgb.train(
     params = list(
@@ -288,6 +287,7 @@ test_that("count:poisson predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$carb
   )
@@ -323,6 +323,7 @@ test_that("reg:tweedie predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$hp
   )
@@ -358,6 +359,7 @@ test_that("reg:squaredlogerror predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$hp
   )
@@ -393,6 +395,7 @@ test_that("reg:gamma predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$hp
   )
@@ -428,6 +431,7 @@ test_that("reg:pseudohubererror predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$hp
   )
@@ -467,6 +471,7 @@ test_that("reg:absoluteerror predictions match native predict", {
   mtcars_adj[, -9] <- round(mtcars_adj[, -9] * 64) / 64
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$hp
   )
@@ -502,6 +507,7 @@ test_that("binary:hinge predictions match native predict", {
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$am
   )
@@ -563,6 +569,7 @@ test_that("DART booster with rate_drop > 0 predictions match native predict", {
   mtcars_adj[, -9] <- round(mtcars_adj[, -9] * 64) / 64
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$am
   )
@@ -600,6 +607,7 @@ test_that("DART booster weight_drop is extracted correctly", {
   skip_if_not_installed("xgboost")
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
@@ -636,6 +644,7 @@ test_that("gbtree booster has no weight_drop", {
   skip_if_not_installed("xgboost")
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
@@ -690,6 +699,7 @@ test_that("model with custom base_score works correctly", {
   skip_if_not_installed("xgboost")
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
@@ -719,6 +729,7 @@ test_that("base_score of 0 is not included in formula", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
   dtrain <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     X,
     label = y,
     feature_names = c("mpg", "cyl", "disp")
@@ -748,6 +759,7 @@ test_that("base_score of 0.5 is included in formula", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
   dtrain <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     X,
     label = y,
     feature_names = c("mpg", "cyl", "disp")
@@ -778,7 +790,7 @@ test_that("predictions with missing values work", {
   y <- mtcars$am
   X_train <- X
   X_train[1:3, 1] <- NA
-  dtrain <- xgboost::xgb.DMatrix(X_train, label = y)
+  dtrain <- xgboost::xgb.DMatrix(nthread = 1L, X_train, label = y)
 
   model <- xgboost::xgb.train(
     params = list(
@@ -796,7 +808,7 @@ test_that("predictions with missing values work", {
   X_pred[10:12, 2] <- NA
 
   fit_formula <- tidypredict_fit(model)
-  dpred <- xgboost::xgb.DMatrix(X_pred)
+  dpred <- xgboost::xgb.DMatrix(nthread = 1L, X_pred)
   native_preds <- predict(model, dpred)
 
   pred_df <- as.data.frame(X_pred)
@@ -827,6 +839,7 @@ test_that("stump trees (no splits) predictions match native predict", {
   skip_if_not_installed("xgboost")
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )
@@ -1049,7 +1062,7 @@ test_that("tidypredict_test respects max_rows parameter", {
 
   # Create a subset DMatrix for max_rows = 10
   X <- as.matrix(mtcars[1:10, -9])
-  xgb_subset <- xgboost::xgb.DMatrix(X)
+  xgb_subset <- xgboost::xgb.DMatrix(nthread = 1L, X)
 
   result <- tidypredict_test(
     model,
@@ -1105,6 +1118,7 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", 
   mtcars_adj[, -9] <- mtcars_adj[, -9] + 0.1
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars_adj[, -9]),
     label = mtcars_adj$am
   )
@@ -1145,6 +1159,7 @@ test_that("gblinear booster is detected by get_xgb_json_params", {
   skip_if_not_installed("xgboost")
 
   xgb_data <- xgboost::xgb.DMatrix(
+    nthread = 1L,
     as.matrix(mtcars[, -9]),
     label = mtcars$am
   )

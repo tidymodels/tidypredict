@@ -44,7 +44,7 @@ test_that("tidypredict_fit produces correct predictions", {
 
   fit_expr <- tidypredict_fit(model)
   fit_pred <- dplyr::mutate(mtcars, pred = !!fit_expr)$pred
-  original_pred <- predict(model, mtcars)$predictions
+  original_pred <- predict(model, mtcars, num.threads = 1)$predictions
 
   expect_equal(fit_pred, original_pred)
 })
@@ -84,7 +84,7 @@ test_that("split operator uses <= for left child (#189)", {
     num.threads = 1
   )
 
-  native <- predict(model, mtcars)$predictions
+  native <- predict(model, mtcars, num.threads = 1)$predictions
   fit <- tidypredict_fit(model)
   tidy <- rlang::eval_tidy(fit, mtcars)
 
@@ -105,7 +105,7 @@ test_that("predictions are averaged not summed (#190)", {
     num.threads = 1
   )
 
-  native <- predict(model, mtcars)$predictions
+  native <- predict(model, mtcars, num.threads = 1)$predictions
   fit <- tidypredict_fit(model)
   tidy <- rlang::eval_tidy(fit, mtcars)
 
@@ -253,7 +253,7 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
   probs <- prob_sums / n_trees
 
   # Compare to native predictions
-  native <- predict(model, iris)$predictions
+  native <- predict(model, iris, num.threads = 1)$predictions
 
   expect_equal(unname(probs), unname(native), tolerance = 1e-10)
 })
@@ -347,7 +347,7 @@ test_that(".extract_ranger_trees produces correct predictions when averaged", {
   tree_preds <- sapply(trees, function(e) rlang::eval_tidy(e, mtcars))
   avg_pred <- rowMeans(tree_preds)
 
-  native <- predict(model, mtcars)$predictions
+  native <- predict(model, mtcars, num.threads = 1)$predictions
 
   expect_equal(avg_pred, native)
 })
