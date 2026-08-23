@@ -26,13 +26,13 @@
       Error in `xgb.DMatrix()`:
       ! xgb.DMatrix does not support construction from NULL
 
-# .extract_xgb_trees errors on non-xgb.Booster
+# tidypredict_trees errors on non-xgb.Booster
 
     Code
-      .extract_xgb_trees(list())
+      tidypredict_trees(list())
     Condition
-      Error in `.extract_xgb_trees()`:
-      ! `model` must be <xgb.Booster>, not an empty list.
+      Error in `tidypredict_trees()`:
+      ! `tidypredict_trees()` is not available for models of class <list>.
 
 # NULL objective with non-zero base_score warns user
 

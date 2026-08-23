@@ -1161,23 +1161,23 @@ test_that("tidypredict_test requires matrix", {
   expect_snapshot(tidypredict_test(model), error = TRUE)
 })
 
-test_that(".extract_catboost_trees returns list of expressions", {
+test_that("tidypredict_trees returns list of expressions", {
   skip_if_not_installed("catboost")
   model <- make_catboost_model()
 
-  trees <- .extract_catboost_trees(model)
+  trees <- tidypredict_trees(model)
 
   expect_type(trees, "list")
   expect_length(trees, 10)
   expect_type(trees[[1]], "language")
 })
 
-test_that(".extract_catboost_trees combined results match tidypredict_fit", {
+test_that("tidypredict_trees combined results match tidypredict_fit", {
   skip_if_not_installed("catboost")
   model <- make_catboost_model()
   test_data <- mtcars[, c("mpg", "cyl", "disp")]
 
-  trees <- .extract_catboost_trees(model)
+  trees <- tidypredict_trees(model)
   eval_env <- rlang::new_environment(
     data = as.list(test_data),
     parent = asNamespace("dplyr")
@@ -1193,10 +1193,20 @@ test_that(".extract_catboost_trees combined results match tidypredict_fit", {
   expect_equal(combined, fit_result)
 })
 
-test_that(".extract_catboost_trees errors on non-catboost model", {
+test_that("tidypredict_trees errors on non-catboost model", {
   expect_snapshot(
-    .extract_catboost_trees(lm(mpg ~ wt, data = mtcars)),
+    tidypredict_trees(lm(mpg ~ wt, data = mtcars)),
     error = TRUE
+  )
+})
+
+test_that("tidypredict_n_trees counts the extracted trees", {
+  skip_if_not_installed("catboost")
+  model <- make_catboost_model()
+
+  expect_identical(
+    tidypredict_n_trees(model),
+    length(tidypredict_trees(model))
   )
 })
 

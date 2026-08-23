@@ -289,19 +289,12 @@ tidypredict_fit.party <- function(model, ...) {
   generate_nested_case_when_tree(tree_info, missing = "na")
 }
 
-# For {orbital}
-#' Extract classprob trees for partykit models
-#'
-#' For use in orbital package.
-#' @param model A partykit model object
-#' @keywords internal
+# Extractors --------------------------------------------------
+
 #' @export
-.extract_partykit_classprob <- function(model) {
-  if (!inherits(model, "party")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls party}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_class_exprs.party <- function(x, ...) {
+  rlang::check_dots_empty()
+  model <- x
 
   extract_classprob <- function(model) {
     mod <- model$fitted
@@ -326,12 +319,15 @@ tidypredict_fit.party <- function(model, ...) {
 
   tree_info_full <- partykit_tree_info_full(model)
 
-  map(seq_len(ncol(preds)), function(i) {
+  res <- map(seq_len(ncol(preds)), function(i) {
     generate_nested_case_when_tree(
       tree_info_with_predictions(tree_info_full, preds[, i]),
       missing = "na"
     )
   })
+  # The generic is named by outcome level so callers never have to assume this
+  # matches `levels()` of the outcome positionally.
+  stats::setNames(res, colnames(preds))
 }
 
 build_tree_formula.pm_tree_party <- function(model) {

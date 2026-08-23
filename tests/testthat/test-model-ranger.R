@@ -166,9 +166,9 @@ test_that("probability and survival forests error with clear message (#301)", {
   expect_snapshot(parse_model(model), error = TRUE)
 })
 
-# Tests for .extract_ranger_classprob()
+# Tests for tidypredict_class_trees()
 
-test_that(".extract_ranger_classprob returns correct structure", {
+test_that("tidypredict_class_trees returns correct structure", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -181,7 +181,7 @@ test_that(".extract_ranger_classprob returns correct structure", {
     probability = TRUE
   )
 
-  result <- .extract_ranger_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
@@ -190,14 +190,14 @@ test_that(".extract_ranger_classprob returns correct structure", {
   expect_length(result[[1]], 3)
 })
 
-test_that(".extract_ranger_classprob errors on non-ranger model", {
+test_that("tidypredict_class_trees errors on non-ranger model", {
   skip_if_not_installed("ranger")
   model <- lm(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_ranger_classprob(model))
+  expect_snapshot(error = TRUE, tidypredict_class_trees(model))
 })
 
-test_that(".extract_ranger_classprob errors without probability = TRUE", {
+test_that("tidypredict_class_trees errors without probability = TRUE", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -210,10 +210,10 @@ test_that(".extract_ranger_classprob errors without probability = TRUE", {
     probability = FALSE
   )
 
-  expect_snapshot(error = TRUE, .extract_ranger_classprob(model))
+  expect_snapshot(error = TRUE, tidypredict_class_trees(model))
 })
 
-test_that(".extract_ranger_classprob works with binary classification", {
+test_that("tidypredict_class_trees works with binary classification", {
   skip_if_not_installed("ranger")
 
   mtcars$vs <- factor(mtcars$vs)
@@ -227,14 +227,14 @@ test_that(".extract_ranger_classprob works with binary classification", {
     probability = TRUE
   )
 
-  result <- .extract_ranger_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 2)
   expect_named(result, c("0", "1"))
 })
 
-test_that(".extract_ranger_classprob produces correct probabilities", {
+test_that("tidypredict_class_trees produces correct probabilities", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -247,7 +247,7 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
     probability = TRUE
   )
 
-  class_trees <- .extract_ranger_classprob(model)
+  class_trees <- tidypredict_class_trees(model)
   n_trees <- model$num.trees
 
   # Sum probabilities for each class
@@ -268,7 +268,7 @@ test_that(".extract_ranger_classprob produces correct probabilities", {
   expect_equal(unname(probs), unname(native), tolerance = 1e-10)
 })
 
-test_that(".extract_ranger_classprob works with single tree", {
+test_that("tidypredict_class_trees works with single tree", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -281,7 +281,7 @@ test_that(".extract_ranger_classprob works with single tree", {
     probability = TRUE
   )
 
-  result <- .extract_ranger_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
@@ -289,9 +289,9 @@ test_that(".extract_ranger_classprob works with single tree", {
   expect_length(result[[1]], 1)
 })
 
-# Tests for .extract_ranger_trees() (regression)
+# Tests for tidypredict_trees() (regression)
 
-test_that(".extract_ranger_trees returns correct structure", {
+test_that("tidypredict_trees returns correct structure", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -303,21 +303,21 @@ test_that(".extract_ranger_trees returns correct structure", {
     num.threads = 2
   )
 
-  result <- .extract_ranger_trees(model)
+  result <- tidypredict_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 5)
   expect_all_true(vapply(result, is.language, logical(1)))
 })
 
-test_that(".extract_ranger_trees errors on non-ranger model", {
+test_that("tidypredict_trees errors on non-ranger model", {
   skip_if_not_installed("ranger")
   model <- lm(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_ranger_trees(model))
+  expect_snapshot(error = TRUE, tidypredict_trees(model))
 })
 
-test_that(".extract_ranger_trees errors on classification model", {
+test_that("tidypredict_trees errors on classification model", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -329,10 +329,10 @@ test_that(".extract_ranger_trees errors on classification model", {
     num.threads = 2
   )
 
-  expect_snapshot(error = TRUE, .extract_ranger_trees(model))
+  expect_snapshot(error = TRUE, tidypredict_trees(model))
 })
 
-test_that(".extract_ranger_trees produces correct predictions when averaged", {
+test_that("tidypredict_trees produces correct predictions when averaged", {
   skip_if_not_installed("ranger")
 
   model <- ranger::ranger(
@@ -344,7 +344,7 @@ test_that(".extract_ranger_trees produces correct predictions when averaged", {
     num.threads = 2
   )
 
-  trees <- .extract_ranger_trees(model)
+  trees <- tidypredict_trees(model)
   n_trees <- length(trees)
 
   tree_preds <- sapply(trees, function(e) rlang::eval_tidy(e, mtcars))
@@ -353,6 +353,24 @@ test_that(".extract_ranger_trees produces correct predictions when averaged", {
   native <- predict(model, mtcars)$predictions
 
   expect_equal(avg_pred, native)
+})
+
+# Tests for tidypredict_n_trees()
+
+test_that("tidypredict_n_trees matches the forest size", {
+  skip_if_not_installed("ranger")
+
+  model <- ranger::ranger(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    num.trees = 5,
+    max.depth = 2,
+    seed = 100,
+    num.threads = 2
+  )
+
+  expect_equal(tidypredict_n_trees(model), model$num.trees)
+  expect_equal(tidypredict_n_trees(model), length(tidypredict_trees(model)))
 })
 
 # Backwards compatibility tests for v2 parsed models
@@ -575,7 +593,7 @@ test_that("factor splits match predict() for a probability forest (#283)", {
     respect.unordered.factors = "partition"
   )
 
-  trees <- .extract_ranger_classprob(model)
+  trees <- tidypredict_class_trees(model)
   probs <- sapply(trees, function(exprs) {
     rowMeans(sapply(exprs, \(e) rlang::eval_tidy(e, df)))
   })

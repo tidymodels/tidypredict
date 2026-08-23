@@ -2327,7 +2327,7 @@ test_that("tidypredict_test respects max_rows parameter", {
   expect_equal(nrow(result$raw_results), 10)
 })
 
-test_that(".extract_lgb_trees returns list of tree expressions", {
+test_that("tidypredict_trees returns list of tree expressions", {
   skip_if_not_installed("lightgbm")
 
   set.seed(123)
@@ -2351,7 +2351,7 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
     verbose = -1L
   )
 
-  trees <- .extract_lgb_trees(model)
+  trees <- tidypredict_trees(model)
 
   expect_type(trees, "list")
   expect_length(trees, 5)
@@ -2360,12 +2360,12 @@ test_that(".extract_lgb_trees returns list of tree expressions", {
   expect_all_equal(types, "language")
 })
 
-test_that(".extract_lgb_trees combined results match tidypredict_fit", {
+test_that("tidypredict_trees combined results match tidypredict_fit", {
   skip_if_not_installed("lightgbm")
   model <- make_lgb_model()
   test_data <- mtcars[, c("mpg", "cyl", "disp")]
 
-  trees <- .extract_lgb_trees(model)
+  trees <- tidypredict_trees(model)
   eval_env <- rlang::new_environment(
     data = as.list(test_data),
     parent = asNamespace("dplyr")
@@ -2378,8 +2378,18 @@ test_that(".extract_lgb_trees combined results match tidypredict_fit", {
   expect_equal(combined, fit_result)
 })
 
-test_that(".extract_lgb_trees errors on non-lgb.Booster", {
-  expect_snapshot(.extract_lgb_trees(list()), error = TRUE)
+test_that("tidypredict_trees errors on non-lgb.Booster", {
+  expect_snapshot(tidypredict_trees(list()), error = TRUE)
+})
+
+test_that("tidypredict_n_trees counts the extracted trees", {
+  skip_if_not_installed("lightgbm")
+  model <- make_lgb_model()
+
+  expect_identical(
+    tidypredict_n_trees(model),
+    length(tidypredict_trees(model))
+  )
 })
 
 test_that("tidypredict works with parsnip/bonsai lightgbm model", {

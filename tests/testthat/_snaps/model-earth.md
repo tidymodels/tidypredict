@@ -21,29 +21,29 @@
       Error in `acceptable_contrasts()`:
       ! The treatment contrast is the only one supported at this time. Field(s) with an invalid contrast are: "f".
 
-# .extract_earth_multiclass errors on non-earth model
+# tidypredict_class_exprs errors on non-earth model
 
     Code
-      .extract_earth_multiclass(model)
+      tidypredict_class_exprs(model)
     Condition
-      Error in `.extract_earth_multiclass()`:
-      ! `model` must be <earth>, not a <lm> object.
+      Error in `tidypredict_class_exprs()`:
+      ! `tidypredict_class_exprs()` is not available for models of class <lm>.
 
-# .extract_earth_multiclass errors on binary model
+# tidypredict_class_exprs errors on binary model
 
     Code
-      .extract_earth_multiclass(model)
+      tidypredict_class_exprs(model)
     Condition
-      Error in `.extract_earth_multiclass()`:
+      Error in `tidypredict_class_exprs()`:
       ! Model does not contain multiclass information.
       i Fit the earth model with `glm = TRUE` for classification.
 
-# .extract_earth_multiclass errors on regression model
+# tidypredict_class_exprs errors on regression model
 
     Code
-      .extract_earth_multiclass(model)
+      tidypredict_class_exprs(model)
     Condition
-      Error in `.extract_earth_multiclass()`:
+      Error in `tidypredict_class_exprs()`:
       ! Model does not contain multiclass information.
       i Fit the earth model with `glm = TRUE` for classification.
 

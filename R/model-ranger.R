@@ -353,23 +353,14 @@ tidypredict_test.ranger <- function(
   test_results_numeric(base, te[, "fit_te"], threshold, model$call)
 }
 
-# For {orbital} -----------------------------------------------
+# Extractors --------------------------------------------------
 
-#' Extract classification probability trees for ranger models
-#'
-#' For use in orbital package.
-#' @param model A ranger model object fitted with `probability = TRUE`
-#' @keywords internal
 #' @export
-.extract_ranger_classprob <- function(model) {
-  if (!inherits(model, "ranger")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_class_trees.ranger <- function(x, ...) {
+  rlang::check_dots_empty()
 
   # Get class levels from treeInfo
-  tree <- ranger_tree_info(model, 1)
+  tree <- ranger_tree_info(x, 1)
   pred_cols <- grep("^pred\\.", names(tree), value = TRUE)
 
   if (length(pred_cols) == 0) {
@@ -386,8 +377,8 @@ tidypredict_test.ranger <- function(
   # For each class, generate nested case_when expressions for all trees
   res <- list()
   for (lvl in lvls) {
-    tree_exprs <- map(seq_len(model$num.trees), function(tree_no) {
-      build_nested_ranger_prob_tree(model, tree_no, lvl)
+    tree_exprs <- map(seq_len(x$num.trees), function(tree_no) {
+      build_nested_ranger_prob_tree(x, tree_no, lvl)
     })
     res[[lvl]] <- tree_exprs
   }
@@ -399,35 +390,33 @@ build_nested_ranger_prob_tree <- function(model, tree_no, class_level) {
   build_nested_ranger_tree(model, tree_no, paste0("pred.", class_level))
 }
 
-#' Extract regression trees for ranger models
-#'
-#' For use in orbital package.
-#' @param model A ranger model object (regression)
-#' @keywords internal
 #' @export
-.extract_ranger_trees <- function(model) {
-  if (!inherits(model, "ranger")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls ranger}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_trees.ranger <- function(x, ...) {
+  rlang::check_dots_empty()
 
   # Check if this is a classification model
-  first_tree <- ranger_tree_info(model, 1)
+  first_tree <- ranger_tree_info(x, 1)
   first_pred <- first_tree$prediction[first_tree$terminal][1]
   if (is.character(first_pred) || is.factor(first_pred)) {
     cli::cli_abort(
       c(
         "Classification models are not supported.",
-        i = "Use {.fn .extract_ranger_classprob} for classification models."
+        i = "Use {.fn tidypredict_class_trees} for classification models."
       )
     )
   }
 
-  n_trees <- model$num.trees
-  map(seq_len(n_trees), function(tree_no) {
-    build_nested_ranger_tree(model, tree_no)
+  map(seq_len(x$num.trees), function(tree_no) {
+    build_nested_ranger_tree(x, tree_no)
   })
+}
+
+#' @export
+tidypredict_n_trees.ranger <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # ranger stores this as a double.
+  as.integer(x$num.trees)
 }
 
 build_tree_formula.pm_tree_ranger <- function(model) {

@@ -442,33 +442,48 @@ test_that("mgaussian family errors with helpful message (#199)", {
   expect_snapshot(error = TRUE, tidypredict_fit(model))
 })
 
-# Tests for .extract_glmnet_multiclass()
+# Tests for tidypredict_class_exprs()
 
-test_that(".extract_glmnet_multiclass returns correct structure", {
+test_that("tidypredict_class_exprs returns correct structure", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
     iris$Species,
     family = "multinomial",
-    lambda = 0.5
+    lambda = 0.01
   )
 
-  result <- .extract_glmnet_multiclass(model)
+  result <- tidypredict_class_exprs(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
   expect_named(result, levels(iris$Species))
-  expect_type(result[[1]], "character")
+  expect_type(result[[1]], "language")
 })
 
-test_that(".extract_glmnet_multiclass errors on non-multnet model", {
+test_that("tidypredict_class_exprs returns a bare numeric for zero coefs", {
+  skip_if_not_installed("glmnet")
+  model <- glmnet::glmnet(
+    as.matrix(iris[, 1:4]),
+    iris$Species,
+    family = "multinomial",
+    lambda = 10
+  )
+
+  result <- tidypredict_class_exprs(model)
+
+  expect_named(result, levels(iris$Species))
+  expect_equal(result[[1]], 0)
+})
+
+test_that("tidypredict_class_exprs errors on non-multnet model", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
 
-  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+  expect_snapshot(error = TRUE, tidypredict_class_exprs(model))
 })
 
-test_that(".extract_glmnet_multiclass errors with multiple penalties", {
+test_that("tidypredict_class_exprs errors with multiple penalties", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
@@ -476,10 +491,10 @@ test_that(".extract_glmnet_multiclass errors with multiple penalties", {
     family = "multinomial"
   )
 
-  expect_snapshot(error = TRUE, .extract_glmnet_multiclass(model))
+  expect_snapshot(error = TRUE, tidypredict_class_exprs(model))
 })
 
-test_that(".extract_glmnet_multiclass works with explicit penalty", {
+test_that("tidypredict_class_exprs works with explicit penalty", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
@@ -487,13 +502,13 @@ test_that(".extract_glmnet_multiclass works with explicit penalty", {
     family = "multinomial"
   )
 
-  result <- .extract_glmnet_multiclass(model, penalty = 0.01)
+  result <- tidypredict_class_exprs(model, penalty = 0.01)
 
   expect_type(result, "list")
   expect_length(result, 3)
 })
 
-test_that(".extract_glmnet_multiclass handles sparse coefficients", {
+test_that("tidypredict_class_exprs handles sparse coefficients", {
   skip_if_not_installed("glmnet")
   # High penalty should zero out many coefficients
 
@@ -504,13 +519,13 @@ test_that(".extract_glmnet_multiclass handles sparse coefficients", {
     lambda = 10
   )
 
-  result <- .extract_glmnet_multiclass(model)
+  result <- tidypredict_class_exprs(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
 })
 
-test_that(".extract_glmnet_multiclass produces correct predictions", {
+test_that("tidypredict_class_exprs produces correct predictions", {
   skip_if_not_installed("glmnet")
   model <- glmnet::glmnet(
     as.matrix(iris[, 1:4]),
@@ -519,12 +534,12 @@ test_that(".extract_glmnet_multiclass produces correct predictions", {
     lambda = 0.01
   )
 
-  eqs <- .extract_glmnet_multiclass(model)
+  eqs <- tidypredict_class_exprs(model)
   n_rows <- nrow(iris)
 
   # Evaluate each linear predictor, recycling scalars to full length
   logits <- sapply(eqs, function(eq) {
-    val <- rlang::eval_tidy(rlang::parse_expr(eq), iris)
+    val <- rlang::eval_tidy(eq, iris)
     if (length(val) == 1) rep(val, n_rows) else val
   })
 

@@ -96,20 +96,20 @@
       ! Multivariate gaussian glmnet models are not supported.
       i Models fit with `family = "mgaussian"` have multiple outcome columns which is not supported.
 
-# .extract_glmnet_multiclass errors on non-multnet model
+# tidypredict_class_exprs errors on non-multnet model
 
     Code
-      .extract_glmnet_multiclass(model)
+      tidypredict_class_exprs(model)
     Condition
-      Error in `.extract_glmnet_multiclass()`:
-      ! `model` must be <multnet>, not an <elnet> object.
+      Error in `tidypredict_class_exprs()`:
+      ! `tidypredict_class_exprs()` is not available for models of class <elnet>.
 
-# .extract_glmnet_multiclass errors with multiple penalties
+# tidypredict_class_exprs errors with multiple penalties
 
     Code
-      .extract_glmnet_multiclass(model)
+      tidypredict_class_exprs(model)
     Condition
-      Error in `.extract_glmnet_multiclass()`:
+      Error in `tidypredict_class_exprs()`:
       ! glmnet model has multiple penalty values.
       i Specify a single `penalty` value.
 

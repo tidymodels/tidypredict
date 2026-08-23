@@ -131,9 +131,9 @@ test_that("v2 parsed classification model errors", {
   expect_snapshot(tidypredict_fit(pm), error = TRUE)
 })
 
-# Tests for .extract_rf_classprob()
+# Tests for tidypredict_class_trees()
 
-test_that(".extract_rf_classprob returns correct structure", {
+test_that("tidypredict_class_trees returns correct structure", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -142,7 +142,7 @@ test_that(".extract_rf_classprob returns correct structure", {
     ntree = 3
   )
 
-  result <- .extract_rf_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
@@ -151,21 +151,21 @@ test_that(".extract_rf_classprob returns correct structure", {
   expect_length(result[[1]], 3)
 })
 
-test_that(".extract_rf_classprob errors on non-randomForest model", {
+test_that("tidypredict_class_trees errors on non-randomForest model", {
   model <- lm(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_rf_classprob(model))
+  expect_snapshot(error = TRUE, tidypredict_class_trees(model))
 })
 
-test_that(".extract_rf_classprob errors on regression model", {
+test_that("tidypredict_class_trees errors on regression model", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
 
-  expect_snapshot(error = TRUE, .extract_rf_classprob(model))
+  expect_snapshot(error = TRUE, tidypredict_class_trees(model))
 })
 
-test_that(".extract_rf_classprob works with binary classification", {
+test_that("tidypredict_class_trees works with binary classification", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   mtcars$vs <- factor(mtcars$vs)
@@ -175,14 +175,14 @@ test_that(".extract_rf_classprob works with binary classification", {
     ntree = 3
   )
 
-  result <- .extract_rf_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 2)
   expect_named(result, c("0", "1"))
 })
 
-test_that(".extract_rf_classprob produces correct vote counts", {
+test_that("tidypredict_class_trees produces correct vote counts", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -191,7 +191,7 @@ test_that(".extract_rf_classprob produces correct vote counts", {
     ntree = 5
   )
 
-  class_trees <- .extract_rf_classprob(model)
+  class_trees <- tidypredict_class_trees(model)
   n_trees <- model$ntree
 
   # Sum votes for each class
@@ -212,7 +212,7 @@ test_that(".extract_rf_classprob produces correct vote counts", {
   expect_equal(unname(probs), unname(native), tolerance = 1e-10)
 })
 
-test_that(".extract_rf_classprob works with single tree", {
+test_that("tidypredict_class_trees works with single tree", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -221,7 +221,7 @@ test_that(".extract_rf_classprob works with single tree", {
     ntree = 1
   )
 
-  result <- .extract_rf_classprob(model)
+  result <- tidypredict_class_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
@@ -229,9 +229,9 @@ test_that(".extract_rf_classprob works with single tree", {
   expect_length(result[[1]], 1)
 })
 
-# Tests for .extract_rf_trees() (regression)
+# Tests for tidypredict_trees() (regression)
 
-test_that(".extract_rf_trees returns correct structure", {
+test_that("tidypredict_trees returns correct structure", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -240,20 +240,20 @@ test_that(".extract_rf_trees returns correct structure", {
     ntree = 5
   )
 
-  result <- .extract_rf_trees(model)
+  result <- tidypredict_trees(model)
 
   expect_type(result, "list")
   expect_length(result, 5)
   expect_all_true(vapply(result, is.language, logical(1)))
 })
 
-test_that(".extract_rf_trees errors on non-randomForest model", {
+test_that("tidypredict_trees errors on non-randomForest model", {
   model <- lm(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_rf_trees(model))
+  expect_snapshot(error = TRUE, tidypredict_trees(model))
 })
 
-test_that(".extract_rf_trees errors on classification model", {
+test_that("tidypredict_trees errors on classification model", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -262,10 +262,10 @@ test_that(".extract_rf_trees errors on classification model", {
     ntree = 3
   )
 
-  expect_snapshot(error = TRUE, .extract_rf_trees(model))
+  expect_snapshot(error = TRUE, tidypredict_trees(model))
 })
 
-test_that(".extract_rf_trees produces correct predictions when averaged", {
+test_that("tidypredict_trees produces correct predictions when averaged", {
   skip_if_not_installed("randomForest")
   set.seed(123)
   model <- randomForest::randomForest(
@@ -274,7 +274,7 @@ test_that(".extract_rf_trees produces correct predictions when averaged", {
     ntree = 5
   )
 
-  trees <- .extract_rf_trees(model)
+  trees <- tidypredict_trees(model)
   n_trees <- length(trees)
 
   tree_preds <- sapply(trees, function(e) rlang::eval_tidy(e, mtcars))
@@ -283,6 +283,21 @@ test_that(".extract_rf_trees produces correct predictions when averaged", {
   native <- as.numeric(predict(model, mtcars))
 
   expect_equal(avg_pred, native)
+})
+
+# Tests for tidypredict_n_trees()
+
+test_that("tidypredict_n_trees matches the forest size", {
+  skip_if_not_installed("randomForest")
+  set.seed(123)
+  model <- randomForest::randomForest(
+    mpg ~ cyl + disp + hp,
+    data = mtcars,
+    ntree = 5
+  )
+
+  expect_equal(tidypredict_n_trees(model), model$ntree)
+  expect_equal(tidypredict_n_trees(model), length(tidypredict_trees(model)))
 })
 
 test_that("parsed models use the right split variable at every node (#232)", {
@@ -431,7 +446,7 @@ test_that("factor splits match predict() for class probabilities (#282)", {
   )
   model <- randomForest::randomForest(am ~ wt + gear, data = df)
 
-  trees <- .extract_rf_classprob(model)
+  trees <- tidypredict_class_trees(model)
   probs <- sapply(trees, function(exprs) {
     rowMeans(sapply(exprs, \(e) rlang::eval_tidy(e, df)))
   })

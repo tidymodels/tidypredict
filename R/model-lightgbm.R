@@ -894,20 +894,20 @@ build_nested_lgb_node <- function(
   expr(case_when(!!condition ~ !!left_subtree, .default = !!right_subtree))
 }
 
-# For {orbital} -----------------------------------------------
+# Extractors --------------------------------------------------
 
-#' Extract processed LightGBM trees
-#'
-#' For use in orbital package.
-#' @param model A LightGBM model object
-#' @keywords internal
 #' @export
-.extract_lgb_trees <- function(model) {
-  if (!inherits(model, "lgb.Booster")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls lgb.Booster}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_trees.lgb.Booster <- function(x, ...) {
+  rlang::check_dots_empty()
 
-  extract_lgb_trees_nested(model)
+  extract_lgb_trees_nested(x)
+}
+
+#' @export
+tidypredict_n_trees.lgb.Booster <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # Trees with a single leaf are dropped by the extractor, so this counts the
+  # trees actually returned rather than the number LightGBM reports.
+  length(tidypredict_trees(x))
 }

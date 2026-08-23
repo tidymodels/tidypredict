@@ -24,13 +24,13 @@
       ! CatBoost models require a matrix for predictions.
       i Pass the prediction matrix via the `xg_df` argument.
 
-# .extract_catboost_trees errors on non-catboost model
+# tidypredict_trees errors on non-catboost model
 
     Code
-      .extract_catboost_trees(lm(mpg ~ wt, data = mtcars))
+      tidypredict_trees(lm(mpg ~ wt, data = mtcars))
     Condition
-      Error in `.extract_catboost_trees()`:
-      ! `model` must be <catboost.Model>, not a <lm> object.
+      Error in `tidypredict_trees()`:
+      ! `tidypredict_trees()` is not available for models of class <lm>.
 
 # multiclass model requires num_class >= 2
 

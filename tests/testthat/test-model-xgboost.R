@@ -1136,24 +1136,36 @@ test_that("tidypredict_test respects max_rows parameter", {
   expect_equal(nrow(result$raw_results), 10)
 })
 
-test_that(".extract_xgb_trees returns list of expressions", {
+test_that("tidypredict_trees returns an unnamed list of expressions", {
   skip_if_not_installed("xgboost")
   model <- make_xgb_model(nrounds = 4L)
 
-  trees <- .extract_xgb_trees(model)
+  trees <- tidypredict_trees(model)
 
   expect_type(trees, "list")
   expect_length(trees, 4)
+  expect_null(names(trees))
   for (tree in trees) {
     expect_type(tree, "language")
   }
 })
 
-test_that(".extract_xgb_trees combined results match tidypredict_fit", {
+test_that("tidypredict_n_trees counts every tree", {
+  skip_if_not_installed("xgboost")
+  model <- make_xgb_model(nrounds = 4L)
+
+  expect_identical(tidypredict_n_trees(model), 4L)
+  expect_identical(
+    tidypredict_n_trees(model),
+    length(tidypredict_trees(model))
+  )
+})
+
+test_that("tidypredict_trees combined results match tidypredict_fit", {
   skip_if_not_installed("xgboost")
   model <- make_xgb_model(nrounds = 4L, objective = "reg:squarederror")
 
-  trees <- .extract_xgb_trees(model)
+  trees <- tidypredict_trees(model)
   eval_env <- rlang::new_environment(
     data = as.list(mtcars),
     parent = asNamespace("dplyr")
@@ -1168,11 +1180,11 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit", {
   expect_equal(combined, fit_result)
 })
 
-test_that(".extract_xgb_trees errors on non-xgb.Booster", {
-  expect_snapshot(.extract_xgb_trees(list()), error = TRUE)
+test_that("tidypredict_trees errors on non-xgb.Booster", {
+  expect_snapshot(tidypredict_trees(list()), error = TRUE)
 })
 
-test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", {
+test_that("tidypredict_trees combined results match tidypredict_fit for DART", {
   skip_if_not_installed("xgboost")
 
   # Add 0.1 to avoid exact split boundaries (float32 vs float64 precision)
@@ -1198,7 +1210,7 @@ test_that(".extract_xgb_trees combined results match tidypredict_fit for DART", 
     verbose = 0
   )
 
-  trees <- .extract_xgb_trees(model)
+  trees <- tidypredict_trees(model)
   eval_env <- rlang::new_environment(
     data = as.list(mtcars_adj),
     parent = asNamespace("dplyr")

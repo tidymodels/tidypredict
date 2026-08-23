@@ -167,19 +167,12 @@ collapse_lists <- function(label, coef, lst) {
   )
 }
 
-# For {orbital}
-#' Extract multiclass linear predictors for earth models
-#'
-#' For use in orbital package.
-#' @param model An earth model object with multiple classes (glm.list with >1 elements)
-#' @keywords internal
+# Extractors --------------------------------------------------
+
 #' @export
-.extract_earth_multiclass <- function(model) {
-  if (!inherits(model, "earth")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls earth}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_class_exprs.earth <- function(x, ...) {
+  rlang::check_dots_empty()
+  model <- x
 
   if (is.null(model$glm.list) || length(model$glm.list) < 2) {
     cli::cli_abort(
@@ -202,10 +195,7 @@ collapse_lists <- function(label, coef, lst) {
 
     # Parse and build expression
     parsedmodel <- parse_model(model_single)
-    expr <- build_fit_formula(parsedmodel)
-
-    # Deparse to string, preserving numeric precision
-    deparse1(expr, control = "digits17")
+    build_fit_formula(parsedmodel)
   })
 
   names(eqs) <- class_names

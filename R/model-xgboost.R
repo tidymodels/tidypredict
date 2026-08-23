@@ -583,22 +583,21 @@ build_fit_formula_xgb <- function(parsedmodel) {
   apply_xgb_objective(f, objective, base_score)
 }
 
-# For {orbital} -----------------------------------------------
+# Extractors --------------------------------------------------
 
-#' Extract processed xgboost trees
-#'
-#' For use in orbital package.
-#' @param model An xgb.Booster model
-#' @keywords internal
 #' @export
-.extract_xgb_trees <- function(model) {
-  if (!inherits(model, "xgb.Booster")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls xgb.Booster}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_trees.xgb.Booster <- function(x, ...) {
+  rlang::check_dots_empty()
 
-  json_params <- get_xgb_json_params(model)
-  trees <- extract_xgb_trees_nested(model)
-  apply_dart_weights(trees, json_params$weight_drop)
+  json_params <- get_xgb_json_params(x)
+  trees <- extract_xgb_trees_nested(x)
+  # The generic promises an unnamed list; split() names these "0", "1", ...
+  unname(apply_dart_weights(trees, json_params$weight_drop))
+}
+
+#' @export
+tidypredict_n_trees.xgb.Booster <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  length(tidypredict_trees(x))
 }

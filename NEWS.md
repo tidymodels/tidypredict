@@ -2,6 +2,12 @@
 
 - Fixed `cforest()` models failing with "'language' object cannot be coerced to type 'symbol'" under partykit 1.3-0. That release added a shim to partykit's methods that identifies the caller with `as.name()`, which errors when the generic is reached as `partykit::gettree()`. (#434)
 
+- New generics expose the pieces `tidypredict_fit()` is assembled from, so that packages generating their own code from a fitted model can reuse tidypredict's parsing: `tidypredict_trees()` returns per-tree expressions, `tidypredict_class_trees()` returns per-tree expressions for each outcome level, `tidypredict_class_exprs()` returns one finished expression per outcome level, and `tidypredict_n_trees()` returns the number of trees. See `?tidypredict_extractors`. (#433)
+
+- The eleven `.extract_*()` functions are deprecated in favour of those generics. They were exported but documented as internal, and each is now a thin wrapper that warns. Two of them change return type under the new names: `.extract_earth_multiclass()` and `.extract_glmnet_multiclass()` returned deparsed strings, while `tidypredict_class_exprs()` returns language objects like every other extractor. (#433)
+
+- `tidypredict_class_exprs()` on a `partykit` model is named by outcome level. The `.extract_partykit_classprob()` it replaces returned an unnamed list, which left callers assuming its order matched `levels()` of the outcome. (#433)
+
 - The error raised when no method knows how to handle a model at all now carries the condition class `tidypredict_unsupported_model`. Many other errors also say "are not supported", but they report an unsupported *configuration* of a model that is otherwise handled, so the wording alone could not distinguish the two. Packages that wrap `tidypredict_fit()`, such as orbital, need that distinction to decide whether to fall back or to report the model as unsupported. (#432)
 
 - New articles for `kernlab::ksvm()`, `mboost::blackboost()` and `xrf::xrf()`, and the model list menu now links to the `LiblineaR` and `quantreg` sections directly. (#317)
