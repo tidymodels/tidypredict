@@ -2,6 +2,16 @@
 
 ## tidypredict (development version)
 
+- The error raised when no method knows how to handle a model at all now
+  carries the condition class `tidypredict_unsupported_model`. Many
+  other errors also say “are not supported”, but they report an
+  unsupported *configuration* of a model that is otherwise handled, so
+  the wording alone could not distinguish the two. Packages that wrap
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md),
+  such as orbital, need that distinction to decide whether to fall back
+  or to report the model as unsupported.
+  ([\#432](https://github.com/tidymodels/tidypredict/issues/432))
+
 - New articles for
   [`kernlab::ksvm()`](https://rdrr.io/pkg/kernlab/man/ksvm.html),
   [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
