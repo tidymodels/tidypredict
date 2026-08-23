@@ -3,6 +3,26 @@
 # weighted terminal-node mean, so it can be expressed as the mean of the
 # individual party-tree expressions.
 
+# partykit 1.3-0 added a shim to its methods that warns when a method is called
+# directly instead of through the generic. It identifies the caller with
+# `as.name(as.list(sys.call(-1))[[1L]])`, which errors on a call whose first
+# element is not a symbol. The generic's own frame is the method's caller, so
+# writing `partykit::gettree(...)` makes that first element the `::` call and
+# every `gettree()` on a cforest model fails with "'language' object cannot be
+# coerced to type 'symbol'".
+#
+# Binding the generic to a local name calls it through a symbol instead. The
+# name has to be `gettree`, because the shim then compares that symbol against
+# the generic's own name and stays quiet only if they match.
+#
+# Only `gettree` is affected. The other partykit functions used here
+# (`nodeids`, `nodeapply`, `as.party`, `id_node`, `is.terminal`, `kids_node`)
+# were checked and are fine with the `::` prefix.
+cforest_gettree <- function(model, tree_no) {
+  gettree <- partykit::gettree
+  gettree(model, tree_no)
+}
+
 cforest_check_regression <- function(model) {
   response_col <- model$fitted[["(response)"]]
   if (!is.numeric(response_col)) {
@@ -24,7 +44,7 @@ parse_model.cforest <- function(model) {
   n_trees <- length(model$nodes)
   pm$tree_info_list <- map(
     seq_len(n_trees),
-    function(tree_no) partykit_tree_info_full(partykit::gettree(model, tree_no))
+    function(tree_no) partykit_tree_info_full(cforest_gettree(model, tree_no))
   )
   as_parsed_model(pm)
 }
@@ -39,7 +59,7 @@ tidypredict_fit.cforest <- function(model, ...) {
   tree_exprs <- map(
     seq_len(n_trees),
     function(tree_no) {
-      tree_info <- partykit_tree_info_full(partykit::gettree(model, tree_no))
+      tree_info <- partykit_tree_info_full(cforest_gettree(model, tree_no))
       generate_nested_case_when_tree(tree_info, missing = "na")
     }
   )
