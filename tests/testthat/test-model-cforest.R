@@ -8,6 +8,23 @@ test_that("cforest regression predictions match", {
   expect_false(tidypredict_test(model, df = mtcars)$alert)
 })
 
+test_that("gettree() is reached without tripping partykit's method shim", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  model <- partykit::cforest(mpg ~ wt + cyl, data = mtcars, ntree = 2)
+
+  # partykit 1.3-0's shim errors if the generic is called as
+  # `partykit::gettree()`, and warns if it is reached under any name other than
+  # `gettree`. Assert both: no condition of either kind.
+  expect_no_error(cforest_gettree(model, 1))
+  expect_no_warning(cforest_gettree(model, 1))
+  expect_s3_class(cforest_gettree(model, 1), "party")
+
+  expect_no_warning(tidypredict_fit(model))
+  expect_no_warning(parse_model(model))
+})
+
 test_that("terminal nodes use in-bag weighted means, not unweighted means", {
   skip_if_not_installed("partykit")
 
