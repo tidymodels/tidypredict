@@ -4,10 +4,11 @@
 model to extract the needed components to produce the prediction. And
 second, it uses the object with the parsed information to produce the R
 formula. Thanks to this two step process, `tidypredict` does not need to
-parse the model every time. `tidypredict`’s functions also accept models
-that have already been parsed. Additionally, because the parsed model
-object is a list of basic variables, it is possible to save it in a
-file. Currently, the best file format is YAML.
+parse the model every time. `tidypredict`’s functions also accept R
+objects that contained already models that have been parsed already.
+Additionally, because the parsed model object is made up of a list made
+up of basic variables, it is possible to save it in a file. Currently,
+the best file format is YAML.
 
 For this article, we will use the following model:
 
@@ -63,47 +64,35 @@ These functions also accept a previously parsed model.
 
 tidypredict_fit(parsed)
 #> 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + 
-#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + 
-#>     (disp * cyl * 0.00540618405824794)
+#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938274) + 
+#>     (disp * cyl * 0.00540618405824793)
 ```
 
 ## Saving the model
 
-Use
-[`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
-to write the model to a YAML file.
+Saving the model is quite easy, use the package such as `yaml` to write
+the model object as a YAML file. Any format that can persist a ragged
+list object should work as well.
 
 ``` r
 
-tidypredict_save(parsed, "my_model.yml")
+library(yaml)
+
+write_yaml(parsed, "my_model.yml")
 ```
-
-It accepts a fitted model as well, parsing it for you:
-
-``` r
-
-tidypredict_save(model, "my_model.yml")
-```
-
-Write the file with
-[`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
-rather than calling
-[`yaml::write_yaml()`](https://yaml.r-lib.org/reference/write_yaml.html)
-yourself. `yaml` writes numbers with 7 significant digits by default,
-which is not enough to store a split threshold exactly. A tree model
-saved that way can send rows down a different branch than the model it
-came from, silently and with no warning.
 
 ## Re-load the model
 
-In a new R session, read the file back with
-[`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md).
+In a new R session, we can read the YAML file into our environment.
 
 ``` r
 
 library(tidypredict)
+library(yaml)
 
-loaded_model <- tidypredict_load("my_model.yml")
+loaded_model <- read_yaml("my_model")
+
+loaded_model <- as_parsed_model(loaded_model)
 ```
 
 The preview of the file looks exactly as the preview of the original
@@ -136,9 +125,8 @@ the formula.
 ``` r
 
 tidypredict_fit(loaded_model)
-#> 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + 
-#>     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + 
-#>     (disp * cyl * 0.00540618405824794)
+#> 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * 
+#>     -3.6302557) + (wt * cyl * 0.5356044) + (disp * cyl * 0.0054062)
 ```
 
 The same variable can be used with other `tidypredict` functions, such
@@ -148,7 +136,7 @@ as
 ``` r
 
 tidypredict_sql(loaded_model, dbplyr::simulate_odbc())
-#> <SQL> ((((53.5256637443325 + ("wt" * -6.38154597431605)) + ("disp" * -0.0458426921825963)) + ("cyl" * -3.63025567939439)) + (("wt" * "cyl") * 0.535604359938273)) + (("disp" * "cyl") * 0.00540618405824794)
+#> <SQL> ((((53.5256637 + ("wt" * -6.381546)) + ("disp" * -0.0458427)) + ("cyl" * -3.6302557)) + (("wt" * "cyl") * 0.5356044)) + (("disp" * "cyl") * 0.0054062)
 ```
 
 ## `broom`

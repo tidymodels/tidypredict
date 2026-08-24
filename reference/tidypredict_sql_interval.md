@@ -23,16 +23,12 @@ tidypredict_sql_interval(model, con, interval = 0.95)
 
   The prediction interval, defaults to 0.95
 
-## Value
-
-A SQL query, as returned by
-[`dbplyr::translate_sql()`](https://dbplyr.tidyverse.org/reference/translate_sql.html),
-giving the half width of the prediction interval.
-
 ## Examples
 
 ``` r
+library(dbplyr)
+
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql_interval(model, dbplyr::simulate_dbi())
+tidypredict_sql_interval(model, simulate_dbi())
 #> <SQL> 2.04840714179524 * SQRT(((((((-0.176776695296637) * (-0.176776695296637)) * 6.8231093058295) + ((-0.590557271637747 + "wt" * 0.183559646169165) * (-0.590557271637747 + "wt" * 0.183559646169165)) * 6.8231093058295) + (((0.769566489443368 + "wt" * -0.176199380745393) + "am" * -0.498926847360626) * ((0.769566489443368 + "wt" * -0.176199380745393) + "am" * -0.498926847360626)) * 6.8231093058295) + ((((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132) * (((-0.224404416240187 + "wt" * -0.23845787029348) + "am" * -0.0214203331902854) + "cyl" * 0.161662223806132)) * 6.8231093058295) + 6.8231093058295)
 ```

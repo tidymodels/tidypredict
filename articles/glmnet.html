@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -108,7 +85,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>glmnet models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/glmnet.Rmd" class="external-link"><code>vignettes/glmnet.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/glmnet.Rmd" class="external-link"><code>vignettes/glmnet.Rmd</code></a></small>
       <div class="d-none name"><code>glmnet.Rmd</code></div>
     </div>
 
@@ -155,7 +132,7 @@
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glmnet.stanford.edu" class="external-link">glmnet</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://glmnet.stanford.edu/reference/glmnet.html" class="external-link">glmnet</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, lambda <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu">glmnet</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/glmnet/man/glmnet.html" class="external-link">glmnet</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>, lambda <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span></code></pre></div>
 <ul>
 <li>
 <p>Create the R formula</p>
@@ -188,8 +165,8 @@
 <span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 22.17473<span style="color: #949494;">, </span>21.51315<span style="color: #949494;">, </span>24.86796<span style="color: #949494;">, </span>20.63104<span style="color: #949494;">, </span>17.64676<span style="color: #949494;">, </span>20.045…</span></span></code></pre></div>
 </li>
 <li>
-<p>Confirm that <code>tidypredict</code> results match the model’s
-<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results.</p>
+<p>Confirm that <code>tidypredict</code> results match to the
+model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidypredict test results</span></span>
@@ -236,17 +213,9 @@
 <span><span class="co">#&gt;   ..$ :List of 4</span></span>
 <span><span class="co">#&gt;   ..$ :List of 4</span></span>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
-<p>A <code>glmnet</code> model has no trees; each entry of
-<code>pm$terms</code> describes one coefficient:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">terms</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 1</span></span>
-<span><span class="co">#&gt;  $ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ label       : chr "(Intercept)"</span></span>
-<span><span class="co">#&gt;   ..$ coef        : num 35.3</span></span>
-<span><span class="co">#&gt;   ..$ is_intercept: int 1</span></span>
-<span><span class="co">#&gt;   ..$ fields      :List of 1</span></span>
-<span><span class="co">#&gt;   .. ..$ :List of 2</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  NULL</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -257,7 +226,7 @@
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

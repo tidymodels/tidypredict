@@ -5,14 +5,14 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>CatBoost models • tidypredict</title>
+<title>catboost models • tidypredict</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Source_Sans_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/Source_Code_Pro-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="CatBoost models">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="catboost models">
 <script src="https://cdn.jsdelivr.net/gh/posit-dev/supported-by-posit/js/badge.min.js" data-max-height="43" data-light-bg="#666f76" data-light-fg="#f9f9f9"></script><script defer data-domain="tidypredict.tidymodels.org,all.tidymodels.org" src="https://plausible.io/js/plausible.js"></script>
 </head>
 <body>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -105,10 +82,10 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>CatBoost models</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>catboost models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/catboost.Rmd" class="external-link"><code>vignettes/catboost.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/catboost.Rmd" class="external-link"><code>vignettes/catboost.Rmd</code></a></small>
       <div class="d-none name"><code>catboost.Rmd</code></div>
     </div>
 
@@ -125,26 +102,26 @@
 <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>,
 <code><a href="../reference/parse_model.html">parse_model()</a></code>
 </td>
-<td>✔</td>
+<td></td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td>✔</td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td>✔</td>
+<td></td>
 </tr>
 <tr class="even">
 <td>
 <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>,
 <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
 </td>
-<td>✗</td>
+<td></td>
 </tr>
 <tr class="odd">
 <td><code>parsnip</code></td>
-<td>✔</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -154,7 +131,6 @@
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://catboost.ai/" class="external-link">catboost</a></span><span class="op">)</span></span>
-<span></span>
 <span><span class="co"># Prepare data</span></span>
 <span><span class="va">X</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mpg"</span>, <span class="st">"cyl"</span>, <span class="st">"disp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">y</span> <span class="op">&lt;-</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">hp</span></span>
@@ -177,107 +153,17 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <ul>
-<li>
-<p>Create the R formula</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 7.00000023841858 ~ case_when(disp &lt;= 142.900001525879 ~ </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 73.3999977111816 ~ -10.2109375, .default = -22.4244791666667), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt;= 73.3999977111816 ~ 0, .default = -11.6136363636364)), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt;= 142.900001525879 ~ case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         73.3999977111816 ~ 0, .default = 0), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         73.3999977111816 ~ 0, .default = 25.7463235294118))) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 241.500007629395 ~ case_when(disp &lt;= 350.500015258789 ~ </span></span>
-<span><span class="co">#&gt;         case_when(disp &lt;= 114.050006866455 ~ -16.8217592592593, </span></span>
-<span><span class="co">#&gt;             .default = -8.66318317099567), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         114.050006866455 ~ 0, .default = 0)), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         350.500015258789 ~ case_when(disp &lt;= 114.050006866455 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = 8.54042598444336), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         114.050006866455 ~ 0, .default = 15.0981617647059))) + </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 16.100001335144 ~ case_when(mpg &lt;= 15.1000008583069 ~ </span></span>
-<span><span class="co">#&gt;         case_when(mpg &lt;= 26.6500005722046 ~ 20.1624199886566, </span></span>
-<span><span class="co">#&gt;             .default = 0), .default = case_when(mpg &lt;= 26.6500005722046 ~ </span></span>
-<span><span class="co">#&gt;         0.967519011736923, .default = 0)), .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;         15.1000008583069 ~ case_when(mpg &lt;= 26.6500005722046 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = 0), .default = case_when(mpg &lt;= 26.6500005722046 ~ </span></span>
-<span><span class="co">#&gt;         -5.55855336794383, .default = -11.7137405960648))) + </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 20.350001335144 ~ case_when(mpg &lt;= 23.5999994277954 ~ </span></span>
-<span><span class="co">#&gt;         case_when(disp &lt;= 78.8500022888183 ~ 0, .default = 6.89136822493766), </span></span>
-<span><span class="co">#&gt;         .default = case_when(disp &lt;= 78.8500022888183 ~ 0, .default = 0)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(mpg &lt;= 23.5999994277954 ~ case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;             78.8500022888183 ~ 0, .default = -4.38832757685116), </span></span>
-<span><span class="co">#&gt;             .default = case_when(disp &lt;= 78.8500022888183 ~ -9.6996753833912, </span></span>
-<span><span class="co">#&gt;                 .default = -6.45346095341689))) + case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;     15.1000008583069 ~ case_when(disp &lt;= 302.500015258789 ~ 15.8714952840688, </span></span>
-<span><span class="co">#&gt;     .default = 4.60180426510644), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     302.500015258789 ~ -4.31877485969645, .default = -2.29917164587966)) + </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 15.1000008583069 ~ case_when(mpg &lt;= 14.8500008583069 ~ </span></span>
-<span><span class="co">#&gt;         case_when(mpg &lt;= 15.3500008583069 ~ 3.16374043226067, </span></span>
-<span><span class="co">#&gt;             .default = 0), .default = case_when(mpg &lt;= 15.3500008583069 ~ </span></span>
-<span><span class="co">#&gt;         13.8875583735602, .default = 0)), .default = case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;         14.8500008583069 ~ case_when(mpg &lt;= 15.3500008583069 ~ </span></span>
-<span><span class="co">#&gt;         0, .default = 0), .default = case_when(mpg &lt;= 15.3500008583069 ~ </span></span>
-<span><span class="co">#&gt;         -4.10483269954833, .default = -1.86758300594439))) + </span></span>
-<span><span class="co">#&gt;     case_when(mpg &lt;= 15.1000008583069 ~ case_when(disp &lt;= 380.000015258789 ~ </span></span>
-<span><span class="co">#&gt;         case_when(disp &lt;= 78.8500022888183 ~ 0, .default = 12.4223339987522), </span></span>
-<span><span class="co">#&gt;         .default = case_when(disp &lt;= 78.8500022888183 ~ 0, .default = -1.42116288460309)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(disp &lt;= 380.000015258789 ~ case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;             78.8500022888183 ~ -5.72816707113319, .default = -0.208602028436654), </span></span>
-<span><span class="co">#&gt;             .default = case_when(disp &lt;= 78.8500022888183 ~ 0, </span></span>
-<span><span class="co">#&gt;                 .default = -1.21225568741093))) + case_when(cyl &lt;= </span></span>
-<span><span class="co">#&gt;     7.00000023841858 ~ case_when(mpg &lt;= 23.5999994277954 ~ case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     241.500007629395 ~ 1.75364491647211, .default = -2.15905609774181), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt;= 241.500007629395 ~ -4.52541367990288, </span></span>
-<span><span class="co">#&gt;         .default = 0)), .default = case_when(mpg &lt;= 23.5999994277954 ~ </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 241.500007629395 ~ 0, .default = 2.8034218920811), </span></span>
-<span><span class="co">#&gt;     .default = case_when(disp &lt;= 241.500007629395 ~ 0, .default = 0))) + </span></span>
-<span><span class="co">#&gt;     case_when(disp &lt;= 87.0500068664551 ~ case_when(cyl &lt;= 7.00000023841858 ~ </span></span>
-<span><span class="co">#&gt;         case_when(mpg &lt;= 11.8500008583069 ~ 0, .default = -3.59506778936443), </span></span>
-<span><span class="co">#&gt;         .default = case_when(mpg &lt;= 11.8500008583069 ~ 0, .default = 0)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(cyl &lt;= 7.00000023841858 ~ case_when(mpg &lt;= </span></span>
-<span><span class="co">#&gt;             11.8500008583069 ~ 0, .default = 0.130749917403693), </span></span>
-<span><span class="co">#&gt;             .default = case_when(mpg &lt;= 11.8500008583069 ~ -2.74671544251141, </span></span>
-<span><span class="co">#&gt;                 .default = 2.78451974222454))) + case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     145.85001373291 ~ case_when(cyl &lt;= 5.00000023841858 ~ case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     466.000015258789 ~ -0.217088634121561, .default = 0), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;     466.000015258789 ~ 6.47088371722999, .default = 0)), .default = case_when(cyl &lt;= </span></span>
-<span><span class="co">#&gt;     5.00000023841858 ~ case_when(disp &lt;= 466.000015258789 ~ -5.20113031092882, </span></span>
-<span><span class="co">#&gt;     .default = 0), .default = case_when(disp &lt;= 466.000015258789 ~ </span></span>
-<span><span class="co">#&gt;     0.142842983663108, .default = -1.9983577212557))) + 146.6875</span></span></code></pre></div>
-</li>
-<li>
-<p>Add the prediction to the original table</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mtcars</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 32</span></span>
-<span><span class="co">#&gt; Columns: 12</span></span>
-<span><span class="co">#&gt; $ mpg  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 21.0<span style="color: #949494;">, </span>21.0<span style="color: #949494;">, </span>22.8<span style="color: #949494;">, </span>21.4<span style="color: #949494;">, </span>18.7<span style="color: #949494;">, </span>18.1<span style="color: #949494;">, </span>14.3<span style="color: #949494;">, </span>24.4<span style="color: #949494;">, </span>22.8<span style="color: #949494;">, </span>19…</span></span>
-<span><span class="co">#&gt; $ cyl  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 6<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>6<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>8<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ disp <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 160.0<span style="color: #949494;">, </span>160.0<span style="color: #949494;">, </span>108.0<span style="color: #949494;">, </span>258.0<span style="color: #949494;">, </span>360.0<span style="color: #949494;">, </span>225.0<span style="color: #949494;">, </span>360.0<span style="color: #949494;">, </span>146.7<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ hp   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 110<span style="color: #949494;">, </span>110<span style="color: #949494;">, </span>93<span style="color: #949494;">, </span>110<span style="color: #949494;">, </span>175<span style="color: #949494;">, </span>105<span style="color: #949494;">, </span>245<span style="color: #949494;">, </span>62<span style="color: #949494;">, </span>95<span style="color: #949494;">, </span>123<span style="color: #949494;">, </span>123<span style="color: #949494;">, </span>180<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ drat <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 3.90<span style="color: #949494;">, </span>3.90<span style="color: #949494;">, </span>3.85<span style="color: #949494;">, </span>3.08<span style="color: #949494;">, </span>3.15<span style="color: #949494;">, </span>2.76<span style="color: #949494;">, </span>3.21<span style="color: #949494;">, </span>3.69<span style="color: #949494;">, </span>3.92<span style="color: #949494;">, </span>3.…</span></span>
-<span><span class="co">#&gt; $ wt   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 2.620<span style="color: #949494;">, </span>2.875<span style="color: #949494;">, </span>2.320<span style="color: #949494;">, </span>3.215<span style="color: #949494;">, </span>3.440<span style="color: #949494;">, </span>3.460<span style="color: #949494;">, </span>3.570<span style="color: #949494;">, </span>3.190<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ qsec <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 16.46<span style="color: #949494;">, </span>17.02<span style="color: #949494;">, </span>18.61<span style="color: #949494;">, </span>19.44<span style="color: #949494;">, </span>17.02<span style="color: #949494;">, </span>20.22<span style="color: #949494;">, </span>15.84<span style="color: #949494;">, </span>20.00<span style="color: #949494;">, </span>…</span></span>
-<span><span class="co">#&gt; $ vs   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 112.09608<span style="color: #949494;">, </span>112.09608<span style="color: #949494;">, </span>92.76673<span style="color: #949494;">, </span>125.38699<span style="color: #949494;">, </span>190.22023<span style="color: #949494;">, </span>12…</span></span></code></pre></div>
-</li>
-<li>
-<p>Confirm that <code>tidypredict</code> results match the model’s
+<li><p>Create the R formula
+<code>r tidypredict_fit(model)</code></p></li>
+<li><p>Add the prediction to the original table ```r
+library(dplyr)</p></li>
+</ul>
+<p>mtcars %&gt;% tidypredict_to_column(model) %&gt;% glimpse() ```</p>
+<ul>
+<li>Confirm that <code>tidypredict</code> results match to the model’s
 <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results. The <code>xg_df</code> argument expects
-the matrix data set.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, xg_df <span class="op">=</span> <span class="va">X</span><span class="op">)</span></span>
-<span><span class="co">#&gt; tidypredict test results</span></span>
-<span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
+the matrix data set.
+<code>r tidypredict_test(model, xg_df = X)</code>
 </li>
 </ul>
 </div>
@@ -286,40 +172,21 @@ the matrix data set.</p>
 </h2>
 <p>CatBoost supports many objective functions. The following objectives
 are supported by <code>tidypredict</code>:</p>
-<p><code>tidypredict</code> always returns predictions on the response
-scale, so the link implied by the objective is inverted for you. This
-does not always agree with <code><a href="https://rdrr.io/pkg/catboost/man/catboost.predict.html" class="external-link">catboost.predict()</a></code>, whose
-default <code>prediction_type = "RawFormulaVal"</code> returns the
-untransformed score. The equivalent <code><a href="https://rdrr.io/pkg/catboost/man/catboost.predict.html" class="external-link">catboost.predict()</a></code> call
-is listed for each group below.</p>
 <div class="section level3">
 <h3 id="regression-objectives-identity-transform">Regression objectives (identity transform)<a class="anchor" aria-label="anchor" href="#regression-objectives-identity-transform"></a>
 </h3>
-<p>Equivalent to <code>prediction_type = "RawFormulaVal"</code>.</p>
 <ul>
 <li>
 <code>RMSE</code> (default)</li>
 <li><code>MAE</code></li>
 <li><code>Quantile</code></li>
 <li><code>MAPE</code></li>
-<li><code>Huber</code></li>
-<li><code>LogCosh</code></li>
-<li><code>Expectile</code></li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="log-link-regression-objectives-exponential-transform">Log-link regression objectives (exponential transform)<a class="anchor" aria-label="anchor" href="#log-link-regression-objectives-exponential-transform"></a>
-</h3>
-<p>Equivalent to <code>prediction_type = "Exponent"</code>.</p>
-<ul>
 <li><code>Poisson</code></li>
-<li><code>Tweedie</code></li>
 </ul>
 </div>
 <div class="section level3">
 <h3 id="binary-classification-sigmoid-transform">Binary classification (sigmoid transform)<a class="anchor" aria-label="anchor" href="#binary-classification-sigmoid-transform"></a>
 </h3>
-<p>Equivalent to <code>prediction_type = "Probability"</code>.</p>
 <ul>
 <li><code>Logloss</code></li>
 <li><code>CrossEntropy</code></li>
@@ -339,7 +206,7 @@ is listed for each group below.</p>
 <div class="section level2">
 <h2 id="binary-classification-example">Binary classification example<a class="anchor" aria-label="anchor" href="#binary-classification-example"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">X_bin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mpg"</span>, <span class="st">"cyl"</span>, <span class="st">"disp"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">y_bin</span> <span class="op">&lt;-</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">am</span></span>
 <span></span>
@@ -361,16 +228,12 @@ is listed for each group below.</p>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model_bin</span>, xg_df <span class="op">=</span> <span class="va">X_bin</span><span class="op">)</span></span>
-<span><span class="co">#&gt; tidypredict test results</span></span>
-<span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model_bin</span>, xg_df <span class="op">=</span> <span class="va">X_bin</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="multiclass-classification-example">Multiclass classification example<a class="anchor" aria-label="anchor" href="#multiclass-classification-example"></a>
 </h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">X_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">y_multi</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="va">iris</span><span class="op">$</span><span class="va">Species</span><span class="op">)</span> <span class="op">-</span> <span class="fl">1L</span></span>
 <span></span>
@@ -394,15 +257,10 @@ is listed for each group below.</p>
 <span></span>
 <span><span class="co"># Multiclass returns a list of formulas, one per class</span></span>
 <span><span class="va">formulas</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_multi</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">formulas</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "class_0" "class_1" "class_2"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">formulas</span><span class="op">)</span></span></code></pre></div>
 <p>Test multiclass predictions:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model_multi</span>, xg_df <span class="op">=</span> <span class="va">X_multi</span><span class="op">)</span></span>
-<span><span class="co">#&gt; tidypredict test results (multiclass: 3 classes)</span></span>
-<span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;  All results are within the difference threshold</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model_multi</span>, xg_df <span class="op">=</span> <span class="va">X_multi</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="categorical-features">Categorical features<a class="anchor" aria-label="anchor" href="#categorical-features"></a>
@@ -410,11 +268,11 @@ is listed for each group below.</p>
 <p>CatBoost models can use categorical features with one-hot
 encoding.</p>
 <div class="section level3">
-<h3 id="with-parsnip-and-bonsai-recommended">With parsnip and bonsai (recommended)<a class="anchor" aria-label="anchor" href="#with-parsnip-and-bonsai-recommended"></a>
+<h3 id="with-parsnipbonsai-recommended">With parsnip/bonsai (recommended)<a class="anchor" aria-label="anchor" href="#with-parsnipbonsai-recommended"></a>
 </h3>
-<p>When using parsnip and bonsai, categorical features are handled
+<p>When using parsnip/bonsai, categorical features are handled
 automatically:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/parsnip" class="external-link">parsnip</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://bonsai.tidymodels.org/" class="external-link">bonsai</a></span><span class="op">)</span></span>
 <span></span>
@@ -431,84 +289,15 @@ automatically:</p>
 <span><span class="va">model_fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">model_spec</span>, <span class="va">target</span> <span class="op">~</span> <span class="va">num_feat</span> <span class="op">+</span> <span class="va">cat_feat</span>, data <span class="op">=</span> <span class="va">df_cat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Categorical features are handled automatically</span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_fit</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(num_feat &lt;= 19.4500017166138 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 22.1500005722046 ~ 0.801145815426329, </span></span>
-<span><span class="co">#&gt;     .default = 0), .default = case_when(num_feat &lt;= 22.1500005722046 ~ </span></span>
-<span><span class="co">#&gt;     1.83374995901249, .default = 0)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 22.1500005722046 ~ -0.51824998841621, </span></span>
-<span><span class="co">#&gt;     .default = -0.818249981710687), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     22.1500005722046 ~ -0.354642849215972, .default = -1.44243746775901))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 21.2000017166138 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ case_when(num_feat &lt;= 16.100001335144 ~ 1.2002477008358, </span></span>
-<span><span class="co">#&gt;         .default = 0.0857384359596435), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         16.100001335144 ~ 1.81174495999619, .default = -0.219992852344537)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             16.100001335144 ~ 0, .default = -0.943187122031322), </span></span>
-<span><span class="co">#&gt;             .default = case_when(num_feat &lt;= 16.100001335144 ~ </span></span>
-<span><span class="co">#&gt;                 0, .default = -1.38558622778375))) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     15.3500008583069 ~ case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     22.1500005722046 ~ 1.28753320737988, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     22.1500005722046 ~ 1.38500250715022, .default = 0)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 22.1500005722046 ~ -0.12498855656414, </span></span>
-<span><span class="co">#&gt;     .default = -0.797112736938237), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     22.1500005722046 ~ 0.128929276853228, .default = -1.38304897148005))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 21.2000017166138 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         15.3500008583069 ~ case_when(cat_feat != "manual" ~ 1.26049501062926, </span></span>
-<span><span class="co">#&gt;         .default = 1.37461498857877), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 0.0826099759077479, .default = 0.299197257933534)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(num_feat &lt;= 15.3500008583069 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;             "manual" ~ 0, .default = 0), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;             "manual" ~ -0.919114475104545, .default = -1.32930321991692))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 16.100001335144 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 1.1255318828183, .default = 1.7708775572066), </span></span>
-<span><span class="co">#&gt;         .default = case_when(cat_feat != "manual" ~ -0.391087771499875, </span></span>
-<span><span class="co">#&gt;             .default = -1.11728512846467)) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     19.4500017166138 ~ case_when(cat_feat != "manual" ~ 0.724507238084902, </span></span>
-<span><span class="co">#&gt;     .default = 1.74962702699511), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ -0.896653865664788, .default = -1.0909491224538)) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 16.8499994277954 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         21.2000017166138 ~ case_when(cat_feat != "manual" ~ 1.07507321302013, </span></span>
-<span><span class="co">#&gt;         .default = 1.72863150314045), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 0, .default = 0)), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         21.2000017166138 ~ case_when(cat_feat != "manual" ~ -0.0206418356182447, </span></span>
-<span><span class="co">#&gt;         .default = -0.18999134448798), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ -0.88128265688268, .default = -1.25212058591477))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 20.350001335144 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         16.100001335144 ~ case_when(cat_feat != "manual" ~ 1.06171125150465, </span></span>
-<span><span class="co">#&gt;         .default = 1.70788792556642), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 0.0749724038426973, .default = 0.231429255543504)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(num_feat &lt;= 16.100001335144 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;             "manual" ~ 0, .default = 0), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;             "manual" ~ -0.866174954530946, .default = -1.19395256766462))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 17.5500001907349 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ case_when(num_feat &lt;= 13.800000667572 ~ 0.996643797927786, </span></span>
-<span><span class="co">#&gt;         .default = 0.733609344823911), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         13.800000667572 ~ 0, .default = 1.68739327091772)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ case_when(num_feat &lt;= 13.800000667572 ~ 0, </span></span>
-<span><span class="co">#&gt;         .default = -0.593103918287044), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         13.800000667572 ~ 0, .default = -1.01745881947742))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 17.5500001907349 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         25.2000017166138 ~ case_when(cat_feat != "manual" ~ 1.00555387207905, </span></span>
-<span><span class="co">#&gt;         .default = 1.6671445521193), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 0, .default = 0)), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         25.2000017166138 ~ case_when(cat_feat != "manual" ~ -0.579759080423866, </span></span>
-<span><span class="co">#&gt;         .default = -0.389137236378184), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 0, .default = -1.19950713097063))) + 146.6875</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_fit</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="with-raw-catboost">With raw CatBoost<a class="anchor" aria-label="anchor" href="#with-raw-catboost"></a>
 </h3>
 <p>For raw CatBoost models, you need to manually establish the
 hash-to-category mapping:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  num_feat <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">mpg</span>,</span>
-<span>  cat_feat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">$</span><span class="va">am</span> <span class="op">==</span> <span class="fl">1</span>, <span class="st">"manual"</span>, <span class="st">"auto"</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  target <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">hp</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">pool_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/catboost/man/catboost.load_pool.html" class="external-link">catboost.load_pool</a></span><span class="op">(</span></span>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">pool_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/catboost/man/catboost.load_pool.html" class="external-link">catboost.load_pool</a></span><span class="op">(</span></span>
 <span>  <span class="va">df_cat</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"num_feat"</span>, <span class="st">"cat_feat"</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>  label <span class="op">=</span> <span class="va">df_cat</span><span class="op">$</span><span class="va">target</span></span>
 <span><span class="op">)</span></span>
@@ -531,121 +320,18 @@ hash-to-category mapping:</p>
 <span><span class="va">pm_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/set_catboost_categories.html">set_catboost_categories</a></span><span class="op">(</span><span class="va">pm_cat</span>, <span class="va">model_cat</span>, <span class="va">df_cat</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Now use the parsed model</span></span>
-<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">pm_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(num_feat &lt;= 21.2000017166138 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     18.4000024795532 ~ case_when(cat_feat != "manual" ~ 14.925, </span></span>
-<span><span class="co">#&gt;     .default = 30.5625), .default = case_when(cat_feat != "manual" ~ </span></span>
-<span><span class="co">#&gt;     2.74479166666667, .default = -3.75520833333333)), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     18.4000024795532 ~ case_when(cat_feat != "manual" ~ 0, .default = 0), </span></span>
-<span><span class="co">#&gt;     .default = case_when(cat_feat != "manual" ~ -15.9107142857143, </span></span>
-<span><span class="co">#&gt;         .default = -23.5681818181818))) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     17.9500017166138 ~ case_when(num_feat &lt;= 15.3500008583069 ~ </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 13.800000667572 ~ 15.0135416666667, </span></span>
-<span><span class="co">#&gt;         .default = 19.76875), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     13.800000667572 ~ 0, .default = 4.58125)), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     15.3500008583069 ~ case_when(num_feat &lt;= 13.800000667572 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = 0), .default = case_when(num_feat &lt;= 13.800000667572 ~ </span></span>
-<span><span class="co">#&gt;     0, .default = -12.6083622343566))) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     15.1000008583069 ~ case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     20.350001335144 ~ 15.4599609375, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     20.350001335144 ~ 17.24765625, .default = 0)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 20.350001335144 ~ -1.76974715625284, </span></span>
-<span><span class="co">#&gt;     .default = -7.76240670855119), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     20.350001335144 ~ 12.684482056769, .default = -10.3744425555505))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 20.350001335144 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         15.1000008583069 ~ case_when(num_feat &lt;= 21.4500017166138 ~ </span></span>
-<span><span class="co">#&gt;         16.15517578125, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         21.4500017166138 ~ 2.43866339847021, .default = 0)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(num_feat &lt;= 15.1000008583069 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             21.4500017166138 ~ 0, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             21.4500017166138 ~ -0.81725027977202, .default = -8.92975554067353))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 16.100001335144 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ 1.74184966725444, .default = 17.1624022513511), </span></span>
-<span><span class="co">#&gt;         .default = case_when(cat_feat != "manual" ~ -1.84846928363624, </span></span>
-<span><span class="co">#&gt;             .default = -2.5527898625831)) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     15.1000008583069 ~ case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.100001335144 ~ 5.0359026918736, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.100001335144 ~ 10.9270019646749, .default = 0)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 16.100001335144 ~ -4.68237897736796, </span></span>
-<span><span class="co">#&gt;     .default = -1.12228492220772), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.100001335144 ~ 6.23540028667622, .default = -1.54990813085402))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 17.9500017166138 ~ case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;         "manual" ~ case_when(num_feat &lt;= 15.3500008583069 ~ 1.35878278732009, </span></span>
-<span><span class="co">#&gt;         .default = -1.61413378865887), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         15.3500008583069 ~ 9.56112671909051, .default = 5.45597525084169)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             15.3500008583069 ~ 0, .default = -0.472868525836861), </span></span>
-<span><span class="co">#&gt;             .default = case_when(num_feat &lt;= 15.3500008583069 ~ </span></span>
-<span><span class="co">#&gt;                 0, .default = -0.941015650875657))) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     22.1500005722046 ~ case_when(num_feat &lt;= 11.8500008583069 ~ </span></span>
-<span><span class="co">#&gt;     case_when(cat_feat != "manual" ~ -1.27554270637297, .default = 0), </span></span>
-<span><span class="co">#&gt;     .default = case_when(cat_feat != "manual" ~ 1.29787175135093, </span></span>
-<span><span class="co">#&gt;         .default = 8.12576428739517)), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     11.8500008583069 ~ case_when(cat_feat != "manual" ~ 0, .default = 0), </span></span>
-<span><span class="co">#&gt;     .default = case_when(cat_feat != "manual" ~ -3.90652769980473, </span></span>
-<span><span class="co">#&gt;         .default = -2.85706547242369))) + case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     15.1000008583069 ~ case_when(cat_feat != "manual" ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.8499994277954 ~ 2.95365536454389, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.8499994277954 ~ 7.3502653432798, .default = 0)), .default = case_when(cat_feat != </span></span>
-<span><span class="co">#&gt;     "manual" ~ case_when(num_feat &lt;= 16.8499994277954 ~ -2.19386484538651, </span></span>
-<span><span class="co">#&gt;     .default = -1.18252440262858), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;     16.8499994277954 ~ 3.75825780856209, .default = -1.01788803241075))) + </span></span>
-<span><span class="co">#&gt;     case_when(num_feat &lt;= 15.1000008583069 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         14.8500008583069 ~ case_when(num_feat &lt;= 31.4000024795532 ~ </span></span>
-<span><span class="co">#&gt;         2.03063806312393, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;         31.4000024795532 ~ 6.43148217536982, .default = 0)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(num_feat &lt;= 14.8500008583069 ~ case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             31.4000024795532 ~ 0, .default = 0), .default = case_when(num_feat &lt;= </span></span>
-<span><span class="co">#&gt;             31.4000024795532 ~ 0.0318676040224114, .default = -3.35761814041808))) + </span></span>
-<span><span class="co">#&gt;     146.6875</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">pm_cat</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="parse-model-spec">Parse model spec<a class="anchor" aria-label="anchor" href="#parse-model-spec"></a>
 </h2>
 <p>Here is an example of the model spec:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">pm</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/parse_model.html">parse_model</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 2</span></span>
-<span><span class="co">#&gt;  $ general:List of 13</span></span>
-<span><span class="co">#&gt;   ..$ model            : chr "catboost.Model"</span></span>
-<span><span class="co">#&gt;   ..$ type             : chr "catboost"</span></span>
-<span><span class="co">#&gt;   ..$ version          : num 3</span></span>
-<span><span class="co">#&gt;   ..$ params           :List of 1</span></span>
-<span><span class="co">#&gt;   ..$ num_class        : num 1</span></span>
-<span><span class="co">#&gt;   ..$ cat_features     : list()</span></span>
-<span><span class="co">#&gt;   ..$ cat_feature_names: chr(0) </span></span>
-<span><span class="co">#&gt;   ..$ feature_names    : chr [1:3] "mpg" "cyl" "disp"</span></span>
-<span><span class="co">#&gt;   ..$ nfeatures        : int 3</span></span>
-<span><span class="co">#&gt;   ..$ scale            : int 1</span></span>
-<span><span class="co">#&gt;   ..$ bias             : num 147</span></span>
-<span><span class="co">#&gt;   ..$ niter            : int 10</span></span>
-<span><span class="co">#&gt;   ..$ tree_type        : chr "oblivious"</span></span>
-<span><span class="co">#&gt;  $ trees  :List of 10</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 4</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 8</span></span>
-<span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_catboost" "list"</span></span></code></pre></div>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>, <span class="fl">2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; List of 1</span></span>
-<span><span class="co">#&gt;  $ :List of 8</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span>
-<span><span class="co">#&gt;   ..$ :List of 2</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span>, <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">pm</span><span class="op">$</span><span class="va">trees</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
@@ -666,7 +352,7 @@ details.</li>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

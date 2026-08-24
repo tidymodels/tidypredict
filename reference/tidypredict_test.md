@@ -19,7 +19,8 @@ tidypredict_test(
 
 - model:
 
-  An R model or a list with a parsed model.
+  An R model or a list with a parsed model. It currently supports lm(),
+  glm() and randomForest() models.
 
 - df:
 
@@ -46,18 +47,8 @@ tidypredict_test(
 
 - xg_df:
 
-  The prediction matrix used to obtain the model's own predictions.
-  Required for XGBoost, LightGBM and CatBoost models, which cannot
-  predict from a data frame. Pass an `xgb.DMatrix` for XGBoost and a
-  numeric matrix for LightGBM and CatBoost. It defaults to NULL.
-
-## Value
-
-A list of test results comparing
-[`predict()`](https://rdrr.io/r/stats/predict.html) and
-[`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md),
-including the maximum difference and whether it stays within
-`threshold`.
+  A xgb.DMatrix object, required only for XGBoost models. It defaults to
+  NULL recommended for large data sets.
 
 ## Examples
 

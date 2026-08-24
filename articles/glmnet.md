@@ -51,7 +51,7 @@ model <- glmnet::glmnet(mtcars[, -1], mtcars$mpg, lambda = 1)
   #> $ fit  <dbl> 22.17473, 21.51315, 24.86796, 20.63104, 17.64676, 20.045…
   ```
 
-- Confirm that `tidypredict` results match the model’s
+- Confirm that `tidypredict` results match to the model’s
   [`predict()`](https://rdrr.io/r/stats/predict.html) results.
 
   ``` r
@@ -107,17 +107,8 @@ str(pm, 2)
 #>  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"
 ```
 
-A `glmnet` model has no trees; each entry of `pm$terms` describes one
-coefficient:
-
 ``` r
 
-str(pm$terms[1], 3)
-#> List of 1
-#>  $ :List of 4
-#>   ..$ label       : chr "(Intercept)"
-#>   ..$ coef        : num 35.3
-#>   ..$ is_intercept: int 1
-#>   ..$ fields      :List of 1
-#>   .. ..$ :List of 2
+str(pm$trees[1])
+#>  NULL
 ```

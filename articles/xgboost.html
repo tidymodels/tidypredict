@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -108,7 +85,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>XGBoost models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/xgboost.Rmd" class="external-link"><code>vignettes/xgboost.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/xgboost.Rmd" class="external-link"><code>vignettes/xgboost.Rmd</code></a></small>
       <div class="d-none name"><code>xgboost.Rmd</code></div>
     </div>
 
@@ -164,7 +141,7 @@
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">xgb_bin_data</span> <span class="op">&lt;-</span> <span class="fu">xgboost</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/xgboost/man/xgb.DMatrix.html" class="external-link">xgb.DMatrix</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/pkg/SparseM/man/SparseM.ontology.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">9</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">as.matrix</a></span><span class="op">(</span><span class="va">mtcars</span><span class="op">[</span>, <span class="op">-</span><span class="fl">9</span><span class="op">]</span><span class="op">)</span>,</span>
 <span>  label <span class="op">=</span> <span class="va">mtcars</span><span class="op">$</span><span class="va">am</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -178,62 +155,61 @@
 <p>Create the R formula</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 1/(1 + exp(-(case_when(wt &lt; 3.18999993801117 ~ case_when(qsec &lt; </span></span>
-<span><span class="co">#&gt;     19.4399995803833 ~ 0.428571463, .default = 0), .default = -0.436363667) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.14999997615814 ~ 0.311573088, .default = case_when(hp &lt; </span></span>
-<span><span class="co">#&gt;         229.999992370605 ~ -0.392053694, .default = -0.0240745768)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.355945677, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.14999997615814 ~ 0.325712085, .default = -0.0384863913)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.309683114, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.14999997615814 ~ 0.283893973, .default = -0.032039877)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.275577009, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.14999997615814 ~ 0.252453178, .default = -0.0266750772)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.248323873, .default = case_when(qsec &lt; </span></span>
-<span><span class="co">#&gt;         17.0499982833862 ~ 0.261978835, .default = -0.00959526002)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.225384533, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.14999997615814 ~ 0.218285918, .default = -0.0373593047)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.205454513, .default = case_when(qsec &lt; </span></span>
-<span><span class="co">#&gt;         18.899998664856 ~ 0.196076646, .default = -0.0544253439)) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.14999997615814 ~ 0.149246693, .default = case_when(qsec &lt; </span></span>
-<span><span class="co">#&gt;         17.4199991226196 ~ 0.0354709327, .default = -0.226075932)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.184417158, .default = case_when(wt &lt; </span></span>
-<span><span class="co">#&gt;         3.14999997615814 ~ 0.176768288, .default = -0.0237750355)) + </span></span>
-<span><span class="co">#&gt;     case_when(gear &lt; 3.99999988079071 ~ -0.168993726, .default = case_when(qsec &lt; </span></span>
-<span><span class="co">#&gt;         18.6099996566772 ~ 0.155569643, .default = -0.0325752236)) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.14999997615814 ~ 0.119126029, .default = -0.105012275) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 17.2999982833862 ~ 0.117254697, .default = -0.0994235724) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.097100094, .default = -0.10567718) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0824323222, .default = -0.091120176) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 17.5999994277954 ~ 0.0854752287, .default = -0.0764453933) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0749477893, .default = -0.0799863264) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 17.8199987411499 ~ 0.0728750378, .default = -0.0646049976) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0682478622, .default = -0.0711427554) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0579533465, .default = -0.0613371208) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.2999982833862 ~ 0.0595484748, .default = -0.0546668135) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0535288528, .default = -0.0558333211) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0454574414, .default = -0.048143398) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5999994277954 ~ 0.0422042683, .default = -0.0454404354) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0420555808, .default = -0.0449385941) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5999994277954 ~ 0.0393446013, .default = -0.0425945036) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0391179025, .default = -0.0420661867) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0304145869, .default = -0.031833414) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0362136625, .default = -0.038949281) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0295153651, .default = -0.0307046026) + </span></span>
-<span><span class="co">#&gt;     case_when(drat &lt; 3.84999978542328 ~ -0.0306891855, .default = 0.0288283136) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0271221269, .default = -0.0281750448) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0228891298, .default = -0.0238814205) + </span></span>
-<span><span class="co">#&gt;     case_when(drat &lt; 3.84999978542328 ~ -0.0296511576, .default = 0.0280048084) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0214707125, .default = -0.0224219449) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0181306079, .default = -0.0190209728) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0379650332, .default = -0.0395050682) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0194106717, .default = -0.0202215631) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0164139606, .default = -0.0171694476) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.013879573, .default = -0.0145772668) + </span></span>
-<span><span class="co">#&gt;     case_when(qsec &lt; 18.5199995040894 ~ 0.0117362784, .default = -0.0123759825) + </span></span>
-<span><span class="co">#&gt;     case_when(wt &lt; 3.18999993801117 ~ 0.0388614088, .default = -0.0400568396) + </span></span>
+<span><span class="co">#&gt; 1 - 1/(1 + exp(case_when(wt &lt; 3.19000006 ~ case_when(qsec &lt; 19.4400005 ~ </span></span>
+<span><span class="co">#&gt;     0.428571463, .default = 0), .default = -0.436363667) + case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;     3.1500001 ~ 0.311573088, .default = case_when(hp &lt; 230 ~ </span></span>
+<span><span class="co">#&gt;     -0.392053694, .default = -0.0240745768)) + case_when(gear &lt; </span></span>
+<span><span class="co">#&gt;     4 ~ -0.355945677, .default = case_when(wt &lt; 3.1500001 ~ 0.325712085, </span></span>
+<span><span class="co">#&gt;     .default = -0.0384863913)) + case_when(gear &lt; 4 ~ -0.309683114, </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt; 3.1500001 ~ 0.283893973, .default = -0.032039877)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.275577009, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.1500001 ~ 0.252453178, .default = -0.0266750772)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.248323873, .default = case_when(qsec &lt; </span></span>
+<span><span class="co">#&gt;         17.0499992 ~ 0.261978835, .default = -0.00959526002)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.225384533, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.1500001 ~ 0.218285918, .default = -0.0373593047)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.205454513, .default = case_when(qsec &lt; </span></span>
+<span><span class="co">#&gt;         18.8999996 ~ 0.196076646, .default = -0.0544253439)) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.1500001 ~ 0.149246693, .default = case_when(qsec &lt; </span></span>
+<span><span class="co">#&gt;         17.4200001 ~ 0.0354709327, .default = -0.226075932)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.184417158, .default = case_when(wt &lt; </span></span>
+<span><span class="co">#&gt;         3.1500001 ~ 0.176768288, .default = -0.0237750355)) + </span></span>
+<span><span class="co">#&gt;     case_when(gear &lt; 4 ~ -0.168993726, .default = case_when(qsec &lt; </span></span>
+<span><span class="co">#&gt;         18.6100006 ~ 0.155569643, .default = -0.0325752236)) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.1500001 ~ 0.119126029, .default = -0.105012275) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 17.2999992 ~ 0.117254697, .default = -0.0994235724) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.097100094, .default = -0.10567718) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0824323222, .default = -0.091120176) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 17.6000004 ~ 0.0854752287, .default = -0.0764453933) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0749477893, .default = -0.0799863264) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 17.8199997 ~ 0.0728750378, .default = -0.0646049976) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0682478622, .default = -0.0711427554) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0579533465, .default = -0.0613371208) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.2999992 ~ 0.0595484748, .default = -0.0546668135) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0535288528, .default = -0.0558333211) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0454574414, .default = -0.048143398) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.6000004 ~ 0.0422042683, .default = -0.0454404354) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0420555808, .default = -0.0449385941) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.6000004 ~ 0.0393446013, .default = -0.0425945036) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0391179025, .default = -0.0420661867) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0304145869, .default = -0.031833414) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0362136625, .default = -0.038949281) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0295153651, .default = -0.0307046026) + </span></span>
+<span><span class="co">#&gt;     case_when(drat &lt; 3.8499999 ~ -0.0306891855, .default = 0.0288283136) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0271221269, .default = -0.0281750448) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0228891298, .default = -0.0238814205) + </span></span>
+<span><span class="co">#&gt;     case_when(drat &lt; 3.8499999 ~ -0.0296511576, .default = 0.0280048084) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0214707125, .default = -0.0224219449) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0181306079, .default = -0.0190209728) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0379650332, .default = -0.0395050682) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0194106717, .default = -0.0202215631) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0164139606, .default = -0.0171694476) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.013879573, .default = -0.0145772668) + </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt; 18.5200005 ~ 0.0117362784, .default = -0.0123759825) + </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt; 3.19000006 ~ 0.0388614088, .default = -0.0400568396) + </span></span>
 <span><span class="co">#&gt;     -0.000357544719 + -0.000285989838 + -0.000228823963 + -0.00018303754 + </span></span>
 <span><span class="co">#&gt;     -0.000146419203 + -0.000117138377 + -9.37248842e-05 + -7.49547908e-05 + </span></span>
-<span><span class="co">#&gt;     log(0.5/(1 - 0.5)))))</span></span></code></pre></div>
+<span><span class="co">#&gt;     log(0.5/(1 - 0.5))))</span></span></code></pre></div>
 </li>
 <li>
 <p>Add the prediction to the original table</p>
@@ -256,20 +232,20 @@
 <span><span class="co">#&gt; $ am   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ gear <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ carb <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>2<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>3<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>4<span style="color: #949494;">, </span>1<span style="color: #949494;">, </span>2<span style="color: #949494;">,</span>…</span></span>
-<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98574329<span style="color: #949494;">, </span>0.98574329<span style="color: #949494;">, </span>0.92725081<span style="color: #949494;">, </span>0.01079918<span style="color: #949494;">, </span>0.046325…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ fit  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.98574329<span style="color: #949494;">, </span>0.98574329<span style="color: #949494;">, </span>0.93896617<span style="color: #949494;">, </span>0.01079918<span style="color: #949494;">, </span>0.046325…</span></span></code></pre></div>
 </li>
 <li>
-<p>Confirm that <code>tidypredict</code> results match the model’s
-<code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results. The <code>xg_df</code> argument expects
-the <code>xgb.DMatrix</code> data set.</p>
+<p>Confirm that <code>tidypredict</code> results match to the
+model’s <code><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict()</a></code> results. The <code>xg_df</code> argument
+expects the <code>xgb.DMatrix</code> data set.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_test.html">tidypredict_test</a></span><span class="op">(</span><span class="va">model</span>, <span class="va">mtcars</span>, xg_df <span class="op">=</span> <span class="va">xgb_bin_data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; tidypredict test results</span></span>
 <span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Fitted records above the threshold: 32</span></span>
+<span><span class="co">#&gt; Fitted records above the threshold: 5</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Max difference: 8.00697489422575e-08</span></span></code></pre></div>
+<span><span class="co">#&gt; Max difference: 7.11972936162653e-08</span></span></code></pre></div>
 </li>
 </ul>
 <p>Please be aware that XGBoost converts data into 32-bit floats
@@ -294,7 +270,7 @@ details.</p>
 <span><span class="co">#&gt; tidypredict test results</span></span>
 <span><span class="co">#&gt; Difference threshold: 1e-12</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Fitted records above the threshold: 32</span></span>
+<span><span class="co">#&gt; Fitted records above the threshold: 12</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Max difference: 1.04374733855828e-07</span></span></code></pre></div>
 </div>
@@ -420,7 +396,7 @@ details.</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

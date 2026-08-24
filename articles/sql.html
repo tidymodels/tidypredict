@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -108,7 +85,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Database write-back</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/sql.Rmd" class="external-link"><code>vignettes/sql.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/sql.Rmd" class="external-link"><code>vignettes/sql.Rmd</code></a></small>
       <div class="d-none name"><code>sql.Rmd</code></div>
     </div>
 
@@ -140,8 +117,8 @@ modifications</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dbi.r-dbi.org" class="external-link">DBI</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span></span>
-<span><span class="va">db_flights</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">flights_table</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html" class="external-link">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html" class="external-link">SQLite</a></span><span class="op">(</span><span class="op">)</span>, path <span class="op">=</span> <span class="st">":memory:"</span><span class="op">)</span></span>
+<span><span class="va">db_fligths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html" class="external-link">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">flights_table</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="model-preparation">Model preparation<a class="anchor" aria-label="anchor" href="#model-preparation"></a>
@@ -149,7 +126,7 @@ modifications</p>
 <p>A sample is downloaded from the database for modeling. This example
 already selects the needed variables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">db_flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">dep_delay</span>, <span class="va">hour</span>, <span class="va">distance</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">1000</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html" class="external-link">collect</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
@@ -179,7 +156,7 @@ automated script.</p>
 <div class="section level2">
 <h2 id="scenario-1---update-scores">Scenario 1 - Update scores<a class="anchor" aria-label="anchor" href="#scenario-1---update-scores"></a>
 </h2>
-<p>In this scenario, the table that supplies the term values is also the
+<p>In this scenario, The table that supplies the term values is also the
 recipient of the new score. This is done by updating a specific field in
 the table. For this example, the field is called
 <code>current_score</code>. The following SQL UPDATE statement should
@@ -190,7 +167,7 @@ work in most databases:</p>
 <span><span class="va">update_statement</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dbplyr.tidyverse.org/reference/build_sql.html" class="external-link">build_sql</a></span><span class="op">(</span><span class="st">"UPDATE flights_table SET current_score  = "</span>, <span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">model</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span>, con <span class="op">=</span> <span class="va">con</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">update_statement</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span></code></pre></div>
 <p>This statement can be then passed on to the database team, via
 documentation or an automated process. In cases where the analyst has
 the responsibility to run the new SQL statement, or if R is being used
@@ -198,17 +175,17 @@ to automate the scoring, the next line can be used:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbSendQuery.html" class="external-link">dbSendQuery</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">update_statement</span><span class="op">)</span></span>
 <span><span class="co">#&gt; &lt;SQLiteResult&gt;</span></span>
-<span><span class="co">#&gt;   SQL  UPDATE flights_table SET current_score  = (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span>
+<span><span class="co">#&gt;   SQL  UPDATE flights_table SET current_score  = (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568)</span></span>
 <span><span class="co">#&gt;   ROWS Fetched: 0 [complete]</span></span>
 <span><span class="co">#&gt;        Changed: 336776</span></span></code></pre></div>
 <p>Here is a sample of the newly populated field:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">db_flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">current_score</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Closing open result set, pending rows</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 1</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.53.3 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.53.3 []</span></span></span>
 <span><span class="co">#&gt;    current_score</span></span>
 <span><span class="co">#&gt;            <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>       -<span style="color: #BB0000;">0.969</span> </span></span>
@@ -223,13 +200,13 @@ to automate the scoring, the next line can be used:</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>        2.47</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="scenario-2---append-new-scores">Scenario 2 - Append new scores<a class="anchor" aria-label="anchor" href="#scenario-2---append-new-scores"></a>
+<h2 id="scenario-2--append-new-scores">Scenario 2- Append new scores<a class="anchor" aria-label="anchor" href="#scenario-2--append-new-scores"></a>
 </h2>
 <p>There may be the need to retain not only the new score, but when it
 was determined and its history. This is usually possible because the
 source of record possesses a unique key identifier per entity, such as
-transaction ID or customer ID. In the example, <code>flight_id</code> is
-the unique identifier.</p>
+transaction ID or customer ID. In the example, <code>flights_id</code>
+is the unique identifier.</p>
 <p>In this example, the new scores will be stored in a new table called
 <code>daily_scores</code>. The following code is part of the example
 preparation, it creates the table and seeds it with a single row. This
@@ -244,19 +221,20 @@ purposes of this example.</p>
 <span>    date <span class="op">=</span> <span class="st">""</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>The plan is to use a SQL statement that most vendors support, called
-INSERT INTO SELECT. The idea is to use <code>dplyr</code> laziness to
-prepare the data transformation and predictions, but it’s not going to
-be executed until it is parsed into SQL and sent as part of another
-statement. The INSERT INTO SELECT statement allows for the results of a
-query to be saved in a table, and without leaving the database.</p>
+<p>The plan is to use a SQL statement that most vendors support, is
+called INSERT INTO SELECT. The idea is to use <code>dplyr</code>
+laziness to prepare the data transformation and predictions, but it’s
+not going to be executed until is parsed into SQL and sent as part of a
+another statement. The INSERT INTO SELECT statement allows for the
+results of a query to be saved in a table, and without leaving the
+database.</p>
 <p>In this example, predictions are going to be executed for just the
 records in the month of December. The data is filtered, and then
 <code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code> is used to create the new fit
-field. The results are then transformed to match the structure of the
+field. The results are then transformed to match to the structure of the
 new <code>daily_scores</code> table.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">new_predictions</span> <span class="op">&lt;-</span> <span class="va">db_flights</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<code class="sourceCode R"><span><span class="va">new_predictions</span> <span class="op">&lt;-</span> <span class="va">db_fligths</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">month</span> <span class="op">==</span> <span class="fl">12</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="../reference/tidypredict_to_column.html">tidypredict_to_column</a></span><span class="op">(</span><span class="va">model</span>, vars <span class="op">=</span> <span class="st">"score"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
@@ -271,7 +249,7 @@ new <code>daily_scores</code> table.</p>
 <span><span class="co">#&gt; FROM (</span></span>
 <span><span class="co">#&gt;   SELECT</span></span>
 <span><span class="co">#&gt;     `flight_id`,</span></span>
-<span><span class="co">#&gt;     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
+<span><span class="co">#&gt;     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
 <span><span class="co">#&gt;   FROM `flights_table`</span></span>
 <span><span class="co">#&gt;   WHERE (`month` = 12.0)</span></span>
 <span><span class="co">#&gt; ) AS `q01`</span></span></code></pre></div>
@@ -286,7 +264,7 @@ is being used to automate the scoring, the next line can be used:</p>
 <span><span class="co">#&gt; FROM (</span></span>
 <span><span class="co">#&gt;   SELECT</span></span>
 <span><span class="co">#&gt;     `flight_id`,</span></span>
-<span><span class="co">#&gt;     (-3.59844229187029 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
+<span><span class="co">#&gt;     (-3.59844229187028 + (`hour` * 1.38710560882252)) + (`distance` * -0.00307606912118568) AS `score`</span></span>
 <span><span class="co">#&gt;   FROM `flights_table`</span></span>
 <span><span class="co">#&gt;   WHERE (`month` = 12.0)</span></span>
 <span><span class="co">#&gt; ) AS `q01`</span></span>
@@ -295,7 +273,7 @@ is being used to automate the scoring, the next line can be used:</p>
 <p>A simple table join can be used to confirm that the new update
 worked. For real life scenarios, a more sophisticated query should be
 performed in order to only get the latest score. For this example, we
-simply filter on the same date we inserted.</p>
+simple filter on the same date we inserted</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"daily_scores"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html" class="external-link">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"flights_table"</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"flight_id"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -303,7 +281,7 @@ simply filter on the same date we inserted.</p>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">dep_delay</span>, <span class="va">hour</span>, <span class="va">distance</span>, <span class="va">score</span>, <span class="va">date</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning: Closing open result set, pending rows</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A query:  ?? x 5</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.53.3 [:memory:]</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Database: sqlite 3.53.3 []</span></span></span>
 <span><span class="co">#&gt;    dep_delay  hour distance   score date      </span></span>
 <span><span class="co">#&gt;        <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>        14    23     <span style="text-decoration: underline;">1</span>617 23.3    01/01/2018</span></span>
@@ -327,7 +305,7 @@ simply filter on the same date we inserted.</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

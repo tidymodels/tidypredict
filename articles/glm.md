@@ -4,7 +4,7 @@
 
 - Defaults to 0-to-1 predictions for `binomial` family models. That is
   akin to running `predict(model, type = "response")`
-- Only *treatment* contrasts (`contr.treatment`) are supported.
+- Only *treatment* contrast (`contr.treatment`) are supported.
 - `offset` is supported
 - Categorical variables are supported
 - In-line functions in the formulas are **not supported**:
@@ -17,8 +17,6 @@
   [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   &
   [`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
-- The `probit` link is approximated rather than reproduced exactly. See
-  [The probit link](#the-probit-link).
 
 ## How it works
 
@@ -34,10 +32,11 @@ df <- mtcars %>%
 model <- glm(am ~ wt + char_cyl, data = df, family = "binomial")
 ```
 
-It returns a SQL query that contains the coefficients (`model`)
-evaluated against the correct variable or categorical variable value. In
-most cases the resulting SQL is one short `CASE WHEN` statement per
-coefficient. It appends the `offset` field or value, if one is provided.
+It returns a SQL query that contains the coefficients
+(`model$coefficients`) operated against the correct variable or
+categorical variable value. In most cases the resulting SQL is one short
+`CASE WHEN` statement per coefficient. It appends the `offset` field or
+value, if one is provided.
 
 For `binomial` models, the
 [sigmoid](https://en.wikipedia.org/wiki/Sigmoid_function) equation is
@@ -48,12 +47,12 @@ support the exponent function.
 
 library(tidypredict)
 tidypredict_sql(model, dbplyr::simulate_mssql())
-#> <SQL> 1.0 / (1.0 + EXP(-(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366097))))
+#> <SQL> 1.0 - 1.0 / (1.0 + EXP(((20.8527831345691 + ([wt] * -7.85934263583836)) + (CASE WHEN ([char_cyl] = 'cyl6') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl6') THEN 0.0 END * 3.10462643177453)) + (CASE WHEN ([char_cyl] = 'cyl8') THEN 1.0 WHEN NOT ([char_cyl] = 'cyl8') THEN 0.0 END * 5.37942092366098)))
 ```
 
 Alternatively, use
 [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
-if the results are to be used or previewed in `dplyr`.
+if the results are the be used or previewed in `dplyr`.
 
 ``` r
 
@@ -73,61 +72,6 @@ df %>%
 #> Merc 280          3.440     cyl6  0 0.04399324
 ```
 
-## The probit link
-
-Every inverse link `tidypredict` writes is exact, with one exception:
-`probit`. The probit inverse link is the standard normal CDF,
-[`pnorm()`](https://rdrr.io/r/stats/Normal.html), and no SQL backend has
-one, so it is written as the Bowling et al. logistic approximation
-instead:
-
-``` math
-\frac{1}{1 + \exp(-0.07056\, x^3 - 1.5976\, x)}
-```
-
-The same expression is used on both the R and the SQL paths, so a probit
-model is the one place where
-[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
-does not reproduce [`predict()`](https://rdrr.io/r/stats/predict.html)
-to floating-point precision. The approximation’s error is about 0.014%
-of the probability, which works out to roughly 1e-4:
-
-``` r
-
-probit_model <- glm(
-  am ~ wt + mpg,
-  data = mtcars,
-  family = binomial(link = "probit")
-)
-
-max(abs(
-  predict(probit_model, mtcars, type = "response") -
-    rlang::eval_tidy(tidypredict_fit(probit_model), mtcars)
-))
-#> [1] 0.0001389629
-```
-
-That is four orders of magnitude larger than the disagreement any other
-link produces, and larger than
-[`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)’s
-default threshold, so a probit model will be reported as failing:
-
-``` r
-
-tidypredict_test(probit_model)
-#> tidypredict test results
-#> Difference threshold: 1e-12
-#> 
-#> Fitted records above the threshold: 31
-#> 
-#> Max difference: 0.00013896287832874
-```
-
-The difference is the approximation, not a defect in the parsed model.
-If the exact probabilities matter more than a portable formula, pass a
-threshold that reflects the approximation’s error, or use
-[`predict()`](https://rdrr.io/r/stats/predict.html) directly.
-
 ## Under the hood
 
 The parser reads several parts of the `glm` object to tabulate all of
@@ -142,12 +86,11 @@ a given model, that line would not exist.
 pm <- parse_model(model)
 str(pm, 2)
 #> List of 2
-#>  $ general:List of 8
+#>  $ general:List of 7
 #>   ..$ model   : chr "glm"
 #>   ..$ version : num 2
 #>   ..$ type    : chr "regression"
 #>   ..$ residual: int 28
-#>   ..$ sigma2  : num 1
 #>   ..$ family  : chr "binomial"
 #>   ..$ link    : chr "logit"
 #>   ..$ is_glm  : num 1
@@ -161,38 +104,36 @@ str(pm, 2)
 
 The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. All
-categorical variables are evaluated using
+is transformed into a `dplyr`, a.k.a Tidy Eval, formula. All categorical
+variables are operated using
 [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html).
 
 ``` r
 
 tidypredict_fit(model)
-#> 1/(1 + exp(-(20.8527831345691 + (wt * -7.85934263583836) + (ifelse(char_cyl == 
-#>     "cyl6", 1, 0) * 3.10462643177453) + (ifelse(char_cyl == "cyl8", 
-#>     1, 0) * 5.37942092366097))))
+#> 1 - 1/(1 + exp(20.8527831345691 + (wt * -7.85934263583836) + 
+#>     (ifelse(char_cyl == "cyl6", 1, 0) * 3.10462643177453) + (ifelse(char_cyl == 
+#>     "cyl8", 1, 0) * 5.37942092366098)))
 ```
 
-From there, the Tidy Eval formula can be used anywhere it can be
-evaluated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere where it can be
+operated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`, `mutate(df, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to add it to a piped command set
-- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
+- Use `tidypredict_to_column(model)` to a piped command set
+- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
 
-Prediction intervals are not available for `glm` models, so
-[`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
-and
-[`tidypredict_sql_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_sql_interval.md)
-have no `glm` counterpart.
+The same applies to the prediction interval functions.
 
 ## How it performs
 
 Testing the `tidypredict` results is easy. The
 [`tidypredict_test()`](https://tidypredict.tidymodels.org/reference/tidypredict_test.md)
-function automatically uses the `glm` model object’s data frame to
+function automatically uses the `lm` model object’s data frame, to
 compare
-[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+[`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md),
+and
+[`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
 to the results given by
 [`predict()`](https://rdrr.io/r/stats/predict.html)
 
@@ -203,45 +144,4 @@ tidypredict_test(model)
 #> Difference threshold: 1e-12
 #> 
 #>  All results are within the difference threshold
-```
-
-## parsnip
-
-`tidypredict` also supports [`glm()`](https://rdrr.io/r/stats/glm.html)
-model objects fitted via the `parsnip` package, using
-[`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
-with the `"glm"` engine.
-
-``` r
-
-library(parsnip)
-
-parsnip_model <- linear_reg() %>%
-  set_engine("glm") %>%
-  fit(am ~ wt + cyl, data = mtcars)
-
-tidypredict_fit(parsnip_model)
-#> 1.5203311478662 + (wt * -0.3729886164835) + (cyl * 0.0138854914772273)
-```
-
-## LiblineaR
-
-Binary logistic regression models fitted with
-[`LiblineaR::LiblineaR()`](https://rdrr.io/pkg/LiblineaR/man/LiblineaR.html)
-are also supported, including
-[`logistic_reg()`](https://parsnip.tidymodels.org/reference/logistic_reg.html)
-models fitted via `parsnip` with the `"LiblineaR"` engine. As with
-[`glm()`](https://rdrr.io/r/stats/glm.html) binomial models, predictions
-are on the 0-to-1 probability scale for the second factor level of the
-outcome.
-
-``` r
-
-liblinear_model <- logistic_reg(penalty = 0.1) %>%
-  set_engine("LiblineaR") %>%
-  fit(factor(am) ~ mpg + cyl, data = mtcars)
-
-tidypredict_fit(liblinear_model)
-#> 1/(1 + exp(-(-1.78560849993735 + (mpg * 0.166363458887311) + 
-#>     (cyl * -0.324861381084945))))
 ```

@@ -51,3 +51,5 @@ generate_tree_node(node, calc_mode = "")
     is used then `is_intercept == 1`.
 
   - `is_intercept`integer, takes values `0` and `1`.\`
+
+  @keywords internal

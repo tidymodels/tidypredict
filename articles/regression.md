@@ -1,11 +1,5 @@
 # Create a regression spec - version 2
 
-This article documents the version 2 parsed model spec for regression
-models. Version 3 is the current format, and tidypredict still reads
-version 2 models for backwards compatibility. See [tree
-internals](https://tidypredict.tidymodels.org/articles/tree-internals.md)
-for what changed.
-
 | Level_1 | Level_2 | Level_3 | Level_4 | Level_5 | Description | Required | Example |
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | general |  |  |  |  | Top level for general info about the model | Yes |  |

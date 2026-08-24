@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -108,7 +85,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Random Forest</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/rf.Rmd" class="external-link"><code>vignettes/rf.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/rf.Rmd" class="external-link"><code>vignettes/rf.Rmd</code></a></small>
       <div class="d-none name"><code>rf.Rmd</code></div>
     </div>
 
@@ -178,54 +155,49 @@ field.</p>
 <span><span class="co">#&gt; 5             8              9        hp      65.500     -3   31.88571</span></span>
 <span><span class="co">#&gt; 6            10             11        wt       3.295     -3   21.38333</span></span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a
-<code>dplyr</code>, a.k.a. Tidy Eval, formula. Each decision tree
-becomes one <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement, which are then
+<code>dplyr</code>, a.k.a Tidy Eval, formula. Each decision tree becomes
+one <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement, which are then
 combined.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ifelse(is.na(cyl) | is.na(disp) | is.na(hp) | is.na(drat) | is.na(wt) | </span></span>
-<span><span class="co">#&gt;     is.na(qsec) | is.na(vs) | is.na(am) | is.na(gear) | is.na(carb), </span></span>
-<span><span class="co">#&gt;     NA_real_, (case_when(carb &lt;= 1.5 ~ case_when(gear &lt;= 3.5 ~ </span></span>
-<span><span class="co">#&gt;         18.1, .default = case_when(hp &lt;= 65.5 ~ 33.9, .default = case_when(qsec &lt;= </span></span>
-<span><span class="co">#&gt;         19.185 ~ 27.3, .default = 32.4))), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;         221.7 ~ case_when(wt &lt;= 3.295 ~ 21.82, .default = 19.2), </span></span>
-<span><span class="co">#&gt;         .default = case_when(wt &lt;= 4.66 ~ case_when(qsec &lt;= 16.96 ~ </span></span>
-<span><span class="co">#&gt;             14.94, .default = case_when(hp &lt;= 162.5 ~ 15.2, .default = case_when(carb &lt;= </span></span>
-<span><span class="co">#&gt;             2.5 ~ 19.2, .default = 16.34))), .default = 10.4))) + </span></span>
-<span><span class="co">#&gt;         case_when(hp &lt;= 95 ~ case_when(hp &lt;= 65.5 ~ 31.5666666666667, </span></span>
-<span><span class="co">#&gt;             .default = case_when(wt &lt;= 2.23 ~ 26.325, .default = 22.8)), </span></span>
-<span><span class="co">#&gt;             .default = case_when(hp &lt;= 190 ~ case_when(drat &lt;= </span></span>
-<span><span class="co">#&gt;                 3.385 ~ case_when(hp &lt;= 130 ~ 19.2, .default = 17.025), </span></span>
-<span><span class="co">#&gt;                 .default = case_when(gear &lt;= 4.5 ~ case_when(vs &lt;= </span></span>
-<span><span class="co">#&gt;                   0.5 ~ 21, .default = 21.5), .default = 19.7)), </span></span>
-<span><span class="co">#&gt;                 .default = case_when(qsec &lt;= 17.62 ~ 14.325, </span></span>
-<span><span class="co">#&gt;                   .default = 10.4))) + case_when(disp &lt;= 142.9 ~ </span></span>
-<span><span class="co">#&gt;         case_when(qsec &lt;= 18.755 ~ 22.8, .default = 28.74), .default = case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;         3.49 ~ case_when(disp &lt;= 163.8 ~ 20.1333333333333, .default = case_when(gear &lt;= </span></span>
-<span><span class="co">#&gt;         3.5 ~ 19.2, .default = 17.4)), .default = case_when(qsec &lt;= </span></span>
-<span><span class="co">#&gt;         17.71 ~ case_when(hp &lt;= 212.5 ~ case_when(drat &lt;= 2.915 ~ </span></span>
-<span><span class="co">#&gt;         15.5, .default = 18.25), .default = case_when(carb &lt;= </span></span>
-<span><span class="co">#&gt;         6 ~ 13.7, .default = 15)), .default = 10.4))) + case_when(am &lt;= </span></span>
-<span><span class="co">#&gt;         0.5 ~ case_when(cyl &lt;= 5 ~ 22.55, .default = case_when(hp &lt;= </span></span>
-<span><span class="co">#&gt;         192.5 ~ case_when(hp &lt;= 136.5 ~ 18.5, .default = case_when(drat &lt;= </span></span>
-<span><span class="co">#&gt;         3.11 ~ 17.075, .default = 17.3)), .default = 13.84)), </span></span>
-<span><span class="co">#&gt;         .default = case_when(wt &lt;= 2.2775 ~ 29.78, .default = 18.42)) + </span></span>
-<span><span class="co">#&gt;         case_when(hp &lt;= 116.5 ~ case_when(cyl &lt;= 5 ~ case_when(drat &lt;= </span></span>
-<span><span class="co">#&gt;             4.165 ~ case_when(hp &lt;= 77.5 ~ 24.4, .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;             114.05 ~ 22.8, .default = 21.7)), .default = 32.15), </span></span>
-<span><span class="co">#&gt;             .default = 21.1), .default = case_when(qsec &lt;= 18.14 ~ </span></span>
-<span><span class="co">#&gt;             case_when(hp &lt;= 192.5 ~ case_when(disp &lt;= 337.9 ~ </span></span>
-<span><span class="co">#&gt;                 16.76, .default = 19.2), .default = case_when(drat &lt;= </span></span>
-<span><span class="co">#&gt;                 3.105 ~ 10.4, .default = 13.975)), .default = 18.2666666666667)))/5)</span></span></code></pre></div>
-<p>From there, the Tidy Eval formula can be used anywhere it can be
-evaluated. <code>tidypredict</code> provides three paths:</p>
+<span><span class="co">#&gt; (case_when(carb &lt;= 1.5 ~ case_when(gear &lt;= 3.5 ~ 18.1, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     65.5 ~ 33.9, .default = case_when(qsec &lt;= 19.185 ~ 27.3, </span></span>
+<span><span class="co">#&gt;     .default = 32.4))), .default = case_when(disp &lt;= 221.7 ~ </span></span>
+<span><span class="co">#&gt;     case_when(wt &lt;= 3.295 ~ 21.82, .default = 19.2), .default = case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     4.66 ~ case_when(qsec &lt;= 16.96 ~ 14.94, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     162.5 ~ 15.2, .default = case_when(carb &lt;= 2.5 ~ 19.2, .default = 16.34))), </span></span>
+<span><span class="co">#&gt;     .default = 10.4))) + case_when(hp &lt;= 95 ~ case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     65.5 ~ 31.5666666666667, .default = case_when(wt &lt;= 2.23 ~ </span></span>
+<span><span class="co">#&gt;     26.325, .default = 22.8)), .default = case_when(hp &lt;= 190 ~ </span></span>
+<span><span class="co">#&gt;     case_when(drat &lt;= 3.385 ~ case_when(hp &lt;= 130 ~ 19.2, .default = 17.025), </span></span>
+<span><span class="co">#&gt;         .default = case_when(gear &lt;= 4.5 ~ case_when(vs &lt;= 0.5 ~ </span></span>
+<span><span class="co">#&gt;             21, .default = 21.5), .default = 19.7)), .default = case_when(qsec &lt;= </span></span>
+<span><span class="co">#&gt;     17.62 ~ 14.325, .default = 10.4))) + case_when(disp &lt;= 142.9 ~ </span></span>
+<span><span class="co">#&gt;     case_when(qsec &lt;= 18.755 ~ 22.8, .default = 28.74), .default = case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.49 ~ case_when(disp &lt;= 163.8 ~ 20.1333333333333, .default = case_when(gear &lt;= </span></span>
+<span><span class="co">#&gt;     3.5 ~ 19.2, .default = 17.4)), .default = case_when(qsec &lt;= </span></span>
+<span><span class="co">#&gt;     17.71 ~ case_when(hp &lt;= 212.5 ~ case_when(drat &lt;= 2.915 ~ </span></span>
+<span><span class="co">#&gt;     15.5, .default = 18.25), .default = case_when(carb &lt;= 6 ~ </span></span>
+<span><span class="co">#&gt;     13.7, .default = 15)), .default = 10.4))) + case_when(am &lt;= </span></span>
+<span><span class="co">#&gt;     0.5 ~ case_when(cyl &lt;= 5 ~ 22.55, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     192.5 ~ case_when(hp &lt;= 136.5 ~ 18.5, .default = case_when(drat &lt;= </span></span>
+<span><span class="co">#&gt;     3.11 ~ 17.075, .default = 17.3)), .default = 13.84)), .default = case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.2775 ~ 29.78, .default = 18.42)) + case_when(hp &lt;= 116.5 ~ </span></span>
+<span><span class="co">#&gt;     case_when(cyl &lt;= 5 ~ case_when(drat &lt;= 4.165 ~ case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;         77.5 ~ 24.4, .default = case_when(disp &lt;= 114.05 ~ 22.8, </span></span>
+<span><span class="co">#&gt;         .default = 21.7)), .default = 32.15), .default = 21.1), </span></span>
+<span><span class="co">#&gt;     .default = case_when(qsec &lt;= 18.14 ~ case_when(hp &lt;= 192.5 ~ </span></span>
+<span><span class="co">#&gt;         case_when(disp &lt;= 337.9 ~ 16.76, .default = 19.2), .default = case_when(drat &lt;= </span></span>
+<span><span class="co">#&gt;         3.105 ~ 10.4, .default = 13.975)), .default = 18.2666666666667)))/5</span></span></code></pre></div>
+<p>From there, the Tidy Eval formula can be used anywhere where it can
+be operated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>,
-<code>mutate(mtcars, !! tidypredict_fit(model))</code>
+<code>mutate(iris, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code>tidypredict_to_column(model)</code> to add it to a piped
-command set</li>
-<li>Use <code>tidypredict_sql(model, con)</code> to retrieve the SQL
+<li>Use <code>tidypredict_to_column(model)</code> to a piped command
+set</li>
+<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL
 statement</li>
 </ul>
 </div>
@@ -242,44 +214,39 @@ model objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ifelse(is.na(cyl) | is.na(disp) | is.na(hp) | is.na(drat) | is.na(wt) | </span></span>
-<span><span class="co">#&gt;     is.na(qsec) | is.na(vs) | is.na(am) | is.na(gear) | is.na(carb), </span></span>
-<span><span class="co">#&gt;     NA_real_, (case_when(disp &lt;= 107.6 ~ case_when(wt &lt;= 2.0675 ~ </span></span>
-<span><span class="co">#&gt;         30.5, .default = 32.4), .default = case_when(wt &lt;= 3.16 ~ </span></span>
-<span><span class="co">#&gt;         case_when(drat &lt;= 4.175 ~ case_when(hp &lt;= 96 ~ 22.8, </span></span>
-<span><span class="co">#&gt;             .default = 20.925), .default = 26), .default = case_when(cyl &lt;= </span></span>
-<span><span class="co">#&gt;         7 ~ case_when(qsec &lt;= 18.6 ~ 19.2, .default = 17.9), </span></span>
-<span><span class="co">#&gt;         .default = case_when(hp &lt;= 177.5 ~ case_when(wt &lt;= 3.4375 ~ </span></span>
-<span><span class="co">#&gt;             15.2, .default = case_when(drat &lt;= 2.92 ~ 15.5, .default = 18.8)), </span></span>
-<span><span class="co">#&gt;             .default = case_when(drat &lt;= 3.14 ~ 16.55, .default = 15.05))))) + </span></span>
-<span><span class="co">#&gt;         case_when(hp &lt;= 79.5 ~ 29.8, .default = case_when(cyl &lt;= </span></span>
-<span><span class="co">#&gt;             7 ~ case_when(disp &lt;= 142.9 ~ 22.125, .default = case_when(hp &lt;= </span></span>
-<span><span class="co">#&gt;             116.5 ~ 21.1333333333333, .default = case_when(qsec &lt;= </span></span>
-<span><span class="co">#&gt;             18.6 ~ 19.5, .default = 17.8))), .default = case_when(disp &lt;= </span></span>
-<span><span class="co">#&gt;             456 ~ case_when(drat &lt;= 3.115 ~ case_when(drat &lt;= </span></span>
-<span><span class="co">#&gt;             3.075 ~ 15.725, .default = 19.2), .default = 15.34), </span></span>
-<span><span class="co">#&gt;             .default = 10.4))) + case_when(drat &lt;= 3.75 ~ case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;         3.3125 ~ 22.05, .default = case_when(drat &lt;= 3.035 ~ </span></span>
-<span><span class="co">#&gt;         10.4, .default = case_when(carb &lt;= 2.5 ~ 16.3666666666667, </span></span>
-<span><span class="co">#&gt;         .default = case_when(hp &lt;= 290 ~ case_when(disp &lt;= 395 ~ </span></span>
-<span><span class="co">#&gt;             13.68, .default = 14.7), .default = 15)))), .default = case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;         2.23 ~ 29.6, .default = case_when(gear &lt;= 4.5 ~ case_when(vs &lt;= </span></span>
-<span><span class="co">#&gt;         0.5 ~ 21, .default = case_when(qsec &lt;= 0 ~ 24.4, .default = 22.8)), </span></span>
-<span><span class="co">#&gt;         .default = 15.8))) + case_when(cyl &lt;= 5 ~ case_when(wt &lt;= </span></span>
-<span><span class="co">#&gt;         2.26 ~ case_when(qsec &lt;= 16.8 ~ 26, .default = 31.5), </span></span>
-<span><span class="co">#&gt;         .default = 22.56), .default = case_when(disp &lt;= 266.9 ~ </span></span>
-<span><span class="co">#&gt;         case_when(qsec &lt;= 19.83 ~ case_when(hp &lt;= 116.5 ~ 21.08, </span></span>
-<span><span class="co">#&gt;             .default = 19.2), .default = 18.1), .default = case_when(qsec &lt;= </span></span>
-<span><span class="co">#&gt;         17.71 ~ case_when(drat &lt;= 3.19 ~ case_when(drat &lt;= 3.075 ~ </span></span>
-<span><span class="co">#&gt;         16.4, .default = 18.95), .default = 15.25), .default = 12.8))) + </span></span>
-<span><span class="co">#&gt;         case_when(hp &lt;= 80.5 ~ 29.9, .default = case_when(carb &lt;= </span></span>
-<span><span class="co">#&gt;             2.5 ~ case_when(gear &lt;= 4.5 ~ case_when(disp &lt;= 182.9 ~ </span></span>
-<span><span class="co">#&gt;             21.7, .default = case_when(wt &lt;= 3.3275 ~ 21.4, .default = case_when(cyl &lt;= </span></span>
-<span><span class="co">#&gt;             7 ~ 18.1, .default = case_when(disp &lt;= 380 ~ 18.7, </span></span>
-<span><span class="co">#&gt;             .default = 19.2)))), .default = 30.4), .default = case_when(hp &lt;= </span></span>
-<span><span class="co">#&gt;             192.5 ~ 15.725, .default = case_when(hp &lt;= 222.5 ~ </span></span>
-<span><span class="co">#&gt;             10.4, .default = case_when(drat &lt;= 3.88 ~ 14.925, </span></span>
-<span><span class="co">#&gt;             .default = 15.8))))))/5)</span></span></code></pre></div>
+<span><span class="co">#&gt; (case_when(disp &lt;= 107.6 ~ case_when(wt &lt;= 2.0675 ~ 30.5, .default = 32.4), </span></span>
+<span><span class="co">#&gt;     .default = case_when(wt &lt;= 3.16 ~ case_when(drat &lt;= 4.175 ~ </span></span>
+<span><span class="co">#&gt;         case_when(hp &lt;= 96 ~ 22.8, .default = 20.925), .default = 26), </span></span>
+<span><span class="co">#&gt;         .default = case_when(cyl &lt;= 7 ~ case_when(qsec &lt;= 18.6 ~ </span></span>
+<span><span class="co">#&gt;             19.2, .default = 17.9), .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;             177.5 ~ case_when(wt &lt;= 3.4375 ~ 15.2, .default = case_when(drat &lt;= </span></span>
+<span><span class="co">#&gt;             2.92 ~ 15.5, .default = 18.8)), .default = case_when(drat &lt;= </span></span>
+<span><span class="co">#&gt;             3.14 ~ 16.55, .default = 15.05))))) + case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     79.5 ~ 29.8, .default = case_when(cyl &lt;= 7 ~ case_when(disp &lt;= </span></span>
+<span><span class="co">#&gt;     142.9 ~ 22.125, .default = case_when(hp &lt;= 116.5 ~ 21.1333333333333, </span></span>
+<span><span class="co">#&gt;     .default = case_when(qsec &lt;= 18.6 ~ 19.5, .default = 17.8))), </span></span>
+<span><span class="co">#&gt;     .default = case_when(disp &lt;= 456 ~ case_when(drat &lt;= 3.115 ~ </span></span>
+<span><span class="co">#&gt;         case_when(drat &lt;= 3.075 ~ 15.725, .default = 19.2), .default = 15.34), </span></span>
+<span><span class="co">#&gt;         .default = 10.4))) + case_when(drat &lt;= 3.75 ~ case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.3125 ~ 22.05, .default = case_when(drat &lt;= 3.035 ~ 10.4, </span></span>
+<span><span class="co">#&gt;     .default = case_when(carb &lt;= 2.5 ~ 16.3666666666667, .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;         290 ~ case_when(disp &lt;= 395 ~ 13.68, .default = 14.7), </span></span>
+<span><span class="co">#&gt;         .default = 15)))), .default = case_when(wt &lt;= 2.23 ~ </span></span>
+<span><span class="co">#&gt;     29.6, .default = case_when(gear &lt;= 4.5 ~ case_when(vs &lt;= </span></span>
+<span><span class="co">#&gt;     0.5 ~ 21, .default = case_when(qsec &lt;= 0 ~ 24.4, .default = 22.8)), </span></span>
+<span><span class="co">#&gt;     .default = 15.8))) + case_when(cyl &lt;= 5 ~ case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     2.26 ~ case_when(qsec &lt;= 16.8 ~ 26, .default = 31.5), .default = 22.56), </span></span>
+<span><span class="co">#&gt;     .default = case_when(disp &lt;= 266.9 ~ case_when(qsec &lt;= 19.83 ~ </span></span>
+<span><span class="co">#&gt;         case_when(hp &lt;= 116.5 ~ 21.08, .default = 19.2), .default = 18.1), </span></span>
+<span><span class="co">#&gt;         .default = case_when(qsec &lt;= 17.71 ~ case_when(drat &lt;= </span></span>
+<span><span class="co">#&gt;             3.19 ~ case_when(drat &lt;= 3.075 ~ 16.4, .default = 18.95), </span></span>
+<span><span class="co">#&gt;             .default = 15.25), .default = 12.8))) + case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     80.5 ~ 29.9, .default = case_when(carb &lt;= 2.5 ~ case_when(gear &lt;= </span></span>
+<span><span class="co">#&gt;     4.5 ~ case_when(disp &lt;= 182.9 ~ 21.7, .default = case_when(wt &lt;= </span></span>
+<span><span class="co">#&gt;     3.3275 ~ 21.4, .default = case_when(cyl &lt;= 7 ~ 18.1, .default = case_when(disp &lt;= </span></span>
+<span><span class="co">#&gt;     380 ~ 18.7, .default = 19.2)))), .default = 30.4), .default = case_when(hp &lt;= </span></span>
+<span><span class="co">#&gt;     192.5 ~ 15.725, .default = case_when(hp &lt;= 222.5 ~ 10.4, </span></span>
+<span><span class="co">#&gt;     .default = case_when(drat &lt;= 3.88 ~ 14.925, .default = 15.8))))))/5</span></span></code></pre></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
@@ -290,7 +257,7 @@ model objects fitted via the <code>parsnip</code> package.</p>
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,40 +35,17 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
-    <li><hr class="dropdown-divider"></li>
-    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
-    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
-    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
-    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
-    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
-    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
-    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
-    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
-    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
-    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
-    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
-    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
-    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
-    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
-    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
-    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
-    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
-    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
-    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
-    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="active nav-item dropdown">
@@ -108,7 +85,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Save and re-load models</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/save.Rmd" class="external-link"><code>vignettes/save.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/save.Rmd" class="external-link"><code>vignettes/save.Rmd</code></a></small>
       <div class="d-none name"><code>save.Rmd</code></div>
     </div>
 
@@ -119,10 +96,11 @@ first parses the model to extract the needed components to produce the
 prediction. And second, it uses the object with the parsed information
 to produce the R formula. Thanks to this two step process,
 <code>tidypredict</code> does not need to parse the model every time.
-<code>tidypredict</code>’s functions also accept models that have
-already been parsed. Additionally, because the parsed model object is a
-list of basic variables, it is possible to save it in a file. Currently,
-the best file format is YAML.</p>
+<code>tidypredict</code>’s functions also accept R objects that
+contained already models that have been parsed already. Additionally,
+because the parsed model object is made up of a list made up of basic
+variables, it is possible to save it in a file. Currently, the best file
+format is YAML.</p>
 <p>For this article, we will use the following model:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="op">(</span><span class="va">wt</span> <span class="op">+</span> <span class="va">disp</span><span class="op">)</span> <span class="op">*</span> <span class="va">cyl</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span></code></pre></div>
@@ -164,38 +142,35 @@ These functions also accept a previously parsed model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsed</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + </span></span>
-<span><span class="co">#&gt;     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + </span></span>
-<span><span class="co">#&gt;     (disp * cyl * 0.00540618405824794)</span></span></code></pre></div>
+<span><span class="co">#&gt;     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938274) + </span></span>
+<span><span class="co">#&gt;     (disp * cyl * 0.00540618405824793)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="saving-the-model">Saving the model<a class="anchor" aria-label="anchor" href="#saving-the-model"></a>
 </h2>
-<p>Use <code><a href="../reference/tidypredict_save.html">tidypredict_save()</a></code> to write the model to a YAML
-file.</p>
+<p>Saving the model is quite easy, use the package such as
+<code>yaml</code> to write the model object as a YAML file. Any format
+that can persist a ragged list object should work as well.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_save.html">tidypredict_save</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="st">"my_model.yml"</span><span class="op">)</span></span></code></pre></div>
-<p>It accepts a fitted model as well, parsing it for you:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_save.html">tidypredict_save</a></span><span class="op">(</span><span class="va">model</span>, <span class="st">"my_model.yml"</span><span class="op">)</span></span></code></pre></div>
-<p>Write the file with <code><a href="../reference/tidypredict_save.html">tidypredict_save()</a></code> rather than
-calling <code><a href="https://yaml.r-lib.org/reference/write_yaml.html" class="external-link">yaml::write_yaml()</a></code> yourself. <code>yaml</code>
-writes numbers with 7 significant digits by default, which is not enough
-to store a split threshold exactly. A tree model saved that way can send
-rows down a different branch than the model it came from, silently and
-with no warning.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yaml.r-lib.org" class="external-link">yaml</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://yaml.r-lib.org/reference/write_yaml.html" class="external-link">write_yaml</a></span><span class="op">(</span><span class="va">parsed</span>, <span class="st">"my_model.yml"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="re-load-the-model">Re-load the model<a class="anchor" aria-label="anchor" href="#re-load-the-model"></a>
 </h2>
-<p>In a new R session, read the file back with
-<code><a href="../reference/tidypredict_save.html">tidypredict_load()</a></code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>In a new R session, we can read the YAML file into our
+environment.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidypredict.tidymodels.org">tidypredict</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://yaml.r-lib.org" class="external-link">yaml</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/tidypredict_save.html">tidypredict_load</a></span><span class="op">(</span><span class="st">"my_model.yml"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://yaml.r-lib.org/reference/read_yaml.html" class="external-link">read_yaml</a></span><span class="op">(</span><span class="st">"my_model"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">loaded_model</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_parsed_model.html">as_parsed_model</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span></code></pre></div>
 <p>The preview of the file looks exactly as the preview of the original
 parsed model.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fl">2</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 2</span></span>
 <span><span class="co">#&gt;  $ general:List of 6</span></span>
@@ -215,16 +190,15 @@ parsed model.</p>
 <span><span class="co">#&gt;  - attr(*, "class")= chr [1:3] "parsed_model" "pm_regression" "list"</span></span></code></pre></div>
 <p><code>tidypredict</code> is able to read the new R variable and use
 it to create the formula.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; 53.5256637443325 + (wt * -6.38154597431605) + (disp * -0.0458426921825963) + </span></span>
-<span><span class="co">#&gt;     (cyl * -3.63025567939439) + (wt * cyl * 0.535604359938273) + </span></span>
-<span><span class="co">#&gt;     (disp * cyl * 0.00540618405824794)</span></span></code></pre></div>
+<span><span class="co">#&gt; 53.5256637 + (wt * -6.381546) + (disp * -0.0458427) + (cyl * </span></span>
+<span><span class="co">#&gt;     -3.6302557) + (wt * cyl * 0.5356044) + (disp * cyl * 0.0054062)</span></span></code></pre></div>
 <p>The same variable can be used with other <code>tidypredict</code>
 functions, such as <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code></p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_sql.html">tidypredict_sql</a></span><span class="op">(</span><span class="va">loaded_model</span>, <span class="fu">dbplyr</span><span class="fu">::</span><span class="fu"><a href="https://dbplyr.tidyverse.org/reference/backend-odbc.html" class="external-link">simulate_odbc</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; &lt;SQL&gt; ((((53.5256637443325 + ("wt" * -6.38154597431605)) + ("disp" * -0.0458426921825963)) + ("cyl" * -3.63025567939439)) + (("wt" * "cyl") * 0.535604359938273)) + (("disp" * "cyl") * 0.00540618405824794)</span></span></code></pre></div>
+<span><span class="co">#&gt; &lt;SQL&gt; ((((53.5256637 + ("wt" * -6.381546)) + ("disp" * -0.0458427)) + ("cyl" * -3.6302557)) + (("wt" * "cyl") * 0.5356044)) + (("disp" * "cyl") * 0.0054062)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="broom">
@@ -232,7 +206,7 @@ functions, such as <code><a href="../reference/tidypredict_sql.html">tidypredict
 </h2>
 <p>The <code>parsed_model</code> object integrates with
 <code><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy()</a></code> from <code>broom</code>.</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://generics.r-lib.org/reference/tidy.html" class="external-link">tidy</a></span><span class="op">(</span><span class="va">loaded_model</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
 <span><span class="co">#&gt;   term        estimate</span></span>
@@ -253,7 +227,7 @@ functions, such as <code><a href="../reference/tidypredict_sql.html">tidypredict
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

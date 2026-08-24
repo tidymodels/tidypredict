@@ -1,4 +1,4 @@
 # License
 
-    YEAR: 2026
+    YEAR: 2021
     COPYRIGHT HOLDER: tidypredict authors

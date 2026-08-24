@@ -43,7 +43,8 @@ The `$general$version` field indicates the parsed model format:
   [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html).
 
 - **Version 3**: Current format. Tree models (rpart, ranger,
-  randomForest, xgboost, lightgbm, catboost, partykit) use nested
+  randomForest, xgboost, lightgbm, catboost, partykit, cubist) use
+  nested
   [`case_when()`](https://dplyr.tidyverse.org/reference/case-and-replace-when.html)
   expressions that mirror the tree structure. This produces more
   efficient SQL and R code because conditions are evaluated
@@ -68,18 +69,6 @@ dispatch:
 - `pm_lgb`: LightGBM gradient boosting models
 
 - `pm_catboost`: CatBoost gradient boosting models
-
-- `pm_bart`: BART models
-
-- `pm_naive_bayes`: Naive Bayes models
-
-- `pm_nnet`: Neural network models
-
-- `pm_multiclass_regression`: Multiclass regression models
-
-- `pm_nullmodel_classification`: Null model classification
-
-This list is not exhaustive; new model types are added as support grows.
 
 ## Examples
 
