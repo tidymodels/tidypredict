@@ -240,27 +240,21 @@ tidypredict_test.rpart <- function(
   test_results_numeric(base, te$fit_te, threshold, model$call)
 }
 
-# For {orbital}
-#' Extract classprob trees for rpart models
-#'
-#' For use in orbital package.
-#' @param model An rpart model object
-#' @keywords internal
+# Extractors --------------------------------------------------
+
 #' @export
-.extract_rpart_classprob <- function(model) {
-  if (!inherits(model, "rpart")) {
+tidypredict_class_exprs.rpart <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (x$method != "class") {
     cli::cli_abort(
-      "{.arg model} must be {.cls rpart}, not {.obj_type_friendly {model}}."
+      "Only classification models are supported, not {.code method = {x$method}}."
     )
   }
 
-  if (model$method != "class") {
-    cli::cli_abort(
-      "{.arg model} must be a classification model (method = 'class')."
-    )
-  }
-
-  lapply(rpart_classprob_tree_info(model), generate_nested_case_when_tree)
+  # rpart_classprob_tree_info() is already keyed by outcome level and lapply()
+  # keeps those names, which is what the generic promises.
+  lapply(rpart_classprob_tree_info(x), generate_nested_case_when_tree)
 }
 
 # One tree_info per outcome level, where the node predictions are the class

@@ -299,44 +299,41 @@ tidypredict_fit_randomForest <- function(parsedmodel) {
   expr_mean(generate_case_when_trees(parsedmodel))
 }
 
-# For {orbital} -----------------------------------------------
+# Extractors --------------------------------------------------
 
-#' Extract classification vote trees for randomForest models
-#'
-#' For use in orbital package.
-#' @param model A randomForest model object
-#' @keywords internal
 #' @export
-.extract_rf_classprob <- function(model) {
-  if (!inherits(model, "randomForest")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_class_trees.randomForest <- function(x, ...) {
+  rlang::check_dots_empty()
 
-  # Check if this is a classification model
-  if (is.null(model$classes)) {
+  if (is.null(x$classes)) {
     cli::cli_abort(
       c(
         "Model is not a classification model.",
-        i = "Use {.fn tidypredict_fit} for regression models."
+        i = "Use {.fn tidypredict_trees} for regression models."
       )
     )
   }
 
-  # Get class levels from the model
-  lvls <- model$classes
-  term_labels <- names(model$forest$ncat)
+  lvls <- x$classes
+  term_labels <- names(x$forest$ncat)
 
   # For each class, generate nested case_when expressions for all trees
   res <- list()
   for (lvl in lvls) {
-    tree_exprs <- map(seq_len(model$ntree), function(tree_no) {
-      build_nested_rf_vote_tree(model, tree_no, term_labels, lvl)
+    tree_exprs <- map(seq_len(x$ntree), function(tree_no) {
+      build_nested_rf_vote_tree(x, tree_no, term_labels, lvl)
     })
     res[[lvl]] <- tree_exprs
   }
   res
+}
+
+#' @export
+tidypredict_n_trees.randomForest <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # randomForest stores this as a double.
+  as.integer(x$ntree)
 }
 
 # Build nested case_when for randomForest voting tree
@@ -359,42 +356,31 @@ build_nested_rf_vote_tree <- function(
   )
 }
 
-#' Extract regression trees for randomForest models
-#'
-#' For use in orbital package.
-#' @param model A randomForest model object (regression)
-#' @keywords internal
 #' @export
-.extract_rf_trees <- function(model) {
-  if (!inherits(model, "randomForest")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls randomForest}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_trees.randomForest <- function(x, ...) {
+  rlang::check_dots_empty()
 
-  # Check if this is a classification model
-  if (!is.null(model$classes)) {
+  if (!is.null(x$classes)) {
     cli::cli_abort(
       c(
         "Classification models are not supported.",
-        i = "Use {.fn .extract_rf_classprob} for classification models."
+        i = "Use {.fn tidypredict_class_trees} for classification models."
       )
     )
   }
 
   # The bias correction applies to the forest average, so it cannot be carried
   # by the individual tree expressions returned here.
-  if (!is.null(model$coefs)) {
+  if (!is.null(x$coefs)) {
     cli::cli_abort(
       "Models fitted with {.code corr.bias = TRUE} are not supported."
     )
   }
 
-  n_trees <- model$ntree
-  term_labels <- names(model$forest$ncat)
+  term_labels <- names(x$forest$ncat)
 
-  map(seq_len(n_trees), function(tree_no) {
-    build_nested_rf_tree(model, tree_no, term_labels)
+  map(seq_len(x$ntree), function(tree_no) {
+    build_nested_rf_tree(x, tree_no, term_labels)
   })
 }
 

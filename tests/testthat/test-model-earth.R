@@ -459,16 +459,16 @@ test_that("inverse.gaussian family works (#195)", {
   expect_equal(tidy, native)
 })
 
-# Tests for .extract_earth_multiclass()
+# Tests for tidypredict_class_exprs()
 
-test_that(".extract_earth_multiclass errors on non-earth model", {
+test_that("tidypredict_class_exprs errors on non-earth model", {
   skip_if_not_installed("earth")
   model <- lm(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+  expect_snapshot(error = TRUE, tidypredict_class_exprs(model))
 })
 
-test_that(".extract_earth_multiclass errors on binary model", {
+test_that("tidypredict_class_exprs errors on binary model", {
   skip_if_not_installed("earth")
   suppressWarnings(
     model <- earth::earth(
@@ -478,17 +478,17 @@ test_that(".extract_earth_multiclass errors on binary model", {
     )
   )
 
-  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+  expect_snapshot(error = TRUE, tidypredict_class_exprs(model))
 })
 
-test_that(".extract_earth_multiclass errors on regression model", {
+test_that("tidypredict_class_exprs errors on regression model", {
   skip_if_not_installed("earth")
   model <- earth::earth(mpg ~ ., data = mtcars)
 
-  expect_snapshot(error = TRUE, .extract_earth_multiclass(model))
+  expect_snapshot(error = TRUE, tidypredict_class_exprs(model))
 })
 
-test_that(".extract_earth_multiclass returns correct structure", {
+test_that("tidypredict_class_exprs returns correct structure", {
   skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
@@ -504,15 +504,15 @@ test_that(".extract_earth_multiclass returns correct structure", {
     )
   )
 
-  result <- .extract_earth_multiclass(model)
+  result <- tidypredict_class_exprs(model)
 
   expect_type(result, "list")
   expect_length(result, 3)
   expect_named(result, levels(iris$Species))
-  expect_type(result[[1]], "character")
+  expect_type(result[[1]], "language")
 })
 
-test_that(".extract_earth_multiclass produces correct predictions", {
+test_that("tidypredict_class_exprs produces correct predictions", {
   skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
@@ -528,13 +528,13 @@ test_that(".extract_earth_multiclass produces correct predictions", {
     )
   )
 
-  eqs <- .extract_earth_multiclass(model)
+  eqs <- tidypredict_class_exprs(model)
   n_rows <- nrow(iris)
 
   # Evaluate each expression - earth GLM outputs are already on probability scale
   # (not logits), so we don't apply softmax
   probs <- sapply(eqs, function(eq) {
-    val <- rlang::eval_tidy(rlang::parse_expr(eq), iris)
+    val <- rlang::eval_tidy(eq, iris)
     if (length(val) == 1) rep(val, n_rows) else val
   })
 
@@ -544,7 +544,7 @@ test_that(".extract_earth_multiclass produces correct predictions", {
   expect_equal(unname(probs), unname(native), tolerance = 1e-6)
 })
 
-test_that(".extract_earth_multiclass works with degree > 1", {
+test_that("tidypredict_class_exprs works with degree > 1", {
   skip_if_not_installed("earth")
   skip_if_not(
     exists("contr.earth.response", where = asNamespace("earth")),
@@ -561,7 +561,7 @@ test_that(".extract_earth_multiclass works with degree > 1", {
     )
   )
 
-  result <- .extract_earth_multiclass(model)
+  result <- tidypredict_class_exprs(model)
 
   expect_type(result, "list")
   expect_length(result, 3)

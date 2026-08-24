@@ -35,37 +35,37 @@
       i Only regression models can be converted to tidy formulas.
       i Classification requires a voting mechanism that cannot be expressed as a single formula.
 
-# .extract_rf_classprob errors on non-randomForest model
+# tidypredict_class_trees errors on non-randomForest model
 
     Code
-      .extract_rf_classprob(model)
+      tidypredict_class_trees(model)
     Condition
-      Error in `.extract_rf_classprob()`:
-      ! `model` must be <randomForest>, not a <lm> object.
+      Error in `tidypredict_class_trees()`:
+      ! `tidypredict_class_trees()` is not available for models of class <lm>.
 
-# .extract_rf_classprob errors on regression model
+# tidypredict_class_trees errors on regression model
 
     Code
-      .extract_rf_classprob(model)
+      tidypredict_class_trees(model)
     Condition
-      Error in `.extract_rf_classprob()`:
+      Error in `tidypredict_class_trees()`:
       ! Model is not a classification model.
-      i Use `tidypredict_fit()` for regression models.
+      i Use `tidypredict_trees()` for regression models.
 
-# .extract_rf_trees errors on non-randomForest model
-
-    Code
-      .extract_rf_trees(model)
-    Condition
-      Error in `.extract_rf_trees()`:
-      ! `model` must be <randomForest>, not a <lm> object.
-
-# .extract_rf_trees errors on classification model
+# tidypredict_trees errors on non-randomForest model
 
     Code
-      .extract_rf_trees(model)
+      tidypredict_trees(model)
     Condition
-      Error in `.extract_rf_trees()`:
+      Error in `tidypredict_trees()`:
+      ! `tidypredict_trees()` is not available for models of class <lm>.
+
+# tidypredict_trees errors on classification model
+
+    Code
+      tidypredict_trees(model)
+    Condition
+      Error in `tidypredict_trees()`:
       ! Classification models are not supported.
-      i Use `.extract_rf_classprob()` for classification models.
+      i Use `tidypredict_class_trees()` for classification models.
 

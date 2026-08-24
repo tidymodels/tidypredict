@@ -75,26 +75,27 @@ test_that("formulas produce correct predictions", {
   )
 })
 
-# .extract_partykit_classprob tests ------------------------------------------
+# tidypredict_class_exprs tests ----------------------------------------------
 
-test_that(".extract_partykit_classprob returns list of expressions", {
+test_that("tidypredict_class_exprs returns list of expressions", {
   skip_if_not_installed("partykit")
 
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_partykit_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
 
   expect_type(exprs, "list")
   expect_length(exprs, 3)
-  expect_true(all(vapply(exprs, typeof, character(1)) == "language"))
+  expect_named(exprs, levels(iris$Species))
+  expect_all_equal(vapply(exprs, typeof, character(1)), "language")
 })
 
-test_that(".extract_partykit_classprob results match predict probabilities", {
+test_that("tidypredict_class_exprs results match predict probabilities", {
   skip_if_not_installed("partykit")
 
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_partykit_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
   eval_env <- rlang::new_environment(
     data = as.list(iris),
     parent = asNamespace("dplyr")
@@ -107,10 +108,10 @@ test_that(".extract_partykit_classprob results match predict probabilities", {
   expect_equal(unname(combined), unname(native))
 })
 
-test_that(".extract_partykit_classprob errors on non-party model", {
+test_that("tidypredict_class_exprs errors on non-party model", {
   skip_if_not_installed("partykit")
 
-  expect_snapshot(.extract_partykit_classprob(list()), error = TRUE)
+  expect_snapshot(tidypredict_class_exprs(list()), error = TRUE)
 })
 
 test_that("stump trees (no splits) work correctly (#196)", {
@@ -165,12 +166,12 @@ test_that("tidypredict_fit works for classification", {
   expect_equal(fit_pred, original_pred)
 })
 
-test_that(".extract_partykit_classprob matches original model probabilities", {
+test_that("tidypredict_class_exprs matches original model probabilities", {
   skip_if_not_installed("partykit")
 
   model <- partykit::ctree(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_partykit_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
 
   eval_env <- rlang::new_environment(
     data = as.list(iris),
@@ -455,7 +456,7 @@ test_that("an unused outcome level matches predict()", {
     as.character(predict(model, df, type = "response"))
   )
 
-  exprs <- .extract_partykit_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
   eval_env <- rlang::new_environment(
     data = as.list(df),
     parent = asNamespace("dplyr")

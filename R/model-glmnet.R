@@ -175,22 +175,14 @@ tidypredict_fit.pm_multiclass_regression <- function(model) {
   paste(terms, collapse = " + ")
 }
 
-#' Extract multiclass linear predictors for glmnet models
-#'
-#' For use in orbital package.
-#' @param model A glmnet model object with class "multnet"
-#' @param penalty The penalty value to use for coefficient extraction
-#' @keywords internal
+# Extractors --------------------------------------------------
+
 #' @export
-.extract_glmnet_multiclass <- function(model, penalty = NULL) {
-  if (!inherits(model, "multnet")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls multnet}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_class_exprs.multnet <- function(x, ..., penalty = NULL) {
+  rlang::check_dots_empty()
 
   if (is.null(penalty)) {
-    if (length(model$lambda) != 1) {
+    if (length(x$lambda) != 1) {
       cli::cli_abort(
         c(
           "glmnet model has multiple penalty values.",
@@ -198,18 +190,21 @@ tidypredict_fit.pm_multiclass_regression <- function(model) {
         )
       )
     }
-    penalty <- model$lambda
+    penalty <- x$lambda
   }
 
   # Get coefficients for each class at the specified penalty
-  coefs_list <- stats::coef(model, s = penalty)
+  coefs_list <- stats::coef(x, s = penalty)
   class_names <- names(coefs_list)
 
   # Build linear predictor expression for each class
   eqs <- lapply(coefs_list, function(coef_mat) {
     coef_names <- rownames(coef_mat)
     coef_values <- as.numeric(coef_mat)
-    .build_linear_pred(coef_names, coef_values)
+    # .build_linear_pred() returns a string; the generic promises a language
+    # object. A model with every coefficient zero gives "0", which parses to a
+    # bare numeric, consistent with how stumps are returned elsewhere.
+    str2lang(.build_linear_pred(coef_names, coef_values))
   })
 
   names(eqs) <- class_names

@@ -902,21 +902,20 @@ build_nested_catboost_categorical <- function(split_info, cat_mapping) {
   expr(!!col_name != !!category)
 }
 
-# For {orbital} -----------------------------------------------
+# Extractors --------------------------------------------------
 
-#' Extract processed CatBoost trees
-#'
-#' For use in orbital package.
-#' @param model A CatBoost model object
-#' @keywords internal
 #' @export
-.extract_catboost_trees <- function(model) {
-  if (!inherits(model, "catboost.Model")) {
-    cli::cli_abort(
-      "{.arg model} must be {.cls catboost.Model}, not {.obj_type_friendly {model}}."
-    )
-  }
+tidypredict_trees.catboost.Model <- function(x, ...) {
+  rlang::check_dots_empty()
 
-  parsedmodel <- parse_model(model)
-  extract_catboost_trees_nested(parsedmodel)
+  extract_catboost_trees_nested(parse_model(x))
+}
+
+#' @export
+tidypredict_n_trees.catboost.Model <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # Not `niter`: for multiclass models CatBoost stores one tree per class per
+  # round, so `niter` is the number of rounds rather than the number of trees.
+  length(tidypredict_trees(x))
 }

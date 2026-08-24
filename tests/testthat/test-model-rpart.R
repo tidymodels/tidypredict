@@ -129,24 +129,25 @@ test_that("produced case_when uses .default", {
   expect_match(fit_text, "\\.default")
 })
 
-# .extract_rpart_classprob tests ------------------------------------------
+# tidypredict_class_exprs tests -------------------------------------------
 
-test_that(".extract_rpart_classprob returns list of expressions", {
+test_that("tidypredict_class_exprs returns list of expressions", {
   skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_rpart_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
 
   expect_type(exprs, "list")
   expect_length(exprs, 3)
-  expect_true(all(vapply(exprs, typeof, character(1)) == "language"))
+  expect_named(exprs, levels(iris$Species))
+  expect_all_equal(vapply(exprs, typeof, character(1)), "language")
 })
 
-test_that(".extract_rpart_classprob results match predict probabilities", {
+test_that("tidypredict_class_exprs results match predict probabilities", {
   skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_rpart_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
   eval_env <- rlang::new_environment(
     data = as.list(iris),
     parent = asNamespace("dplyr")
@@ -159,15 +160,15 @@ test_that(".extract_rpart_classprob results match predict probabilities", {
   expect_equal(unname(combined), unname(native))
 })
 
-test_that(".extract_rpart_classprob errors on non-rpart model", {
+test_that("tidypredict_class_exprs errors on non-rpart model", {
   skip_if_not_installed("rpart")
-  expect_snapshot(.extract_rpart_classprob(list()), error = TRUE)
+  expect_snapshot(tidypredict_class_exprs(list()), error = TRUE)
 })
 
-test_that(".extract_rpart_classprob errors on regression model", {
+test_that("tidypredict_class_exprs errors on regression model", {
   skip_if_not_installed("rpart")
   model <- rpart::rpart(mpg ~ cyl + wt, data = mtcars)
-  expect_snapshot(.extract_rpart_classprob(model), error = TRUE)
+  expect_snapshot(tidypredict_class_exprs(model), error = TRUE)
 })
 
 # Nested case_when tests --------------------------------------------------
@@ -194,11 +195,11 @@ test_that("tidypredict_fit works for classification", {
   expect_equal(fit_pred, original_pred)
 })
 
-test_that(".extract_rpart_classprob matches original model probabilities", {
+test_that("tidypredict_class_exprs matches original model probabilities", {
   skip_if_not_installed("rpart")
   model <- rpart::rpart(Species ~ Sepal.Length + Sepal.Width, data = iris)
 
-  exprs <- .extract_rpart_classprob(model)
+  exprs <- tidypredict_class_exprs(model)
 
   eval_env <- rlang::new_environment(
     data = as.list(iris),

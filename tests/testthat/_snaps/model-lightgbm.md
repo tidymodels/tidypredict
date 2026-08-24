@@ -79,11 +79,11 @@
       ! LightGBM models require a matrix for predictions.
       i Pass the prediction matrix via the `xg_df` argument.
 
-# .extract_lgb_trees errors on non-lgb.Booster
+# tidypredict_trees errors on non-lgb.Booster
 
     Code
-      .extract_lgb_trees(list())
+      tidypredict_trees(list())
     Condition
-      Error in `.extract_lgb_trees()`:
-      ! `model` must be <lgb.Booster>, not an empty list.
+      Error in `tidypredict_trees()`:
+      ! `tidypredict_trees()` is not available for models of class <list>.
 
