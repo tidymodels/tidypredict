@@ -601,3 +601,44 @@ tidypredict_n_trees.xgb.Booster <- function(x, ...) {
 
   length(tidypredict_trees(x))
 }
+
+# Output metadata ---------------------------------
+
+# `apply_xgb_objective()` decides this. The two logistic objectives get wrapped
+# in a logistic and so are probabilities. `binary:hinge` gets wrapped in
+# `as.numeric(score >= 0)`, which takes only the values 0 and 1: a hard class
+# prediction rather than a number, even though it is numerically typed.
+# Everything else stays a raw score on the response scale, and the multiclass
+# objectives are rejected outright.
+#' @export
+tidypredict_output_type.pm_xgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  objective <- x$general$params$objective
+  if (
+    identical(objective, "binary:logistic") ||
+      identical(objective, "reg:logistic")
+  ) {
+    return("prob")
+  }
+  if (identical(objective, "binary:hinge")) {
+    return("class")
+  }
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.pm_xgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # xgboost is fit on a numeric label, so no fit ever records outcome levels.
+  NULL
+}
+
+#' @export
+tidypredict_normalized.pm_xgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # Multiclass objectives are unsupported, so the fit is always one expression.
+  NA
+}

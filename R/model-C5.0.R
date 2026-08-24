@@ -1092,3 +1092,25 @@ build_tree_formula.pm_tree_C5.0 <- function(model) {
   }
   c50_with_na_descent(build_tree_formula_single(model), model$tree_info)
 }
+
+# Output metadata ---------------------------------
+
+# C5.0 is classification only, and the fit votes the trees into a single class
+# label rather than a probability.
+#' @export
+tidypredict_output_type.C5.0 <- function(x, ...) {
+  rlang::check_dots_empty()
+  "class"
+}
+
+#' @export
+tidypredict_outcome_levels.C5.0 <- function(x, ...) {
+  rlang::check_dots_empty()
+  x$levels
+}
+
+#' @export
+tidypredict_normalized.C5.0 <- function(x, ...) {
+  rlang::check_dots_empty()
+  NA
+}

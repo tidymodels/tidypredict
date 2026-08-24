@@ -95,6 +95,62 @@ parse_model_liblinear <- function(model, call = rlang::caller_env()) {
   as_parsed_model(pm)
 }
 
+# Output metadata ---------------------------------
+
+# This is the model class the metadata generics exist for. The three `type`
+# families produce three different things from an identically shaped result: a
+# single linear expression. Logistic regression gives a probability, SVM
+# classification gives a decision value whose sign picks the class, and SVR
+# gives a plain number. Cutting an SVM decision value at 0.5 as though it were
+# a probability misclassifies every row whose value lies between 0 and 0.5.
+
+#' @export
+tidypredict_output_type.LiblineaR <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (x$Type %in% liblinear_lr_types) {
+    return("prob")
+  }
+  if (x$Type %in% liblinear_svm_class_types) {
+    return("decision")
+  }
+  if (x$Type %in% liblinear_regression_types) {
+    return("numeric")
+  }
+
+  # parse_model_liblinear() rejects any other type, so reaching here means the
+  # two lists have drifted apart.
+  cli::cli_abort(
+    "Unsupported {.pkg LiblineaR} model {.arg type} {.val {x$Type}}.",
+    .internal = TRUE
+  )
+}
+
+#' @export
+tidypredict_outcome_levels.LiblineaR <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (x$Type %in% liblinear_regression_types) {
+    return(NULL)
+  }
+
+  # `ClassNames` is a factor whose element order reflects LiblineaR's internal
+  # ordering, not the outcome's level order. `parse_model_liblinear()` already
+  # normalises to the glm convention of predicting the second level, so report
+  # the levels rather than the elements to stay consistent with it.
+  levels(x$ClassNames)
+}
+
+#' @export
+tidypredict_normalized.LiblineaR <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # Binary only, and a single expression, so there is no set of per-level
+  # values to sum. `TRUE` would imply the caller can read probabilities for
+  # every level straight off the result, which it cannot.
+  NA
+}
+
 # Test --------------------------------------------
 
 #' @export

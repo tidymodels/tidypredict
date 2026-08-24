@@ -224,3 +224,35 @@ tidypredict_test.nnet <- function(
     model$call
   )
 }
+
+# Output metadata ---------------------------------
+
+# `build_fit_formula_nnet()` returns one expression per level for a
+# classification fit, either from `expr_softmax()` or as `1 - p` and `p` for a
+# single logistic output unit, so the per-level values always sum to one. With
+# no levels recorded the single output unit is a plain numeric prediction.
+#' @export
+tidypredict_output_type.pm_nnet <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (is.null(parsed_model_classes(x))) {
+    return("numeric")
+  }
+  "prob"
+}
+
+#' @export
+tidypredict_outcome_levels.pm_nnet <- function(x, ...) {
+  rlang::check_dots_empty()
+  parsed_model_classes(x)
+}
+
+#' @export
+tidypredict_normalized.pm_nnet <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (is.null(parsed_model_classes(x))) {
+    return(NA)
+  }
+  TRUE
+}

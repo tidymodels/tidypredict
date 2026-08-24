@@ -5,6 +5,10 @@
 #' @export
 parse_model.ksvm <- function(model) parse_model_ksvm(model)
 
+ksvm_is_classification <- function(model) {
+  kernlab::type(model) %in% c("C-svc", "nu-svc", "C-bsvc")
+}
+
 parse_model_ksvm <- function(model, call = rlang::caller_env()) {
   acceptable_formula(model)
 
@@ -19,7 +23,7 @@ parse_model_ksvm <- function(model, call = rlang::caller_env()) {
   }
 
   svm_type <- kernlab::type(model)
-  is_classification <- svm_type %in% c("C-svc", "nu-svc", "C-bsvc")
+  is_classification <- ksvm_is_classification(model)
   is_regression <- svm_type %in% c("eps-svr", "nu-svr", "eps-bsvr")
   if (!is_classification && !is_regression) {
     cli::cli_abort(
@@ -286,4 +290,22 @@ tidypredict_test.ksvm <- function(
     threshold,
     model@kcall
   )
+}
+
+# Output metadata ---------------------------------
+
+# `parse_model_ksvm()` folds Platt scaling into the glm logit machinery, so
+# `tidypredict_output_type.pm_regression()` already reports "prob" for a
+# classifier and "numeric" for an SVR. Only the levels need the fitted object.
+#' @export
+tidypredict_outcome_levels.ksvm <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # `lev()` holds the sorted response values for a regression, so read the mode
+  # off `type()` the way `parse_model_ksvm()` does. A classifier is binary
+  # because `parse_model_ksvm()` rejects anything else.
+  if (!ksvm_is_classification(x)) {
+    return(NULL)
+  }
+  as.character(kernlab::lev(x))
 }

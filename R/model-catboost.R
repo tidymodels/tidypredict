@@ -919,3 +919,43 @@ tidypredict_n_trees.catboost.Model <- function(x, ...) {
   # round, so `niter` is the number of rounds rather than the number of trees.
   length(tidypredict_trees(x))
 }
+
+# Output metadata ---------------------------------
+
+# The same objective groups `build_fit_formula_catboost_nested()` switches on.
+catboost_parsed_objective <- function(x) {
+  x$general$params$objective %||% "RMSE"
+}
+
+#' @export
+tidypredict_output_type.pm_catboost <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  objective <- catboost_parsed_objective(x)
+  if (
+    objective %in%
+      c(catboost_multiclass_objectives, catboost_sigmoid_objectives)
+  ) {
+    return("prob")
+  }
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.pm_catboost <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # CatBoost is fit on integer labels, and the multiclass expressions come back
+  # named `class_0`, `class_1` and so on, which are positions, not levels.
+  NULL
+}
+
+#' @export
+tidypredict_normalized.pm_catboost <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (catboost_parsed_objective(x) %in% catboost_multiclass_objectives) {
+    return(TRUE)
+  }
+  NA
+}

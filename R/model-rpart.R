@@ -287,3 +287,36 @@ rpart_classprob_tree_info <- function(model) {
 build_tree_formula.pm_tree_rpart <- function(model) {
   build_tree_formula_single(model)
 }
+
+# Output metadata ---------------------------------
+
+# The parsed form keeps only the tree, so the mode has to come off the fitted
+# object. `method` is the same signal `tidypredict_test.rpart()` uses.
+#' @export
+tidypredict_output_type.rpart <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (identical(x$method, "class")) {
+    return("class")
+  }
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.rpart <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (identical(x$method, "class")) {
+    return(attr(x, "ylevels"))
+  }
+  NULL
+}
+
+#' @export
+tidypredict_normalized.rpart <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # One expression, a class label for a classification tree and a number for a
+  # regression one, so there are no per-level values to sum either way.
+  NA
+}

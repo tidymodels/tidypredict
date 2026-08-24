@@ -1,6 +1,12 @@
 # tidypredict (development version)
 
+- New generics describe what a model's fitted expressions compute, which the expressions themselves do not say: `tidypredict_output_type()` returns one of `"numeric"`, `"prob"`, `"decision"` or `"class"`, `tidypredict_outcome_levels()` returns the outcome levels in model order, and `tidypredict_normalized()` reports whether per-level probabilities already sum to one. See `?tidypredict_metadata`. (#435)
+
+- The distinctions these generics record cannot be recovered from the shape of a `tidypredict_fit()` result. A `LiblineaR` SVM classifier and a `LiblineaR` logistic regression both return a single expression, but the first is an uncalibrated decision value whose sign picks the class, so thresholding it at 0.5 as though it were a probability is wrong. A multiclass probability list and a `quantreg::rq()` fit with several `tau` are both named lists of expressions of the same length. (#435)
+
 - Fixed `cforest()` models failing with "'language' object cannot be coerced to type 'symbol'" under partykit 1.3-0. That release added a shim to partykit's methods that identifies the caller with `as.name()`, which errors when the generic is reached as `partykit::gettree()`. (#434)
+
+- `tidypredict_output_type()`, `tidypredict_outcome_levels()` and `tidypredict_normalized()` describe what a model's fitted expressions actually compute: a number, a probability, an uncalibrated decision value or a class label, which outcome levels they are named for, and whether a per-level list already sums to one. None of it is recoverable from the shape of the result, so a caller generating code from `tidypredict_fit()` no longer has to keep its own list of which backend produces which shape. See `?tidypredict_metadata`. (#433)
 
 - New generics expose the pieces `tidypredict_fit()` is assembled from, so that packages generating their own code from a fitted model can reuse tidypredict's parsing: `tidypredict_trees()` returns per-tree expressions, `tidypredict_class_trees()` returns per-tree expressions for each outcome level, `tidypredict_class_exprs()` returns one finished expression per outcome level, and `tidypredict_n_trees()` returns the number of trees. See `?tidypredict_extractors`. (#433)
 

@@ -257,3 +257,24 @@ tidypredict_test.bart <- function(
     y_scale = diff(range(model$y))
   )
 }
+
+# Output metadata ---------------------------------
+
+# {dbarts} models are supported for regression only.
+#' @export
+tidypredict_output_type.pm_bart <- function(x, ...) {
+  rlang::check_dots_empty()
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.pm_bart <- function(x, ...) {
+  rlang::check_dots_empty()
+  NULL
+}
+
+#' @export
+tidypredict_normalized.pm_bart <- function(x, ...) {
+  rlang::check_dots_empty()
+  NA
+}

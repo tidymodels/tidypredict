@@ -50,3 +50,29 @@ split_rqs <- function(model) {
     }
   )
 }
+
+# Output metadata ---------------------------------
+
+# `parse_model.rqs()` returns a bare list of parsed models rather than a single
+# parsed model, so the default cannot route through it. Several `tau` give a
+# named list of expressions that looks exactly like a multiclass probability
+# list but holds unrelated quantile predictions.
+#' @export
+tidypredict_output_type.rqs <- function(x, ...) {
+  rlang::check_dots_empty()
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.rqs <- function(x, ...) {
+  rlang::check_dots_empty()
+  NULL
+}
+
+#' @export
+tidypredict_normalized.rqs <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # The names are quantiles, not levels, and the values do not sum to anything.
+  NA
+}
