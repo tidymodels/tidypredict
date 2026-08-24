@@ -11,6 +11,41 @@
   [`partykit::gettree()`](https://rdrr.io/pkg/partykit/man/cforest.html).
   ([\#434](https://github.com/tidymodels/tidypredict/issues/434))
 
+- New generics expose the pieces
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  is assembled from, so that packages generating their own code from a
+  fitted model can reuse tidypredict’s parsing:
+  [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  returns per-tree expressions,
+  [`tidypredict_class_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  returns per-tree expressions for each outcome level,
+  [`tidypredict_class_exprs()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  returns one finished expression per outcome level, and
+  [`tidypredict_n_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  returns the number of trees. See
+  [`?tidypredict_extractors`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md).
+  ([\#433](https://github.com/tidymodels/tidypredict/issues/433))
+
+- The eleven `.extract_*()` functions are deprecated in favour of those
+  generics. They were exported but documented as internal, and each is
+  now a thin wrapper that warns. Two of them change return type under
+  the new names:
+  [`.extract_earth_multiclass()`](https://tidypredict.tidymodels.org/reference/deprecated-extractors.md)
+  and
+  [`.extract_glmnet_multiclass()`](https://tidypredict.tidymodels.org/reference/deprecated-extractors.md)
+  returned deparsed strings, while
+  [`tidypredict_class_exprs()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  returns language objects like every other extractor.
+  ([\#433](https://github.com/tidymodels/tidypredict/issues/433))
+
+- [`tidypredict_class_exprs()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  on a `partykit` model is named by outcome level. The
+  [`.extract_partykit_classprob()`](https://tidypredict.tidymodels.org/reference/deprecated-extractors.md)
+  it replaces returned an unnamed list, which left callers assuming its
+  order matched [`levels()`](https://rdrr.io/r/base/levels.html) of the
+  outcome.
+  ([\#433](https://github.com/tidymodels/tidypredict/issues/433))
+
 - The error raised when no method knows how to handle a model at all now
   carries the condition class `tidypredict_unsupported_model`. Many
   other errors also say “are not supported”, but they report an

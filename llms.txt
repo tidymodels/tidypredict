@@ -215,6 +215,11 @@ By contributing to this project, you agree to abide by its terms.
   : Set categorical feature mappings for CatBoost model
 - [`tidy(`*`<pm_regression>`*`)`](https://tidypredict.tidymodels.org/reference/tidy.pm_regression.md)
   : Tidy the parsed model results
+- [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  [`tidypredict_class_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  [`tidypredict_class_exprs()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  [`tidypredict_n_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  : Extract model internals as expressions
 - [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
   : Returns a Tidy Eval formula to calculate fitted values
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)

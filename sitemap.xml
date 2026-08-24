@@ -50,6 +50,7 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/as_parsed_model.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/build_nested_node.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/build_nested_split_condition.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/deprecated-extractors.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_case_when_tree.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_linear_pred.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-build_nested_case_when_tree.html</loc></url>
@@ -58,17 +59,6 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_bagger_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_bart_scaling.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_bart_trees.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_catboost_trees.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_earth_multiclass.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_glmnet_multiclass.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_lgb_trees.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_partykit_classprob.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_classprob.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_ranger_trees.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_classprob.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rf_trees.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_rpart_classprob.html</loc></url>
-<url><loc>https://tidypredict.tidymodels.org/reference/dot-extract_xgb_trees.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-partykit_tree_info_full.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/dot-rpart_tree_info_full.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/generate_case_when_trees.html</loc></url>
@@ -84,6 +74,7 @@
 <url><loc>https://tidypredict.tidymodels.org/reference/set_catboost_categories.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidy.pm_regression.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict-package.html</loc></url>
+<url><loc>https://tidypredict.tidymodels.org/reference/tidypredict_extractors.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict_fit.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict_interval.html</loc></url>
 <url><loc>https://tidypredict.tidymodels.org/reference/tidypredict_save.html</loc></url>
