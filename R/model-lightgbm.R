@@ -911,3 +911,42 @@ tidypredict_n_trees.lgb.Booster <- function(x, ...) {
   # trees actually returned rather than the number LightGBM reports.
   length(tidypredict_trees(x))
 }
+
+# Output metadata ---------------------------------
+
+# The same objective groups `build_fit_formula_lgb()` switches on: the
+# multiclass objectives softmax one raw score per class, the sigmoid objectives
+# give a single binary probability, and the rest stay numeric.
+lgb_parsed_objective <- function(x) {
+  x$general$params$objective %||% "regression"
+}
+
+#' @export
+tidypredict_output_type.pm_lgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  objective <- lgb_parsed_objective(x)
+  if (objective %in% c(lgb_multiclass_objectives, lgb_sigmoid_objectives)) {
+    return("prob")
+  }
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.pm_lgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # LightGBM is fit on integer labels. The multiclass expressions come back
+  # named `class_0`, `class_1` and so on, which are positions, not levels.
+  NULL
+}
+
+#' @export
+tidypredict_normalized.pm_lgb <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (lgb_parsed_objective(x) %in% lgb_multiclass_objectives) {
+    return(TRUE)
+  }
+  NA
+}

@@ -210,3 +210,14 @@ tidypredict_class_exprs.multnet <- function(x, ..., penalty = NULL) {
   names(eqs) <- class_names
   eqs
 }
+
+# Output metadata ---------------------------------
+
+# A `multnet` fit parses to a multiclass parsed model, which carries its own
+# levels. A binary `lognet` parses to a single logistic expression, so its
+# levels only exist on the fitted object.
+#' @export
+tidypredict_outcome_levels.lognet <- function(x, ...) {
+  rlang::check_dots_empty()
+  as.character(x$classnames)
+}

@@ -208,3 +208,66 @@ tidypredict_test.H2OMultinomialModel <- function(
 h2o_test_results <- function(base, te, threshold) {
   test_results_numeric(base, te, threshold)
 }
+
+# Output metadata ---------------------------------
+
+# H2O models have no `parse_model()` method, so the metadata has to be read off
+# the model handle. The three classes are exactly the three modes.
+#' @export
+tidypredict_output_type.H2ORegressionModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.H2ORegressionModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  NULL
+}
+
+#' @export
+tidypredict_normalized.H2ORegressionModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  NA
+}
+
+#' @export
+tidypredict_output_type.H2OBinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  "prob"
+}
+
+#' @export
+tidypredict_outcome_levels.H2OBinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  h2o_response_domain(x)
+}
+
+#' @export
+tidypredict_normalized.H2OBinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # `tidypredict_fit()` returns the probability of the second domain level
+  # only, so there are no per-level values to sum.
+  NA
+}
+
+#' @export
+tidypredict_output_type.H2OMultinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  "prob"
+}
+
+#' @export
+tidypredict_outcome_levels.H2OMultinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+  h2o_response_domain(x)
+}
+
+#' @export
+tidypredict_normalized.H2OMultinomialModel <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # `expr_softmax()` over the domain.
+  TRUE
+}

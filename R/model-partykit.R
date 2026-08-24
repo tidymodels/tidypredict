@@ -333,3 +333,39 @@ tidypredict_class_exprs.party <- function(x, ...) {
 build_tree_formula.pm_tree_party <- function(model) {
   generate_nested_case_when_tree(model$tree_info, missing = "na")
 }
+
+# Output metadata ---------------------------------
+
+# `party_tree_info()` reads the mode off the response column of `fitted`, and
+# the parsed form does not record it, so the fitted object answers.
+party_is_classification <- function(x) {
+  is.factor(x$fitted[["(response)"]])
+}
+
+#' @export
+tidypredict_output_type.party <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (party_is_classification(x)) {
+    return("class")
+  }
+  "numeric"
+}
+
+#' @export
+tidypredict_outcome_levels.party <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (party_is_classification(x)) {
+    return(levels(x$fitted[["(response)"]]))
+  }
+  NULL
+}
+
+#' @export
+tidypredict_normalized.party <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # A single expression, so there are no per-level values to sum.
+  NA
+}

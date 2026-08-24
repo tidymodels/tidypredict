@@ -197,3 +197,33 @@ bagger_check_model <- function(model, call = rlang::caller_env()) {
 build_tree_formula.pm_tree_bagger <- function(model) {
   bagger_build_formula(model)
 }
+
+# Output metadata ---------------------------------
+
+# `bagger_classes()` is the same mode signal `parse_model.bagger()` uses:
+# `NULL` for regression, the outcome levels for classification. A classification
+# ensemble averages class probabilities and then picks the largest, so the fit
+# is a class label rather than a probability.
+#' @export
+tidypredict_output_type.bagger <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (is.null(bagger_classes(x))) {
+    return("numeric")
+  }
+  "class"
+}
+
+#' @export
+tidypredict_outcome_levels.bagger <- function(x, ...) {
+  rlang::check_dots_empty()
+  bagger_classes(x)
+}
+
+#' @export
+tidypredict_normalized.bagger <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # A single expression either way, so there are no per-level values to sum.
+  NA
+}

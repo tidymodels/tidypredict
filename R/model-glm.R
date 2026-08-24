@@ -29,3 +29,23 @@ te_interval_glm <- function(parsedmodel, interval = 0.95) {
   }
   intervals
 }
+
+# Output metadata ---------------------------------
+
+# The parsed form is coefficients only, so the response levels have to come off
+# the fitted object. A binomial glm fit on a 0/1 numeric records none, which is
+# the "did not retain the levels" case.
+#' @export
+tidypredict_outcome_levels.glm <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  if (!identical(x$family$family, "binomial")) {
+    return(NULL)
+  }
+
+  response <- stats::model.frame(x)[[1]]
+  if (!is.factor(response)) {
+    return(NULL)
+  }
+  levels(response)
+}
