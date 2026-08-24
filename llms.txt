@@ -224,6 +224,10 @@ By contributing to this project, you agree to abide by its terms.
   : Returns a Tidy Eval formula to calculate fitted values
 - [`tidypredict_interval()`](https://tidypredict.tidymodels.org/reference/tidypredict_interval.md)
   : Returns a Tidy Eval formula to calculate prediction interval.
+- [`tidypredict_output_type()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  [`tidypredict_outcome_levels()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  [`tidypredict_normalized()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  : Describe what a model's fitted expressions compute
 - [`tidypredict_save()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
   [`tidypredict_load()`](https://tidypredict.tidymodels.org/reference/tidypredict_save.md)
   : Save and re-load a parsed model

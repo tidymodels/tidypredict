@@ -2,6 +2,29 @@
 
 ## tidypredict (development version)
 
+- New generics describe what a model’s fitted expressions compute, which
+  the expressions themselves do not say:
+  [`tidypredict_output_type()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  returns one of `"numeric"`, `"prob"`, `"decision"` or `"class"`,
+  [`tidypredict_outcome_levels()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  returns the outcome levels in model order, and
+  [`tidypredict_normalized()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  reports whether per-level probabilities already sum to one. See
+  [`?tidypredict_metadata`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md).
+  ([\#435](https://github.com/tidymodels/tidypredict/issues/435))
+
+- The distinctions these generics record cannot be recovered from the
+  shape of a
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  result. A `LiblineaR` SVM classifier and a `LiblineaR` logistic
+  regression both return a single expression, but the first is an
+  uncalibrated decision value whose sign picks the class, so
+  thresholding it at 0.5 as though it were a probability is wrong. A
+  multiclass probability list and a
+  [`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html) fit with
+  several `tau` are both named lists of expressions of the same length.
+  ([\#435](https://github.com/tidymodels/tidypredict/issues/435))
+
 - Fixed [`cforest()`](https://rdrr.io/pkg/partykit/man/cforest.html)
   models failing with “‘language’ object cannot be coerced to type
   ‘symbol’” under partykit 1.3-0. That release added a shim to
@@ -10,6 +33,21 @@
   generic is reached as
   [`partykit::gettree()`](https://rdrr.io/pkg/partykit/man/cforest.html).
   ([\#434](https://github.com/tidymodels/tidypredict/issues/434))
+
+- [`tidypredict_output_type()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md),
+  [`tidypredict_outcome_levels()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  and
+  [`tidypredict_normalized()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+  describe what a model’s fitted expressions actually compute: a number,
+  a probability, an uncalibrated decision value or a class label, which
+  outcome levels they are named for, and whether a per-level list
+  already sums to one. None of it is recoverable from the shape of the
+  result, so a caller generating code from
+  [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
+  no longer has to keep its own list of which backend produces which
+  shape. See
+  [`?tidypredict_metadata`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md).
+  ([\#433](https://github.com/tidymodels/tidypredict/issues/433))
 
 - New generics expose the pieces
   [`tidypredict_fit()`](https://tidypredict.tidymodels.org/reference/tidypredict_fit.md)
