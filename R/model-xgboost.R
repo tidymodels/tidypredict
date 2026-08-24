@@ -186,6 +186,10 @@ get_xgb_json_params <- function(model) {
   # Use regex extraction instead of full JSON parsing (3-4x faster)
   txt <- paste(readLines(tmp_file, warn = FALSE), collapse = "")
 
+  parse_xgb_json_params(txt)
+}
+
+parse_xgb_json_params <- function(txt) {
   # Extract base_score - format is "base_score":"[5E-1]"
   base_score_match <- regmatches(
     txt,
@@ -213,10 +217,13 @@ get_xgb_json_params <- function(model) {
     booster_name <- "gblinear"
   }
 
-  # Extract weight_drop for DART
+  # Extract the dropout weights. xgboost >= 3.4 canonicalises `booster = "dart"`
+  # to `"gbtree"` in the saved JSON while still writing `weight_drop`, so the
+  # weights have to be looked for regardless of the serialised booster name.
+  # Non-dropout models either omit `weight_drop` or leave it all ones.
 
   weight_drop <- NULL
-  if (booster_name == "dart") {
+  if (booster_name != "gblinear") {
     wd_match <- regmatches(
       txt,
       regexpr('weight_drop":\\[[^]]+\\]', txt, perl = TRUE)
@@ -224,6 +231,12 @@ get_xgb_json_params <- function(model) {
     if (length(wd_match) > 0 && nchar(wd_match) > 0) {
       wd_str <- gsub('weight_drop":\\[([^]]+)\\]', "\\1", wd_match, perl = TRUE)
       weight_drop <- as.numeric(strsplit(wd_str, ",")[[1]])
+    }
+    if (!is.null(weight_drop) && all(weight_drop == 1)) {
+      weight_drop <- NULL
+    }
+    if (!is.null(weight_drop)) {
+      booster_name <- "dart"
     }
   }
 

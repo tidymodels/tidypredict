@@ -4,12 +4,14 @@ make_lgb_model <- function() {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -118,10 +120,11 @@ test_that("model without explicit colnames still works", {
   y <- mtcars$hp
 
   # Create dataset WITHOUT specifying colnames
-  dtrain <- lightgbm::lgb.Dataset(X, label = y)
+  dtrain <- lightgbm::lgb.Dataset(params = list(num_threads = 1L), X, label = y)
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -608,6 +611,7 @@ test_that("model with missing values produces valid parse", {
   X_with_na[10:15, 2] <- NA
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X_with_na,
     label = y,
     colnames = c("mpg", "cyl")
@@ -615,6 +619,7 @@ test_that("model with missing values produces valid parse", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -680,6 +685,7 @@ test_that("regression predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -687,6 +693,7 @@ test_that("regression predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression",
@@ -698,7 +705,7 @@ test_that("regression predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -711,6 +718,7 @@ test_that("binary classification predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -718,6 +726,7 @@ test_that("binary classification predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "binary",
@@ -729,7 +738,7 @@ test_that("binary classification predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -841,10 +850,16 @@ test_that("poisson predictions match native predict", {
   set.seed(123)
   X <- data.matrix(mtcars[, c("mpg", "disp")])
   y <- mtcars$carb
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("mpg", "disp"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("mpg", "disp")
+  )
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "poisson",
@@ -856,7 +871,7 @@ test_that("poisson predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -869,6 +884,7 @@ test_that("regression_l1 predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -876,6 +892,7 @@ test_that("regression_l1 predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression_l1",
@@ -887,7 +904,7 @@ test_that("regression_l1 predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -900,6 +917,7 @@ test_that("regression_l2 predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -907,6 +925,7 @@ test_that("regression_l2 predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "regression_l2",
@@ -918,7 +937,7 @@ test_that("regression_l2 predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -931,6 +950,7 @@ test_that("mape predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -938,6 +958,7 @@ test_that("mape predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "mape",
@@ -949,7 +970,7 @@ test_that("mape predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -962,6 +983,7 @@ test_that("huber predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -969,6 +991,7 @@ test_that("huber predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "huber",
@@ -980,7 +1003,7 @@ test_that("huber predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -993,6 +1016,7 @@ test_that("fair predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1000,6 +1024,7 @@ test_that("fair predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "fair",
@@ -1011,7 +1036,7 @@ test_that("fair predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1024,6 +1049,7 @@ test_that("quantile predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1031,6 +1057,7 @@ test_that("quantile predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "quantile",
@@ -1043,7 +1070,7 @@ test_that("quantile predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1056,6 +1083,7 @@ test_that("gamma predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1063,6 +1091,7 @@ test_that("gamma predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "gamma",
@@ -1074,7 +1103,7 @@ test_that("gamma predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1087,6 +1116,7 @@ test_that("tweedie predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1094,6 +1124,7 @@ test_that("tweedie predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "tweedie",
@@ -1106,7 +1137,7 @@ test_that("tweedie predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1119,6 +1150,7 @@ test_that("cross_entropy predictions match native predict", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$am
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1126,6 +1158,7 @@ test_that("cross_entropy predictions match native predict", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.3,
       objective = "cross_entropy",
@@ -1137,7 +1170,7 @@ test_that("cross_entropy predictions match native predict", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1150,6 +1183,7 @@ test_that("RF boosting predictions match native predict (#185)", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- mtcars$hp
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
@@ -1157,6 +1191,7 @@ test_that("RF boosting predictions match native predict (#185)", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       boosting = "rf",
       num_leaves = 4L,
       objective = "regression",
@@ -1170,7 +1205,7 @@ test_that("RF boosting predictions match native predict (#185)", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1186,6 +1221,7 @@ test_that("predictions with missing values match", {
   X_train <- X
   X_train[1:3, 1] <- NA
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X_train,
     label = y,
     colnames = c("mpg", "cyl")
@@ -1193,6 +1229,7 @@ test_that("predictions with missing values match", {
 
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1209,7 +1246,7 @@ test_that("predictions with missing values match", {
   X_pred[10:12, 2] <- NA
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X_pred)
+  native_preds <- predict(model, params = list(num_threads = 1L), X_pred)
 
   pred_df <- as.data.frame(X_pred)
   tidy_preds <- dplyr::mutate(pred_df, pred = !!fit_formula)$pred
@@ -1271,7 +1308,7 @@ test_that("SQL predictions match native predictions with SQLite", {
   )
 
   X <- data.matrix(test_data)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
 })
@@ -1285,9 +1322,10 @@ test_that("SQL predictions match for binary classification with SQLite", {
   set.seed(456)
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- as.integer(mtcars$am)
-  dtrain <- lightgbm::lgb.Dataset(X, label = y)
+  dtrain <- lightgbm::lgb.Dataset(params = list(num_threads = 1L), X, label = y)
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "binary",
@@ -1310,7 +1348,7 @@ test_that("SQL predictions match for binary classification with SQLite", {
     paste0("SELECT ", sql_query, " AS pred FROM test_data")
   )
 
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
 })
@@ -1325,9 +1363,15 @@ test_that("parse_model extracts num_class for multiclass", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1355,9 +1399,15 @@ test_that("tidypredict_fit returns list for multiclass", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1387,9 +1437,15 @@ test_that("multiclass predictions match native predictions", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.3,
       objective = "multiclass",
@@ -1402,7 +1458,7 @@ test_that("multiclass predictions match native predictions", {
   )
 
   fit_formulas <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- as.data.frame(X)
   tidy_preds <- dplyr::mutate(
@@ -1424,9 +1480,15 @@ test_that("multiclass probabilities sum to 1", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1460,9 +1522,15 @@ test_that("multiclassova predictions match native predictions", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.3,
       objective = "multiclassova",
@@ -1475,7 +1543,7 @@ test_that("multiclassova predictions match native predictions", {
   )
 
   fit_formulas <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   expect_named(fit_formulas, c("class_0", "class_1", "class_2"))
 
@@ -1500,9 +1568,15 @@ test_that("multiclass SQL generation returns list of SQL", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -1775,12 +1849,14 @@ test_that("parse_model handles categorical splits", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1815,12 +1891,14 @@ test_that("categorical predictions match native predictions", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1832,7 +1910,7 @@ test_that("categorical predictions match native predictions", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- data.frame(cat_feat = cat_int)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -1852,12 +1930,14 @@ test_that("mixed numerical + categorical predictions match", {
   X <- cbind(num_feat = num_feat, cat_feat = cat_int)
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 8L,
       learning_rate = 0.5,
       objective = "regression",
@@ -1869,7 +1949,7 @@ test_that("mixed numerical + categorical predictions match", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- as.data.frame(X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -1894,12 +1974,14 @@ test_that("categorical with missing values predictions match", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1917,7 +1999,7 @@ test_that("categorical with missing values predictions match", {
   colnames(test_X) <- "cat_feat"
   test_df <- data.frame(cat_feat = c(0, 1, 2, 3, NA))
 
-  native_preds <- predict(model, test_X)
+  native_preds <- predict(model, params = list(num_threads = 1L), test_X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -1938,12 +2020,14 @@ test_that("categorical SQL generation works", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -1971,7 +2055,7 @@ test_that("categorical SQL generation works", {
 
   test_X <- matrix(0:3, ncol = 1)
   colnames(test_X) <- "cat_feat"
-  native_preds <- predict(model, test_X)
+  native_preds <- predict(model, params = list(num_threads = 1L), test_X)
 
   expect_equal(db_result$pred, unname(native_preds), tolerance = 1e-10)
 })
@@ -2005,12 +2089,14 @@ test_that("categorical path contains both in and not-in operators", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -2044,12 +2130,14 @@ test_that("categorical with many categories works", {
   colnames(X) <- "cat_feat"
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     categorical_feature = "cat_feat"
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 1.0,
       objective = "regression",
@@ -2061,7 +2149,7 @@ test_that("categorical with many categories works", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- data.frame(cat_feat = cat_int)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -2078,12 +2166,14 @@ test_that("model can be saved and re-loaded", {
   y <- mtcars$hp
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2120,9 +2210,15 @@ test_that("multiclass model can be saved and re-loaded", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -2162,12 +2258,14 @@ test_that("tidypredict_test works for regression model", {
   y <- mtcars$hp
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2192,9 +2290,10 @@ test_that("tidypredict_test works for binary classification model", {
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
   y <- as.integer(mtcars$am)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y)
+  dtrain <- lightgbm::lgb.Dataset(params = list(num_threads = 1L), X, label = y)
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "binary",
@@ -2254,9 +2353,15 @@ test_that("tidypredict_test errors for multiclass model", {
   colnames(X) <- c("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width")
   y <- as.integer(iris$Species) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = colnames(X))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = colnames(X)
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "multiclass",
@@ -2279,12 +2384,14 @@ test_that("tidypredict_test errors when matrix not provided", {
   y <- mtcars$hp
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2306,12 +2413,14 @@ test_that("tidypredict_test respects max_rows parameter", {
   y <- mtcars$hp
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2335,12 +2444,14 @@ test_that("tidypredict_trees returns list of tree expressions", {
   y <- mtcars$hp
 
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     X,
     label = y,
     colnames = c("mpg", "cyl", "disp")
   )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       num_leaves = 4L,
       learning_rate = 0.5,
       objective = "regression",
@@ -2427,7 +2538,7 @@ test_that("tidypredict works with parsnip/bonsai lightgbm model", {
   expect_type(fit_formula, "language")
 
   X <- data.matrix(train_data[, c("mpg", "cyl", "disp")])
-  native_preds <- predict(lgb_model, X)
+  native_preds <- predict(lgb_model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(train_data, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -2464,7 +2575,7 @@ test_that("tidypredict works with parsnip/bonsai binary classification", {
   expect_type(fit_formula, "language")
 
   X <- data.matrix(mtcars[, c("mpg", "cyl", "disp")])
-  native_preds <- predict(lgb_model, X)
+  native_preds <- predict(lgb_model, params = list(num_threads = 1L), X)
   tidy_preds <- dplyr::mutate(mtcars, pred = !!fit_formula)$pred
 
   expect_equal(unname(tidy_preds), unname(native_preds), tolerance = 1e-10)
@@ -2539,9 +2650,15 @@ test_that("linear tree regression predictions match native predict (#186)", {
   X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
   y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2553,7 +2670,7 @@ test_that("linear tree regression predictions match native predict (#186)", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- as.data.frame(X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -2569,9 +2686,15 @@ test_that("linear tree binary classification predictions match (#186)", {
   X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
   y <- as.numeric((2 * X[, 1] + 3 * X[, 2] + rnorm(n)) > 0)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "binary",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2583,7 +2706,7 @@ test_that("linear tree binary classification predictions match (#186)", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- as.data.frame(X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -2599,9 +2722,15 @@ test_that("linear tree multiclass predictions match (#186)", {
   X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
   y <- as.integer(cut(X[, 1] + X[, 2] + rnorm(n, sd = 0.5), breaks = 3)) - 1L
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "multiclass",
       num_class = 3L,
       linear_tree = TRUE,
@@ -2614,7 +2743,7 @@ test_that("linear tree multiclass predictions match (#186)", {
   )
 
   fit_formulas <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
   native_mat <- matrix(native_preds, ncol = 3, byrow = FALSE)
 
   test_df <- as.data.frame(X)
@@ -2637,9 +2766,15 @@ test_that("linear tree with RF boosting predictions match (#186)", {
   X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
   y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       boosting = "rf",
       objective = "regression",
       linear_tree = TRUE,
@@ -2654,7 +2789,7 @@ test_that("linear tree with RF boosting predictions match (#186)", {
   )
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, X)
+  native_preds <- predict(model, params = list(num_threads = 1L), X)
 
   test_df <- as.data.frame(X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred
@@ -2670,9 +2805,15 @@ test_that("linear tree parsed model has correct structure", {
   X <- cbind(x1 = rnorm(n), x2 = rnorm(n))
   y <- 2 * X[, 1] + 3 * X[, 2] + rnorm(n, sd = 0.1)
 
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2723,9 +2864,15 @@ test_that("linear tree handles NA values correctly when trained with NAs (#186)"
   x2[c(10, 20, 30)] <- NA
 
   X <- cbind(x1 = x1, x2 = x2)
-  dtrain <- lightgbm::lgb.Dataset(X, label = y, colnames = c("x1", "x2"))
+  dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
+    X,
+    label = y,
+    colnames = c("x1", "x2")
+  )
   model <- lightgbm::lgb.train(
     params = list(
+      num_threads = 1,
       objective = "regression",
       linear_tree = TRUE,
       num_leaves = 4L,
@@ -2746,7 +2893,7 @@ test_that("linear tree handles NA values correctly when trained with NAs (#186)"
   colnames(test_X) <- c("x1", "x2")
 
   fit_formula <- tidypredict_fit(model)
-  native_preds <- predict(model, test_X)
+  native_preds <- predict(model, params = list(num_threads = 1L), test_X)
 
   test_df <- as.data.frame(test_X)
   tidy_preds <- dplyr::mutate(test_df, pred = !!fit_formula)$pred

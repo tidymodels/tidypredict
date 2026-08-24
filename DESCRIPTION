@@ -1,6 +1,6 @@
 Package: tidypredict
 Title: Run Predictions Inside the Database
-Version: 1.1.0.9000
+Version: 1.1.1.9000
 Authors@R: c(
     person("Emil", "Hvitfeldt", , "emil.hvitfeldt@posit.co", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-0679-1945")),
@@ -43,6 +43,7 @@ Suggests:
     C50,
     covr,
     Cubist (>= 0.5.1),
+    data.table,
     dbarts,
     DBI,
     dbplyr,
@@ -70,6 +71,7 @@ Suggests:
     quantreg,
     randomForest,
     ranger (>= 0.14.1),
+    RhpcBLASctl,
     rmarkdown,
     rpart (>= 4.1.0),
     RSQLite,
