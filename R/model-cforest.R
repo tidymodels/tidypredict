@@ -55,16 +55,38 @@ parse_model.cforest <- function(model) {
 tidypredict_fit.cforest <- function(model, ...) {
   cforest_check_regression(model)
 
-  n_trees <- length(model$nodes)
-  tree_exprs <- map(
-    seq_len(n_trees),
+  tidypredict_combine_trees(model, tidypredict_trees(model))
+}
+
+# Extractors --------------------------------------
+
+#' @export
+tidypredict_trees.cforest <- function(x, ...) {
+  rlang::check_dots_empty()
+  cforest_check_regression(x)
+
+  map(
+    seq_len(length(x$nodes)),
     function(tree_no) {
-      tree_info <- partykit_tree_info_full(cforest_gettree(model, tree_no))
+      tree_info <- partykit_tree_info_full(cforest_gettree(x, tree_no))
       generate_nested_case_when_tree(tree_info, missing = "na")
     }
   )
+}
 
-  expr_mean(tree_exprs, n_trees)
+#' @export
+tidypredict_n_trees.cforest <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  length(x$nodes)
+}
+
+#' @export
+tidypredict_combine_trees.cforest <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  expr_mean(trees, length(trees))
 }
 
 build_tree_formula.pm_tree_cforest <- function(model) {

@@ -25,7 +25,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `assemble_lgb_formula()`:
+      Error in `lgb_check_objective()`:
       ! Unsupported objective: "unsupported_objective".
       i Supported objectives: "regression", "regression_l2", "regression_l1", "huber", "fair", "quantile", "mape", "poisson", "gamma", "tweedie", "binary", "cross_entropy", "multiclass", and "multiclassova".
 
@@ -42,7 +42,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `assemble_lgb_formula()`:
+      Error in `lgb_combine()`:
       ! Multiclass model must have num_class >= 2.
 
 # multiclass with NULL num_class throws error
@@ -50,7 +50,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `assemble_lgb_formula()`:
+      Error in `lgb_combine()`:
       ! Multiclass model must have num_class >= 2.
 
 # build_lgb_nested_condition errors on unknown type

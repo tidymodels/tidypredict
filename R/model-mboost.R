@@ -62,8 +62,11 @@ mboost_build_formula <- function(tree_info_list, nu, offset) {
     tree_info_list,
     \(tree_info) generate_nested_case_when_tree(tree_info, missing = "na")
   )
-  res <- reduce_addition(tree_exprs)
-  expr(!!offset + !!nu * !!res)
+  mboost_combine(tree_exprs, nu, offset)
+}
+
+mboost_combine <- function(tree_exprs, nu, offset) {
+  expr(!!offset + !!nu * !!reduce_addition(tree_exprs))
 }
 
 # Model parser -------------------------------------
@@ -90,8 +93,42 @@ parse_model.blackboost <- function(model) {
 tidypredict_fit.blackboost <- function(model, ...) {
   mboost_check_regression(model)
 
-  comps <- mboost_components(model)
-  mboost_build_formula(comps$tree_info_list, comps$nu, comps$offset)
+  tidypredict_combine_trees(model, tidypredict_trees(model))
+}
+
+# Extractors --------------------------------------
+
+#' @export
+tidypredict_trees.blackboost <- function(x, ...) {
+  rlang::check_dots_empty()
+  mboost_check_regression(x)
+
+  map(
+    mboost_components(x)$tree_info_list,
+    \(tree_info) generate_nested_case_when_tree(tree_info, missing = "na")
+  )
+}
+
+#' @export
+tidypredict_n_trees.blackboost <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  # `mstop` rather than the raw ensemble length: subsetting a fitted model
+  # leaves `ens` at full length, and `mboost_components()` truncates to the
+  # iterations the model actually uses.
+  length(mboost_components(x)$tree_info_list)
+}
+
+# Boosting, so the trees are summed rather than averaged, then shrunk by `nu`
+# and offset. Summing them plainly, as a caller might assume, would be wrong on
+# both counts.
+#' @export
+tidypredict_combine_trees.blackboost <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  comps <- mboost_components(x)
+  mboost_combine(trees, comps$nu, comps$offset)
 }
 
 build_tree_formula.pm_tree_blackboost <- function(model) {

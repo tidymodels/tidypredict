@@ -3,7 +3,7 @@
     Code
       tidypredict_fit(pm)
     Condition
-      Error in `build_fit_formula_catboost_nested()`:
+      Error in `catboost_check_objective()`:
       ! Unsupported objective: "UnsupportedObjective".
       i Supported objectives: "RMSE", "MAE", "Quantile", "MAPE", "Huber", "LogCosh", "Expectile", "Poisson", "Tweedie", "Logloss", "CrossEntropy", "MultiClass", and "MultiClassOneVsAll".
 

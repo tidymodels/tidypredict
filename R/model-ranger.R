@@ -254,12 +254,14 @@ tidypredict_fit_ranger_nested <- function(model) {
     build_nested_ranger_tree(model, tree_no)
   })
 
-  # A forest of stumps mentions no column, so anchor it to one. These are the
-  # predictors `ranger:::predict.ranger()` itself requires in `newdata`.
-  expr_recycle_over_column(
-    expr_mean(tree_exprs, n_trees),
-    model$forest$independent.variable.names
-  )
+  ranger_combine(tree_exprs, n_trees, model$forest$independent.variable.names)
+}
+
+# A forest of stumps mentions no column, so the average is anchored to one.
+# These are the predictors `ranger:::predict.ranger()` itself requires in
+# `newdata`.
+ranger_combine <- function(tree_exprs, n_trees, predictors) {
+  expr_recycle_over_column(expr_mean(tree_exprs, n_trees), predictors)
 }
 
 # Build nested case_when for a single ranger tree
@@ -417,6 +419,15 @@ tidypredict_n_trees.ranger <- function(x, ...) {
 
   # ranger stores this as a double.
   as.integer(x$num.trees)
+}
+
+#' @export
+tidypredict_combine_trees.ranger <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+  ranger_check_supported(x)
+
+  ranger_combine(trees, x$num.trees, x$forest$independent.variable.names)
 }
 
 build_tree_formula.pm_tree_ranger <- function(model) {

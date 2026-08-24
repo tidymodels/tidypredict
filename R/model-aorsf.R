@@ -108,17 +108,45 @@ parse_model.ObliqueForest <- function(model) {
 tidypredict_fit.ObliqueForest <- function(model, ...) {
   aorsf_check_supported(model)
 
-  n_trees <- length(model$forest$child_left)
-  tree_exprs <- map(
-    seq_len(n_trees),
+  tidypredict_combine_trees(model, tidypredict_trees(model))
+}
+
+# Extractors --------------------------------------
+
+#' @export
+tidypredict_trees.ObliqueForest <- function(x, ...) {
+  rlang::check_dots_empty()
+  aorsf_check_supported(x)
+
+  map(
+    seq_len(length(x$forest$child_left)),
     function(tree_no) {
-      generate_nested_case_when_tree(aorsf_tree_info_full(model, tree_no))
+      generate_nested_case_when_tree(aorsf_tree_info_full(x, tree_no))
     }
   )
+}
 
-  # `aorsf` refuses to predict from an incomplete row ("Please remove missing
-  # values from new data, or impute them."), so there is no value to match.
-  expr_na_if_incomplete(expr_mean(tree_exprs, n_trees), model$get_names_x())
+#' @export
+tidypredict_n_trees.ObliqueForest <- function(x, ...) {
+  rlang::check_dots_empty()
+
+  length(x$forest$child_left)
+}
+
+# The mean is only half of it. `aorsf` refuses to predict from an incomplete
+# row ("Please remove missing values from new data, or impute them."), so the
+# result is wrapped to return `NA` for such a row. A caller that averaged the
+# trees itself would silently produce a number where the model produces
+# nothing.
+#' @export
+tidypredict_combine_trees.ObliqueForest <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  expr_na_if_incomplete(
+    expr_mean(trees, length(trees)),
+    x$get_names_x()
+  )
 }
 
 build_tree_formula.pm_tree_aorsf <- function(model) {

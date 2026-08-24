@@ -683,7 +683,13 @@ assemble_lgb_formula <- function(parsedmodel, build_trees) {
     cli::cli_abort("Model has no trees.")
   }
 
-  objective <- parsedmodel$general$params$objective %||% "regression"
+  lgb_check_objective(parsedmodel)
+
+  lgb_combine(build_trees(), parsedmodel)
+}
+
+lgb_check_objective <- function(parsedmodel) {
+  objective <- lgb_parsed_objective(parsedmodel)
 
   if (!objective %in% lgb_supported_objectives) {
     cli::cli_abort(
@@ -694,7 +700,16 @@ assemble_lgb_formula <- function(parsedmodel, build_trees) {
     )
   }
 
-  trees <- build_trees()
+  invisible(parsedmodel)
+}
+
+# Combine per-tree expressions into the booster's prediction: an additive sum
+# (averaged instead when boosting is random forest), then the objective's
+# inverse link. A multiclass model instead groups the trees by class and
+# returns one expression per class, which is not a single language object.
+lgb_combine <- function(trees, parsedmodel) {
+  objective <- lgb_parsed_objective(parsedmodel)
+  n_trees <- length(trees)
 
   # A model of stumps mentions no column, so anchor it to one. The feature
   # names recorded at parse time are the columns `newdata` has to supply.
@@ -904,11 +919,41 @@ tidypredict_trees.lgb.Booster <- function(x, ...) {
 }
 
 #' @export
+tidypredict_combine_trees.lgb.Booster <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  parsedmodel <- parse_model(x)
+  lgb_check_objective(parsedmodel)
+
+  # A multiclass fit is one expression per class rather than one for the model,
+  # so there is no single language object to return. `tidypredict_trees()` does
+  # hand back the trees of such a model, and they are assigned to classes
+  # positionally, so a caller could otherwise sum trees belonging to different
+  # classes together.
+  if (lgb_parsed_objective(parsedmodel) %in% lgb_multiclass_objectives) {
+    cli::cli_abort(
+      c(
+        "Multiclass {.pkg lightgbm} trees cannot be combined into one
+         expression.",
+        i = "The fit is one expression per class.",
+        i = "Use {.fn tidypredict_fit} for the whole model instead."
+      ),
+      class = "tidypredict_no_combiner"
+    )
+  }
+
+  lgb_combine(trees, parsedmodel)
+}
+
+#' @export
 tidypredict_n_trees.lgb.Booster <- function(x, ...) {
   rlang::check_dots_empty()
 
-  # Trees with a single leaf are dropped by the extractor, so this counts the
-  # trees actually returned rather than the number LightGBM reports.
+  # Counts what the extractor returns, which includes single-leaf trees:
+  # `lgb.model.dt.tree()` omits them but `add_lgb_stump_trees()` puts them
+  # back, deliberately, because multiclass class assignment is positional and a
+  # gap shifts every later class (#419).
   length(tidypredict_trees(x))
 }
 

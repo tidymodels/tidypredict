@@ -299,16 +299,25 @@ assemble_xgb_formula <- function(
   objective
 ) {
   # Apply DART weight_drop if present
-  trees_nested <- apply_dart_weights(trees_nested, weight_drop)
+  xgb_combine(
+    apply_dart_weights(trees_nested, weight_drop),
+    base_score,
+    objective
+  )
+}
 
-  # Additive model
-  f <- reduce_addition(trees_nested)
-
+# Combine already-weighted per-tree expressions: an additive sum, then the
+# objective's inverse link and `base_score`.
+#
+# DART weighting is deliberately not applied here. `tidypredict_trees()` folds
+# it into the per-tree expressions it returns, so doing it again would square
+# the weights.
+xgb_combine <- function(trees, base_score, objective) {
   if (is.null(base_score)) {
     base_score <- 0.5 # nocov
   }
 
-  apply_xgb_objective(f, objective, base_score)
+  apply_xgb_objective(reduce_addition(trees), objective, base_score)
 }
 
 # Build nested formula from parsed xgboost model (version 3)
@@ -593,6 +602,24 @@ tidypredict_trees.xgb.Booster <- function(x, ...) {
   trees <- extract_xgb_trees_nested(x)
   # The generic promises an unnamed list; split() names these "0", "1", ...
   unname(apply_dart_weights(trees, json_params$weight_drop))
+}
+
+#' @export
+tidypredict_combine_trees.xgb.Booster <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  json_params <- get_xgb_json_params(x)
+  params <- attr(x, "param") %||% x$params
+
+  expr_recycle_over_column(
+    xgb_combine(
+      trees,
+      json_params$base_score,
+      params$objective %||% json_params$objective
+    ),
+    xgb_feature_names(x)
+  )
 }
 
 #' @export
