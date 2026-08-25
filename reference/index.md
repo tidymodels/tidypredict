@@ -12,6 +12,8 @@
   : Set categorical feature mappings for CatBoost model
 - [`tidy(`*`<pm_regression>`*`)`](https://tidypredict.tidymodels.org/reference/tidy.pm_regression.md)
   : Tidy the parsed model results
+- [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  : Combine per-tree expressions into a model's prediction
 - [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
   [`tidypredict_class_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
   [`tidypredict_class_exprs()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)

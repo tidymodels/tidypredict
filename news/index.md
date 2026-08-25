@@ -2,6 +2,50 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  is a new generic that turns per-tree expressions back into a model’s
+  prediction.
+  [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  alone is not enough to do this:
+  [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
+  combines as `offset + nu * sum(trees)`, `aorsf` averages inside a
+  guard that returns `NA` for an incomplete row, CatBoost applies a
+  scale and a bias, and boosters then apply their objective’s inverse
+  link. Summing or averaging the trees, as the shape of the list
+  invites, is wrong for all of those.
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
+- [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  has methods for `randomForest`, `ranger`, xgboost, LightGBM, CatBoost,
+  `cforest`, `blackboost` and `aorsf`, so a caller that computes each
+  tree into its own column can combine references to those columns
+  without knowing which backend it is holding. Every one satisfies
+  `tidypredict_combine_trees(x, tidypredict_trees(x))` computing the
+  same values as `tidypredict_fit(x)`.
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
+- Boosted
+  [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html)
+  models deliberately have no
+  [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  method, and
+  [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  refuses them with an explanation. Their trials vote with a class label
+  and a confidence rather than contributing numbers, so there is nothing
+  to sum or average and splitting the trees apart would only enable a
+  wrong answer.
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
+- [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  and
+  [`tidypredict_n_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  gain methods for
+  [`partykit::cforest()`](https://rdrr.io/pkg/partykit/man/cforest.html),
+  [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html)
+  and
+  [`aorsf::orsf()`](https://docs.ropensci.org/aorsf/reference/orsf.html).
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
 - New generics describe what a model’s fitted expressions compute, which
   the expressions themselves do not say:
   [`tidypredict_output_type()`](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)

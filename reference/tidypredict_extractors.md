@@ -86,12 +86,10 @@ trees <- tidypredict_trees(model)
 length(trees)
 #> [1] 5
 trees[[1]]
-#> case_when(drat <= 3.75 ~ case_when(carb <= 3.5 ~ case_when(wt <= 
-#>     3.3125 ~ 24.4, .default = case_when(drat <= 3.115 ~ case_when(qsec <= 
-#>     16.96 ~ 15.5, .default = case_when(wt <= 3.7875 ~ 17.62, 
-#>     .default = 19.2)), .default = 15.2)), .default = case_when(drat <= 
-#>     3.105 ~ 10.4, .default = case_when(wt <= 4.5925 ~ 13.7, .default = 14.7))), 
-#>     .default = case_when(wt <= 1.9875 ~ 32.15, .default = case_when(wt <= 
-#>         2.47 ~ 23.8666666666667, .default = case_when(vs <= 0.5 ~ 
-#>         21, .default = 19.8))))
+#> case_when(wt <= 2.3325 ~ case_when(hp <= 65.5 ~ 33.9, .default = case_when(disp <= 
+#>     78.85 ~ 32.4, .default = 29.78)), .default = case_when(cyl <= 
+#>     7 ~ case_when(hp <= 116.5 ~ case_when(gear <= 3.5 ~ 19.8, 
+#>     .default = case_when(drat <= 4.005 ~ 21, .default = 21.4)), 
+#>     .default = 18.9), .default = case_when(carb <= 3.5 ~ 17.26, 
+#>     .default = case_when(hp <= 217.5 ~ 10.4, .default = 14.96))))
 ```
