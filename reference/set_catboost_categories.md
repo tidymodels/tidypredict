@@ -41,13 +41,14 @@ features are handled automatically and this function is not required.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
 # For raw CatBoost models with categorical features:
 pm <- parse_model(catboost_model)
+#> Error: object 'catboost_model' not found
 pm <- set_catboost_categories(pm, catboost_model, training_data)
+#> Error: object 'pm' not found
 tidypredict_fit(pm)
+#> Error: object 'pm' not found
 
 # For parsnip/bonsai models, this is not needed:
 # tidypredict_fit(parsnip_model_fit)  # works automatically
-} # }
 ```

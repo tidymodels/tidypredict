@@ -19,17 +19,17 @@ tidypredict_sql(model, con)
   Database connection object. It is used to select the correct SQL
   translation syntax.
 
+## Value
+
+A SQL query, as returned by
+[`dbplyr::translate_sql()`](https://dbplyr.tidyverse.org/reference/translate_sql.html).
+Models that produce one formula per class or per outcome return a list
+of queries.
+
 ## Examples
 
 ``` r
-library(dbplyr)
-#> 
-#> Attaching package: ‘dbplyr’
-#> The following objects are masked from ‘package:dplyr’:
-#> 
-#>     ident, sql, sql_escape_ident, sql_escape_string
-
 model <- lm(mpg ~ wt + am + cyl, data = mtcars)
-tidypredict_sql(model, simulate_dbi())
+tidypredict_sql(model, dbplyr::simulate_dbi())
 #> <SQL> ((39.4179334351865 + ("wt" * -3.12514220026708)) + ("am" * 0.176493157719672)) + ("cyl" * -1.5102456624971)
 ```

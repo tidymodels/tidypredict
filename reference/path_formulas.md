@@ -26,4 +26,4 @@ path_formulas(path)
   - `col` character.
 
   - `val` if `type == "conditional"` and `vals` if `type == "set"`. Can
-    be character or numeric. @keywords internal
+    be character or numeric.

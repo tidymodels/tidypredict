@@ -5,11 +5,10 @@
 - **Supports prediction intervals**, it uses the
   [`qr.solve()`](https://rdrr.io/r/base/qr.html) function to parse the
   interval coefficient of each term.
-- Supports categorical variables and interactions
-- Only *treatment* contrast (`contr.treatment`) are supported.
-- `offset` is supported
-- Categorical variables are supported
+- Categorical variables are supported, but only with *treatment*
+  contrasts (`contr.treatment`).
 - Interactions with `:` and `*` are supported
+- `offset` is supported
 - In-line functions in the formulas are **not supported**:
   - OK - `wt ~ mpg + am`
   - OK - `wt ~ mpg * am + vs:disp`
@@ -32,11 +31,10 @@ df <- mtcars %>%
 model <- lm(mpg ~ wt + char_cyl, offset = am, data = df)
 ```
 
-It returns a SQL query that contains the coefficients
-(`model$coefficients`) operated against the correct variable or
-categorical variable value. In most cases the resulting SQL is one short
-`CASE WHEN` statement per coefficient. It appends the `offset` field or
-value, if one is provided.
+It returns a SQL query that contains the coefficients (`model`)
+evaluated against the correct variable or categorical variable value. In
+most cases the resulting SQL is one short `CASE WHEN` statement per
+coefficient. It appends the `offset` field or value, if one is provided.
 
 ``` r
 
@@ -47,7 +45,7 @@ tidypredict_sql(model, dbplyr::simulate_mssql())
 
 Alternatively, use
 [`tidypredict_to_column()`](https://tidypredict.tidymodels.org/reference/tidypredict_to_column.md)
-if the results are the be used or previewed in `dplyr`.
+if the results are to be used or previewed in `dplyr`.
 
 ``` r
 
@@ -107,7 +105,7 @@ df %>%
 The parser reads several parts of the `lm` object to tabulate all of the
 needed variables. One entry per coefficient is added to the final table,
 those entries will have the results of
-[`qr.solve()`](https://rdrr.io/r/base/qr.html) already operated and
+[`qr.solve()`](https://rdrr.io/r/base/qr.html) already evaluated and
 placed in the correct column, they will have a `qr_` prefix. There will
 be one `qr_` column per coefficient.
 
@@ -139,8 +137,8 @@ str(pm, 2)
 
 The output from
 [`parse_model()`](https://tidypredict.tidymodels.org/reference/parse_model.md)
-is transformed into a `dplyr`, a.k.a Tidy Eval, formula. All categorical
-variables are operated using
+is transformed into a `dplyr`, a.k.a. Tidy Eval, formula. All
+categorical variables are evaluated using
 [`if_else()`](https://dplyr.tidyverse.org/reference/if_else.html).
 
 ``` r
@@ -172,12 +170,12 @@ tidypredict_interval(model)
 #>     6.63799055122669)
 ```
 
-From there, the Tidy Eval formula can be used anywhere where it can be
-operated. `tidypredict` provides three paths:
+From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. `tidypredict` provides three paths:
 
 - Use directly inside `dplyr`, `mutate(df, !! tidypredict_fit(model))`
-- Use `tidypredict_to_column(model)` to a piped command set
-- Use `tidypredict_to_sql(model)` to retrieve the SQL statement
+- Use `tidypredict_to_column(model)` to add it to a piped command set
+- Use `tidypredict_sql(model, con)` to retrieve the SQL statement
 
 The same applies to the prediction interval functions.
 
@@ -229,4 +227,22 @@ parsnip_model <- linear_reg() %>%
 
 tidypredict_fit(parsnip_model)
 #> 39.686261480253 + (wt * -3.19097213898375) + (cyl * -1.5077949682598)
+```
+
+## Quantile regression
+
+`tidypredict` also supports quantile regression models fitted with
+[`quantreg::rq()`](https://rdrr.io/pkg/quantreg/man/rq.html), as well as
+[`linear_reg()`](https://parsnip.tidymodels.org/reference/linear_reg.html)
+models fitted via `parsnip` with the `"quantreg"` engine.
+
+``` r
+
+library(quantreg)
+#> Loading required package: SparseM
+
+rq_model <- rq(mpg ~ wt + cyl, data = mtcars)
+
+tidypredict_fit(rq_model)
+#> 38.8714285714286 + (wt * -2.67857142857143) + (cyl * -1.74285714285714)
 ```

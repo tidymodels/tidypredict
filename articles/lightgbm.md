@@ -38,40 +38,39 @@ model <- lgb.train(
   ``` r
 
   tidypredict_fit(model)
-  #> case_when(cyl <= 7 | is.na(cyl) ~ 122.371527777778, .default = case_when(mpg <= 
-  #>     15.1 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
-  #>     240.84375, .default = 187.34375), .default = 164.21875)) + 
-  #>     case_when(mpg <= 20.35 | is.na(mpg) ~ case_when(mpg <= 15.1 | 
-  #>         is.na(mpg) ~ 24.7864583333333, .default = 7.36516196529071), 
-  #>         .default = case_when(mpg <= 23.6 | is.na(mpg) ~ -9.47147832598005, 
-  #>             .default = -24.4000499589103)) + case_when(mpg <= 
-  #>     21.45 | is.na(mpg) ~ case_when(mpg <= 17.55 | is.na(mpg) ~ 
-  #>     case_when(mpg <= 15.65 | is.na(mpg) ~ 6.33150075541602, .default = 18.2080434163411), 
-  #>     .default = 0.0642609119415283), .default = -11.2250245332718) + 
-  #>     case_when(disp <= 334 | is.na(disp) ~ case_when(mpg <= 15.1 | 
-  #>         is.na(mpg) ~ 31.5191459655761, .default = -4.16611832639445), 
-  #>         .default = case_when(disp <= 380 | is.na(disp) ~ 16.3295566439629, 
-  #>             .default = -0.254162490367889)) + case_when(disp <= 
-  #>     78.85 | is.na(disp) ~ -10.7901678085327, .default = case_when(mpg <= 
-  #>     28.85 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
-  #>     -0.749505842104554, .default = 4.01884852349758), .default = 15.2098321914673)) + 
-  #>     case_when(disp <= 78.85 | is.na(disp) ~ -5.39508358637492, 
-  #>         .default = case_when(disp <= 466 | is.na(disp) ~ case_when(mpg <= 
-  #>             15.1 | is.na(mpg) ~ 4.51956310272216, .default = 0.0956797075012456), 
-  #>             .default = -8.61319732666016)) + case_when(mpg <= 
-  #>     21.45 | is.na(mpg) ~ case_when(disp <= 153.35 | is.na(disp) ~ 
-  #>     case_when(cyl <= 5 | is.na(cyl) ~ 0.427817046642302, .default = 25.0094966888427), 
-  #>     .default = -0.436469084024429), .default = -1.67079323530197) + 
-  #>     case_when(disp <= 334 | is.na(disp) ~ case_when(mpg <= 15.1 | 
-  #>         is.na(mpg) ~ 14.0927782058715, .default = case_when(disp <= 
-  #>         288.4 | is.na(disp) ~ -0.208523882286889, .default = -11.3294992446899)), 
-  #>         .default = 1.61815292341635) + case_when(mpg <= 13.8 | 
-  #>     is.na(mpg) ~ -3.70564748346806, .default = case_when(mpg <= 
-  #>     17.55 | is.na(mpg) ~ case_when(disp <= 334 | is.na(disp) ~ 
-  #>     -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + 
-  #>     case_when(disp <= 380 | is.na(disp) ~ case_when(mpg <= 17.55 | 
-  #>         is.na(mpg) ~ 1.89159697956509, .default = case_when(mpg <= 
-  #>         18.95 | is.na(mpg) ~ -6.20051162441571, .default = 0.834156103432178)), 
+  #> case_when(is.na(cyl) | cyl <= 7 ~ 122.371527777778, .default = case_when(is.na(mpg) | 
+  #>     mpg <= 15.1 ~ case_when(is.na(disp) | disp <= 334 ~ 240.84375, 
+  #>     .default = 187.34375), .default = 164.21875)) + case_when(is.na(mpg) | 
+  #>     mpg <= 20.35 ~ case_when(is.na(mpg) | mpg <= 15.1 ~ 24.7864583333333, 
+  #>     .default = 7.36516196529071), .default = case_when(is.na(mpg) | 
+  #>     mpg <= 23.6 ~ -9.47147832598005, .default = -24.4000499589103)) + 
+  #>     case_when(is.na(mpg) | mpg <= 21.45 ~ case_when(is.na(mpg) | 
+  #>         mpg <= 17.55 ~ case_when(is.na(mpg) | mpg <= 15.65 ~ 
+  #>         6.33150075541602, .default = 18.2080434163411), .default = 0.0642609119415283), 
+  #>         .default = -11.2250245332718) + case_when(is.na(disp) | 
+  #>     disp <= 334 ~ case_when(is.na(mpg) | mpg <= 15.1 ~ 31.5191459655761, 
+  #>     .default = -4.16611832639445), .default = case_when(is.na(disp) | 
+  #>     disp <= 380 ~ 16.3295566439629, .default = -0.254162490367889)) + 
+  #>     case_when(is.na(disp) | disp <= 78.85 ~ -10.7901678085327, 
+  #>         .default = case_when(is.na(mpg) | mpg <= 28.85 ~ case_when(is.na(disp) | 
+  #>             disp <= 334 ~ -0.749505842104554, .default = 4.01884852349758), 
+  #>             .default = 15.2098321914673)) + case_when(is.na(disp) | 
+  #>     disp <= 78.85 ~ -5.39508358637492, .default = case_when(is.na(disp) | 
+  #>     disp <= 466 ~ case_when(is.na(mpg) | mpg <= 15.1 ~ 4.51956310272216, 
+  #>     .default = 0.0956797075012456), .default = -8.61319732666016)) + 
+  #>     case_when(is.na(mpg) | mpg <= 21.45 ~ case_when(is.na(disp) | 
+  #>         disp <= 153.35 ~ case_when(is.na(cyl) | cyl <= 5 ~ 0.427817046642302, 
+  #>         .default = 25.0094966888427), .default = -0.436469084024429), 
+  #>         .default = -1.67079323530197) + case_when(is.na(disp) | 
+  #>     disp <= 334 ~ case_when(is.na(mpg) | mpg <= 15.1 ~ 14.0927782058715, 
+  #>     .default = case_when(is.na(disp) | disp <= 288.4 ~ -0.208523882286889, 
+  #>         .default = -11.3294992446899)), .default = 1.61815292341635) + 
+  #>     case_when(is.na(mpg) | mpg <= 13.8 ~ -3.70564748346806, .default = case_when(is.na(mpg) | 
+  #>         mpg <= 17.55 ~ case_when(is.na(disp) | disp <= 334 ~ 
+  #>         -0.805894414583842, .default = 9.19054534534613), .default = -0.580966327060014)) + 
+  #>     case_when(is.na(disp) | disp <= 380 ~ case_when(is.na(mpg) | 
+  #>         mpg <= 17.55 ~ 1.89159697956509, .default = case_when(is.na(mpg) | 
+  #>         mpg <= 18.95 ~ -6.20051162441571, .default = 0.834156103432178)), 
   #>         .default = -2.94233404099941)
   ```
 
@@ -100,7 +99,7 @@ model <- lgb.train(
   #> $ fit  <dbl> 107.75256, 107.75256, 95.22895, 107.75256, 186.49246, 11…
   ```
 
-- Confirm that `tidypredict` results match to the model’s
+- Confirm that `tidypredict` results match the model’s
   [`predict()`](https://rdrr.io/r/stats/predict.html) results. The
   `xg_df` argument expects the matrix data set.
 
@@ -342,72 +341,90 @@ str(pm$trees[1])
 #>   .. ..$ prediction: num 122
 #>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 1
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "cyl"
-#>   .. .. .. ..$ val    : num 7
-#>   .. .. .. ..$ op     : chr "less-equal"
-#>   .. .. .. ..$ missing: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "cyl"
+#>   .. .. .. ..$ val         : num 7
+#>   .. .. .. ..$ op          : chr "less-equal"
+#>   .. .. .. ..$ missing     : logi TRUE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
 #>   ..$ :List of 3
 #>   .. ..$ prediction: num 241
 #>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 3
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "cyl"
-#>   .. .. .. ..$ val    : num 7
-#>   .. .. .. ..$ op     : chr "more"
-#>   .. .. .. ..$ missing: logi FALSE
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "mpg"
-#>   .. .. .. ..$ val    : num 15.1
-#>   .. .. .. ..$ op     : chr "less-equal"
-#>   .. .. .. ..$ missing: logi TRUE
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "disp"
-#>   .. .. .. ..$ val    : num 334
-#>   .. .. .. ..$ op     : chr "less-equal"
-#>   .. .. .. ..$ missing: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "cyl"
+#>   .. .. .. ..$ val         : num 7
+#>   .. .. .. ..$ op          : chr "more"
+#>   .. .. .. ..$ missing     : logi FALSE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "mpg"
+#>   .. .. .. ..$ val         : num 15.1
+#>   .. .. .. ..$ op          : chr "less-equal"
+#>   .. .. .. ..$ missing     : logi TRUE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "disp"
+#>   .. .. .. ..$ val         : num 334
+#>   .. .. .. ..$ op          : chr "less-equal"
+#>   .. .. .. ..$ missing     : logi TRUE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
 #>   ..$ :List of 3
 #>   .. ..$ prediction: num 187
 #>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 3
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "cyl"
-#>   .. .. .. ..$ val    : num 7
-#>   .. .. .. ..$ op     : chr "more"
-#>   .. .. .. ..$ missing: logi FALSE
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "mpg"
-#>   .. .. .. ..$ val    : num 15.1
-#>   .. .. .. ..$ op     : chr "less-equal"
-#>   .. .. .. ..$ missing: logi TRUE
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "disp"
-#>   .. .. .. ..$ val    : num 334
-#>   .. .. .. ..$ op     : chr "more"
-#>   .. .. .. ..$ missing: logi FALSE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "cyl"
+#>   .. .. .. ..$ val         : num 7
+#>   .. .. .. ..$ op          : chr "more"
+#>   .. .. .. ..$ missing     : logi FALSE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "mpg"
+#>   .. .. .. ..$ val         : num 15.1
+#>   .. .. .. ..$ op          : chr "less-equal"
+#>   .. .. .. ..$ missing     : logi TRUE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "disp"
+#>   .. .. .. ..$ val         : num 334
+#>   .. .. .. ..$ op          : chr "more"
+#>   .. .. .. ..$ missing     : logi FALSE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
 #>   ..$ :List of 3
 #>   .. ..$ prediction: num 164
 #>   .. ..$ linear    : NULL
 #>   .. ..$ path      :List of 2
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "cyl"
-#>   .. .. .. ..$ val    : num 7
-#>   .. .. .. ..$ op     : chr "more"
-#>   .. .. .. ..$ missing: logi FALSE
-#>   .. .. ..$ :List of 5
-#>   .. .. .. ..$ type   : chr "conditional"
-#>   .. .. .. ..$ col    : chr "mpg"
-#>   .. .. .. ..$ val    : num 15.1
-#>   .. .. .. ..$ op     : chr "more"
-#>   .. .. .. ..$ missing: logi FALSE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "cyl"
+#>   .. .. .. ..$ val         : num 7
+#>   .. .. .. ..$ op          : chr "more"
+#>   .. .. .. ..$ missing     : logi FALSE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
+#>   .. .. ..$ :List of 7
+#>   .. .. .. ..$ type        : chr "conditional"
+#>   .. .. .. ..$ col         : chr "mpg"
+#>   .. .. .. ..$ val         : num 15.1
+#>   .. .. .. ..$ op          : chr "more"
+#>   .. .. .. ..$ missing     : logi FALSE
+#>   .. .. .. ..$ missing_type: chr "None"
+#>   .. .. .. ..$ default_left: logi TRUE
 ```
 
 ## Limitations

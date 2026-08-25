@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">tidypredict</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1.9000</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -35,17 +35,40 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-model-list" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Model list</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-model-list">
-<li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
+<li><a class="dropdown-item" href="../articles/models.html">All supported models</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><a class="dropdown-item" href="../articles/lm.html">Linear Regression - lm()</a></li>
     <li><a class="dropdown-item" href="../articles/glm.html">Generalized Regression - glm()</a></li>
     <li><a class="dropdown-item" href="../articles/glmnet.html">Regularized Regression - glmnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/glm.html#liblinear">Regularized Regression - LiblineaR()</a></li>
+    <li><a class="dropdown-item" href="../articles/lm.html#quantile-regression">Quantile Regression - rq()</a></li>
+    <li><a class="dropdown-item" href="../articles/multinom.html">Multinomial Regression - multinom()</a></li>
+    <li><a class="dropdown-item" href="../articles/fda.html">Flexible Discriminant Analysis - fda()</a></li>
+    <li><a class="dropdown-item" href="../articles/lda.html">Linear Discriminant Analysis - lda()</a></li>
+    <li><a class="dropdown-item" href="../articles/qda.html">Quadratic Discriminant Analysis - qda()</a></li>
+    <li><a class="dropdown-item" href="../articles/sda.html">Shrinkage Discriminant Analysis - sda()</a></li>
+    <li><a class="dropdown-item" href="../articles/sparsediscrim.html">Regularized Discriminant Analysis - sparsediscrim</a></li>
+    <li><a class="dropdown-item" href="../articles/naivebayes.html">Naive Bayes - NaiveBayes()</a></li>
+    <li><a class="dropdown-item" href="../articles/mixOmics.html">Partial Least Squares - mixOmics</a></li>
+    <li><a class="dropdown-item" href="../articles/nnet.html">Neural Network - nnet()</a></li>
+    <li><a class="dropdown-item" href="../articles/ksvm.html">Support Vector Machine - kernlab - ksvm()</a></li>
     <li><a class="dropdown-item" href="../articles/ranger.html">Random Forest - Ranger - ranger()</a></li>
     <li><a class="dropdown-item" href="../articles/rf.html">Random Forest - randomForest()</a></li>
+    <li><a class="dropdown-item" href="../articles/partykit.html">Random Forest - partykit - cforest()</a></li>
+    <li><a class="dropdown-item" href="../articles/aorsf.html">Oblique Random Forest - aorsf - orsf()</a></li>
     <li><a class="dropdown-item" href="../articles/rpart.html">Decision Tree - rpart()</a></li>
+    <li><a class="dropdown-item" href="../articles/C5.0.html">Decision Tree - C5.0()</a></li>
+    <li><a class="dropdown-item" href="../articles/bart.html">BART - bart()</a></li>
+    <li><a class="dropdown-item" href="../articles/bagging.html">Bagged Trees - bagger()</a></li>
     <li><a class="dropdown-item" href="../articles/mars.html">MARS - earth()</a></li>
     <li><a class="dropdown-item" href="../articles/cubist.html">Cubist - cubist()</a></li>
     <li><a class="dropdown-item" href="../articles/xgboost.html">XGboost - xgb.Booster.complete()</a></li>
     <li><a class="dropdown-item" href="../articles/lightgbm.html">LightGBM - lgb.Booster()</a></li>
     <li><a class="dropdown-item" href="../articles/catboost.html">CatBoost - catboost.Model()</a></li>
+    <li><a class="dropdown-item" href="../articles/h2o.html">H2O GBM - H2OModel</a></li>
+    <li><a class="dropdown-item" href="../articles/mboost.html">Model-based Boosting - mboost - blackboost()</a></li>
+    <li><a class="dropdown-item" href="../articles/xrf.html">RuleFit - xrf - xrf()</a></li>
+    <li><a class="dropdown-item" href="../articles/nullmodel.html">Null Model - nullmodel()</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -85,7 +108,7 @@
       <img src="../logo.png" class="logo" alt=""><h1>Decision trees, using rpart</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/v1.1.1/vignettes/rpart.Rmd" class="external-link"><code>vignettes/rpart.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/tidymodels/tidypredict/blob/main/vignettes/rpart.Rmd" class="external-link"><code>vignettes/rpart.Rmd</code></a></small>
       <div class="d-none name"><code>rpart.Rmd</code></div>
     </div>
 
@@ -102,26 +125,26 @@
 <code><a href="../reference/tidypredict_fit.html">tidypredict_fit()</a></code>, <code><a href="../reference/tidypredict_sql.html">tidypredict_sql()</a></code>,
 <code><a href="../reference/parse_model.html">parse_model()</a></code>
 </td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td><code><a href="../reference/tidypredict_to_column.html">tidypredict_to_column()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="odd">
 <td><code><a href="../reference/tidypredict_test.html">tidypredict_test()</a></code></td>
-<td></td>
+<td>✔</td>
 </tr>
 <tr class="even">
 <td>
 <code><a href="../reference/tidypredict_interval.html">tidypredict_interval()</a></code>,
 <code><a href="../reference/tidypredict_sql_interval.html">tidypredict_sql_interval()</a></code>
 </td>
-<td></td>
+<td>✗</td>
 </tr>
 <tr class="odd">
 <td><code>parsnip</code></td>
-<td></td>
+<td>✔</td>
 </tr>
 </tbody>
 </table>
@@ -154,21 +177,27 @@ value handling.</p>
 <span><span class="co">#&gt; 5 &lt;leaf&gt; 14 14   59.87214 18.26429 0.01000000        0          0</span></span>
 <span><span class="co">#&gt; 3 &lt;leaf&gt; 11 11  203.38545 26.66364 0.01000000        0          0</span></span></code></pre></div>
 <p>The output from <code><a href="../reference/parse_model.html">parse_model()</a></code> is transformed into a
-<code>dplyr</code>, a.k.a Tidy Eval, formula. The decision tree becomes
+<code>dplyr</code>, a.k.a. Tidy Eval, formula. The decision tree becomes
 a <code><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">dplyr::case_when()</a></code> statement.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
-<span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
-<p>From there, the Tidy Eval formula can be used anywhere where it can
-be operated. <code>tidypredict</code> provides three paths:</p>
+<span><span class="co">#&gt; case_when(case_when(!is.na(cyl) ~ cyl &lt; 5, !is.na(disp) ~ disp &lt; </span></span>
+<span><span class="co">#&gt;     142.9, !is.na(hp) ~ hp &lt; 101, !is.na(wt) ~ wt &lt; 2.5425, !is.na(qsec) ~ </span></span>
+<span><span class="co">#&gt;     !qsec &lt; 18.41, !is.na(vs) ~ !vs &lt; 0.5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     26.6636363636364, .default = case_when(case_when(!is.na(hp) ~ </span></span>
+<span><span class="co">#&gt;     hp &lt; 192.5, !is.na(disp) ~ disp &lt; 334, !is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     4.66, !is.na(qsec) ~ !qsec &lt; 15.455, !is.na(carb) ~ carb &lt; </span></span>
+<span><span class="co">#&gt;     3.5, !is.na(gear) ~ gear &lt; 4.5, .default = TRUE) ~ 18.2642857142857, </span></span>
+<span><span class="co">#&gt;     .default = 13.4142857142857))</span></span></code></pre></div>
+<p>From there, the Tidy Eval formula can be used anywhere it can be
+evaluated. <code>tidypredict</code> provides three paths:</p>
 <ul>
 <li>Use directly inside <code>dplyr</code>,
 <code>mutate(mtcars, !! tidypredict_fit(model))</code>
 </li>
-<li>Use <code>tidypredict_to_column(model)</code> to a piped command
-set</li>
-<li>Use <code>tidypredict_to_sql(model)</code> to retrieve the SQL
+<li>Use <code>tidypredict_to_column(model)</code> to add it to a piped
+command set</li>
+<li>Use <code>tidypredict_sql(model, con)</code> to retrieve the SQL
 statement</li>
 </ul>
 </div>
@@ -179,8 +208,13 @@ statement</li>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">model_class</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">Species</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_class</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(Petal.Length &lt;= 2.45 ~ "setosa", .default = case_when(Petal.Width &lt;= </span></span>
-<span><span class="co">#&gt;     1.75 ~ "versicolor", .default = "virginica"))</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(case_when(!is.na(Petal.Length) ~ Petal.Length &lt; 2.45, </span></span>
+<span><span class="co">#&gt;     !is.na(Petal.Width) ~ Petal.Width &lt; 0.8, !is.na(Sepal.Length) ~ </span></span>
+<span><span class="co">#&gt;         Sepal.Length &lt; 5.45, !is.na(Sepal.Width) ~ !Sepal.Width &lt; </span></span>
+<span><span class="co">#&gt;         3.35, .default = FALSE) ~ "setosa", .default = case_when(case_when(!is.na(Petal.Width) ~ </span></span>
+<span><span class="co">#&gt;     Petal.Width &lt; 1.75, !is.na(Petal.Length) ~ Petal.Length &lt; </span></span>
+<span><span class="co">#&gt;     4.75, !is.na(Sepal.Length) ~ Sepal.Length &lt; 6.15, !is.na(Sepal.Width) ~ </span></span>
+<span><span class="co">#&gt;     Sepal.Width &lt; 2.95, .default = TRUE) ~ "versicolor", .default = "virginica"))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="parsnip">parsnip<a class="anchor" aria-label="anchor" href="#parsnip"></a>
@@ -195,8 +229,14 @@ objects fitted via the <code>parsnip</code> package.</p>
 <span>  <span class="fu"><a href="https://generics.r-lib.org/reference/fit.html" class="external-link">fit</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">mtcars</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">parsnip_model</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl &lt;= 5 ~ 26.6636363636364, .default = case_when(hp &lt;= </span></span>
-<span><span class="co">#&gt;     192.5 ~ 18.2642857142857, .default = 13.4142857142857))</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(case_when(!is.na(cyl) ~ cyl &lt; 5, !is.na(disp) ~ disp &lt; </span></span>
+<span><span class="co">#&gt;     142.9, !is.na(hp) ~ hp &lt; 101, !is.na(wt) ~ wt &lt; 2.5425, !is.na(qsec) ~ </span></span>
+<span><span class="co">#&gt;     !qsec &lt; 18.41, !is.na(vs) ~ !vs &lt; 0.5, .default = FALSE) ~ </span></span>
+<span><span class="co">#&gt;     26.6636363636364, .default = case_when(case_when(!is.na(hp) ~ </span></span>
+<span><span class="co">#&gt;     hp &lt; 192.5, !is.na(disp) ~ disp &lt; 334, !is.na(wt) ~ wt &lt; </span></span>
+<span><span class="co">#&gt;     4.66, !is.na(qsec) ~ !qsec &lt; 15.455, !is.na(carb) ~ carb &lt; </span></span>
+<span><span class="co">#&gt;     3.5, !is.na(gear) ~ gear &lt; 4.5, .default = TRUE) ~ 18.2642857142857, </span></span>
+<span><span class="co">#&gt;     .default = 13.4142857142857))</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="categorical-predictors">Categorical predictors<a class="anchor" aria-label="anchor" href="#categorical-predictors"></a>
@@ -209,8 +249,11 @@ generated formula uses <code>%in%</code> for categorical splits:</p>
 <span></span>
 <span><span class="va">model_cat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/rpart/man/rpart.html" class="external-link">rpart</a></span><span class="op">(</span><span class="va">mpg</span> <span class="op">~</span> <span class="va">cyl</span> <span class="op">+</span> <span class="va">wt</span> <span class="op">+</span> <span class="va">hp</span>, data <span class="op">=</span> <span class="va">mtcars2</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/tidypredict_fit.html">tidypredict_fit</a></span><span class="op">(</span><span class="va">model_cat</span><span class="op">)</span></span>
-<span><span class="co">#&gt; case_when(cyl %in% c("6", "8") ~ case_when(hp &lt;= 192.5 ~ 18.2642857142857, </span></span>
-<span><span class="co">#&gt;     .default = 13.4142857142857), .default = 26.6636363636364)</span></span></code></pre></div>
+<span><span class="co">#&gt; case_when(case_when(!is.na(cyl) ~ cyl %in% c("6", "8"), !is.na(hp) ~ </span></span>
+<span><span class="co">#&gt;     !hp &lt; 101, !is.na(wt) ~ !wt &lt; 2.5425, .default = TRUE) ~ </span></span>
+<span><span class="co">#&gt;     case_when(case_when(!is.na(hp) ~ hp &lt; 192.5, !is.na(wt) ~ </span></span>
+<span><span class="co">#&gt;         wt &lt; 4.66, .default = TRUE) ~ 18.2642857142857, .default = 13.4142857142857), </span></span>
+<span><span class="co">#&gt;     .default = 26.6636363636364)</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="surrogate-splits">Surrogate splits<a class="anchor" aria-label="anchor" href="#surrogate-splits"></a>
@@ -230,7 +273,7 @@ to route the observation. This behavior is controlled by the
    </div>
   <footer><div class="container">
   <div class="pkgdown-footer-left">
-  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>.</p>
+  <p>Developed by Emil Hvitfeldt, Edgar Ruiz, <a href="https://github.com/topepo" class="external-link">Max Kuhn</a>, <a href="https://www.posit.co" class="external-link"><img src="https://www.tidyverse.org/posit-logo.svg" alt="Posit" height="16" width="62" style="margin-bottom: 3px;"></a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
