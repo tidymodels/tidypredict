@@ -1,2 +1,4 @@
 *.html
 *.R
+# Shared setup sourced by the vignettes, so it has to be tracked.
+!_threads.R

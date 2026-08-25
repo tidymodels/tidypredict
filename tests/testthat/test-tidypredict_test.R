@@ -83,9 +83,18 @@ test_that("offset handling in tidypredict_test", {
 test_that("xgboost alert branch", {
   skip_if_not_installed("xgboost")
   df <- mtcars[, c("wt", "cyl", "disp")]
-  xg_mat <- xgboost::xgb.DMatrix(as.matrix(df), label = mtcars$mpg)
+  xg_mat <- xgboost::xgb.DMatrix(
+    nthread = 1L,
+    as.matrix(df),
+    label = mtcars$mpg
+  )
   model <- xgboost::xgb.train(
-    params = list(max_depth = 2, eta = 0.5, objective = "reg:squarederror"),
+    params = list(
+      max_depth = 2,
+      eta = 0.5,
+      objective = "reg:squarederror",
+      nthread = 1
+    ),
     data = xg_mat,
     nrounds = 3,
     verbose = 0
@@ -118,6 +127,7 @@ test_that("lightgbm alert branch (mocked)", {
   df <- mtcars[, c("wt", "cyl", "disp")]
   lgb_mat <- as.matrix(df)
   dtrain <- lightgbm::lgb.Dataset(
+    params = list(num_threads = 1L),
     lgb_mat,
     label = mtcars$mpg,
     colnames = colnames(df)
@@ -126,7 +136,8 @@ test_that("lightgbm alert branch (mocked)", {
     params = list(
       objective = "regression",
       num_leaves = 4L,
-      min_data_in_leaf = 1L
+      min_data_in_leaf = 1L,
+      num_threads = 1
     ),
     data = dtrain,
     nrounds = 10L,
