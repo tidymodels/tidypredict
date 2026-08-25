@@ -717,7 +717,18 @@ build_fit_formula_catboost_nested <- function(parsedmodel) {
     cli::cli_abort("Model has no trees.")
   }
 
-  objective <- parsedmodel$general$params$objective %||% "RMSE"
+  objective <- catboost_parsed_objective(parsedmodel)
+  catboost_check_objective(parsedmodel)
+
+  if (objective %in% catboost_multiclass_objectives) {
+    return(build_fit_formula_catboost_multiclass_nested(parsedmodel, objective))
+  }
+
+  catboost_combine(extract_catboost_trees_nested(parsedmodel), parsedmodel)
+}
+
+catboost_check_objective <- function(parsedmodel) {
+  objective <- catboost_parsed_objective(parsedmodel)
 
   if (!objective %in% catboost_supported_objectives) {
     cli::cli_abort(
@@ -728,14 +739,15 @@ build_fit_formula_catboost_nested <- function(parsedmodel) {
     )
   }
 
-  if (objective %in% catboost_multiclass_objectives) {
-    return(build_fit_formula_catboost_multiclass_nested(parsedmodel, objective))
-  }
+  invisible(parsedmodel)
+}
 
-  # Extract nested trees
-  trees <- extract_catboost_trees_nested(parsedmodel)
-  f <- reduce_addition(trees)
-  f <- apply_catboost_scale_bias(f, parsedmodel)
+# Combine per-tree expressions into the model's prediction: an additive sum
+# rescaled by the model's `scale` and `bias`, then the objective's inverse link.
+catboost_combine <- function(trees, parsedmodel) {
+  objective <- catboost_parsed_objective(parsedmodel)
+
+  f <- apply_catboost_scale_bias(reduce_addition(trees), parsedmodel)
 
   if (objective %in% catboost_sigmoid_objectives) {
     f <- expr_logistic(f)
@@ -909,6 +921,35 @@ tidypredict_trees.catboost.Model <- function(x, ...) {
   rlang::check_dots_empty()
 
   extract_catboost_trees_nested(parse_model(x))
+}
+
+#' @export
+tidypredict_combine_trees.catboost.Model <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  parsedmodel <- parse_model(x)
+  catboost_check_objective(parsedmodel)
+
+  # A multiclass fit is one expression per class rather than one for the model.
+  # `tidypredict_trees()` returns the trees of such a model as a flat list in
+  # which they belong to different classes round-robin, so summing them is not
+  # an approximation of the fit.
+  if (
+    catboost_parsed_objective(parsedmodel) %in% catboost_multiclass_objectives
+  ) {
+    cli::cli_abort(
+      c(
+        "Multiclass {.pkg catboost} trees cannot be combined into one
+         expression.",
+        i = "The fit is one expression per class.",
+        i = "Use {.fn tidypredict_fit} for the whole model instead."
+      ),
+      class = "tidypredict_no_combiner"
+    )
+  }
+
+  catboost_combine(trees, parsedmodel)
 }
 
 #' @export

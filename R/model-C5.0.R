@@ -1005,6 +1005,34 @@ c50_boosted_tree_info <- function(trees, classes) {
   lapply(trees, function(tree) c50_tree_info(tree, classes, tree$root_class))
 }
 
+# Extractors --------------------------------------
+
+# The per-trial trees are available, but they cannot be recombined by any
+# arithmetic on their values. Boosted C5.0 predicts by a confidence-weighted
+# vote across trials, where each tree contributes a *class label* plus a
+# confidence, and `SelectClassGen()` breaks ties using that trial's own root
+# class. Splitting the trees apart and adding or averaging them is not an
+# approximation of that, it is a different model.
+#
+# So `tidypredict_trees()` is deliberately not implemented here: exposing the
+# trees without a way to put them back together would only enable a wrong
+# answer. `tidypredict_combine_trees()` refuses for the same reason, with a
+# message saying why rather than the generic "no method" one.
+#' @export
+tidypredict_combine_trees.C5.0 <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+
+  cli::cli_abort(
+    c(
+      "Boosted {.pkg C5.0} trees cannot be recombined arithmetically.",
+      i = "Each trial votes with a class label and a confidence, so there are
+           no per-tree numbers to sum or average.",
+      i = "Use {.fn tidypredict_fit} for the whole model instead."
+    ),
+    class = "tidypredict_no_combiner"
+  )
+}
+
 # Test ---------------------------------------------
 
 # `C5.0()` keeps no copy of the training data, so `df` has no useful default.

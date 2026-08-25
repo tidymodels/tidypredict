@@ -1,5 +1,13 @@
 # tidypredict (development version)
 
+- `tidypredict_combine_trees()` is a new generic that turns per-tree expressions back into a model's prediction. `tidypredict_trees()` alone is not enough to do this: `mboost::blackboost()` combines as `offset + nu * sum(trees)`, `aorsf` averages inside a guard that returns `NA` for an incomplete row, CatBoost applies a scale and a bias, and boosters then apply their objective's inverse link. Summing or averaging the trees, as the shape of the list invites, is wrong for all of those. (#436)
+
+- `tidypredict_combine_trees()` has methods for `randomForest`, `ranger`, xgboost, LightGBM, CatBoost, `cforest`, `blackboost` and `aorsf`, so a caller that computes each tree into its own column can combine references to those columns without knowing which backend it is holding. Every one satisfies `tidypredict_combine_trees(x, tidypredict_trees(x))` computing the same values as `tidypredict_fit(x)`. (#436)
+
+- Boosted `C50::C5.0()` models deliberately have no `tidypredict_trees()` method, and `tidypredict_combine_trees()` refuses them with an explanation. Their trials vote with a class label and a confidence rather than contributing numbers, so there is nothing to sum or average and splitting the trees apart would only enable a wrong answer. (#436)
+
+- `tidypredict_trees()` and `tidypredict_n_trees()` gain methods for `partykit::cforest()`, `mboost::blackboost()` and `aorsf::orsf()`. (#436)
+
 - New generics describe what a model's fitted expressions compute, which the expressions themselves do not say: `tidypredict_output_type()` returns one of `"numeric"`, `"prob"`, `"decision"` or `"class"`, `tidypredict_outcome_levels()` returns the outcome levels in model order, and `tidypredict_normalized()` reports whether per-level probabilities already sum to one. See `?tidypredict_metadata`. (#435)
 
 - The distinctions these generics record cannot be recovered from the shape of a `tidypredict_fit()` result. A `LiblineaR` SVM classifier and a `LiblineaR` logistic regression both return a single expression, but the first is an uncalibrated decision value whose sign picks the class, so thresholding it at 0.5 as though it were a probability is wrong. A multiclass probability list and a `quantreg::rq()` fit with several `tau` are both named lists of expressions of the same length. (#435)

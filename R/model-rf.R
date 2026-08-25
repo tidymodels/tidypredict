@@ -210,11 +210,15 @@ tidypredict_fit_rf_nested <- function(model) {
     build_nested_rf_tree(model, tree_no, term_labels)
   })
 
-  # `randomForest::predict()` returns `NA` for a row with any missing
-  # predictor, so the forest average is only defined on complete rows.
+  rf_combine(tree_exprs, n_trees, unname(model$coefs), term_labels)
+}
+
+# `randomForest::predict()` returns `NA` for a row with any missing predictor,
+# so the forest average is only defined on complete rows.
+rf_combine <- function(tree_exprs, n_trees, coefs, predictors) {
   expr_na_if_incomplete(
-    rf_correct_bias(expr_mean(tree_exprs, n_trees), unname(model$coefs)),
-    term_labels
+    rf_correct_bias(expr_mean(tree_exprs, n_trees), coefs),
+    predictors
   )
 }
 
@@ -382,6 +386,36 @@ tidypredict_trees.randomForest <- function(x, ...) {
   map(seq_len(x$ntree), function(tree_no) {
     build_nested_rf_tree(x, tree_no, term_labels)
   })
+}
+
+# Averaging the trees is not the whole prediction: `predict()` declines to score
+# a row with any missing predictor, so the average is wrapped in a guard that
+# returns `NA` for such a row.
+#' @export
+tidypredict_combine_trees.randomForest <- function(x, trees, ...) {
+  rlang::check_dots_empty()
+  check_trees_arg(trees)
+
+  if (!is.null(x$classes)) {
+    cli::cli_abort(
+      c(
+        "Classification models are not supported.",
+        i = "Each tree votes for a class, so there are no per-tree numbers to
+             average."
+      ),
+      class = "tidypredict_no_combiner"
+    )
+  }
+  # As in `tidypredict_trees()`: the bias correction applies to the forest
+  # average, and the coefficients it needs cannot be recovered from the trees.
+  if (!is.null(x$coefs)) {
+    cli::cli_abort(
+      "Models fitted with {.code corr.bias = TRUE} are not supported.",
+      class = "tidypredict_no_combiner"
+    )
+  }
+
+  rf_combine(trees, x$ntree, NULL, names(x$forest$ncat))
 }
 
 build_tree_formula.pm_tree_randomForest <- function(model) {
