@@ -49,6 +49,54 @@
 #' are named by outcome level so that callers never have to assume the order
 #' matches `levels()` of the outcome.
 #'
+#' @section Which models implement which generic:
+#' `.` means the generic is not implemented for that class and will error.
+#'
+#' ```
+#'                  trees  class_trees  class_exprs  n_trees  combine
+#' blackboost         x         .            .          x        x
+#' C5.0               .         .            .          .        x
+#' catboost.Model     x         .            .          x        x
+#' cforest            x         .            .          x        x
+#' earth              .         .            x          .        .
+#' lgb.Booster        x         .            .          x        x
+#' multnet            .         .            x          .        .
+#' ObliqueForest      x         .            .          x        x
+#' party              .         .            x          .        .
+#' randomForest       x         x            .          x        x
+#' ranger             x         x            .          x        x
+#' rpart              .         .            x          .        .
+#' xgb.Booster        x         .            .          x        x
+#' ```
+#'
+#' `C50::C5.0()` is the one row with a `tidypredict_combine_trees()` method and
+#' no `tidypredict_trees()`. That method exists only to refuse, with an
+#' explanation, rather than to let the caller reach the `.default` error and
+#' guess why.
+#'
+#' @section Implementing these for a new model class:
+#' The table above shows the grouping to follow. `tidypredict_trees()`,
+#' `tidypredict_n_trees()` and `tidypredict_combine_trees()` are a set:
+#' implement all three or none. Per-tree expressions are not usable without a
+#' count to size them and a rule to recombine them, and shipping the first
+#' without the third invites a caller to sum the trees, which is wrong for
+#' every backend that carries an offset, a scale or a link.
+#'
+#' A useful check on a new method is that
+#' `tidypredict_combine_trees(x, tidypredict_trees(x))` computes the same
+#' values as `tidypredict_fit(x)`. That identity is what the tests for the
+#' existing methods assert, and it catches a combination rule that was assumed
+#' rather than read out of the model.
+#'
+#' If a model's trees genuinely cannot be recombined arithmetically, give it a
+#' `tidypredict_combine_trees()` method that refuses and no
+#' `tidypredict_trees()` method, as `C50::C5.0()` does. Splitting trees apart
+#' that cannot be put back together only enables a wrong answer.
+#'
+#' @seealso [tidypredict_combine_trees()] for turning per-tree expressions back
+#'   into a prediction, and [tidypredict_metadata] for what the resulting
+#'   values mean.
+#'
 #' @examplesIf rlang::is_installed("randomForest")
 #' model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 5)
 #'

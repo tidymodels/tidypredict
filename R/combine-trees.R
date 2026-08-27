@@ -35,6 +35,10 @@
 #' by a confidence-weighted vote that yields a class label, so there is no
 #' arithmetic to apply to per-tree numbers and no method is provided.
 #'
+#' @seealso [tidypredict_extractors] for the generics that produce `trees`,
+#'   including a table of which model classes implement them, and
+#'   [tidypredict_metadata] for what the combined value means.
+#'
 #' @examplesIf rlang::is_installed("randomForest")
 #' model <- randomForest::randomForest(mpg ~ ., data = mtcars, ntree = 3)
 #'

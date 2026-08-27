@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- `?tidypredict_extractors` now documents which model classes implement each of the extractor generics, and what to implement when adding a new one. `tidypredict_trees()`, `tidypredict_n_trees()` and `tidypredict_combine_trees()` are a set: per-tree expressions are not usable without a count to size them and a rule to recombine them, and providing the first without the third invites a caller to sum the trees, which is wrong for every backend carrying an offset, a scale or a link. The three seam topics now cross-reference each other. (#436)
+
 - `tidypredict_combine_trees()` is a new generic that turns per-tree expressions back into a model's prediction. `tidypredict_trees()` alone is not enough to do this: `mboost::blackboost()` combines as `offset + nu * sum(trees)`, `aorsf` averages inside a guard that returns `NA` for an incomplete row, CatBoost applies a scale and a bias, and boosters then apply their objective's inverse link. Summing or averaging the trees, as the shape of the list invites, is wrong for all of those. (#436)
 
 - `tidypredict_combine_trees()` has methods for `randomForest`, `ranger`, xgboost, LightGBM, CatBoost, `cforest`, `blackboost` and `aorsf`, so a caller that computes each tree into its own column can combine references to those columns without knowing which backend it is holding. Every one satisfies `tidypredict_combine_trees(x, tidypredict_trees(x))` computing the same values as `tidypredict_fit(x)`. (#436)

@@ -74,6 +74,10 @@
 #' In the first the values sum to one across the list; in the second they are
 #' unrelated numeric predictions.
 #'
+#' @seealso [tidypredict_extractors] for the generics that expose a model's
+#'   per-tree and per-level expressions, and [tidypredict_combine_trees()] for
+#'   recombining them.
+#'
 #' @examplesIf rlang::is_installed("MASS")
 #' model <- lm(mpg ~ wt, data = mtcars)
 #' tidypredict_output_type(model)

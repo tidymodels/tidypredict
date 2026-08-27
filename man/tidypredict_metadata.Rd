@@ -97,3 +97,8 @@ tidypredict_outcome_levels(model)
 tidypredict_normalized(model)
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+\link{tidypredict_extractors} for the generics that expose a model's
+per-tree and per-level expressions, and \code{\link[=tidypredict_combine_trees]{tidypredict_combine_trees()}} for
+recombining them.
+}
