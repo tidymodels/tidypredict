@@ -2,6 +2,17 @@
 
 ## tidypredict (development version)
 
+- [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  now takes the divisor from the model for `cforest` and `aorsf` models,
+  rather than from `length(trees)`. Both average their trees, so a
+  caller passing one subtotal per batch of trees, which is what orbital
+  does to keep a generated expression short enough for a database
+  parser, divided by the number of batches instead of by the number of
+  trees. Every other method already summed.
+  [`?tidypredict_combine_trees`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  now documents that passing subtotals is supported.
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
 - [`?tidypredict_extractors`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
   now documents which model classes implement each of the extractor
   generics, and what to implement when adding a new one.
