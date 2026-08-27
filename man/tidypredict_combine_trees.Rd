@@ -56,3 +56,8 @@ tidypredict_combine_trees(model, trees)
 tidypredict_combine_trees(model, rlang::syms(c("t1", "t2", "t3")))
 \dontshow{\}) # examplesIf}
 }
+\seealso{
+\link{tidypredict_extractors} for the generics that produce \code{trees},
+including a table of which model classes implement them, and
+\link{tidypredict_metadata} for what the combined value means.
+}
