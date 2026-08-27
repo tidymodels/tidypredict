@@ -86,7 +86,7 @@ tidypredict_combine_trees.cforest <- function(x, trees, ...) {
   rlang::check_dots_empty()
   check_trees_arg(trees)
 
-  expr_mean(trees, length(trees))
+  expr_mean(trees, tidypredict_n_trees(x))
 }
 
 build_tree_formula.pm_tree_cforest <- function(model) {

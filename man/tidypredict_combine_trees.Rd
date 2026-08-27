@@ -36,6 +36,14 @@ compute each tree into its own column, for a database to evaluate in
 parallel, and then pass symbols referring to those columns rather than the
 expressions themselves. The combination is the same either way.
 
+A caller may also pass fewer elements than the model has trees, where each
+one is a subtotal of several trees added together. This is what a caller
+does to keep any single generated expression short enough for a database
+parser. Every method supports it: those that average take the divisor from
+the model rather than from \code{length(trees)}, and the rest sum. The one thing
+a caller must not do is reorder or drop trees, since a method is free to
+treat position as meaningful.
+
 Every ensemble satisfies
 \code{tidypredict_combine_trees(x, tidypredict_trees(x))} computing the same
 values as \code{tidypredict_fit(x)}, and that identity is what the tests for

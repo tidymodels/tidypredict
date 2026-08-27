@@ -144,7 +144,7 @@ tidypredict_combine_trees.ObliqueForest <- function(x, trees, ...) {
   check_trees_arg(trees)
 
   expr_na_if_incomplete(
-    expr_mean(trees, length(trees)),
+    expr_mean(trees, tidypredict_n_trees(x)),
     x$get_names_x()
   )
 }
