@@ -149,6 +149,7 @@ tidypredict_combine_trees.ObliqueForest <- function(x, trees, ...) {
   )
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_aorsf <- function(model) {
   expr_na_if_incomplete(
     build_tree_formula_forest(model),

@@ -330,6 +330,7 @@ tidypredict_class_exprs.party <- function(x, ...) {
   stats::setNames(res, colnames(preds))
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_party <- function(model) {
   generate_nested_case_when_tree(model$tree_info, missing = "na")
 }

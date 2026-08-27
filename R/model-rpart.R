@@ -284,6 +284,7 @@ rpart_classprob_tree_info <- function(model) {
 
 # Parsed model builder ----------------------------
 
+#' @exportS3Method
 build_tree_formula.pm_tree_rpart <- function(model) {
   build_tree_formula_single(model)
 }

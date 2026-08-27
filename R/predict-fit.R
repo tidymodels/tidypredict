@@ -103,6 +103,7 @@ build_tree_formula <- function(model) {
   UseMethod("build_tree_formula")
 }
 
+#' @exportS3Method
 build_tree_formula.default <- function(model) {
   cli::cli_abort(
     "No builder for tree model {.val {model$general$model}}.",

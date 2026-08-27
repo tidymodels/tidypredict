@@ -1102,6 +1102,7 @@ parse_model.C5.0 <- function(model) {
 
 # C5.0 has three shapes: a rule set, a boosted sequence of trees, and a single
 # tree.
+#' @exportS3Method
 build_tree_formula.pm_tree_C5.0 <- function(model) {
   if (!is.null(model$rules_info)) {
     return(c50_rules_case_when(model$rules_info))

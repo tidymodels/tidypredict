@@ -430,6 +430,7 @@ tidypredict_combine_trees.ranger <- function(x, trees, ...) {
   ranger_combine(trees, x$num.trees, x$forest$independent.variable.names)
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_ranger <- function(model) {
   expr_mean(map(
     model$tree_info_list,

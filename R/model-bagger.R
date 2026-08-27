@@ -194,6 +194,7 @@ bagger_check_model <- function(model, call = rlang::caller_env()) {
   invisible(model)
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_bagger <- function(model) {
   bagger_build_formula(model)
 }
