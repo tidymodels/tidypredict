@@ -303,3 +303,43 @@ test_that("boosted C5.0 refuses to combine its trees", {
     class = "tidypredict_no_combiner"
   )
 })
+
+# orbital writes each tree to its own column and then adds them in batches, so
+# it hands back one subtotal per batch rather than one element per tree. A
+# method that averaged over `length(trees)` would divide by the number of
+# batches.
+test_that("averaging methods take the divisor from the model", {
+  skip_if_not_installed("partykit")
+
+  set.seed(1)
+  model <- partykit::cforest(mpg ~ wt + cyl, data = mtcars, ntree = 4)
+
+  trees <- tidypredict_trees(model)
+  batched <- list(
+    rlang::expr(!!trees[[1]] + !!trees[[2]]),
+    rlang::expr(!!trees[[3]] + !!trees[[4]])
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_combine_trees(model, batched), mtcars),
+    rlang::eval_tidy(tidypredict_combine_trees(model, trees), mtcars)
+  )
+})
+
+test_that("aorsf averaging takes the divisor from the model", {
+  skip_if_not_installed("aorsf")
+
+  set.seed(1)
+  model <- aorsf::orsf(mtcars, mpg ~ wt + cyl + disp, n_tree = 4)
+
+  trees <- tidypredict_trees(model)
+  batched <- list(
+    rlang::expr(!!trees[[1]] + !!trees[[2]]),
+    rlang::expr(!!trees[[3]] + !!trees[[4]])
+  )
+
+  expect_equal(
+    rlang::eval_tidy(tidypredict_combine_trees(model, batched), mtcars),
+    rlang::eval_tidy(tidypredict_combine_trees(model, trees), mtcars)
+  )
+})
