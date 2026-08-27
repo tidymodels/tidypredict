@@ -24,3 +24,4 @@ config.toml
 ^[.]?air[.]toml$
 ^\.vscode$
 ^\.claude$
+^vignettes/articles$
