@@ -2,6 +2,20 @@
 
 ## tidypredict (development version)
 
+- [`?tidypredict_extractors`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  now documents which model classes implement each of the extractor
+  generics, and what to implement when adding a new one.
+  [`tidypredict_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md),
+  [`tidypredict_n_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+  and
+  [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+  are a set: per-tree expressions are not usable without a count to size
+  them and a rule to recombine them, and providing the first without the
+  third invites a caller to sum the trees, which is wrong for every
+  backend carrying an offset, a scale or a link. The three seam topics
+  now cross-reference each other.
+  ([\#436](https://github.com/tidymodels/tidypredict/issues/436))
+
 - [`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
   is a new generic that turns per-tree expressions back into a model’s
   prediction.

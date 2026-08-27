@@ -104,6 +104,14 @@ several `tau` both return a named list of expressions of the same length
 and structure. In the first the values sum to one across the list; in
 the second they are unrelated numeric predictions.
 
+## See also
+
+[tidypredict_extractors](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+for the generics that expose a model's per-tree and per-level
+expressions, and
+[`tidypredict_combine_trees()`](https://tidypredict.tidymodels.org/reference/tidypredict_combine_trees.md)
+for recombining them.
+
 ## Examples
 
 ``` r

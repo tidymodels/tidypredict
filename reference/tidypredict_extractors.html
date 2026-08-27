@@ -160,6 +160,56 @@ to sum or average, and needs <code>tidypredict_n_trees()</code> to do it.
 are named by outcome level so that callers never have to assume the order
 matches <code><a href="https://rdrr.io/r/base/levels.html" class="external-link">levels()</a></code> of the outcome.</p>
     </div>
+    <div class="section level2">
+    <h2 id="which-models-implement-which-generic">Which models implement which generic<a class="anchor" aria-label="anchor" href="#which-models-implement-which-generic"></a></h2>
+
+
+<p><code>.</code> means the generic is not implemented for that class and will error.</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>                 trees  class_trees  class_exprs  n_trees  combine</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>blackboost         x         .            .          x        x</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>C5<span class="fl">.0</span>               .         .            .          .        x</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>catboost.Model     x         .            .          x        x</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>cforest            x         .            .          x        x</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>earth              .         .            x          .        .</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>lgb.Booster        x         .            .          x        x</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>multnet            .         .            x          .        .</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>ObliqueForest      x         .            .          x        x</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>party              .         .            x          .        .</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>randomForest       x         x            .          x        x</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>ranger             x         x            .          x        x</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>rpart              .         .            x          .        .</span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>xgb.Booster        x         .            .          x        x</span></code></pre><p></p></div>
+<p><code><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C50::C5.0()</a></code> is the one row with a <code><a href="tidypredict_combine_trees.html">tidypredict_combine_trees()</a></code> method and
+no <code>tidypredict_trees()</code>. That method exists only to refuse, with an
+explanation, rather than to let the caller reach the <code>.default</code> error and
+guess why.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="implementing-these-for-a-new-model-class">Implementing these for a new model class<a class="anchor" aria-label="anchor" href="#implementing-these-for-a-new-model-class"></a></h2>
+
+
+<p>The table above shows the grouping to follow. <code>tidypredict_trees()</code>,
+<code>tidypredict_n_trees()</code> and <code><a href="tidypredict_combine_trees.html">tidypredict_combine_trees()</a></code> are a set:
+implement all three or none. Per-tree expressions are not usable without a
+count to size them and a rule to recombine them, and shipping the first
+without the third invites a caller to sum the trees, which is wrong for
+every backend that carries an offset, a scale or a link.</p>
+<p>A useful check on a new method is that
+<code>tidypredict_combine_trees(x, tidypredict_trees(x))</code> computes the same
+values as <code>tidypredict_fit(x)</code>. That identity is what the tests for the
+existing methods assert, and it catches a combination rule that was assumed
+rather than read out of the model.</p>
+<p>If a model's trees genuinely cannot be recombined arithmetically, give it a
+<code><a href="tidypredict_combine_trees.html">tidypredict_combine_trees()</a></code> method that refuses and no
+<code>tidypredict_trees()</code> method, as <code><a href="https://topepo.github.io/C5.0/reference/C5.0.html" class="external-link">C50::C5.0()</a></code> does. Splitting trees apart
+that cannot be put back together only enables a wrong answer.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="tidypredict_combine_trees.html">tidypredict_combine_trees()</a></code> for turning per-tree expressions back
+into a prediction, and <a href="tidypredict_metadata.html">tidypredict_metadata</a> for what the resulting
+values mean.</p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>

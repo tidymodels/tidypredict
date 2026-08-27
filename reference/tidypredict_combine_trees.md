@@ -57,6 +57,14 @@ boosting combines its trees by a confidence-weighted vote that yields a
 class label, so there is no arithmetic to apply to per-tree numbers and
 no method is provided.
 
+## See also
+
+[tidypredict_extractors](https://tidypredict.tidymodels.org/reference/tidypredict_extractors.md)
+for the generics that produce `trees`, including a table of which model
+classes implement them, and
+[tidypredict_metadata](https://tidypredict.tidymodels.org/reference/tidypredict_metadata.md)
+for what the combined value means.
+
 ## Examples
 
 ``` r
