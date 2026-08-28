@@ -105,7 +105,7 @@ fit[["setosa"]]
 #>     Sepal.Length) * -0.0303959537594359) + (ifelse(is.na(Sepal.Width), 
 #>     3.05733333333333, Sepal.Width) * -0.492023767406961) + (ifelse(is.na(Petal.Length), 
 #>     3.758, Petal.Length) * 0.0179469395936271) + (ifelse(is.na(Petal.Width), 
-#>     1.19933333333333, Petal.Width) * -0.0152407670638333) - (0.391460011724113 + 
+#>     1.19933333333333, Petal.Width) * -0.0152407670638333) - (0.391460011724112 + 
 #>     (ifelse(is.na(Sepal.Length), 5.84333333333333, Sepal.Length) * 
 #>         -0.118750531861652) + (ifelse(is.na(Sepal.Width), 3.05733333333333, 
 #>     Sepal.Width) * 0.378311039737146) + (ifelse(is.na(Petal.Length), 
@@ -115,7 +115,7 @@ fit[["setosa"]]
 #>         0.149146485621088) + (ifelse(is.na(Sepal.Width), 3.05733333333333, 
 #>     Sepal.Width) * 0.113712727669814) + (ifelse(is.na(Petal.Length), 
 #>     3.758, Petal.Length) * 0.06660994176504) + (ifelse(is.na(Petal.Width), 
-#>     1.19933333333333, Petal.Width) * 0.184573114942953) - (0.391460011724113 + 
+#>     1.19933333333333, Petal.Width) * 0.184573114942953) - (0.391460011724112 + 
 #>     (ifelse(is.na(Sepal.Length), 5.84333333333333, Sepal.Length) * 
 #>         -0.118750531861652) + (ifelse(is.na(Sepal.Width), 3.05733333333333, 
 #>     Sepal.Width) * 0.378311039737146) + (ifelse(is.na(Petal.Length), 
