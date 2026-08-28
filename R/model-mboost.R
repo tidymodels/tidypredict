@@ -131,6 +131,7 @@ tidypredict_combine_trees.blackboost <- function(x, trees, ...) {
   mboost_combine(trees, comps$nu, comps$offset)
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_blackboost <- function(model) {
   mboost_build_formula(
     model$tree_info_list,

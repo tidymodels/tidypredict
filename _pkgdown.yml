@@ -51,7 +51,7 @@ articles:
   - cubist
   - xgboost
   - lightgbm
-  - catboost
+  - articles/catboost
   - h2o
   - mboost
   - xrf

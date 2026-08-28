@@ -418,6 +418,7 @@ tidypredict_combine_trees.randomForest <- function(x, trees, ...) {
   rf_combine(trees, x$ntree, NULL, names(x$forest$ncat))
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_randomForest <- function(model) {
   expr_na_if_incomplete(
     rf_correct_bias(build_tree_formula_forest(model), model$general$coefs),

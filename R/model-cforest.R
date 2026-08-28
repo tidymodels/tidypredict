@@ -89,6 +89,7 @@ tidypredict_combine_trees.cforest <- function(x, trees, ...) {
   expr_mean(trees, tidypredict_n_trees(x))
 }
 
+#' @exportS3Method
 build_tree_formula.pm_tree_cforest <- function(model) {
   expr_mean(map(
     model$tree_info_list,

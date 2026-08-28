@@ -1,10 +1,6 @@
 ---
 title: "CatBoost models"
 output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{CatBoost models}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include = FALSE}
@@ -21,7 +17,7 @@ knitr::opts_chunk$set(
   comment = "#>",
   eval = eval_code
 )
-source("_threads.R")
+source("../_threads.R")
 ```
 
 | Function                                                      |Works|
