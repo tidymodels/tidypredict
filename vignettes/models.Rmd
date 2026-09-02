@@ -58,7 +58,7 @@ tidypredict dispatches on the class of the fitted model, so a model is supported
 |---|---|---|---|
 | XGBoost | `xgboost::xgb.train()` | `boost_tree(engine = "xgboost")` | [article](xgboost.html) |
 | LightGBM | `lightgbm::lgb.train()` | `boost_tree(engine = "lightgbm")`, via bonsai | [article](lightgbm.html) |
-| CatBoost | `catboost::catboost.train()` | `boost_tree(engine = "catboost")`, via bonsai | [article](catboost.html) |
+| CatBoost | `catboost::catboost.train()` | `boost_tree(engine = "catboost")`, via bonsai | |
 | Boosted C5.0 trees | `C50::C5.0()` with `trials` | `boost_tree(engine = "C5.0")` | [article](C5.0.html) |
 | Model-based boosting | `mboost::blackboost()` | | |
 | Cubist | `Cubist::cubist()` | `cubist_rules(engine = "Cubist")` | [article](cubist.html) |
