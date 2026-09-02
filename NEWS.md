@@ -1,4 +1,4 @@
-# tidypredict (development version)
+# tidypredict 1.2.0
 
 ## New Model Supports
 
