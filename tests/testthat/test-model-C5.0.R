@@ -148,6 +148,7 @@ c50_boost_data <- function(seed, n_class = 4, ordered = TRUE, n = 300) {
 
 test_that("boosted trials vote with the right confidence (#287)", {
   skip_if_not_installed("C50")
+  skip_on_cran()
   # A trial votes with `(freq + prior) / (n_leaf + 1)`, where `prior` is the
   # class proportion at the root of that trial's own tree, not with the Laplace
   # ratio `(freq + 1) / (n_leaf + 2)`. The two are close enough that a
