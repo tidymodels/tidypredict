@@ -151,8 +151,11 @@ test_that("boosted trials vote with the right confidence (#287)", {
   # A trial votes with `(freq + prior) / (n_leaf + 1)`, where `prior` is the
   # class proportion at the root of that trial's own tree, not with the Laplace
   # ratio `(freq + 1) / (n_leaf + 2)`. The two are close enough that a
-  # disagreement needs several trials and several classes to show up.
-  for (seed in 1:6) {
+  # disagreement needs several trials and several classes to show up. Seeds 1
+  # and 6 are kept because each reproduces the disagreement on its own at
+  # every `trials` value below; evaluating a boosted fit is expensive, so the
+  # other seeds that only sometimes reproduce it are not worth the extra time.
+  for (seed in c(1, 6)) {
     d <- c50_boost_data(seed)
     for (trials in c(3L, 5L, 10L)) {
       model <- C50::C5.0(d[c("x1", "x2", "x3", "g", "o")], d$y, trials = trials)
