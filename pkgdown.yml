@@ -40,7 +40,7 @@ articles:
   tree: tree.html
   xgboost: xgboost.html
   xrf: xrf.html
-last_built: 2026-08-28T00:09Z
+last_built: 2026-09-04T15:55Z
 urls:
   reference: https://tidypredict.tidymodels.org/reference
   article: https://tidypredict.tidymodels.org/articles

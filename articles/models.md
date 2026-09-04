@@ -58,7 +58,7 @@ route, not that it is known to fail.
 |----|----|----|----|
 | XGBoost | [`xgboost::xgb.train()`](https://rdrr.io/pkg/xgboost/man/xgb.train.html) | `boost_tree(engine = "xgboost")` | [article](https://tidypredict.tidymodels.org/articles/xgboost.md) |
 | LightGBM | [`lightgbm::lgb.train()`](https://rdrr.io/pkg/lightgbm/man/lgb.train.html) | `boost_tree(engine = "lightgbm")`, via bonsai | [article](https://tidypredict.tidymodels.org/articles/lightgbm.md) |
-| CatBoost | [`catboost::catboost.train()`](https://rdrr.io/pkg/catboost/man/catboost.train.html) | `boost_tree(engine = "catboost")`, via bonsai | [article](https://tidypredict.tidymodels.org/articles/catboost.md) |
+| CatBoost | [`catboost::catboost.train()`](https://rdrr.io/pkg/catboost/man/catboost.train.html) | `boost_tree(engine = "catboost")`, via bonsai |  |
 | Boosted C5.0 trees | [`C50::C5.0()`](https://topepo.github.io/C5.0/reference/C5.0.html) with `trials` | `boost_tree(engine = "C5.0")` | [article](https://tidypredict.tidymodels.org/articles/C5.0.md) |
 | Model-based boosting | [`mboost::blackboost()`](https://rdrr.io/pkg/mboost/man/blackboost.html) |  |  |
 | Cubist | [`Cubist::cubist()`](http://topepo.github.io/Cubist/reference/cubist.default.md) | `cubist_rules(engine = "Cubist")` | [article](https://tidypredict.tidymodels.org/articles/cubist.md) |
