@@ -81,7 +81,7 @@ test_that("works with boost_tree() and the C5.0 engine", {
 
   model <- parsnip::fit(
     parsnip::set_engine(
-      parsnip::boost_tree(mode = "classification", trees = 10),
+      parsnip::boost_tree(mode = "classification", trees = 3),
       "C5.0"
     ),
     Species ~ .,

@@ -141,7 +141,17 @@ test_that("works with non-default xgb_control, sparse, and deoverlap", {
     as.numeric(predict(shallow, df))
   )
 
-  deoverlapped <- xrf_reg_model(deoverlap = TRUE)
+  # deoverlap's merging cost grows sharply with rule count, so this uses a
+  # shallower xgb_control than xrf_reg_model()'s default to keep the test fast
+  # while still generating multiple rules to deoverlap.
+  set.seed(7)
+  deoverlapped <- xrf::xrf(
+    mpg ~ wt + hp + cyl,
+    df,
+    family = "gaussian",
+    xgb_control = list(nrounds = 3, max_depth = 2),
+    deoverlap = TRUE
+  )
   expect_equal(
     rlang::eval_tidy(tidypredict_fit(deoverlapped), df),
     as.numeric(predict(deoverlapped, df))
