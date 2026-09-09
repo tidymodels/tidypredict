@@ -154,3 +154,12 @@ RuleFit models are not supported, because `h2o::h2o.rule_importance()` does not
 expose the per-class coefficients needed to reproduce the predictions. Because
 predictions require a live H2O cluster, the parsed formula cannot be reused
 after the cluster is shut down.
+
+```{r, include = FALSE}
+# Shut down the H2O cluster started at the top of this vignette so the Java
+# process it spawns does not outlive the rendering process (CRAN's check
+# systems flag leftover processes).
+if (h2o_available) {
+  try(h2o::h2o.shutdown(prompt = FALSE), silent = TRUE)
+}
+```
