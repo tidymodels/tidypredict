@@ -2,7 +2,17 @@
 
 ## tidypredict (development version)
 
+## tidypredict 1.2.1
+
+CRAN release: 2026-09-09
+
+- `vignettes/h2o.Rmd` now shuts down the H2O cluster it starts, so the
+  Java process it spawns no longer outlives the vignette build (leftover
+  processes were flagged on CRAN’s check systems).
+
 ## tidypredict 1.2.0
+
+CRAN release: 2026-09-04
 
 ### New Model Supports
 
