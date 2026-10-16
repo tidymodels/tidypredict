@@ -125,7 +125,7 @@ library(parsnip)
 
 parsnip_model <- linear_reg() %>%
   set_engine("lm") %>%
-  fit(mpg ~ wt + cyl, offset = am, data = mtcars)
+  fit(mpg ~ wt + cyl, data = mtcars)
 
 tidypredict_fit(parsnip_model)
 ```
