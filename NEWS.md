@@ -1,5 +1,7 @@
 # tidypredict (development version)
 
+- Update vignette to avoid error with new parsnip release.
+
 # tidypredict 1.2.1
 
 - `vignettes/h2o.Rmd` now shuts down the H2O cluster it starts, so the Java process it spawns no longer outlives the vignette build (leftover processes were flagged on CRAN's check systems).
