@@ -1,6 +1,6 @@
 ## Comments
 
-Fixed it so the Java process it spawns no longer outlives the vignette build (leftover processes were flagged on CRAN's check systems).
+Fixed vignette to stop error on CRAN
 
 ## R CMD check results
 
