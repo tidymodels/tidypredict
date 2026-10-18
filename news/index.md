@@ -1,6 +1,10 @@
 # Changelog
 
-## tidypredict (development version)
+## tidypredict 1.2.2
+
+CRAN release: 2026-10-18
+
+- Update vignette to avoid error with new parsnip release.
 
 ## tidypredict 1.2.1
 
